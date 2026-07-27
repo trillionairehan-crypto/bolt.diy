@@ -6,6 +6,7 @@ import { createScopedLogger } from '~/utils/logger';
 import { unreachable } from '~/utils/unreachable';
 import type { ActionCallbackData } from './message-parser';
 import type { BoltShell } from '~/utils/shell';
+import { LOCAL_PREVIEW_STORAGE_KEY, postFileToLocalPreviewServer } from '~/lib/stores/previews';
 
 const logger = createScopedLogger('ActionRunner');
 
@@ -336,6 +337,22 @@ export class ActionRunner {
     } catch (error) {
       logger.error('Failed to write file\n\n', error);
     }
+
+    this.#mirrorFileToLocalPreviewServer(relativePath, action.content);
+  }
+
+  /*
+   * Best-effort mirror of the file to the standalone local preview server, if enabled. Never
+   * throws: the server is optional and may not be running.
+   */
+  #mirrorFileToLocalPreviewServer(relativePath: string, content: string) {
+    if (typeof window === 'undefined' || localStorage.getItem(LOCAL_PREVIEW_STORAGE_KEY) !== 'true') {
+      return;
+    }
+
+    postFileToLocalPreviewServer(relativePath, content).catch((error) => {
+      logger.debug('Local preview server unavailable, skipping mirror', error);
+    });
   }
 
   #updateAction(id: string, newState: ActionStateUpdate) {

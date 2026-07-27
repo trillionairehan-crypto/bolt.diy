@@ -14,6 +14,24 @@ export interface PreviewInfo {
   baseUrl: string;
 }
 
+/*
+ * Config for the standalone local preview server (server/preview-server.mjs), which runs
+ * parallel to WebContainer and serves files saved to disk under preview-output/<sessionId>/.
+ * A single fixed session is used for now (static-HTML proof of concept only).
+ */
+export const LOCAL_PREVIEW_SERVER_URL = 'http://localhost:5174';
+export const LOCAL_PREVIEW_SESSION_ID = 'default';
+export const LOCAL_PREVIEW_STORAGE_KEY = 'bolt_local_preview_server_enabled';
+
+// Shared by action-runner.ts (mirrors on every write) and Preview.tsx (eager sync on toggle-on).
+export async function postFileToLocalPreviewServer(relativePath: string, content: string): Promise<void> {
+  await fetch(`${LOCAL_PREVIEW_SERVER_URL}/save/${LOCAL_PREVIEW_SESSION_ID}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: relativePath, content }),
+  });
+}
+
 // Create a broadcast channel for preview updates
 const PREVIEW_CHANNEL = 'preview-updates';
 

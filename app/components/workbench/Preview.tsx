@@ -7,6 +7,14 @@ import { ScreenshotSelector } from './ScreenshotSelector';
 import { expoUrlAtom } from '~/lib/stores/qrCodeStore';
 import { ExpoQrModal } from '~/components/workbench/ExpoQrModal';
 import type { ElementInfo } from './Inspector';
+import {
+  LOCAL_PREVIEW_SERVER_URL,
+  LOCAL_PREVIEW_SESSION_ID,
+  LOCAL_PREVIEW_STORAGE_KEY,
+  postFileToLocalPreviewServer,
+} from '~/lib/stores/previews';
+import { path } from '~/utils/path';
+import { WORK_DIR } from '~/utils/constants';
 
 type ResizeSide = 'left' | 'right' | null;
 
@@ -89,8 +97,51 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
   const [showDeviceFrameInPreview, setShowDeviceFrameInPreview] = useState(false);
   const expoUrl = useStore(expoUrlAtom);
   const [isExpoQrModalOpen, setIsExpoQrModalOpen] = useState(false);
+  const [useLocalPreviewServer, setUseLocalPreviewServer] = useState<boolean>(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    return localStorage.getItem(LOCAL_PREVIEW_STORAGE_KEY) === 'true';
+  });
+
+  const toggleLocalPreviewServer = useCallback(() => {
+    setUseLocalPreviewServer((prev) => {
+      const next = !prev;
+      localStorage.setItem(LOCAL_PREVIEW_STORAGE_KEY, String(next));
+
+      if (next) {
+        /*
+         * Push whatever is already loaded right away, so there's something to see
+         * immediately instead of waiting for the next file-write action to mirror it.
+         */
+        const files = workbenchStore.files.get();
+
+        Object.entries(files).forEach(([filePath, dirent]) => {
+          if (dirent?.type !== 'file' || dirent.isBinary) {
+            return;
+          }
+
+          const relativePath = path.relative(WORK_DIR, filePath);
+
+          postFileToLocalPreviewServer(relativePath, dirent.content).catch((error) => {
+            console.warn('[Preview] Failed to sync file to local preview server:', filePath, error);
+          });
+        });
+      }
+
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
+    if (useLocalPreviewServer) {
+      setIframeUrl(`${LOCAL_PREVIEW_SERVER_URL}/preview/${LOCAL_PREVIEW_SESSION_ID}/`);
+      setDisplayPath('/');
+
+      return;
+    }
+
     if (!activePreview) {
       setIframeUrl(undefined);
       setDisplayPath('/');
@@ -101,7 +152,7 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
     const { baseUrl } = activePreview;
     setIframeUrl(baseUrl);
     setDisplayPath('/');
-  }, [activePreview]);
+  }, [activePreview, useLocalPreviewServer]);
 
   const findMinPortIndex = useCallback(
     (minIndex: number, preview: { port: number }, index: number, array: { port: number }[]) => {
@@ -667,6 +718,20 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
       )}
       <div className="bg-bolt-elements-background-depth-2 p-2 flex items-center gap-2">
         <div className="flex items-center gap-2">
+          <IconButton
+            icon="i-ph:cloud-arrow-down"
+            onClick={toggleLocalPreviewServer}
+            className={
+              useLocalPreviewServer
+                ? 'bg-bolt-elements-background-depth-3 !text-bolt-elements-item-contentAccent'
+                : 'text-bolt-elements-item-contentDefault'
+            }
+            title={
+              useLocalPreviewServer
+                ? 'Using local preview server (click to switch back to WebContainer)'
+                : 'Using WebContainer preview (click to use local preview server)'
+            }
+          />
           <IconButton icon="i-ph:arrow-clockwise" onClick={reloadPreview} />
           <IconButton
             icon="i-ph:selection"

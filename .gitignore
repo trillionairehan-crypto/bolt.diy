@@ -11,6 +11,9 @@ dist
 dist-ssr
 *.local
 
+# local preview server output (server/preview-server.mjs)
+preview-output
+
 .vscode/*
 .vscode/launch.json
 !.vscode/extensions.json
