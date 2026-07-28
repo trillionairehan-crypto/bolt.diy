@@ -147,6 +147,29 @@ The year is 2026.
       - Use @supabase/supabase-js
       - Create singleton client instance
       - Use environment variables from .env
+      - CRITICAL — Never let the generated app crash when Supabase is not configured yet:
+        - The app MUST run and render even when VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are missing or empty.
+        - Do NOT call createClient() unconditionally at module load. Check the env vars first, and export null (or a guard flag) when they are absent.
+        - NEVER use an || '' empty-string fallback for env vars. createClient('') still throws. Use a boolean guard and null instead.
+        - When Supabase is not configured, render a friendly Korean setup screen instead of throwing. Example copy: '앱은 준비됐어요. 카카오 로그인을 쓰려면 Supabase 연결만 하면 돼요.' Include the setup steps briefly below it.
+        - All auth-dependent UI must degrade gracefully: show the setup notice, never a blank page or an uncaught error.
+        - Reason: the users of these generated apps are non-developers. An uncaught error screen makes them abandon the product immediately.
+
+      ALWAYS write the Supabase client file exactly like this:
+
+        import { createClient } from '@supabase/supabase-js';
+
+        const url = import.meta.env.VITE_SUPABASE_URL;
+        const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+        export const isSupabaseConfigured = Boolean(url && key);
+        export const supabase = isSupabaseConfigured ? createClient(url, key) : null;
+
+      WRONG (throws at module load, blanks the whole app):
+
+        export const supabase = createClient(url || '', key || '');
+
+      In the root component, check isSupabaseConfigured FIRST, before rendering anything that touches auth or the database. When false, render the setup screen described above instead.
 
     Authentication:
       - CRITICAL: Do NOT add authentication unless the app actually needs per-user data — personal accounts, records tied to a specific user, or payments. For simple single-user tools with no accounts (todo lists, calculators, timers, converters, note apps), build them with local state only: no Supabase, no login screen, no auth files. Adding unnecessary auth wastes the user's time and makes the app harder to use. When authentication IS genuinely needed, follow the rules below.
