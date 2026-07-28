@@ -105,6 +105,7 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
     return localStorage.getItem(LOCAL_PREVIEW_STORAGE_KEY) === 'true';
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for the hidden toggle button, see comment near the toolbar
   const toggleLocalPreviewServer = useCallback(() => {
     setUseLocalPreviewServer((prev) => {
       const next = !prev;
@@ -718,20 +719,7 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
       )}
       <div className="bg-bolt-elements-background-depth-2 p-2 flex items-center gap-2">
         <div className="flex items-center gap-2">
-          <IconButton
-            icon="i-ph:cloud-arrow-down"
-            onClick={toggleLocalPreviewServer}
-            className={
-              useLocalPreviewServer
-                ? 'bg-bolt-elements-background-depth-3 !text-bolt-elements-item-contentAccent'
-                : 'text-bolt-elements-item-contentDefault'
-            }
-            title={
-              useLocalPreviewServer
-                ? 'Using local preview server (click to switch back to WebContainer)'
-                : 'Using WebContainer preview (click to use local preview server)'
-            }
-          />
+          {/* 로컬 프리뷰 서버 토글 버튼 숨김: 별도 서버 실행 필요 + localStorage에 상태가 남아 비개발자 사용자가 원인을 알 수 없는 "연결 거부" 상태에 빠짐 */}
           <IconButton icon="i-ph:arrow-clockwise" onClick={reloadPreview} />
           <IconButton
             icon="i-ph:selection"
