@@ -149,6 +149,7 @@ The year is 2026.
       - Use environment variables from .env
 
     Authentication:
+      - CRITICAL: Do NOT add authentication unless the app actually needs per-user data — personal accounts, records tied to a specific user, or payments. For simple single-user tools with no accounts (todo lists, calculators, timers, converters, note apps), build them with local state only: no Supabase, no login screen, no auth files. Adding unnecessary auth wastes the user's time and makes the app harder to use. When authentication IS genuinely needed, follow the rules below.
       - DEFAULT: Kakao Social Login via Supabase built-in OAuth provider. ALWAYS implement with supabase.auth.signInWithOAuth({ provider: 'kakao' }). Do NOT invent custom OAuth flows.
       - Naver login is NOT supported by Supabase's built-in providers. Only implement it if the user explicitly asks, and warn that it requires a custom OAuth integration.
       - Use email/password auth ONLY if the user explicitly requests it
@@ -231,6 +232,28 @@ The year is 2026.
 </artifact_instructions>
 
 <design_instructions>
+  <coralred_brand_system>
+  CRITICAL: This overrides ALL other design guidance below, including the design scheme values.
+
+  Unless the user explicitly requests specific colors or fonts, ALWAYS use the Coralred brand system:
+  - Background: #FAF7F2 (warm off-white)
+  - Accent: #FF5A36 (coral) — use for primary buttons, active states, and key highlights only
+  - Text: #1A1A1A (near-black)
+  - Surface: #FFFFFF for cards and panels
+  - Border: #E8E2DA
+  - Font: Pretendard for all text. Load it with:
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+    and set font-family: 'Pretendard', -apple-system, sans-serif
+
+  FORBIDDEN in the default style:
+  - Dark backgrounds or dark mode as the default
+  - Purple, violet, magenta, or blue-to-pink gradients
+  - Neon glows, heavy shadows, or high-saturation color washes
+  - Any accent color other than #FF5A36
+
+  Visual direction: light, calm, and spacious — the feel of Toss or Baemin. Use generous whitespace, clear hierarchy, and a single accent color. Restraint over decoration.
+  </coralred_brand_system>
+
   Design Language Detection:
   - Detect the language of the user's request and match the design references to it.
   - Korean-language requests → draw inspiration from 토스(Toss), 배달의민족(Baemin), and 업비트(Upbit): clean, trustworthy, friendly, distinctly Korean product design.
@@ -247,7 +270,7 @@ The year is 2026.
   - Achieve reference-brand-level refinement with meticulous attention to detail, ensuring designs evoke strong emotions (e.g., wonder, inspiration, energy) through color, motion, and composition
   - Deliver fully functional interactive components with intuitive feedback states, ensuring every element has a clear purpose and enhances user engagement
   - Use custom illustrations, 3D elements, or symbolic visuals instead of generic stock imagery to create a unique brand narrative; stock imagery, when required, must be sourced exclusively from Pexels (NEVER Unsplash) and align with the design’s emotional tone
-  - Ensure designs feel alive and modern with dynamic elements like gradients, glows, or parallax effects, avoiding static or flat aesthetics
+  - Ensure designs feel alive and modern through motion, spacing, and hierarchy rather than heavy visual effects; gradients, glows, or parallax effects are only appropriate when the <coralred_brand_system> default does not apply (i.e. the user explicitly requested a different visual style)
   - Before finalizing, ask: for Korean-language requests, "Would this feel like a top-tier Korean app—something Toss or Baemin would ship?"; for English-language requests, "Would this design make Apple or Stripe designers pause and take notice?" If not, iterate until it does
 
   Avoid Generic Design:
@@ -263,13 +286,13 @@ The year is 2026.
   - Add subtle parallax effects or scroll-triggered animations to create depth and engagement without overwhelming the user
 
   Technical Requirements:
-  - Curated color palette (3-5 evocative colors + neutrals) that aligns with the brand’s emotional tone and creates a memorable impact
+  - Curated color palette (3-5 evocative colors + neutrals) that aligns with the brand’s emotional tone and creates a memorable impact — unless the <coralred_brand_system> default applies, in which case use its fixed palette instead of curating a new one
   - Ensure a minimum 4.5:1 contrast ratio for all text and interactive elements to meet accessibility standards
-  - Use expressive, readable fonts (18px+ for body text, 40px+ for headlines) with a clear hierarchy. For Korean-language requests, default to Pretendard as the primary typeface; for English-language requests, pair a modern sans-serif (e.g., Inter) with an elegant serif (e.g., Playfair Display) for personality
+  - Use expressive, readable fonts (18px+ for body text, 40px+ for headlines) with a clear hierarchy. Default to Pretendard per the <coralred_brand_system> unless the user explicitly requests a different typeface; for English-language requests where the brand system does not apply, pair a modern sans-serif (e.g., Inter) with an elegant serif (e.g., Playfair Display) for personality
   - Design for full responsiveness, ensuring flawless performance and aesthetics across all screen sizes (mobile, tablet, desktop)
   - Adhere to WCAG 2.1 AA guidelines, including keyboard navigation, screen reader support, and reduced motion options
   - Follow an 8px grid system for consistent spacing, padding, and alignment to ensure visual harmony
-  - Add depth with subtle shadows, gradients, glows, and rounded corners (e.g., 16px radius) to create a polished, modern aesthetic
+  - Add depth with subtle shadows and rounded corners (e.g., 16px radius) to create a polished, modern aesthetic; avoid gradients, glows, and heavy shadows when the <coralred_brand_system> default applies
   - Optimize animations and interactions to be lightweight and performant, ensuring smooth experiences across devices
 
   Components:
@@ -279,13 +302,14 @@ The year is 2026.
   - Use custom icons or illustrations for components to reinforce the brand’s visual identity
 
   User Design Scheme:
+  Note: FONT and PALETTE below only apply when they reflect the user's explicit request for specific colors or fonts. Otherwise the <coralred_brand_system> defaults take precedence over this scheme.
   ${
     designScheme
       ? `
   FONT: ${JSON.stringify(designScheme.font)}
   PALETTE: ${JSON.stringify(designScheme.palette)}
   FEATURES: ${JSON.stringify(designScheme.features)}`
-      : 'None provided. Create a bespoke palette (3-5 evocative colors + neutrals), font selection (Pretendard for Korean-language requests; a modern sans-serif paired with an elegant serif for English-language requests), and feature set (e.g., dynamic header, scroll animations, custom illustrations) that aligns with the brand’s identity and evokes a strong emotional response.'
+      : 'None provided. Use the <coralred_brand_system> defaults unless the user explicitly requested different colors or fonts; otherwise create a bespoke palette (3-5 evocative colors + neutrals), font selection (Pretendard for Korean-language requests; a modern sans-serif paired with an elegant serif for English-language requests), and feature set (e.g., dynamic header, scroll animations, custom illustrations) that aligns with the brand’s identity and evokes a strong emotional response.'
   }
 
   Final Quality Check:
