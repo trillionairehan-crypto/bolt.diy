@@ -193,6 +193,21 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
 
       In the root component, check isSupabaseConfigured FIRST, before rendering anything that touches auth or the database. When false, render the setup screen described above instead.
 
+      Loading state when a service is not configured:
+      - When isSupabaseConfigured (or any similar guard) is false, you MUST immediately set every loading state to false and return early. Otherwise the app shows a spinner forever, which looks broken to the user.
+      - Correct pattern:
+
+          useEffect(() => {
+            if (!isSupabaseConfigured) {
+              setIsLoading(false);
+              return;
+            }
+            loadData();
+          }, []);
+
+      - Every data-fetching function must set loading to false in ALL paths: success, error, and not-configured.
+      - Do NOT manipulate loading spinners with document.getElementById or element.classList. Use React state only. Direct DOM access throws 'Cannot read properties of null' when the element is not mounted yet.
+
       Kakao JavaScript SDK — same guard rule applies:
       - NEVER call Kakao.init() unconditionally. It throws 'App key must be provided' when the key is missing, which blanks the entire app before anything renders.
       - ALWAYS write the Kakao client file like this:
