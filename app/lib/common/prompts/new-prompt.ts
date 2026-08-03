@@ -449,7 +449,13 @@ CREATE TABLE IF NOT EXISTS reservations (
 ALTER TABLE reservations ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "본인 예약만 조회" ON reservations FOR SELECT TO authenticated USING (auth.uid() = user_id);
 CREATE POLICY "본인 예약만 생성" ON reservations FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);</boltAction>
-<boltAction type="file" filePath="src/lib/supabase.ts">...</boltAction>
+<boltAction type="file" filePath="src/lib/supabase.ts">import { createClient } from '@supabase/supabase-js';
+
+const url = import.meta.env.VITE_SUPABASE_URL;
+const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+export const isSupabaseConfigured = Boolean(url && key);
+export const supabase = isSupabaseConfigured ? createClient(url, key) : null;</boltAction>
 <boltAction type="file" filePath="src/lib/alimtalk.ts">...</boltAction>
 <boltAction type="file" filePath="src/App.tsx">...</boltAction>
 <boltAction type="shell">npm install</boltAction>
