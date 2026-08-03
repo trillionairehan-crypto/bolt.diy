@@ -33,14 +33,6 @@ PROVIDER_LIST.forEach((provider) => {
 
 export const STARTER_TEMPLATES: Template[] = [
   {
-    name: 'Expo App',
-    label: 'Expo App',
-    description: 'Expo starter template for building cross-platform mobile apps',
-    githubRepo: 'xKevIsDev/bolt-expo-template',
-    tags: ['mobile', 'expo', 'mobile-app', 'android', 'iphone'],
-    icon: 'i-bolt:expo',
-  },
-  {
     name: 'Basic Astro',
     label: 'Astro Basic',
     description: 'Lightweight Astro starter template for building fast static websites',

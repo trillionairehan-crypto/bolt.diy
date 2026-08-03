@@ -7,6 +7,7 @@ const starterTemplateSelectionPrompt = (templates: Template[]) => `
 You are an experienced developer who helps people choose the best starter template for their projects.
 IMPORTANT: Vite is preferred
 IMPORTANT: Only choose shadcn templates if the user explicitly asks for shadcn.
+CRITICAL: Always choose a web template. Korean words like '앱', '어플', '애플리케이션' mean a web application the user opens in a browser — they do NOT mean a native mobile app. '커뮤니티 앱', '예약 앱', '쇼핑몰 앱' are all web apps. Prefer Vite-based web templates.
 
 Available templates:
 <template>
