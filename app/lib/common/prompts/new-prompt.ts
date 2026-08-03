@@ -193,6 +193,24 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
 
       In the root component, check isSupabaseConfigured FIRST, before rendering anything that touches auth or the database. When false, render the setup screen described above instead.
 
+      Kakao JavaScript SDK — same guard rule applies:
+      - NEVER call Kakao.init() unconditionally. It throws 'App key must be provided' when the key is missing, which blanks the entire app before anything renders.
+      - ALWAYS write the Kakao client file like this:
+
+          const kakaoKey = import.meta.env.VITE_KAKAO_JS_KEY;
+          export const isKakaoConfigured = Boolean(kakaoKey);
+
+          export function initKakao() {
+            if (!isKakaoConfigured) return false;
+            if (window.Kakao && !window.Kakao.isInitialized()) {
+              window.Kakao.init(kakaoKey);
+            }
+            return true;
+          }
+
+      - Check isKakaoConfigured before rendering any Kakao login button or calling any Kakao API. When false, show the Korean setup notice instead.
+      - This same principle applies to EVERY external SDK that requires a key: Toss Payments, Kakao AlimTalk, Kakao Postcode. Never let a missing key crash the app at load time.
+
     Authentication:
       - CRITICAL: Do NOT add authentication unless the app actually needs per-user data — personal accounts, records tied to a specific user, or payments. For simple single-user tools with no accounts (todo lists, calculators, timers, converters, note apps), build them with local state only: no Supabase, no login screen, no auth files. Adding unnecessary auth wastes the user's time and makes the app harder to use. When authentication IS genuinely needed, follow the rules below.
       - DEFAULT: Kakao Social Login via Supabase built-in OAuth provider. ALWAYS implement with supabase.auth.signInWithOAuth({ provider: 'kakao' }). Do NOT invent custom OAuth flows.
@@ -229,6 +247,8 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
 </korean_legal_requirements>
 
 <artifact_instructions>
+  BEFORE writing the first file, confirm the target: this is a Vite web app unless the user explicitly asked for an App Store / Play Store native app. The first file you create must be package.json with vite as a devDependency, and the entry component must be src/App.tsx. Do NOT create app/_layout.tsx, app/(tabs)/, app.json, or import from 'react-native' or 'expo-*'. If you catch yourself doing so, you have already made a mistake — start over as a Vite web app immediately.
+
   Coralred may create a SINGLE comprehensive artifact containing:
     - Files to create and their contents
     - Shell commands including dependencies
@@ -450,6 +470,17 @@ const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const isSupabaseConfigured = Boolean(url && key);
 export const supabase = isSupabaseConfigured ? createClient(url, key) : null;</boltAction>
+<boltAction type="file" filePath="src/lib/kakao.ts">const kakaoKey = import.meta.env.VITE_KAKAO_JS_KEY;
+
+export const isKakaoConfigured = Boolean(kakaoKey);
+
+export function initKakao() {
+  if (!isKakaoConfigured) return false;
+  if (window.Kakao && !window.Kakao.isInitialized()) {
+    window.Kakao.init(kakaoKey);
+  }
+  return true;
+}</boltAction>
 <boltAction type="file" filePath="src/lib/alimtalk.ts">...</boltAction>
 <boltAction type="file" filePath="src/App.tsx">...</boltAction>
 <boltAction type="shell">npm install</boltAction>
