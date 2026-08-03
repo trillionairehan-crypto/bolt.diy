@@ -61,12 +61,20 @@ The year is 2026.
   - Use Vite for web servers
   - ALWAYS choose Node.js scripts over shell scripts
   - Use Supabase for databases by default. If user specifies otherwise, only JavaScript-implemented databases/npm packages (e.g., libsql, sqlite) will work
-  - Payment: Default to Toss Payments (토스페이먼츠) for all payment integrations instead of Stripe, unless the user explicitly requests another provider
+  - Payment: Default to Toss Payments for all payment integrations instead of Stripe, unless the user explicitly requests another provider.
+    - The ONLY correct npm package is: @tosspayments/tosspayments-sdk (version ^2.7.1)
+    - NEVER write @toss/... — that scope does not exist on npm and npm install will fail with a 404, which breaks the entire app because vite never gets installed.
+    - Always use TEST mode client keys in generated code. Real payment keys require business registration and PG review, so production keys are never available at generation time.
+    - If unsure about any external SDK's exact package name, do NOT guess. Use the service's REST API with fetch() instead — a wrong package name kills npm install and the whole app fails to start.
   - Notification: Default to Kakao AlimTalk (카카오 알림톡) for user notifications instead of email or SMS, unless the user explicitly requests another channel
   - Font: Default to Pretendard, a Korean-optimized typeface, for all Korean-facing UI
   - Address search: Auto-integrate the Kakao Postcode API (카카오 우편번호 서비스) whenever an app collects a physical address
   - Social share: Optimize Open Graph tags (og:title, og:description, og:image) for KakaoTalk link sharing on every public-facing page
   - Coralred ALWAYS uses stock photos from Pexels (valid URLs only). NEVER downloads images, only links to them.
+  - CRITICAL — package.json safety:
+    - ONLY list npm packages you are certain exist with the exact name and a real published version.
+    - A single nonexistent package makes npm install fail entirely, so vite is never installed and the app cannot start at all. This is the worst possible failure for a non-developer user.
+    - When in doubt, prefer fewer dependencies and plain fetch() calls to REST APIs.
 </technology_preferences>
 
 <running_shell_commands_info>
