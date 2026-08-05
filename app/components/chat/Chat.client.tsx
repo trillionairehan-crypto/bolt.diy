@@ -28,6 +28,7 @@ import type { ElementInfo } from '~/components/workbench/Inspector';
 import type { TextUIPart, FileUIPart, Attachment } from '@ai-sdk/ui-utils';
 import { useMCPStore } from '~/lib/stores/mcp';
 import type { LlmErrorAlertType } from '~/types/actions';
+import { hasFreeGenerationsRemaining, incrementFreeGenerationsUsed } from '~/lib/freeTrial';
 
 const logger = createScopedLogger('Chat');
 
@@ -410,6 +411,13 @@ export const ChatImpl = memo(
       runAnimation();
 
       if (!chatStarted) {
+        if (!hasFreeGenerationsRemaining()) {
+          toast.error('무료 체험 3회를 모두 사용했어요. 유료 플랜에서 계속 만들 수 있어요.');
+          return;
+        }
+
+        incrementFreeGenerationsUsed();
+
         setFakeLoading(true);
 
         if (autoSelectTemplate) {

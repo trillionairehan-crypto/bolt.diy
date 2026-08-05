@@ -33,6 +33,7 @@ import { ChatBox } from './ChatBox';
 import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import LlmErrorAlert from './LLMApiAlert';
+import { getFreeGenerationsRemaining } from '~/lib/freeTrial';
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
@@ -136,6 +137,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     ref,
   ) => {
     const TEXTAREA_MAX_HEIGHT = chatStarted ? 400 : 200;
+    const freeGenerationsRemaining = getFreeGenerationsRemaining();
     const [apiKeys, setApiKeys] = useState<Record<string, string>>(getApiKeysFromCookies());
     const [modelList, setModelList] = useState<ModelInfo[]>([]);
     const [isModelSettingsCollapsed, setIsModelSettingsCollapsed] = useState(false);
@@ -357,6 +359,19 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 </h1>
                 <p className="text-md lg:text-xl mb-8 text-bolt-elements-textSecondary animate-fade-in animation-delay-200">
                   Bring ideas to life in seconds or get help on existing projects.
+                </p>
+                <p
+                  className="text-sm lg:text-base mb-8 animate-fade-in animation-delay-200"
+                  style={{ color: '#1A1A1A' }}
+                >
+                  {freeGenerationsRemaining > 0 ? (
+                    <>
+                      무료 체험 <span style={{ color: '#FF5A36', fontWeight: 600 }}>{freeGenerationsRemaining}회</span>{' '}
+                      남았어요
+                    </>
+                  ) : (
+                    <span style={{ color: '#FF5A36', fontWeight: 600 }}>무료 체험을 모두 사용했어요</span>
+                  )}
                 </p>
               </div>
             )}
