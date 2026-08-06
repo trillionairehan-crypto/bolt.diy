@@ -92,6 +92,7 @@ export const ChatImpl = memo(
     const [imageDataList, setImageDataList] = useState<string[]>([]);
     const [searchParams, setSearchParams] = useSearchParams();
     const [fakeLoading, setFakeLoading] = useState(false);
+    const [clarifyingPrompt, setClarifyingPrompt] = useState<string | null>(null);
     const files = useStore(workbenchStore.files);
     const [designScheme, setDesignScheme] = useState<DesignScheme>(defaultDesignScheme);
     const actionAlert = useStore(workbenchStore.alert);
@@ -324,10 +325,14 @@ export const ChatImpl = memo(
         return;
       }
 
-      await Promise.all([
-        animate('#examples', { opacity: 0, display: 'none' }, { duration: 0.1 }),
-        animate('#intro', { opacity: 0, flex: 1 }, { duration: 0.2, ease: cubicEasingFn }),
-      ]);
+      try {
+        await Promise.all([
+          animate('#examples', { opacity: 0, display: 'none' }, { duration: 0.1 }),
+          animate('#intro', { opacity: 0, flex: 1 }, { duration: 0.2, ease: cubicEasingFn }),
+        ]);
+      } catch {
+        // #intro/#examples may already be unmounted (e.g. after the clarification flow replaced them) — skip the fade animation.
+      }
 
       chatStore.setKey('started', true);
 
@@ -387,6 +392,115 @@ export const ChatImpl = memo(
       return attachments;
     };
 
+    // Runs the actual generation for a brand-new app (post-clarification, or skipped straight through).
+    const generateNewApp = async (promptContent: string) => {
+      runAnimation();
+
+      if (!hasFreeGenerationsRemaining()) {
+        toast.error('무료 체험 3회를 모두 사용했어요. 유료 플랜에서 계속 만들 수 있어요.');
+        return;
+      }
+
+      incrementFreeGenerationsUsed();
+
+      setFakeLoading(true);
+
+      if (autoSelectTemplate) {
+        const { template, title } = await selectStarterTemplate({
+          message: promptContent,
+          model,
+          provider,
+        });
+
+        if (template !== 'blank') {
+          const temResp = await getTemplates(template, title).catch((e) => {
+            if (e.message.includes('rate limit')) {
+              toast.warning('Rate limit exceeded. Skipping starter template\n Continuing with blank template');
+            } else {
+              toast.warning('Failed to import starter template\n Continuing with blank template');
+            }
+
+            return null;
+          });
+
+          if (temResp) {
+            const { assistantMessage, userMessage } = temResp;
+            const userMessageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${promptContent}`;
+
+            setMessages([
+              {
+                id: `1-${new Date().getTime()}`,
+                role: 'user',
+                content: userMessageText,
+                parts: createMessageParts(userMessageText, imageDataList),
+              },
+              {
+                id: `2-${new Date().getTime()}`,
+                role: 'assistant',
+                content: assistantMessage,
+              },
+              {
+                id: `3-${new Date().getTime()}`,
+                role: 'user',
+                content: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${userMessage}`,
+                annotations: ['hidden'],
+              },
+            ]);
+
+            const reloadOptions =
+              uploadedFiles.length > 0
+                ? { experimental_attachments: await filesToAttachments(uploadedFiles) }
+                : undefined;
+
+            reload(reloadOptions);
+            setInput('');
+            Cookies.remove(PROMPT_COOKIE_KEY);
+
+            setUploadedFiles([]);
+            setImageDataList([]);
+
+            resetEnhancer();
+
+            textareaRef.current?.blur();
+            setFakeLoading(false);
+
+            return;
+          }
+        }
+      }
+
+      // If autoSelectTemplate is disabled or template selection failed, proceed with normal message
+      const userMessageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${promptContent}`;
+      const attachments = uploadedFiles.length > 0 ? await filesToAttachments(uploadedFiles) : undefined;
+
+      setMessages([
+        {
+          id: `${new Date().getTime()}`,
+          role: 'user',
+          content: userMessageText,
+          parts: createMessageParts(userMessageText, imageDataList),
+          experimental_attachments: attachments,
+        },
+      ]);
+      reload(attachments ? { experimental_attachments: attachments } : undefined);
+      setFakeLoading(false);
+      setInput('');
+      Cookies.remove(PROMPT_COOKIE_KEY);
+
+      setUploadedFiles([]);
+      setImageDataList([]);
+
+      resetEnhancer();
+
+      textareaRef.current?.blur();
+    };
+
+    // Called by PromptClarification once the user finishes answering (or skips) — resumes generation.
+    const handleClarificationComplete = (finalPrompt: string) => {
+      setClarifyingPrompt(null);
+      generateNewApp(finalPrompt);
+    };
+
     const sendMessage = async (_event: React.UIEvent, messageInput?: string) => {
       const messageContent = messageInput || input;
 
@@ -408,106 +522,13 @@ export const ChatImpl = memo(
         finalMessageContent = messageContent + elementInfo;
       }
 
-      runAnimation();
-
       if (!chatStarted) {
         if (!hasFreeGenerationsRemaining()) {
           toast.error('무료 체험 3회를 모두 사용했어요. 유료 플랜에서 계속 만들 수 있어요.');
           return;
         }
 
-        incrementFreeGenerationsUsed();
-
-        setFakeLoading(true);
-
-        if (autoSelectTemplate) {
-          const { template, title } = await selectStarterTemplate({
-            message: finalMessageContent,
-            model,
-            provider,
-          });
-
-          if (template !== 'blank') {
-            const temResp = await getTemplates(template, title).catch((e) => {
-              if (e.message.includes('rate limit')) {
-                toast.warning('Rate limit exceeded. Skipping starter template\n Continuing with blank template');
-              } else {
-                toast.warning('Failed to import starter template\n Continuing with blank template');
-              }
-
-              return null;
-            });
-
-            if (temResp) {
-              const { assistantMessage, userMessage } = temResp;
-              const userMessageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${finalMessageContent}`;
-
-              setMessages([
-                {
-                  id: `1-${new Date().getTime()}`,
-                  role: 'user',
-                  content: userMessageText,
-                  parts: createMessageParts(userMessageText, imageDataList),
-                },
-                {
-                  id: `2-${new Date().getTime()}`,
-                  role: 'assistant',
-                  content: assistantMessage,
-                },
-                {
-                  id: `3-${new Date().getTime()}`,
-                  role: 'user',
-                  content: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${userMessage}`,
-                  annotations: ['hidden'],
-                },
-              ]);
-
-              const reloadOptions =
-                uploadedFiles.length > 0
-                  ? { experimental_attachments: await filesToAttachments(uploadedFiles) }
-                  : undefined;
-
-              reload(reloadOptions);
-              setInput('');
-              Cookies.remove(PROMPT_COOKIE_KEY);
-
-              setUploadedFiles([]);
-              setImageDataList([]);
-
-              resetEnhancer();
-
-              textareaRef.current?.blur();
-              setFakeLoading(false);
-
-              return;
-            }
-          }
-        }
-
-        // If autoSelectTemplate is disabled or template selection failed, proceed with normal message
-        const userMessageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${finalMessageContent}`;
-        const attachments = uploadedFiles.length > 0 ? await filesToAttachments(uploadedFiles) : undefined;
-
-        setMessages([
-          {
-            id: `${new Date().getTime()}`,
-            role: 'user',
-            content: userMessageText,
-            parts: createMessageParts(userMessageText, imageDataList),
-            experimental_attachments: attachments,
-          },
-        ]);
-        reload(attachments ? { experimental_attachments: attachments } : undefined);
-        setFakeLoading(false);
-        setInput('');
-        Cookies.remove(PROMPT_COOKIE_KEY);
-
-        setUploadedFiles([]);
-        setImageDataList([]);
-
-        resetEnhancer();
-
-        textareaRef.current?.blur();
+        setClarifyingPrompt(finalMessageContent);
 
         return;
       }
@@ -623,6 +644,8 @@ export const ChatImpl = memo(
         input={input}
         showChat={showChat}
         chatStarted={chatStarted}
+        clarifyingPrompt={clarifyingPrompt}
+        onClarificationComplete={handleClarificationComplete}
         isStreaming={isLoading || fakeLoading}
         onStreamingChange={(streaming) => {
           streamingState.set(streaming);

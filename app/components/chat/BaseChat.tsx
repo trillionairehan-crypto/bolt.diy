@@ -34,6 +34,7 @@ import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import LlmErrorAlert from './LLMApiAlert';
 import { getFreeGenerationsRemaining } from '~/lib/freeTrial';
+import PromptClarification from './PromptClarification';
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
@@ -43,6 +44,8 @@ interface BaseChatProps {
   scrollRef?: RefCallback<HTMLDivElement> | undefined;
   showChat?: boolean;
   chatStarted?: boolean;
+  clarifyingPrompt?: string | null;
+  onClarificationComplete?: (finalPrompt: string) => void;
   isStreaming?: boolean;
   onStreamingChange?: (streaming: boolean) => void;
   messages?: Message[];
@@ -91,6 +94,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       textareaRef,
       showChat = true,
       chatStarted = false,
+      clarifyingPrompt = null,
+      onClarificationComplete,
       isStreaming = false,
       onStreamingChange,
       model,
@@ -352,7 +357,14 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         <ClientOnly>{() => <Menu />}</ClientOnly>
         <div className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
           <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
-            {!chatStarted && (
+            {clarifyingPrompt ? (
+              <PromptClarification
+                initialPrompt={clarifyingPrompt}
+                onComplete={(finalPrompt) => onClarificationComplete?.(finalPrompt)}
+              />
+            ) : (
+              <>
+                {!chatStarted && (
               <div id="intro" className="mt-[16vh] max-w-2xl mx-auto text-center px-4 lg:px-0">
                 <h1 className="text-3xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in">
                   Where ideas begin
@@ -506,6 +518,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 {!chatStarted && <StarterTemplates />}
               </div>
             </div>
+              </>
+            )}
           </div>
           <ClientOnly>
             {() => (
