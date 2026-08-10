@@ -7,6 +7,9 @@ interface HeaderActionButtonsProps {
   chatStarted: boolean;
 }
 
+// Report Bug/Debug Log link to the upstream bolt.diy repo and are developer-only — kept but hidden.
+const SHOW_DEBUG_TOOLS = false;
+
 export function HeaderActionButtons({ chatStarted: _chatStarted }: HeaderActionButtonsProps) {
   const [activePreviewIndex] = useState(0);
   const previews = useStore(workbenchStore.previews);
@@ -20,7 +23,7 @@ export function HeaderActionButtons({ chatStarted: _chatStarted }: HeaderActionB
       {shouldShowButtons && <DeployButton />}
 
       {/* Debug Tools */}
-      {shouldShowButtons && (
+      {shouldShowButtons && SHOW_DEBUG_TOOLS && (
         <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden text-sm">
           <button
             onClick={() =>

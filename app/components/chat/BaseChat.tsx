@@ -367,10 +367,10 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 {!chatStarted && (
               <div id="intro" className="mt-[16vh] max-w-2xl mx-auto text-center px-4 lg:px-0">
                 <h1 className="text-3xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in">
-                  Where ideas begin
+                  만들고 싶은 걸 말해보세요
                 </h1>
                 <p className="text-md lg:text-xl mb-8 text-bolt-elements-textSecondary animate-fade-in animation-delay-200">
-                  Bring ideas to life in seconds or get help on existing projects.
+                  코딩 몰라도 괜찮아요. 한국어로 설명하면 앱이 만들어져요.
                 </p>
                 <p
                   className="text-sm lg:text-base mb-8 animate-fade-in animation-delay-200"
