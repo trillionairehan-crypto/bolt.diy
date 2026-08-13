@@ -11,7 +11,7 @@
     "email": "maintainers@bolt.diy"
   },
   "scripts": {
-    "deploy": "npm run build && wrangler pages deploy",
+    "deploy": "npm run build && wrangler pages deploy build/client --branch=coralred",
     "build": "remix vite:build",
     "dev": "node pre-start.cjs  && remix vite:dev",
     "preview-server": "node server/preview-server.mjs",
