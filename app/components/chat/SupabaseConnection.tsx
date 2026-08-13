@@ -83,6 +83,9 @@ export function SupabaseConnection() {
           disabled={connecting}
           onClick={() => setIsDialogOpen(!isDialogOpen)}
           className="hover:bg-bolt-elements-item-backgroundActive !text-white flex items-center gap-2"
+          title={
+            isConnected ? '데이터베이스가 연결됐어요' : '앱에 로그인과 데이터 저장 기능을 쓰려면 연결이 필요해요'
+          }
         >
           <img
             className="w-4 h-4"
@@ -91,9 +94,7 @@ export function SupabaseConnection() {
             crossOrigin="anonymous"
             src="https://cdn.simpleicons.org/supabase"
           />
-          {isConnected && supabaseConn.project && (
-            <span className="ml-1 text-xs max-w-[100px] truncate">{supabaseConn.project.name}</span>
-          )}
+          <span className="ml-1 text-xs">{isConnected ? '연결됨' : '데이터베이스 연결'}</span>
         </Button>
       </div>
 
@@ -315,9 +316,10 @@ interface ButtonProps {
   children?: any;
   onClick?: VoidFunction;
   className?: string;
+  title?: string;
 }
 
-function Button({ active = false, disabled = false, children, onClick, className }: ButtonProps) {
+function Button({ active = false, disabled = false, children, onClick, className, title }: ButtonProps) {
   return (
     <button
       className={classNames(
@@ -332,6 +334,7 @@ function Button({ active = false, disabled = false, children, onClick, className
         className,
       )}
       onClick={onClick}
+      title={title}
     >
       {children}
     </button>
