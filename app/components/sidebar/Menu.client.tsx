@@ -11,9 +11,11 @@ import { cubicEasingFn } from '~/utils/easings';
 import { HistoryItem } from './HistoryItem';
 import { binDates } from './date-binning';
 import { useSearchFilter } from '~/lib/hooks/useSearchFilter';
+import useViewport from '~/lib/hooks';
 import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { profileStore } from '~/lib/stores/profile';
+import { sidebarOpenStore, setSidebarOpen } from '~/lib/stores/sidebar';
 
 const menuVariants = {
   closed: {
@@ -66,8 +68,9 @@ function CurrentDateTime() {
 export const Menu = () => {
   const { duplicateCurrentChat, exportChat } = useChatHistory();
   const menuRef = useRef<HTMLDivElement>(null);
+  const isSmallViewport = useViewport(1024);
   const [list, setList] = useState<ChatHistoryItem[]>([]);
-  const [open, setOpen] = useState(false);
+  const open = useStore(sidebarOpenStore);
   const [dialogContent, setDialogContent] = useState<DialogContent>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const profile = useStore(profileStore);
@@ -283,16 +286,16 @@ export const Menu = () => {
     const exitThreshold = 20;
 
     function onMouseMove(event: MouseEvent) {
-      if (isSettingsOpen) {
+      if (isSettingsOpen || isSmallViewport) {
         return;
       }
 
       if (event.pageX < enterThreshold) {
-        setOpen(true);
+        setSidebarOpen(true);
       }
 
       if (menuRef.current && event.clientX > menuRef.current.getBoundingClientRect().right + exitThreshold) {
-        setOpen(false);
+        setSidebarOpen(false);
       }
     }
 
@@ -301,7 +304,7 @@ export const Menu = () => {
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
     };
-  }, [isSettingsOpen]);
+  }, [isSettingsOpen, isSmallViewport]);
 
   const handleDuplicate = async (id: string) => {
     await duplicateCurrentChat(id);
@@ -310,7 +313,7 @@ export const Menu = () => {
 
   const handleSettingsClick = () => {
     setIsSettingsOpen(true);
-    setOpen(false);
+    setSidebarOpen(false);
   };
 
   const handleSettingsClose = () => {

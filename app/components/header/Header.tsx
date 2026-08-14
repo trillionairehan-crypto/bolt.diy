@@ -1,12 +1,14 @@
 import { useStore } from '@nanostores/react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { chatStore } from '~/lib/stores/chat';
+import { sidebarOpenStore, toggleSidebar } from '~/lib/stores/sidebar';
 import { classNames } from '~/utils/classNames';
 import { HeaderActionButtons } from './HeaderActionButtons.client';
 import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
 
 export function Header() {
   const chat = useStore(chatStore);
+  const sidebarOpen = useStore(sidebarOpenStore);
 
   return (
     <header
@@ -16,7 +18,13 @@ export function Header() {
       })}
     >
       <div className="flex items-center gap-2 z-logo text-bolt-elements-textPrimary cursor-pointer">
-        <div className="i-ph:sidebar-simple-duotone text-xl" />
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          aria-label="사이드바 열기/닫기"
+          aria-expanded={sidebarOpen}
+          className="i-ph:sidebar-simple-duotone text-xl"
+        />
         <a href="/" className="flex items-center gap-2">
           <div
             className="flex items-center justify-center shrink-0"
