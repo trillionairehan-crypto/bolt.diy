@@ -367,7 +367,7 @@ export const Menu = () => {
             <div className="flex gap-2">
               <a
                 href="/"
-                className="flex-1 flex gap-2 items-center bg-[#FF5A36]/10 dark:bg-purple-500/10 text-[#FF5A36] dark:text-purple-300 hover:bg-[#FF5A36]/20 dark:hover:bg-purple-500/20 rounded-lg px-4 py-2 transition-colors"
+                className="flex-1 flex gap-2 items-center bg-[#FF5A36]/10 dark:bg-[#FF5A36]/10 text-[#FF5A36] dark:text-[#FF5A36] hover:bg-[#FF5A36]/20 dark:hover:bg-[#FF5A36]/20 rounded-lg px-4 py-2 transition-colors"
               >
                 <span className="inline-block i-ph:plus-circle h-4 w-4" />
                 <span className="text-sm font-medium">새로 시작하기</span>
@@ -377,7 +377,7 @@ export const Menu = () => {
                 className={classNames(
                   'flex gap-1 items-center rounded-lg px-3 py-2 transition-colors',
                   selectionMode
-                    ? 'bg-[#FF5A36] dark:bg-purple-500 text-white border border-[#E44A28] dark:border-purple-600'
+                    ? 'bg-[#FF5A36] dark:bg-[#FF5A36] text-white border border-[#E44A28] dark:border-[#E44A28]'
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700',
                 )}
                 aria-label={selectionMode ? 'Exit selection mode' : 'Enter selection mode'}
