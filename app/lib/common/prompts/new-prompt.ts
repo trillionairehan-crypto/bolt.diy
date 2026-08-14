@@ -175,6 +175,9 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
         - NEVER use an || '' empty-string fallback for env vars. createClient('') still throws. Use a boolean guard and null instead.
         - When Supabase is not configured, render a friendly Korean setup screen instead of throwing. Example copy: '앱은 준비됐어요. 카카오 로그인을 쓰려면 Supabase 연결만 하면 돼요.' Include the setup steps briefly below it.
         - All auth-dependent UI must degrade gracefully: show the setup notice, never a blank page or an uncaught error.
+        - If the setup screen uses an icon, always constrain its size explicitly, e.g.:
+          <AlertTriangle className="w-12 h-12 text-[#FF5A36]" />
+          Never render an icon component without explicit width/height sizing — an unconstrained SVG fills its parent container and can end up covering the whole screen.
         - Reason: the users of these generated apps are non-developers. An uncaught error screen makes them abandon the product immediately.
 
       ALWAYS write the Supabase client file exactly like this:
@@ -225,6 +228,9 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
 
       - Check isKakaoConfigured before rendering any Kakao login button or calling any Kakao API. When false, show the Korean setup notice instead.
       - This same principle applies to EVERY external SDK that requires a key: Toss Payments, Kakao AlimTalk, Kakao Postcode. Never let a missing key crash the app at load time.
+      - If the setup notice uses an icon, always constrain its size explicitly, e.g.:
+        <AlertTriangle className="w-12 h-12 text-[#FF5A36]" />
+        Never render an icon component without explicit width/height sizing — an unconstrained SVG fills its parent container and can end up covering the whole screen.
 
     Authentication:
       - CRITICAL: Do NOT add authentication unless the app actually needs per-user data — personal accounts, records tied to a specific user, or payments. For simple single-user tools with no accounts (todo lists, calculators, timers, converters, note apps), build them with local state only: no Supabase, no login screen, no auth files. Adding unnecessary auth wastes the user's time and makes the app harder to use. When authentication IS genuinely needed, follow the rules below.
