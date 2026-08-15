@@ -16,6 +16,8 @@ import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { profileStore } from '~/lib/stores/profile';
 import { sidebarOpenStore, setSidebarOpen } from '~/lib/stores/sidebar';
+import { authUserStore, initAuthListener, signInWithGoogle } from '~/lib/stores/auth';
+import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
 
 const menuVariants = {
   closed: {
@@ -74,6 +76,7 @@ export const Menu = () => {
   const [dialogContent, setDialogContent] = useState<DialogContent>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const profile = useStore(profileStore);
+  const authUser = useStore(authUserStore);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
@@ -270,6 +273,11 @@ export const Menu = () => {
     }
   }, [open, loadEntries]);
 
+  useEffect(() => {
+    const unsubscribe = initAuthListener();
+    return unsubscribe;
+  }, []);
+
   // Exit selection mode when sidebar is closed
   useEffect(() => {
     if (!open && selectionMode) {
@@ -343,9 +351,26 @@ export const Menu = () => {
         <div className="h-12 flex items-center justify-between px-4 border-b border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-900/50 rounded-tr-2xl">
           <div className="text-gray-900 dark:text-white font-medium"></div>
           <div className="flex items-center gap-3">
-            <span className="font-medium text-sm text-gray-900 dark:text-white truncate">
-              {profile?.username || '게스트'}
-            </span>
+            {authUser ? (
+              <span className="font-medium text-sm text-gray-900 dark:text-white truncate">
+                {authUser.user_metadata?.full_name || authUser.email}
+              </span>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-sm text-gray-900 dark:text-white truncate">
+                  {profile?.username || '게스트'}
+                </span>
+                {isPlatformSupabaseConfigured && (
+                  <button
+                    type="button"
+                    onClick={() => signInWithGoogle()}
+                    className="text-xs font-medium text-[#FF5A36] hover:underline"
+                  >
+                    구글로 로그인
+                  </button>
+                )}
+              </div>
+            )}
             <div className="flex items-center justify-center w-[32px] h-[32px] overflow-hidden bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-500 rounded-full shrink-0">
               {profile?.avatar ? (
                 <img
