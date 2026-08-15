@@ -348,43 +348,39 @@ export const Menu = () => {
           isSettingsOpen ? 'z-40' : 'z-sidebar',
         )}
       >
-        <div className="h-12 flex items-center justify-between px-4 border-b border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-900/50 rounded-tr-2xl">
-          <div className="text-gray-900 dark:text-white font-medium"></div>
-          <div className="flex items-center gap-3">
-            {authUser ? (
+        <div className="border-b border-gray-100 dark:border-gray-800/50 bg-gray-50/50 dark:bg-gray-900/50 rounded-tr-2xl">
+          <div className="h-12 flex items-center justify-between px-4">
+            <div className="text-gray-900 dark:text-white font-medium"></div>
+            <div className="flex items-center gap-3">
               <span className="font-medium text-sm text-gray-900 dark:text-white truncate">
-                {authUser.user_metadata?.full_name || authUser.email}
+                {authUser ? authUser.user_metadata?.full_name || authUser.email : profile?.username || '게스트'}
               </span>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-sm text-gray-900 dark:text-white truncate">
-                  {profile?.username || '게스트'}
-                </span>
-                {isPlatformSupabaseConfigured && (
-                  <button
-                    type="button"
-                    onClick={() => signInWithGoogle()}
-                    className="text-xs font-medium text-[#FF5A36] hover:underline"
-                  >
-                    구글로 로그인
-                  </button>
+              <div className="flex items-center justify-center w-[32px] h-[32px] overflow-hidden bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-500 rounded-full shrink-0">
+                {profile?.avatar ? (
+                  <img
+                    src={profile.avatar}
+                    alt={profile?.username || 'User'}
+                    className="w-full h-full object-cover"
+                    loading="eager"
+                    decoding="sync"
+                  />
+                ) : (
+                  <div className="i-ph:user-fill text-lg" />
                 )}
               </div>
-            )}
-            <div className="flex items-center justify-center w-[32px] h-[32px] overflow-hidden bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-500 rounded-full shrink-0">
-              {profile?.avatar ? (
-                <img
-                  src={profile.avatar}
-                  alt={profile?.username || 'User'}
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                  decoding="sync"
-                />
-              ) : (
-                <div className="i-ph:user-fill text-lg" />
-              )}
             </div>
           </div>
+          {!authUser && isPlatformSupabaseConfigured && (
+            <div className="px-4 pb-3">
+              <button
+                type="button"
+                onClick={() => signInWithGoogle()}
+                className="w-full flex items-center justify-center gap-2 bg-[#FF5A36]/10 dark:bg-[#FF5A36]/10 text-[#FF5A36] dark:text-[#FF5A36] hover:bg-[#FF5A36]/20 dark:hover:bg-[#FF5A36]/20 rounded-lg px-4 py-2 transition-colors text-sm font-medium"
+              >
+                로그인
+              </button>
+            </div>
+          )}
         </div>
         <CurrentDateTime />
         <div className="flex-1 flex flex-col h-full w-full overflow-hidden">

@@ -135,7 +135,7 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
                   'w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors',
                 )}
               />
-              {authUser ? '로그아웃' : '구글로 로그인'}
+              {authUser ? '로그아웃' : '로그인'}
             </DropdownMenu.Item>
           )}
 
