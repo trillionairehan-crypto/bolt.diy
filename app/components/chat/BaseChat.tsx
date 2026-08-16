@@ -33,7 +33,8 @@ import { ChatBox } from './ChatBox';
 import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import LlmErrorAlert from './LLMApiAlert';
-import { getFreeGenerationsRemaining } from '~/lib/freeTrial';
+import { getGenerationsRemaining } from '~/lib/freeTrial';
+import { authUserStore } from '~/lib/stores/auth';
 import PromptClarification from './PromptClarification';
 
 const TEXTAREA_MIN_HEIGHT = 76;
@@ -142,7 +143,23 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     ref,
   ) => {
     const TEXTAREA_MAX_HEIGHT = chatStarted ? 400 : 200;
-    const freeGenerationsRemaining = getFreeGenerationsRemaining();
+    const authUser = useStore(authUserStore);
+    const [freeGenerationsRemaining, setFreeGenerationsRemaining] = useState(0);
+
+    useEffect(() => {
+      let cancelled = false;
+
+      getGenerationsRemaining().then((remaining) => {
+        if (!cancelled) {
+          setFreeGenerationsRemaining(remaining);
+        }
+      });
+
+      return () => {
+        cancelled = true;
+      };
+    }, [authUser]);
+
     const [apiKeys, setApiKeys] = useState<Record<string, string>>(getApiKeysFromCookies());
     const [modelList, setModelList] = useState<ModelInfo[]>([]);
     const [isModelSettingsCollapsed, setIsModelSettingsCollapsed] = useState(false);

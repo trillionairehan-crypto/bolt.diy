@@ -28,7 +28,9 @@ import type { ElementInfo } from '~/components/workbench/Inspector';
 import type { TextUIPart, FileUIPart, Attachment } from '@ai-sdk/ui-utils';
 import { useMCPStore } from '~/lib/stores/mcp';
 import type { LlmErrorAlertType } from '~/types/actions';
-import { hasFreeGenerationsRemaining, incrementFreeGenerationsUsed } from '~/lib/freeTrial';
+import { hasGenerationsRemaining, incrementGenerationsUsed } from '~/lib/freeTrial';
+import { authUserStore } from '~/lib/stores/auth';
+import { setSidebarOpen } from '~/lib/stores/sidebar';
 
 const logger = createScopedLogger('Chat');
 
@@ -400,16 +402,52 @@ export const ChatImpl = memo(
       return attachments;
     };
 
+    // Shows a limit-reached message; nudges guests toward the sidebar login buttons.
+    const notifyGenerationLimitReached = () => {
+      if (authUserStore.get()) {
+        toast.error('무료 생성 횟수를 모두 사용했어요. 유료 플랜에서 계속 만들 수 있어요.');
+        return;
+      }
+
+      toast.error('무료 체험을 다 쓰셨어요. 로그인하면 더 만들 수 있어요.');
+      setSidebarOpen(true);
+    };
+
+    // Gates generation on the remaining-count check. If the check itself fails (network/RPC error),
+    // fails closed — blocks generation rather than letting a broken check pass everyone through.
+    const checkGenerationsAllowed = async (): Promise<boolean> => {
+      let remaining: boolean;
+
+      try {
+        remaining = await hasGenerationsRemaining();
+      } catch (error) {
+        logger.error('Failed to check free generation limit', error);
+        toast.error('일시적인 오류가 발생했어요. 잠시 후 다시 시도해주세요.');
+
+        return false;
+      }
+
+      if (!remaining) {
+        notifyGenerationLimitReached();
+        return false;
+      }
+
+      return true;
+    };
+
     // Runs the actual generation for a brand-new app (post-clarification, or skipped straight through).
     const generateNewApp = async (promptContent: string) => {
       runAnimation();
 
-      if (!hasFreeGenerationsRemaining()) {
-        toast.error('무료 체험 3회를 모두 사용했어요. 유료 플랜에서 계속 만들 수 있어요.');
+      if (!(await checkGenerationsAllowed())) {
         return;
       }
 
-      incrementFreeGenerationsUsed();
+      try {
+        await incrementGenerationsUsed();
+      } catch (error) {
+        logger.error('Failed to record generation usage', error);
+      }
 
       setFakeLoading(true);
 
@@ -531,8 +569,7 @@ export const ChatImpl = memo(
       }
 
       if (!chatStarted) {
-        if (!hasFreeGenerationsRemaining()) {
-          toast.error('무료 체험 3회를 모두 사용했어요. 유료 플랜에서 계속 만들 수 있어요.');
+        if (!(await checkGenerationsAllowed())) {
           return;
         }
 
