@@ -46,6 +46,30 @@ export async function signInWithKakao() {
   });
 }
 
+export async function sendEmailOtp(email: string) {
+  if (!platformSupabase) {
+    throw new Error('Supabase가 설정되어 있지 않습니다.');
+  }
+
+  const { error } = await platformSupabase.auth.signInWithOtp({ email });
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function verifyEmailOtp(email: string, token: string) {
+  if (!platformSupabase) {
+    throw new Error('Supabase가 설정되어 있지 않습니다.');
+  }
+
+  const { error } = await platformSupabase.auth.verifyOtp({ email, token, type: 'email' });
+
+  if (error) {
+    throw error;
+  }
+}
+
 export async function signOut() {
   if (!platformSupabase) {
     return;

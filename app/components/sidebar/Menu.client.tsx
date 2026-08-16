@@ -18,6 +18,7 @@ import { profileStore } from '~/lib/stores/profile';
 import { sidebarOpenStore, setSidebarOpen } from '~/lib/stores/sidebar';
 import { authUserStore, initAuthListener, signInWithGoogle, signInWithKakao } from '~/lib/stores/auth';
 import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
+import { EmailOtpModal } from '~/components/auth/EmailOtpModal';
 
 const menuVariants = {
   closed: {
@@ -79,6 +80,7 @@ export const Menu = () => {
   const authUser = useStore(authUserStore);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  const [isEmailOtpOpen, setIsEmailOtpOpen] = useState(false);
 
   const { filteredItems: filteredList, handleSearchChange } = useSearchFilter({
     items: list,
@@ -386,6 +388,13 @@ export const Menu = () => {
               >
                 카카오로 로그인
               </button>
+              <button
+                type="button"
+                onClick={() => setIsEmailOtpOpen(true)}
+                className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg px-4 py-2 transition-colors text-sm font-medium"
+              >
+                이메일로 로그인
+              </button>
             </div>
           )}
         </div>
@@ -565,6 +574,7 @@ export const Menu = () => {
       </motion.div>
 
       <ControlPanel open={isSettingsOpen} onClose={handleSettingsClose} />
+      <EmailOtpModal open={isEmailOtpOpen} onClose={() => setIsEmailOtpOpen(false)} />
     </>
   );
 };
