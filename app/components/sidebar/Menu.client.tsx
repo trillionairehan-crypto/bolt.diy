@@ -16,7 +16,7 @@ import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { profileStore } from '~/lib/stores/profile';
 import { sidebarOpenStore, setSidebarOpen } from '~/lib/stores/sidebar';
-import { authUserStore, initAuthListener, signInWithGoogle } from '~/lib/stores/auth';
+import { authUserStore, initAuthListener, signInWithGoogle, signInWithKakao } from '~/lib/stores/auth';
 import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
 
 const menuVariants = {
@@ -371,13 +371,20 @@ export const Menu = () => {
             </div>
           </div>
           {!authUser && isPlatformSupabaseConfigured && (
-            <div className="px-4 pb-3">
+            <div className="px-4 pb-3 flex flex-col gap-2">
               <button
                 type="button"
                 onClick={() => signInWithGoogle()}
                 className="w-full flex items-center justify-center gap-2 bg-[#FF5A36]/10 dark:bg-[#FF5A36]/10 text-[#FF5A36] dark:text-[#FF5A36] hover:bg-[#FF5A36]/20 dark:hover:bg-[#FF5A36]/20 rounded-lg px-4 py-2 transition-colors text-sm font-medium"
               >
-                로그인
+                구글로 로그인
+              </button>
+              <button
+                type="button"
+                onClick={() => signInWithKakao()}
+                className="w-full flex items-center justify-center gap-2 bg-[#FEE500] hover:bg-[#FEE500]/80 text-black rounded-lg px-4 py-2 transition-colors text-sm font-medium"
+              >
+                카카오로 로그인
               </button>
             </div>
           )}

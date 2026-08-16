@@ -35,6 +35,17 @@ export async function signInWithGoogle() {
   });
 }
 
+export async function signInWithKakao() {
+  if (!platformSupabase) {
+    return;
+  }
+
+  await platformSupabase.auth.signInWithOAuth({
+    provider: 'kakao',
+    options: { redirectTo: window.location.origin },
+  });
+}
+
 export async function signOut() {
   if (!platformSupabase) {
     return;

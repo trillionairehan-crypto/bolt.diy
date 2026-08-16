@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { useStore } from '@nanostores/react';
 import { classNames } from '~/utils/classNames';
 import { profileStore } from '~/lib/stores/profile';
-import { authUserStore, signInWithGoogle, signOut } from '~/lib/stores/auth';
+import { authUserStore, signInWithGoogle, signInWithKakao, signOut } from '~/lib/stores/auth';
 import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
 import type { TabType, Profile } from './types';
 
@@ -116,7 +116,7 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             Settings
           </DropdownMenu.Item>
 
-          {isPlatformSupabaseConfigured && (
+          {isPlatformSupabaseConfigured && authUser && (
             <DropdownMenu.Item
               className={classNames(
                 'flex items-center gap-2 px-4 py-2.5',
@@ -127,16 +127,47 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
                 'outline-none',
                 'group',
               )}
-              onClick={() => (authUser ? signOut() : signInWithGoogle())}
+              onClick={() => signOut()}
             >
-              <div
-                className={classNames(
-                  authUser ? 'i-ph:sign-out' : 'i-ph:google-logo',
-                  'w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors',
-                )}
-              />
-              {authUser ? '로그아웃' : '로그인'}
+              <div className="i-ph:sign-out w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
+              로그아웃
             </DropdownMenu.Item>
+          )}
+
+          {isPlatformSupabaseConfigured && !authUser && (
+            <>
+              <DropdownMenu.Item
+                className={classNames(
+                  'flex items-center gap-2 px-4 py-2.5',
+                  'text-sm text-gray-700 dark:text-gray-200',
+                  'hover:bg-purple-50 dark:hover:bg-purple-500/10',
+                  'hover:text-purple-500 dark:hover:text-purple-400',
+                  'cursor-pointer transition-all duration-200',
+                  'outline-none',
+                  'group',
+                )}
+                onClick={() => signInWithGoogle()}
+              >
+                <div className="i-ph:google-logo w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
+                구글로 로그인
+              </DropdownMenu.Item>
+
+              <DropdownMenu.Item
+                className={classNames(
+                  'flex items-center gap-2 px-4 py-2.5',
+                  'text-sm text-gray-700 dark:text-gray-200',
+                  'hover:bg-purple-50 dark:hover:bg-purple-500/10',
+                  'hover:text-purple-500 dark:hover:text-purple-400',
+                  'cursor-pointer transition-all duration-200',
+                  'outline-none',
+                  'group',
+                )}
+                onClick={() => signInWithKakao()}
+              >
+                <div className="i-ph:chat-circle-dots-fill w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
+                카카오로 로그인
+              </DropdownMenu.Item>
+            </>
           )}
 
           <div className="my-1 border-t border-gray-200/50 dark:border-gray-800/50" />
