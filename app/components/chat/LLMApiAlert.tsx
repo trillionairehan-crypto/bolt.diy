@@ -26,13 +26,13 @@ export default function LlmErrorAlert({ alert, clearAlert }: Props) {
   const getErrorMessage = () => {
     switch (errorType) {
       case 'authentication':
-        return `Authentication failed with ${provider}. Please check your API key.`;
+        return `${provider} 인증에 실패했어요. API 키를 확인해주세요.`;
       case 'rate_limit':
-        return `Rate limit exceeded for ${provider}. Please wait before retrying.`;
+        return `${provider}의 요청 한도를 초과했어요. 잠시 후 다시 시도해주세요.`;
       case 'quota':
-        return `Quota exceeded for ${provider}. Please check your account limits.`;
+        return `${provider}의 사용량을 초과했어요. 계정 한도를 확인해주세요.`;
       default:
-        return 'An error occurred while processing your request.';
+        return '요청을 처리하는 중 오류가 발생했어요.';
     }
   };
 
@@ -75,7 +75,7 @@ export default function LlmErrorAlert({ alert, clearAlert }: Props) {
 
               {description && (
                 <div className="text-xs text-bolt-elements-textSecondary p-2 bg-bolt-elements-background-depth-3 rounded mt-4 mb-4">
-                  Error Details: {description}
+                  오류 상세: {description}
                 </div>
               )}
             </motion.div>
@@ -97,7 +97,7 @@ export default function LlmErrorAlert({ alert, clearAlert }: Props) {
                     'text-bolt-elements-button-secondary-text',
                   )}
                 >
-                  Dismiss
+                  닫기
                 </button>
               </div>
             </motion.div>

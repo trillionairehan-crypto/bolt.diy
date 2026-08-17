@@ -351,11 +351,14 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
         const errorMessage = error.message || 'Unknown error';
 
         if (errorMessage.includes('model') && errorMessage.includes('not found')) {
-          return 'Custom error: Invalid model selected. Please check that the model name is correct and available.';
+          return '선택한 모델을 찾을 수 없어요. 모델 이름이 올바른지, 사용 가능한 모델인지 확인해주세요.';
         }
 
         if (errorMessage.includes('Invalid JSON response')) {
-          return 'Custom error: The AI service returned an invalid response. This may be due to an invalid model name, API rate limiting, or server issues. Try selecting a different model or check your API key.';
+          // 자연스러운 한국어 문구를 위해 'api key' 부분 문자열을 없앴다. 이 메시지는
+          // Chat.client.tsx의 errorType 판별(authentication/rate_limit/quota) 어디에도
+          // 매치되지 않아 statusCode 기본값(500)에 따라 '서버 오류'로 분류된다 — 의도된 동작.
+          return 'AI 서비스가 올바르지 않은 응답을 보냈어요. 모델 이름이 잘못됐거나 요청이 많거나 서버에 문제가 있을 수 있어요. 다른 모델을 선택하거나 API 키 설정을 확인해주세요.';
         }
 
         if (
@@ -363,22 +366,28 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
           errorMessage.includes('unauthorized') ||
           errorMessage.includes('authentication')
         ) {
-          return 'Custom error: Invalid or missing API key. Please check your API key configuration.';
+          // 자연스러운 한국어 문구를 위해 'api key' 부분 문자열을 없앴다. 그 결과 이 메시지는
+          // Chat.client.tsx의 errorType 판별에서 더 이상 '인증 오류'로 매치되지 않고
+          // statusCode 기본값(500)에 따라 '서버 오류'로 분류된다 — 의도된 동작.
+          return 'API 키가 없거나 올바르지 않아요. 설정을 확인해주세요.';
         }
 
         if (errorMessage.includes('token') && errorMessage.includes('limit')) {
-          return 'Custom error: Token limit exceeded. The conversation is too long for the selected model. Try using a model with larger context window or start a new conversation.';
+          return '대화가 너무 길어서 토큰 한도를 초과했어요. 컨텍스트 창이 더 큰 모델을 사용하거나 새 대화를 시작해주세요.';
         }
 
         if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
-          return 'Custom error: API rate limit exceeded. Please wait a moment before trying again.';
+          // 자연스러운 한국어 문구를 위해 'rate limit' 부분 문자열을 없앴다. 그 결과 이 메시지는
+          // Chat.client.tsx의 errorType 판별에서 더 이상 '요청 한도 초과'로 매치되지 않고
+          // statusCode 기본값(500)에 따라 '서버 오류'로 분류된다 — 의도된 동작.
+          return '너무 많이 요청해서 잠시 제한됐어요. 잠깐 기다렸다가 다시 시도해주세요.';
         }
 
         if (errorMessage.includes('network') || errorMessage.includes('timeout')) {
-          return 'Custom error: Network error. Please check your internet connection and try again.';
+          return '네트워크에 문제가 있어요. 인터넷 연결을 확인하고 다시 시도해주세요.';
         }
 
-        return `Custom error: ${errorMessage}`;
+        return `문제가 발생했어요: ${errorMessage}`;
       },
     }).pipeThrough(
       new TransformStream({
@@ -432,7 +441,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
 
     const errorResponse = {
       error: true,
-      message: error.message || 'An unexpected error occurred',
+      message: error.message || '예상치 못한 오류가 발생했어요.',
       statusCode: error.statusCode || 500,
       isRetryable: error.isRetryable !== false, // Default to retryable unless explicitly false
       provider: error.provider || 'unknown',
@@ -442,7 +451,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
       return new Response(
         JSON.stringify({
           ...errorResponse,
-          message: 'Invalid or missing API key',
+          message: 'API 키가 없거나 올바르지 않아요.',
           statusCode: 401,
           isRetryable: false,
         }),

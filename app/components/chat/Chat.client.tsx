@@ -251,7 +251,7 @@ export const ChatImpl = memo(
         setFakeLoading(false);
 
         let errorInfo = {
-          message: 'An unexpected error occurred',
+          message: '알 수 없는 오류가 발생했어요.',
           isRetryable: true,
           statusCode: 500,
           provider: provider.name,
@@ -274,20 +274,20 @@ export const ChatImpl = memo(
         }
 
         let errorType: LlmErrorAlertType['errorType'] = 'unknown';
-        let title = 'Request Failed';
+        let title = '요청 실패';
 
         if (errorInfo.statusCode === 401 || errorInfo.message.toLowerCase().includes('api key')) {
           errorType = 'authentication';
-          title = 'Authentication Error';
+          title = '인증 오류';
         } else if (errorInfo.statusCode === 429 || errorInfo.message.toLowerCase().includes('rate limit')) {
           errorType = 'rate_limit';
-          title = 'Rate Limit Exceeded';
+          title = '요청 한도 초과';
         } else if (errorInfo.message.toLowerCase().includes('quota')) {
           errorType = 'quota';
-          title = 'Quota Exceeded';
+          title = '사용량 초과';
         } else if (errorInfo.statusCode >= 500) {
           errorType = 'network';
-          title = 'Server Error';
+          title = '서버 오류';
         }
 
         logStore.logError(`${context} request failed`, error, {

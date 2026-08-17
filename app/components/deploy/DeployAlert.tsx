@@ -88,7 +88,7 @@ export default function DeployChatAlert({ alert, clearAlert, postMessage }: Depl
                           <span className="text-white text-xs">1</span>
                         )}
                       </div>
-                      <span className="ml-2">Build</span>
+                      <span className="ml-2">빌드</span>
                     </div>
 
                     {/* Connector Line */}
@@ -123,7 +123,7 @@ export default function DeployChatAlert({ alert, clearAlert, postMessage }: Depl
                           <span className="text-white text-xs">2</span>
                         )}
                       </div>
-                      <span className="ml-2">Deploy</span>
+                      <span className="ml-2">배포</span>
                     </div>
                   </div>
                 </div>
@@ -142,7 +142,7 @@ export default function DeployChatAlert({ alert, clearAlert, postMessage }: Depl
                     rel="noopener noreferrer"
                     className="text-bolt-elements-item-contentAccent hover:underline flex items-center"
                   >
-                    <span className="mr-1">View deployed site</span>
+                    <span className="mr-1">배포된 사이트 보기</span>
                     <div className="i-ph:arrow-square-out"></div>
                   </a>
                 </div>
@@ -159,9 +159,7 @@ export default function DeployChatAlert({ alert, clearAlert, postMessage }: Depl
               <div className={classNames('flex gap-2')}>
                 {type === 'error' && (
                   <button
-                    onClick={() =>
-                      postMessage(`*Fix this deployment error*\n\`\`\`\n${content || description}\n\`\`\`\n`)
-                    }
+                    onClick={() => postMessage(`*이 배포 오류를 고쳐줘*\n\`\`\`\n${content || description}\n\`\`\`\n`)}
                     className={classNames(
                       `px-2 py-1.5 rounded-md text-sm font-medium`,
                       'bg-bolt-elements-button-primary-background',
@@ -185,7 +183,7 @@ export default function DeployChatAlert({ alert, clearAlert, postMessage }: Depl
                     'text-bolt-elements-button-secondary-text',
                   )}
                 >
-                  Dismiss
+                  닫기
                 </button>
               </div>
             </motion.div>

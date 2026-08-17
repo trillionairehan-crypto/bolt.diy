@@ -55,7 +55,7 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
               <p>{message}</p>
               {description && (
                 <div className="text-xs text-bolt-elements-textSecondary p-2 bg-bolt-elements-background-depth-3 rounded mt-4 mb-4">
-                  Error: {description}
+                  오류: {description}
                 </div>
               )}
             </motion.div>
@@ -71,7 +71,7 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                 <button
                   onClick={() =>
                     postMessage(
-                      `*Fix this ${isPreview ? 'preview' : 'terminal'} error* \n\`\`\`${isPreview ? 'js' : 'sh'}\n${content}\n\`\`\`\n`,
+                      `*이 ${isPreview ? '미리보기' : '터미널'} 오류를 고쳐줘* \n\`\`\`${isPreview ? 'js' : 'sh'}\n${content}\n\`\`\`\n`,
                     )
                   }
                   className={classNames(
@@ -96,7 +96,7 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                     'text-bolt-elements-button-secondary-text',
                   )}
                 >
-                  Dismiss
+                  닫기
                 </button>
               </div>
             </motion.div>

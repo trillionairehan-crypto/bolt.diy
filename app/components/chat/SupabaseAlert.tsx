@@ -21,11 +21,11 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
   const isConnected = !!(connection.token && connection.selectedProjectId);
 
   // Set title and description based on connection state
-  const title = isConnected ? 'Supabase Query' : 'Supabase Connection Required';
-  const description = isConnected ? 'Execute database query' : 'Supabase connection required';
+  const title = isConnected ? 'Supabase 쿼리' : 'Supabase 연결 필요';
+  const description = isConnected ? '데이터베이스 쿼리 실행' : 'Supabase 연결이 필요해요';
   const message = isConnected
-    ? 'Please review the proposed changes and apply them to your database.'
-    : 'Please connect to Supabase to continue with this operation.';
+    ? '제안된 변경사항을 확인하고 데이터베이스에 적용해주세요.'
+    : '계속하려면 먼저 Supabase에 연결해주세요.';
 
   const handleConnectClick = () => {
     // Dispatch an event to open the Supabase connection dialog
@@ -58,7 +58,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
 
       if (!response.ok) {
         const errorData = (await response.json()) as any;
-        throw new Error(`Supabase query failed: ${errorData.error?.message || response.statusText}`);
+        throw new Error(`Supabase 쿼리 실행에 실패했어요: ${errorData.error?.message || response.statusText}`);
       }
 
       const result = await response.json();
@@ -67,7 +67,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
     } catch (error) {
       console.error('Failed to execute Supabase action:', error);
       postMessage(
-        `*Error executing Supabase query please fix and return the query again*\n\`\`\`\n${error instanceof Error ? error.message : String(error)}\n\`\`\`\n`,
+        `*Supabase 쿼리 실행 중 오류가 발생했어요. 고쳐서 쿼리를 다시 알려줘*\n\`\`\`\n${error instanceof Error ? error.message : String(error)}\n\`\`\`\n`,
       );
     } finally {
       setIsExecuting(false);
@@ -114,7 +114,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
           {!isConnected ? (
             <div className="p-3 rounded-md bg-bolt-elements-background-depth-3">
               <span className="text-sm text-bolt-elements-textPrimary">
-                You must first connect to Supabase and select a project.
+                먼저 Supabase에 연결하고 프로젝트를 선택해주세요.
               </span>
             </div>
           ) : (
@@ -125,7 +125,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
               >
                 <div className="i-ph:database text-bolt-elements-textPrimary mr-2"></div>
                 <span className="text-sm text-bolt-elements-textPrimary flex-grow">
-                  {description || 'Create table and setup auth'}
+                  {description || '테이블 생성 및 인증 설정'}
                 </span>
                 <div
                   className={`i-ph:caret-up text-bolt-elements-textPrimary transition-transform ${isCollapsed ? 'rotate-180' : ''}`}
@@ -158,7 +158,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                   'flex items-center gap-1.5',
                 )}
               >
-                Connect to Supabase
+                Supabase 연결하기
               </button>
             ) : (
               <button
@@ -174,7 +174,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                   isExecuting ? 'opacity-70 cursor-not-allowed' : '',
                 )}
               >
-                {isExecuting ? 'Applying...' : 'Apply Changes'}
+                {isExecuting ? '적용 중...' : '변경사항 적용'}
               </button>
             )}
             <button
@@ -189,7 +189,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                 isExecuting ? 'opacity-70 cursor-not-allowed' : '',
               )}
             >
-              Dismiss
+              닫기
             </button>
           </div>
         </div>
