@@ -172,7 +172,7 @@ export default function DeployChatAlert({ alert, clearAlert, postMessage }: Depl
                     )}
                   >
                     <div className="i-ph:chat-circle-duotone"></div>
-                    Ask Bolt
+                    코랄레드에게 물어보기
                   </button>
                 )}
                 <button

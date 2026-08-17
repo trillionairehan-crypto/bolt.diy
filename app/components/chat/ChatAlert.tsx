@@ -12,10 +12,10 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
   const { description, content, source } = alert;
 
   const isPreview = source === 'preview';
-  const title = isPreview ? 'Preview Error' : 'Terminal Error';
+  const title = isPreview ? '미리보기 오류' : '터미널 오류';
   const message = isPreview
-    ? 'We encountered an error while running the preview. Would you like Bolt to analyze and help resolve this issue?'
-    : 'We encountered an error while running terminal commands. Would you like Bolt to analyze and help resolve this issue?';
+    ? '미리보기를 실행하는 중 오류가 발생했어요. 코랄레드가 분석해서 해결하도록 도와줄까요?'
+    : '터미널 명령을 실행하는 중 오류가 발생했어요. 코랄레드가 분석해서 해결하도록 도와줄까요?';
 
   return (
     <AnimatePresence>
@@ -84,7 +84,7 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                   )}
                 >
                   <div className="i-ph:chat-circle-duotone"></div>
-                  Ask Bolt
+                  코랄레드에게 물어보기
                 </button>
                 <button
                   onClick={clearAlert}

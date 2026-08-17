@@ -225,7 +225,7 @@ export async function selectContext(props: {
   logger.info(`Total files: ${totalFiles}`);
 
   if (totalFiles == 0) {
-    throw new Error(`Bolt failed to select files`);
+    throw new Error(`코랄레드가 파일을 선택하지 못했어요`);
   }
 
   return filteredFiles;

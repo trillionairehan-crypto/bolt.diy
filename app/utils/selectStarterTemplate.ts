@@ -185,7 +185,7 @@ export async function getTemplates(templateName: string, title?: string) {
   }
 
   const assistantMessage = `
-Bolt is initializing your project with the required files using the ${template.name} template.
+코랄레드가 ${template.name} 템플릿으로 필요한 파일을 준비해서 프로젝트를 초기화하고 있어요.
 <boltArtifact id="imported-files" title="${title || 'Create initial files'}" type="bundled">
 ${filesToImport.files
   .map(
