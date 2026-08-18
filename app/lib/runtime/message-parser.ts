@@ -2,6 +2,7 @@ import type { ActionType, BoltAction, BoltActionData, FileAction, ShellAction, S
 import type { BoltArtifactData } from '~/types/artifact';
 import { createScopedLogger } from '~/utils/logger';
 import { unreachable } from '~/utils/unreachable';
+import { postProcessReactFile } from './file-postprocess';
 
 const ARTIFACT_TAG_OPEN = '<boltArtifact';
 const ARTIFACT_TAG_CLOSE = '</boltArtifact>';
@@ -156,6 +157,10 @@ export class StreamingMessageParser {
               }
 
               content += '\n';
+            }
+
+            if ('type' in currentAction && currentAction.type === 'file' && /\.(tsx|jsx)$/.test(currentAction.filePath)) {
+              content = postProcessReactFile(currentAction.filePath, content);
             }
 
             currentAction.content = content;
