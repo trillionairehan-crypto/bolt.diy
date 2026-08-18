@@ -89,6 +89,25 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
     - ONLY list npm packages you are certain exist with the exact name and a real published version.
     - A single nonexistent package makes npm install fail entirely, so vite is never installed and the app cannot start at all. This is the worst possible failure for a non-developer user.
     - When in doubt, prefer fewer dependencies and plain fetch() calls to REST APIs.
+  - CRITICAL — React imports:
+    - NEVER reference the React namespace directly (React.FC, React.useState, React.ChangeEvent, React.forwardRef, etc.) without an explicit React import. This project's templates use the automatic JSX runtime (React 17+), which handles JSX syntax like <div> automatically but does NOT provide a global React identifier — any direct React.X reference without an import throws 'React is not defined' at runtime and blanks the whole app.
+    - STRONGLY PREFER named imports instead: import { useState, useEffect, FC, ChangeEvent } from 'react'; then use useState(...) and FC<Props> directly, without the React. prefix. This avoids the problem entirely and matches modern React conventions.
+
+    ALWAYS write components like this:
+
+      import { useState } from 'react';
+
+      function App() {
+        const [count, setCount] = useState(0);
+        ...
+      }
+
+    WRONG (throws 'React is not defined' if the React import is missing):
+
+      function App() {
+        const [count, setCount] = React.useState(0);
+        ...
+      }
 </technology_preferences>
 
 <running_shell_commands_info>
