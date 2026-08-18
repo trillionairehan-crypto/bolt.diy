@@ -30,6 +30,7 @@ import { useMCPStore } from '~/lib/stores/mcp';
 import type { LlmErrorAlertType } from '~/types/actions';
 import { hasGenerationsRemaining, incrementGenerationsUsed } from '~/lib/freeTrial';
 import { authUserStore } from '~/lib/stores/auth';
+import { buildFixPrompt } from '~/utils/buildFixPrompt';
 import { setSidebarOpen } from '~/lib/stores/sidebar';
 
 const logger = createScopedLogger('Chat');
@@ -345,6 +346,7 @@ export const ChatImpl = memo(
       }
 
       chatStore.setKey('started', true);
+      chatStore.setKey('autoFixAttempts', 0);
 
       setChatStarted(true);
     };
@@ -629,6 +631,24 @@ export const ChatImpl = memo(
 
       textareaRef.current?.blur();
     };
+
+    // Auto-retries preview runtime errors by asking Coralred to fix them, up to a small cap.
+    // Terminal errors are out of scope here — those keep the existing manual "물어보기" flow.
+    useEffect(() => {
+      if (!actionAlert || actionAlert.source !== 'preview') {
+        return;
+      }
+
+      const attempts = chatStore.get().autoFixAttempts;
+
+      if (attempts >= 2) {
+        return;
+      }
+
+      chatStore.setKey('autoFixAttempts', attempts + 1);
+      sendMessage({} as any, buildFixPrompt(true, actionAlert.content));
+      workbenchStore.clearAlert();
+    }, [actionAlert]);
 
     /**
      * Handles the change event for the textarea and updates the input state.

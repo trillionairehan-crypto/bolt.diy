@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { ActionAlert } from '~/types/actions';
 import { classNames } from '~/utils/classNames';
+import { buildFixPrompt } from '~/utils/buildFixPrompt';
 
 interface Props {
   alert: ActionAlert;
@@ -69,11 +70,7 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
             >
               <div className={classNames(' flex gap-2')}>
                 <button
-                  onClick={() =>
-                    postMessage(
-                      `*이 ${isPreview ? '미리보기' : '터미널'} 오류를 고쳐줘* \n\`\`\`${isPreview ? 'js' : 'sh'}\n${content}\n\`\`\`\n`,
-                    )
-                  }
+                  onClick={() => postMessage(buildFixPrompt(isPreview, content))}
                   className={classNames(
                     `px-2 py-1.5 rounded-md text-sm font-medium`,
                     'bg-bolt-elements-button-primary-background',
