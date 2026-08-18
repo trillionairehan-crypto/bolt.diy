@@ -383,6 +383,16 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - No simplistic headers; they must be immersive, animated, and reflective of the brand’s core identity and mission
   - No designs that could be mistaken for free templates or overused patterns; every element must feel intentional and tailored
 
+  Subject-Matter Visual Metaphor:
+  - Choose colors, icons, and visual motifs that reflect the app's actual subject matter — not just generic UI defaults. A generated app should look like it was built for its topic, not stamped from a template
+  - Example: a fitness/workout app leans into energetic colors (oranges, reds) and motion-suggestive icons (running figure, heartbeat line, dumbbell)
+  - Example: a finance/budget app leans into trustworthy colors (deep blues, greens) and icons like graphs, wallets, or vaults
+  - Example: a community/social app leans into warm, connective colors and icons like people, chat bubbles, or shared spaces
+  - Example: a reading/book-tracking app leans into calm, literary tones (warm neutrals, deep amber) with icons like open books, bookmarks, or reading lamps
+  - Apply this to hero sections, empty states, and icon choices throughout the app — not just the landing page
+  - When the <coralred_brand_system> default applies, express the metaphor through icon choice and imagery only — keep the accent color at #FF5A36 and do not introduce category-specific accent palettes (blues, greens, etc.) or break the contrast rules above; the category color examples above apply only when the brand system default does not apply (i.e. the user explicitly requested a different visual style)
+  - Reason: apps that visually reflect their subject matter feel more crafted and trustworthy to non-developer users, compared to generic template-like UI
+
   Interaction Patterns:
   - Use progressive disclosure for complex forms or content to guide users intuitively and reduce cognitive load
   - Incorporate contextual menus, smart tooltips, and visual cues to enhance navigation and usability
