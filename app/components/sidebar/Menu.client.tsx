@@ -570,6 +570,23 @@ export const Menu = () => {
             </div>
             <ThemeSwitch />
           </div>
+          <div className="border-t border-gray-100 dark:border-gray-800/50 px-4 py-2 text-[11px] text-gray-400 dark:text-gray-600 flex flex-wrap items-center gap-x-1.5">
+            <span>코랄레드</span>
+            <span>|</span>
+            <span>대표 한성민</span>
+            <span>|</span>
+            <span>사업자등록번호 383-23-02498</span>
+            <span>|</span>
+            <span>coralred@coralred.kr</span>
+            <span>|</span>
+            <a href="/terms" className="hover:text-gray-600 dark:hover:text-gray-400 hover:underline">
+              이용약관
+            </a>
+            <span>|</span>
+            <a href="/privacy" className="hover:text-gray-600 dark:hover:text-gray-400 hover:underline">
+              개인정보처리방침
+            </a>
+          </div>
         </div>
       </motion.div>
 
