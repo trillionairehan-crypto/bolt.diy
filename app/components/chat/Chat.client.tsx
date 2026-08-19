@@ -35,6 +35,9 @@ import { setSidebarOpen } from '~/lib/stores/sidebar';
 
 const logger = createScopedLogger('Chat');
 
+// Error patterns that are almost always a one-line missing-import/typo fix — not worth Opus's cost.
+const SIMPLE_MISTAKE_PATTERN = /is not defined|is not a function|Cannot find module|has no exported member/i;
+
 export function Chat() {
   renderLogger.trace('Chat');
 
@@ -549,7 +552,16 @@ export const ChatImpl = memo(
       generateNewApp(finalPrompt);
     };
 
-    const sendMessage = async (_event: React.UIEvent, messageInput?: string) => {
+    /**
+     * `modelOverride`, when given, replaces the `model`/`provider` React state ONLY for the
+     * `[Model: ...][Provider: ...]` tag on this one outgoing message — the state itself, and
+     * therefore every other message (past or future), is untouched.
+     */
+    const sendMessage = async (
+      _event: React.UIEvent,
+      messageInput?: string,
+      modelOverride?: { model: string; providerName: string },
+    ) => {
       const messageContent = messageInput || input;
 
       if (!messageContent?.trim()) {
@@ -588,9 +600,12 @@ export const ChatImpl = memo(
 
       chatStore.setKey('aborted', false);
 
+      const taggedModel = modelOverride?.model ?? model;
+      const taggedProviderName = modelOverride?.providerName ?? provider.name;
+
       if (modifiedFiles !== undefined) {
         const userUpdateArtifact = filesToArtifacts(modifiedFiles, `${Date.now()}`);
-        const messageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${userUpdateArtifact}${finalMessageContent}`;
+        const messageText = `[Model: ${taggedModel}]\n\n[Provider: ${taggedProviderName}]\n\n${userUpdateArtifact}${finalMessageContent}`;
 
         const attachmentOptions =
           uploadedFiles.length > 0 ? { experimental_attachments: await filesToAttachments(uploadedFiles) } : undefined;
@@ -606,7 +621,7 @@ export const ChatImpl = memo(
 
         workbenchStore.resetAllFileModifications();
       } else {
-        const messageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${finalMessageContent}`;
+        const messageText = `[Model: ${taggedModel}]\n\n[Provider: ${taggedProviderName}]\n\n${finalMessageContent}`;
 
         const attachmentOptions =
           uploadedFiles.length > 0 ? { experimental_attachments: await filesToAttachments(uploadedFiles) } : undefined;
@@ -645,8 +660,26 @@ export const ChatImpl = memo(
         return;
       }
 
+      const prompt = buildFixPrompt(true, actionAlert.content);
+
+      // On the last automatic retry, promote to Opus for anything that isn't an obvious one-line mistake.
+      // modelOverride is passed straight into sendMessage's 3rd argument — it only affects the
+      // [Model:/Provider:] tag baked into THIS message's text. It never calls setModel/setProvider or
+      // touches the selectedModel/selectedProvider cookies, so the component's model/provider state is
+      // untouched and the very next message (retry or user-typed) reads that unchanged state fresh.
+      let modelOverride: { model: string; providerName: string } | undefined;
+
+      if (attempts === 1) {
+        if (SIMPLE_MISTAKE_PATTERN.test(actionAlert.description)) {
+          logger.debug('Auto-fix: 단순 실수로 판단, Sonnet 유지');
+        } else {
+          logger.debug('Auto-fix: 복잡한 에러로 판단, Opus로 1회 승격');
+          modelOverride = { model: 'claude-opus-5', providerName: 'Anthropic' };
+        }
+      }
+
       chatStore.setKey('autoFixAttempts', attempts + 1);
-      sendMessage({} as any, buildFixPrompt(true, actionAlert.content));
+      sendMessage({} as any, prompt, modelOverride);
       workbenchStore.clearAlert();
     }, [actionAlert]);
 

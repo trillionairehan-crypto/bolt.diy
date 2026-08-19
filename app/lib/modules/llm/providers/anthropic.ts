@@ -15,8 +15,17 @@ export default class AnthropicProvider extends BaseProvider {
   staticModels: ModelInfo[] = [
     /*
      * Essential fallback models - only the most stable/reliable, currently-supported ones
-     * Claude Opus 4.8: 1M context, most capable Opus-tier model (current flagship)
+     * Claude Opus 5: 1M context, most capable model
      */
+    {
+      name: 'claude-opus-5',
+      label: 'Claude Opus 5',
+      provider: 'Anthropic',
+      maxTokenAllowed: 1000000,
+      maxCompletionTokens: 128000,
+    },
+
+    // Claude Opus 4.8: 1M context, most capable Opus-tier model
     {
       name: 'claude-opus-4-8',
       label: 'Claude Opus 4.8',
