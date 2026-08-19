@@ -1,7 +1,7 @@
 import { motion, type Variants } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { Dialog, DialogButton, DialogDescription, DialogRoot, DialogTitle } from '~/components/ui/Dialog';
+import { Dialog, DialogButton, DialogDescription, DialogRoot, DialogTitle, dialogBackdropVariants } from '~/components/ui/Dialog';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
 import { ControlPanel } from '~/components/@settings/core/ControlPanel';
 import { SettingsButton } from '~/components/ui/SettingsButton';
@@ -337,12 +337,22 @@ export const Menu = () => {
 
   return (
     <>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-[900] bg-black/40 backdrop-blur-sm"
+          initial="closed"
+          animate="open"
+          exit="closed"
+          variants={dialogBackdropVariants}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
       <motion.div
         ref={menuRef}
         initial="closed"
         animate={open ? 'open' : 'closed'}
         variants={menuVariants}
-        style={{ width: '340px' }}
+        style={{ width: 'min(340px, calc(100vw - 40px))' }}
         className={classNames(
           'flex selection-accent flex-col side-menu fixed top-0 h-full rounded-r-2xl',
           'bg-white dark:bg-gray-950 border-r border-bolt-elements-borderColor',
