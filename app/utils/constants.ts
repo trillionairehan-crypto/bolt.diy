@@ -6,7 +6,13 @@ export const WORK_DIR = `/home/${WORK_DIR_NAME}`;
 export const MODIFICATIONS_TAG_NAME = 'bolt_file_modifications';
 export const MODEL_REGEX = /^\[Model: (.*?)\]\n\n/;
 export const PROVIDER_REGEX = /\[Provider: (.*?)\]\n\n/;
-export const DEFAULT_MODEL = 'claude-sonnet-5';
+/*
+ * Temporarily rolled back from 'claude-sonnet-5' — the installed ai SDK (v4.3.16, three majors
+ * behind latest) force-injects `temperature: 0` on every non-reasoning call regardless of what
+ * the app code sends, and Sonnet 5 rejects any explicit temperature param ("temperature is
+ * deprecated for this model"). Revert once the ai SDK is upgraded and this is verified fixed.
+ */
+export const DEFAULT_MODEL = 'claude-sonnet-4-5-20250929';
 export { SHOW_DEV_TOOLS } from './featureFlags';
 export const PROMPT_COOKIE_KEY = 'cachedPrompt';
 export const TOOL_EXECUTION_APPROVAL = {

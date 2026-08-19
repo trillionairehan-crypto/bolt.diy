@@ -35,6 +35,14 @@ import { setSidebarOpen } from '~/lib/stores/sidebar';
 
 const logger = createScopedLogger('Chat');
 
+/*
+ * Locked: the installed ai SDK (v4.3.16) force-injects `temperature: 0` on every non-reasoning
+ * call, and Opus 5 rejects any explicit temperature param the same way Sonnet 5 does. Promoting
+ * to Opus 5 here would just trade one crash for another. Re-enable once the SDK is upgraded and
+ * this is verified fixed.
+ */
+const OPUS_PROMOTION_LOCKED = true;
+
 // Error patterns that are almost always a one-line missing-import/typo fix — not worth Opus's cost.
 const SIMPLE_MISTAKE_PATTERN = /is not defined|is not a function|Cannot find module|has no exported member/i;
 
@@ -672,6 +680,8 @@ export const ChatImpl = memo(
       if (attempts === 1) {
         if (SIMPLE_MISTAKE_PATTERN.test(actionAlert.description)) {
           logger.debug('Auto-fix: 단순 실수로 판단, Sonnet 유지');
+        } else if (OPUS_PROMOTION_LOCKED) {
+          logger.debug('Auto-fix: 복잡한 에러로 판단됐지만 Opus 승격은 잠겨 있어 Sonnet 유지');
         } else {
           logger.debug('Auto-fix: 복잡한 에러로 판단, Opus로 1회 승격');
           modelOverride = { model: 'claude-opus-5', providerName: 'Anthropic' };
