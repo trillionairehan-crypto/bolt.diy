@@ -1,7 +1,7 @@
 import { BaseProvider } from '~/lib/modules/llm/base-provider';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { IProviderSetting } from '~/types/model';
-import type { LanguageModelV2 } from '@ai-sdk/provider';
+import type { LanguageModelV3 } from '@ai-sdk/provider';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 
 export default class GoogleProvider extends BaseProvider {
@@ -123,7 +123,7 @@ export default class GoogleProvider extends BaseProvider {
     serverEnv: any;
     apiKeys?: Record<string, string>;
     providerSettings?: Record<string, IProviderSetting>;
-  }): LanguageModelV2 {
+  }): LanguageModelV3 {
     const { model, serverEnv, apiKeys, providerSettings } = options;
 
     const { apiKey } = this.getProviderBaseUrlAndKey({

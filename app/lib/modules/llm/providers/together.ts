@@ -1,7 +1,7 @@
 import { BaseProvider, getOpenAILikeModel } from '~/lib/modules/llm/base-provider';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { IProviderSetting } from '~/types/model';
-import type { LanguageModelV2 } from '@ai-sdk/provider';
+import type { LanguageModelV3 } from '@ai-sdk/provider';
 
 export default class TogetherProvider extends BaseProvider {
   name = 'Together';
@@ -78,7 +78,7 @@ export default class TogetherProvider extends BaseProvider {
     serverEnv: Env;
     apiKeys?: Record<string, string>;
     providerSettings?: Record<string, IProviderSetting>;
-  }): LanguageModelV2 {
+  }): LanguageModelV3 {
     const { model, serverEnv, apiKeys, providerSettings } = options;
 
     const { baseUrl, apiKey } = this.getProviderBaseUrlAndKey({
