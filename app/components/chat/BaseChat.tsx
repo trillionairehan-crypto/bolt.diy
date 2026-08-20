@@ -2,7 +2,7 @@
  * @ts-nocheck
  * Preventing TS checks with files presented in the video for a better presentation.
  */
-import type { JSONValue, Message } from 'ai';
+import type { JSONValue, UIMessage } from 'ai';
 import React, { type RefCallback, useEffect, useState } from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { Menu } from '~/components/sidebar/Menu.client';
@@ -49,7 +49,8 @@ interface BaseChatProps {
   onClarificationComplete?: (finalPrompt: string) => void;
   isStreaming?: boolean;
   onStreamingChange?: (streaming: boolean) => void;
-  messages?: Message[];
+  messages?: UIMessage[];
+  parsedMessages?: { [key: number]: string };
   description?: string;
   enhancingPrompt?: boolean;
   promptEnhanced?: boolean;
@@ -63,7 +64,7 @@ interface BaseChatProps {
   sendMessage?: (event: React.UIEvent, messageInput?: string) => void;
   handleInputChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   enhancePrompt?: () => void;
-  importChat?: (description: string, messages: Message[]) => Promise<void>;
+  importChat?: (description: string, messages: UIMessage[]) => Promise<void>;
   exportChat?: () => void;
   uploadedFiles?: File[];
   setUploadedFiles?: (files: File[]) => void;
@@ -80,12 +81,18 @@ interface BaseChatProps {
   data?: JSONValue[] | undefined;
   chatMode?: 'discuss' | 'build';
   setChatMode?: (mode: 'discuss' | 'build') => void;
-  append?: (message: Message) => void;
+  append?: (message: { text: string }) => void;
   designScheme?: DesignScheme;
   setDesignScheme?: (scheme: DesignScheme) => void;
   selectedElement?: ElementInfo | null;
   setSelectedElement?: (element: ElementInfo | null) => void;
-  addToolResult?: ({ toolCallId, result }: { toolCallId: string; result: any }) => void;
+  addToolOutput?: (input: {
+    state?: 'output-available';
+    tool: string;
+    toolCallId: string;
+    output: any;
+    errorText?: never;
+  }) => void;
   onWebSearchResult?: (result: string) => void;
 }
 
@@ -119,6 +126,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       imageDataList = [],
       setImageDataList,
       messages,
+      parsedMessages,
       actionAlert,
       clearAlert,
       deployAlert,
@@ -135,8 +143,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       setDesignScheme,
       selectedElement,
       setSelectedElement,
-      addToolResult = () => {
-        throw new Error('addToolResult not implemented');
+      addToolOutput = () => {
+        throw new Error('addToolOutput not implemented');
       },
       onWebSearchResult,
     },
@@ -418,13 +426,14 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       <Messages
                         className="flex flex-col w-full flex-1 max-w-chat pb-4 mx-auto z-1"
                         messages={messages}
+                        parsedMessages={parsedMessages}
                         isStreaming={isStreaming}
                         append={append}
                         chatMode={chatMode}
                         setChatMode={setChatMode}
                         provider={provider}
                         model={model}
-                        addToolResult={addToolResult}
+                        addToolOutput={addToolOutput}
                       />
                     ) : null;
                   }}

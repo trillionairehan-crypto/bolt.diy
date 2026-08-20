@@ -1,7 +1,7 @@
 import { useLoaderData, useNavigate, useSearchParams } from '@remix-run/react';
 import { useState, useEffect, useCallback } from 'react';
 import { atom } from 'nanostores';
-import { generateId, type JSONValue, type Message } from 'ai';
+import { generateId, type UIMessage } from 'ai';
 import { toast } from 'react-toastify';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { logStore } from '~/lib/stores/logs'; // Import logStore
@@ -21,13 +21,12 @@ import type { FileMap } from '~/lib/stores/files';
 import type { Snapshot } from './types';
 import { webcontainer } from '~/lib/webcontainer';
 import { detectProjectCommands, createCommandActionsString } from '~/utils/projectCommands';
-import type { ContextAnnotation } from '~/types/context';
 
 export interface ChatHistoryItem {
   id: string;
   urlId?: string;
   description?: string;
-  messages: Message[];
+  messages: UIMessage[];
   timestamp: string;
   metadata?: IChatMetadata;
 }
@@ -44,8 +43,8 @@ export function useChatHistory() {
   const { id: mixedId } = useLoaderData<{ id?: string }>();
   const [searchParams] = useSearchParams();
 
-  const [archivedMessages, setArchivedMessages] = useState<Message[]>([]);
-  const [initialMessages, setInitialMessages] = useState<Message[]>([]);
+  const [archivedMessages, setArchivedMessages] = useState<UIMessage[]>([]);
+  const [initialMessages, setInitialMessages] = useState<UIMessage[]>([]);
   const [ready, setReady] = useState<boolean>(false);
   const [urlId, setUrlId] = useState<string | undefined>();
 
@@ -92,7 +91,7 @@ export function useChatHistory() {
             }
 
             let filteredMessages = storedMessages.messages.slice(startingIdx + 1, endingIdx);
-            let archivedMessages: Message[] = [];
+            let archivedMessages: UIMessage[] = [];
 
             if (startingIdx >= 0) {
               archivedMessages = storedMessages.messages.slice(0, startingIdx + 1);
@@ -122,15 +121,18 @@ export function useChatHistory() {
                 {
                   id: generateId(),
                   role: 'user',
-                  content: `Restore project from snapshot`, // Removed newline
-                  annotations: ['no-store', 'hidden'],
+                  parts: [{ type: 'text', text: `Restore project from snapshot` }], // Removed newline
+                  metadata: { hidden: true, noStore: true },
                 },
                 {
                   id: storedMessages.messages[snapshotIndex].id,
                   role: 'assistant',
 
                   // Combine followup message and the artifact with files and command actions
-                  content: `코랄레드가 스냅샷에서 채팅을 복원했어요. 이 메시지를 되돌리면 전체 채팅 기록을 불러올 수 있어요.
+                  parts: [
+                    {
+                      type: 'text',
+                      text: `코랄레드가 스냅샷에서 채팅을 복원했어요. 이 메시지를 되돌리면 전체 채팅 기록을 불러올 수 있어요.
                   <boltArtifact id="restored-project-setup" title="Restored Project & Setup" type="bundled">
                   ${Object.entries(snapshot?.files || {})
                     .map(([key, value]) => {
@@ -145,21 +147,24 @@ ${value.content}
                       }
                     })
                     .join('\n')}
-                  ${commandActionsString} 
+                  ${commandActionsString}
                   </boltArtifact>
                   `, // Added commandActionsString, followupMessage, updated id and title
-                  annotations: [
-                    'no-store',
+                    },
                     ...(summary
                       ? [
                           {
-                            chatId: storedMessages.messages[snapshotIndex].id,
-                            type: 'chatSummary',
-                            summary,
-                          } satisfies ContextAnnotation,
+                            type: 'data-chatSummary' as const,
+                            id: 'chatSummary',
+                            data: {
+                              chatId: storedMessages.messages[snapshotIndex].id,
+                              summary,
+                            },
+                          },
                         ]
                       : []),
                   ],
+                  metadata: { noStore: true },
                 },
 
                 // Remove the separate user and assistant messages for commands
@@ -273,13 +278,13 @@ ${value.content}
         console.error(error);
       }
     },
-    storeMessageHistory: async (messages: Message[]) => {
+    storeMessageHistory: async (messages: UIMessage[]) => {
       if (!db || messages.length === 0) {
         return;
       }
 
       const { firstArtifact } = workbenchStore;
-      messages = messages.filter((m) => !m.annotations?.includes('no-store'));
+      messages = messages.filter((m) => !(m as any).metadata?.noStore);
 
       let _urlId = urlId;
 
@@ -294,15 +299,7 @@ ${value.content}
       const lastMessage = messages[messages.length - 1];
 
       if (lastMessage.role === 'assistant') {
-        const annotations = lastMessage.annotations as JSONValue[];
-        const filteredAnnotations = (annotations?.filter(
-          (annotation: JSONValue) =>
-            annotation && typeof annotation === 'object' && Object.keys(annotation).includes('type'),
-        ) || []) as { type: string; value: any } & { [key: string]: any }[];
-
-        if (filteredAnnotations.find((annotation) => annotation.type === 'chatSummary')) {
-          chatSummary = filteredAnnotations.find((annotation) => annotation.type === 'chatSummary')?.summary;
-        }
+        chatSummary = (lastMessage.parts?.find((p: any) => p.type === 'data-chatSummary') as any)?.data?.summary;
       }
 
       takeSnapshot(messages[messages.length - 1].id, workbenchStore.files.get(), _urlId, chatSummary);
@@ -356,7 +353,7 @@ ${value.content}
         console.log(error);
       }
     },
-    importChat: async (description: string, messages: Message[], metadata?: IChatMetadata) => {
+    importChat: async (description: string, messages: UIMessage[], metadata?: IChatMetadata) => {
       if (!db) {
         return;
       }

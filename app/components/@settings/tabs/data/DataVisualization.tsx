@@ -13,6 +13,7 @@ import {
 } from 'chart.js';
 import { Bar, Pie } from 'react-chartjs-2';
 import type { Chat } from '~/lib/persistence/chats';
+import type { TextUIPart } from 'ai';
 import { classNames } from '~/utils/classNames';
 
 // Register ChartJS components
@@ -66,7 +67,12 @@ export function DataVisualization({ chats }: DataVisualizationProps) {
         totalMessages++;
 
         if (message.role === 'assistant') {
-          const providerMatch = message.content.match(/provider:\s*([\w-]+)/i);
+          const textContent =
+            message.parts
+              ?.filter((part): part is TextUIPart => part.type === 'text')
+              .map((part) => part.text)
+              .join('') ?? '';
+          const providerMatch = textContent.match(/provider:\s*([\w-]+)/i);
           const provider = providerMatch ? providerMatch[1] : 'unknown';
           apiUsage[provider] = (apiUsage[provider] || 0) + 1;
         }

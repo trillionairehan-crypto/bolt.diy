@@ -1,17 +1,21 @@
-import { type Message } from 'ai';
+import { type UIMessage, type TextUIPart } from 'ai';
 import { DEFAULT_MODEL, DEFAULT_PROVIDER, MODEL_REGEX, PROVIDER_REGEX } from '~/utils/constants';
 import { IGNORE_PATTERNS, type FileMap } from './constants';
 import ignore from 'ignore';
 import type { ContextAnnotation } from '~/types/context';
 
-export function extractPropertiesFromMessage(message: Omit<Message, 'id'>): {
+export const extractTextContent = (message: Omit<UIMessage, 'id'>) =>
+  message.parts
+    ?.filter((part): part is TextUIPart => part.type === 'text')
+    .map((part) => part.text)
+    .join('') ?? '';
+
+export function extractPropertiesFromMessage(message: Omit<UIMessage, 'id'>): {
   model: string;
   provider: string;
   content: string;
 } {
-  const textContent = Array.isArray(message.content)
-    ? message.content.find((item) => item.type === 'text')?.text || ''
-    : message.content;
+  const textContent = extractTextContent(message);
 
   const modelMatch = textContent.match(MODEL_REGEX);
   const providerMatch = textContent.match(PROVIDER_REGEX);
@@ -28,18 +32,7 @@ export function extractPropertiesFromMessage(message: Omit<Message, 'id'>): {
    */
   const provider = providerMatch ? providerMatch[1] : DEFAULT_PROVIDER.name;
 
-  const cleanedContent = Array.isArray(message.content)
-    ? message.content.map((item) => {
-        if (item.type === 'text') {
-          return {
-            type: 'text',
-            text: item.text?.replace(MODEL_REGEX, '').replace(PROVIDER_REGEX, ''),
-          };
-        }
-
-        return item; // Preserve image_url and other types as is
-      })
-    : textContent.replace(MODEL_REGEX, '').replace(PROVIDER_REGEX, '');
+  const cleanedContent = textContent.replace(MODEL_REGEX, '').replace(PROVIDER_REGEX, '');
 
   return { model, provider, content: cleanedContent };
 }
@@ -88,41 +81,24 @@ export function createFilesContext(files: FileMap, useRelativePath?: boolean) {
   return `<boltArtifact id="code-content" title="Code Content" >\n${fileContexts.join('\n')}\n</boltArtifact>`;
 }
 
-export function extractCurrentContext(messages: Message[]) {
+export function extractCurrentContext(messages: UIMessage[]) {
   const lastAssistantMessage = messages.filter((x) => x.role == 'assistant').slice(-1)[0];
 
   if (!lastAssistantMessage) {
     return { summary: undefined, codeContext: undefined };
   }
 
-  let summary: ContextAnnotation | undefined;
-  let codeContext: ContextAnnotation | undefined;
+  // v5 UIMessage has no `annotations` field — chatSummary/codeContext are now persisted as
+  // non-transient `data-*` parts instead (see api.chat.ts), so we read them off `parts`.
+  const chatSummaryPart = lastAssistantMessage.parts?.find((p: any) => p.type === 'data-chatSummary') as any;
+  const codeContextPart = lastAssistantMessage.parts?.find((p: any) => p.type === 'data-codeContext') as any;
 
-  if (!lastAssistantMessage.annotations?.length) {
-    return { summary: undefined, codeContext: undefined };
-  }
-
-  for (let i = 0; i < lastAssistantMessage.annotations.length; i++) {
-    const annotation = lastAssistantMessage.annotations[i];
-
-    if (!annotation || typeof annotation !== 'object') {
-      continue;
-    }
-
-    if (!(annotation as any).type) {
-      continue;
-    }
-
-    const annotationObject = annotation as any;
-
-    if (annotationObject.type === 'codeContext') {
-      codeContext = annotationObject;
-      break;
-    } else if (annotationObject.type === 'chatSummary') {
-      summary = annotationObject;
-      break;
-    }
-  }
+  const summary: ContextAnnotation | undefined = chatSummaryPart
+    ? ({ type: 'chatSummary', ...chatSummaryPart.data } as ContextAnnotation)
+    : undefined;
+  const codeContext: ContextAnnotation | undefined = codeContextPart
+    ? ({ type: 'codeContext', ...codeContextPart.data } as ContextAnnotation)
+    : undefined;
 
   return { summary, codeContext };
 }

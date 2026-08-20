@@ -1,9 +1,15 @@
-import { generateText, type CoreTool, type GenerateTextResult, type Message } from 'ai';
+import { generateText, type ToolSet, type GenerateTextResult, type UIMessage } from 'ai';
 import ignore from 'ignore';
 import type { IProviderSetting } from '~/types/model';
 import { IGNORE_PATTERNS, type FileMap } from './constants';
 import { DEFAULT_MODEL, DEFAULT_PROVIDER, PROVIDER_LIST } from '~/utils/constants';
-import { createFilesContext, extractCurrentContext, extractPropertiesFromMessage, simplifyBoltActions } from './utils';
+import {
+  createFilesContext,
+  extractCurrentContext,
+  extractPropertiesFromMessage,
+  extractTextContent,
+  simplifyBoltActions,
+} from './utils';
 import { createScopedLogger } from '~/utils/logger';
 import { LLMManager } from '~/lib/modules/llm/manager';
 
@@ -13,7 +19,7 @@ const ig = ignore().add(IGNORE_PATTERNS);
 const logger = createScopedLogger('select-context');
 
 export async function selectContext(props: {
-  messages: Message[];
+  messages: UIMessage[];
   env?: Env;
   apiKeys?: Record<string, string>;
   files: FileMap;
@@ -21,7 +27,7 @@ export async function selectContext(props: {
   promptId?: string;
   contextOptimization?: boolean;
   summary: string;
-  onFinish?: (resp: GenerateTextResult<Record<string, CoreTool<any, any>>, never>) => void;
+  onFinish?: (resp: GenerateTextResult<ToolSet, never>) => void;
 }) {
   const { messages, env: serverEnv, apiKeys, files, providerSettings, summary, onFinish } = props;
   let currentModel = DEFAULT_MODEL;
@@ -32,16 +38,20 @@ export async function selectContext(props: {
       currentModel = model;
       currentProvider = provider;
 
-      return { ...message, content };
+      const nonTextParts = (message.parts ?? []).filter((part) => part.type !== 'text');
+
+      return { ...message, parts: [{ type: 'text' as const, text: content }, ...nonTextParts] };
     } else if (message.role == 'assistant') {
-      let content = message.content;
+      let content = extractTextContent(message);
 
       content = simplifyBoltActions(content);
 
       content = content.replace(/<div class=\\"__boltThought__\\">.*?<\/div>/s, '');
       content = content.replace(/<think>.*?<\/think>/s, '');
 
-      return { ...message, content };
+      const nonTextParts = (message.parts ?? []).filter((part) => part.type !== 'text');
+
+      return { ...message, parts: [{ type: 'text' as const, text: content }, ...nonTextParts] };
     }
 
     return message;
@@ -106,11 +116,6 @@ export async function selectContext(props: {
   }
 
   const summaryText = `Here is the summary of the chat till now: ${summary}`;
-
-  const extractTextContent = (message: Message) =>
-    Array.isArray(message.content)
-      ? (message.content.find((item) => item.type === 'text')?.text as string) || ''
-      : message.content;
 
   const lastUserMessage = processedMessages.filter((x) => x.role == 'user').pop();
 

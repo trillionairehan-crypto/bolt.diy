@@ -1,15 +1,8 @@
-import {
-  experimental_createMCPClient,
-  type ToolSet,
-  type Message,
-  type DataStreamWriter,
-  convertToCoreMessages,
-  formatDataStreamPart,
-} from 'ai';
-import { Experimental_StdioMCPTransport } from 'ai/mcp-stdio';
+import { type ToolSet, type UIMessage, type UIMessageStreamWriter, convertToCoreMessages } from 'ai';
+import { experimental_createMCPClient } from '@ai-sdk/mcp';
+import { Experimental_StdioMCPTransport } from '@ai-sdk/mcp/mcp-stdio';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
 import { z } from 'zod';
-import type { ToolCallAnnotation } from '~/types/context';
 import {
   TOOL_EXECUTION_APPROVAL,
   TOOL_EXECUTION_DENIED,
@@ -82,7 +75,7 @@ export type ToolCall = {
   type: 'tool-call';
   toolCallId: string;
   toolName: string;
-  args: Record<string, unknown>;
+  input: unknown;
 };
 
 export type MCPServerTools = Record<string, MCPServer>;
@@ -174,25 +167,27 @@ export class MCPService {
   ): Promise<MCPClient> {
     logger.debug(`Creating Streamable-HTTP client for ${serverName} with URL: ${config.url}`);
 
+    // TODO: MCP 기능은 부수 기능(사용 빈도 낮음), 추후 @ai-sdk/mcp 타입에 맞게 정식 전환 필요
     const client = await experimental_createMCPClient({
       transport: new StreamableHTTPClientTransport(new URL(config.url), {
         requestInit: {
           headers: config.headers,
         },
-      }),
+      }) as any,
     });
 
-    return Object.assign(client, { serverName });
+    return Object.assign(client, { serverName }) as any;
   }
 
   private async _createSSEClient(serverName: string, config: SSEServerConfig): Promise<MCPClient> {
     logger.debug(`Creating SSE client for ${serverName} with URL: ${config.url}`);
 
+    // TODO: MCP 기능은 부수 기능(사용 빈도 낮음), 추후 @ai-sdk/mcp 타입에 맞게 정식 전환 필요
     const client = await experimental_createMCPClient({
       transport: config,
     });
 
-    return Object.assign(client, { serverName });
+    return Object.assign(client, { serverName }) as any;
   }
 
   private async _createStdioClient(serverName: string, config: STDIOServerConfig): Promise<MCPClient> {
@@ -200,9 +195,10 @@ export class MCPService {
       `Creating STDIO client for '${serverName}' with command: '${config.command}' ${config.args?.join(' ') || ''}`,
     );
 
+    // TODO: MCP 기능은 부수 기능(사용 빈도 낮음), 추후 @ai-sdk/mcp 타입에 맞게 정식 전환 필요
     const client = await experimental_createMCPClient({ transport: new Experimental_StdioMCPTransport(config) });
 
-    return Object.assign(client, { serverName });
+    return Object.assign(client, { serverName }) as any;
   }
 
   private _registerTools(serverName: string, tools: ToolSet) {
@@ -355,7 +351,7 @@ export class MCPService {
     return toolName in this._tools;
   }
 
-  processToolCall(toolCall: ToolCall, dataStream: DataStreamWriter): void {
+  processToolCall(toolCall: ToolCall, dataStream: UIMessageStreamWriter): void {
     const { toolCallId, toolName } = toolCall;
 
     if (this.isValidToolName(toolName)) {
@@ -363,18 +359,21 @@ export class MCPService {
       const serverName = this._toolNamesToServerNames.get(toolName);
 
       if (serverName) {
-        dataStream.writeMessageAnnotation({
-          type: 'toolCall',
-          toolCallId,
-          serverName,
-          toolName,
-          toolDescription: description,
-        } satisfies ToolCallAnnotation);
+        dataStream.write({
+          type: 'data-toolCall',
+          id: toolCallId,
+          data: {
+            toolCallId,
+            serverName,
+            toolName,
+            toolDescription: description,
+          },
+        });
       }
     }
   }
 
-  async processToolInvocations(messages: Message[], dataStream: DataStreamWriter): Promise<Message[]> {
+  async processToolInvocations(messages: UIMessage[], dataStream: UIMessageStreamWriter): Promise<UIMessage[]> {
     const lastMessage = messages[messages.length - 1];
     const parts = lastMessage.parts;
 
@@ -384,29 +383,28 @@ export class MCPService {
 
     const processedParts = await Promise.all(
       parts.map(async (part) => {
-        // Only process tool invocations parts
-        if (part.type !== 'tool-invocation') {
+        // Only process dynamic tool parts (MCP tools are not statically typed)
+        if (part.type !== 'dynamic-tool') {
           return part;
         }
 
-        const { toolInvocation } = part;
-        const { toolName, toolCallId } = toolInvocation;
+        const { toolName, toolCallId } = part;
 
         // return part as-is if tool does not exist, or if it's not a tool call result
-        if (!this.isValidToolName(toolName) || toolInvocation.state !== 'result') {
+        if (!this.isValidToolName(toolName) || part.state !== 'output-available') {
           return part;
         }
 
         let result;
 
-        if (toolInvocation.result === TOOL_EXECUTION_APPROVAL.APPROVE) {
+        if (part.output === TOOL_EXECUTION_APPROVAL.APPROVE) {
           const toolInstance = this._tools[toolName];
 
           if (toolInstance && typeof toolInstance.execute === 'function') {
-            logger.debug(`calling tool "${toolName}" with args: ${JSON.stringify(toolInvocation.args)}`);
+            logger.debug(`calling tool "${toolName}" with args: ${JSON.stringify(part.input)}`);
 
             try {
-              result = await toolInstance.execute(toolInvocation.args, {
+              result = await toolInstance.execute(part.input, {
                 messages: convertToCoreMessages(messages),
                 toolCallId,
               });
@@ -417,7 +415,7 @@ export class MCPService {
           } else {
             result = TOOL_NO_EXECUTE_FUNCTION;
           }
-        } else if (toolInvocation.result === TOOL_EXECUTION_APPROVAL.REJECT) {
+        } else if (part.output === TOOL_EXECUTION_APPROVAL.REJECT) {
           result = TOOL_EXECUTION_DENIED;
         } else {
           // For any unhandled responses, return the original part.
@@ -425,20 +423,16 @@ export class MCPService {
         }
 
         // Forward updated tool result to the client.
-        dataStream.write(
-          formatDataStreamPart('tool_result', {
-            toolCallId,
-            result,
-          }),
-        );
+        dataStream.write({
+          type: 'tool-output-available',
+          toolCallId,
+          output: result,
+        });
 
-        // Return updated toolInvocation with the actual result.
+        // Return updated part with the actual result.
         return {
           ...part,
-          toolInvocation: {
-            ...toolInvocation,
-            result,
-          },
+          output: result,
         };
       }),
     );

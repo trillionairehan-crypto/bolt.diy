@@ -103,7 +103,7 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
         messages: [
           {
             role: 'user',
-            content: `${message}`,
+            parts: [{ type: 'text', text: `${message}` }],
           },
         ],
         env: context.cloudflare?.env as any,
@@ -233,12 +233,15 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
       const result = await generateText(finalParams);
       logger.info(`Generated response`);
 
-      return new Response(JSON.stringify(result), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
+      return new Response(
+        JSON.stringify({ text: result.text, usage: result.usage, finishReason: result.finishReason }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
     } catch (error: unknown) {
       console.log(error);
 

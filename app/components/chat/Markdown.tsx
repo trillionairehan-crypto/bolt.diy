@@ -5,7 +5,6 @@ import { createScopedLogger } from '~/utils/logger';
 import { rehypePlugins, remarkPlugins, allowedHTMLElements } from '~/utils/markdown';
 import { Artifact, openArtifactInWorkbench } from './Artifact';
 import { CodeBlock } from './CodeBlock';
-import type { Message } from 'ai';
 import styles from './Markdown.module.scss';
 import ThoughtBox from './ThoughtBox';
 import type { ProviderInfo } from '~/types/model';
@@ -16,7 +15,7 @@ interface MarkdownProps {
   children: string;
   html?: boolean;
   limitedMarkdown?: boolean;
-  append?: (message: Message) => void;
+  append?: (message: { text: string }) => void;
   chatMode?: 'discuss' | 'build';
   setChatMode?: (mode: 'discuss' | 'build') => void;
   model?: string;
@@ -149,29 +148,11 @@ export const Markdown = memo(
                   if (type === 'file') {
                     openArtifactInWorkbench(path);
                   } else if (type === 'message' && append) {
-                    append({
-                      id: `quick-action-message-${Date.now()}`,
-                      content: [
-                        {
-                          type: 'text',
-                          text: `[Model: ${model}]\n\n[Provider: ${provider?.name}]\n\n${message}`,
-                        },
-                      ] as any,
-                      role: 'user',
-                    });
+                    append({ text: `[Model: ${model}]\n\n[Provider: ${provider?.name}]\n\n${message}` });
                     console.log('Message appended:', message);
                   } else if (type === 'implement' && append && setChatMode) {
                     setChatMode('build');
-                    append({
-                      id: `quick-action-implement-${Date.now()}`,
-                      content: [
-                        {
-                          type: 'text',
-                          text: `[Model: ${model}]\n\n[Provider: ${provider?.name}]\n\n${message}`,
-                        },
-                      ] as any,
-                      role: 'user',
-                    });
+                    append({ text: `[Model: ${model}]\n\n[Provider: ${provider?.name}]\n\n${message}` });
                   } else if (type === 'link' && typeof href === 'string') {
                     try {
                       const url = new URL(href, window.location.origin);

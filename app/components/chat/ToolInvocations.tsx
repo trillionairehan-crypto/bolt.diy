@@ -1,4 +1,4 @@
-import type { ToolInvocationUIPart } from '@ai-sdk/ui-utils';
+import type { DynamicToolUIPart } from 'ai';
 import { AnimatePresence, motion } from 'framer-motion';
 import { memo, useMemo, useState, useEffect } from 'react';
 import { createHighlighter, type BundledLanguage, type BundledTheme, type HighlighterGeneric } from 'shiki';
@@ -70,13 +70,21 @@ function JsonCodeBlock({ className, code, theme }: JsonCodeBlockProps) {
   );
 }
 
+type AddToolOutput = (input: {
+  state?: 'output-available';
+  tool: string;
+  toolCallId: string;
+  output: any;
+  errorText?: never;
+}) => void;
+
 interface ToolInvocationsProps {
-  toolInvocations: ToolInvocationUIPart[];
+  toolInvocations: DynamicToolUIPart[];
   toolCallAnnotations: ToolCallAnnotation[];
-  addToolResult: ({ toolCallId, result }: { toolCallId: string; result: any }) => void;
+  addToolOutput: AddToolOutput;
 }
 
-export const ToolInvocations = memo(({ toolInvocations, toolCallAnnotations, addToolResult }: ToolInvocationsProps) => {
+export const ToolInvocations = memo(({ toolInvocations, toolCallAnnotations, addToolOutput }: ToolInvocationsProps) => {
   const theme = useStore(themeStore);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -85,12 +93,12 @@ export const ToolInvocations = memo(({ toolInvocations, toolCallAnnotations, add
   };
 
   const toolCalls = useMemo(
-    () => toolInvocations.filter((inv) => inv.toolInvocation.state === 'call'),
+    () => toolInvocations.filter((inv) => inv.state === 'input-available'),
     [toolInvocations],
   );
 
   const toolResults = useMemo(
-    () => toolInvocations.filter((inv) => inv.toolInvocation.state === 'result'),
+    () => toolInvocations.filter((inv) => inv.state === 'output-available'),
     [toolInvocations],
   );
 
@@ -157,7 +165,7 @@ export const ToolInvocations = memo(({ toolInvocations, toolCallAnnotations, add
               <ToolCallsList
                 toolInvocations={toolCalls}
                 toolCallAnnotations={toolCallAnnotations}
-                addToolResult={addToolResult}
+                addToolOutput={addToolOutput}
                 theme={theme}
               />
             </div>
@@ -190,7 +198,7 @@ const toolVariants = {
 };
 
 interface ToolResultsListProps {
-  toolInvocations: ToolInvocationUIPart[];
+  toolInvocations: DynamicToolUIPart[];
   toolCallAnnotations: ToolCallAnnotation[];
   theme: Theme;
 }
@@ -200,20 +208,20 @@ const ToolResultsList = memo(({ toolInvocations, toolCallAnnotations, theme }: T
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
       <ul className="list-none space-y-4">
         {toolInvocations.map((tool, index) => {
-          const toolCallState = tool.toolInvocation.state;
+          const toolCallState = tool.state;
 
-          if (toolCallState !== 'result') {
+          if (toolCallState !== 'output-available') {
             return null;
           }
 
-          const { toolName, toolCallId } = tool.toolInvocation;
+          const { toolName, toolCallId } = tool;
 
           const annotation = toolCallAnnotations.find((annotation) => {
             return annotation.toolCallId === toolCallId;
           });
 
           const isErrorResult = [TOOL_NO_EXECUTE_FUNCTION, TOOL_EXECUTION_DENIED, TOOL_EXECUTION_ERROR].includes(
-            tool.toolInvocation.result,
+            tool.output as any,
           );
 
           return (
@@ -251,11 +259,11 @@ const ToolResultsList = memo(({ toolInvocations, toolCallAnnotations, theme }: T
                 </div>
                 <div className="text-bolt-elements-textSecondary text-xs mb-1">Parameters:</div>
                 <div className="bg-[#FAFAFA] dark:bg-[#0A0A0A] p-3 rounded-md">
-                  <JsonCodeBlock className="mb-0" code={JSON.stringify(tool.toolInvocation.args)} theme={theme} />
+                  <JsonCodeBlock className="mb-0" code={JSON.stringify(tool.input)} theme={theme} />
                 </div>
                 <div className="text-bolt-elements-textSecondary text-xs mt-3 mb-1">Result:</div>
                 <div className="bg-[#FAFAFA] dark:bg-[#0A0A0A] p-3 rounded-md">
-                  <JsonCodeBlock className="mb-0" code={JSON.stringify(tool.toolInvocation.result)} theme={theme} />
+                  <JsonCodeBlock className="mb-0" code={JSON.stringify(tool.output)} theme={theme} />
                 </div>
               </div>
             </motion.li>
@@ -267,13 +275,13 @@ const ToolResultsList = memo(({ toolInvocations, toolCallAnnotations, theme }: T
 });
 
 interface ToolCallsListProps {
-  toolInvocations: ToolInvocationUIPart[];
+  toolInvocations: DynamicToolUIPart[];
   toolCallAnnotations: ToolCallAnnotation[];
-  addToolResult: ({ toolCallId, result }: { toolCallId: string; result: any }) => void;
+  addToolOutput: AddToolOutput;
   theme: Theme;
 }
 
-const ToolCallsList = memo(({ toolInvocations, toolCallAnnotations, addToolResult }: ToolCallsListProps) => {
+const ToolCallsList = memo(({ toolInvocations, toolCallAnnotations, addToolOutput }: ToolCallsListProps) => {
   const [expanded, setExpanded] = useState<{ [id: string]: boolean }>({});
 
   // OS detection for shortcut display
@@ -282,8 +290,8 @@ const ToolCallsList = memo(({ toolInvocations, toolCallAnnotations, addToolResul
   useEffect(() => {
     const expandedState: { [id: string]: boolean } = {};
     toolInvocations.forEach((inv) => {
-      if (inv.toolInvocation.state === 'call') {
-        expandedState[inv.toolInvocation.toolCallId] = true;
+      if (inv.state === 'input-available') {
+        expandedState[inv.toolCallId] = true;
       }
     });
     setExpanded(expandedState);
@@ -309,40 +317,48 @@ const ToolCallsList = memo(({ toolInvocations, toolCallAnnotations, addToolResul
         return;
       }
 
+      const openToolName = toolInvocations.find((inv) => inv.toolCallId === openId)?.toolName;
+
+      if (!openToolName) {
+        return;
+      }
+
       // Cancel: Cmd/Ctrl + Backspace
       if ((isMac ? e.metaKey : e.ctrlKey) && e.key === 'Backspace') {
         e.preventDefault();
-        addToolResult({
+        addToolOutput({
           toolCallId: openId,
-          result: TOOL_EXECUTION_APPROVAL.REJECT,
+          tool: openToolName,
+          output: TOOL_EXECUTION_APPROVAL.REJECT,
         });
       }
 
       // Run tool: Cmd/Ctrl + Enter
       if ((isMac ? e.metaKey : e.ctrlKey) && (e.key === 'Enter' || e.key === 'Return')) {
         e.preventDefault();
-        addToolResult({
+        addToolOutput({
           toolCallId: openId,
-          result: TOOL_EXECUTION_APPROVAL.APPROVE,
+          tool: openToolName,
+          output: TOOL_EXECUTION_APPROVAL.APPROVE,
         });
       }
     };
     window.addEventListener('keydown', handleKeyDown);
 
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [expanded, addToolResult, isMac]);
+  }, [expanded, addToolOutput, isMac, toolInvocations]);
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
       <ul className="list-none space-y-4">
         {toolInvocations.map((tool, index) => {
-          const toolCallState = tool.toolInvocation.state;
+          const toolCallState = tool.state;
 
-          if (toolCallState !== 'call') {
+          if (toolCallState !== 'input-available') {
             return null;
           }
 
-          const { toolName, toolCallId } = tool.toolInvocation;
+          const { toolName, toolCallId } = tool;
           const annotation = toolCallAnnotations.find((annotation) => annotation.toolCallId === toolCallId);
 
           return (
@@ -373,9 +389,10 @@ const ToolCallsList = memo(({ toolInvocations, toolCallAnnotations, addToolResul
                         'flex items-center gap-2',
                       )}
                       onClick={() =>
-                        addToolResult({
+                        addToolOutput({
                           toolCallId,
-                          result: TOOL_EXECUTION_APPROVAL.REJECT,
+                          tool: toolName,
+                          output: TOOL_EXECUTION_APPROVAL.REJECT,
                         })
                       }
                     >
@@ -389,9 +406,10 @@ const ToolCallsList = memo(({ toolInvocations, toolCallAnnotations, addToolResul
                         'disabled:opacity-50 disabled:cursor-not-allowed',
                       )}
                       onClick={() =>
-                        addToolResult({
+                        addToolOutput({
                           toolCallId,
-                          result: TOOL_EXECUTION_APPROVAL.APPROVE,
+                          tool: toolName,
+                          output: TOOL_EXECUTION_APPROVAL.APPROVE,
                         })
                       }
                     >
