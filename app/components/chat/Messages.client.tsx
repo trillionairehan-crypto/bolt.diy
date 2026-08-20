@@ -1,4 +1,4 @@
-import type { Message } from 'ai';
+import type { UIMessage } from 'ai';
 import { Fragment } from 'react';
 import { classNames } from '~/utils/classNames';
 import { AssistantMessage } from './AssistantMessage';
@@ -15,18 +15,25 @@ interface MessagesProps {
   id?: string;
   className?: string;
   isStreaming?: boolean;
-  messages?: Message[];
-  append?: (message: Message) => void;
+  messages?: UIMessage[];
+  parsedMessages?: { [key: number]: string };
+  append?: (message: { text: string }) => void;
   chatMode?: 'discuss' | 'build';
   setChatMode?: (mode: 'discuss' | 'build') => void;
   model?: string;
   provider?: ProviderInfo;
-  addToolResult: ({ toolCallId, result }: { toolCallId: string; result: any }) => void;
+  addToolOutput: (input: {
+    state?: 'output-available';
+    tool: string;
+    toolCallId: string;
+    output: any;
+    errorText?: never;
+  }) => void;
 }
 
 export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
   (props: MessagesProps, ref: ForwardedRef<HTMLDivElement> | undefined) => {
-    const { id, isStreaming = false, messages = [] } = props;
+    const { id, isStreaming = false, messages = [], parsedMessages = {} } = props;
     const location = useLocation();
 
     const handleRewind = (messageId: string) => {
@@ -53,10 +60,14 @@ export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
       <div id={id} className={props.className} ref={ref}>
         {messages.length > 0
           ? messages.map((message, index) => {
-              const { role, content, id: messageId, annotations, parts } = message;
+              const { role, id: messageId, parts } = message;
               const isUserMessage = role === 'user';
               const isFirst = index === 0;
-              const isHidden = annotations?.includes('hidden');
+              const parsedContent = parsedMessages[index] || '';
+
+              // v5 UIMessage has no `annotations` field — hidden messages are now flagged via
+              // `message.metadata.hidden` instead (see generateNewApp() in Chat.client.tsx).
+              const isHidden = (message as any).metadata?.hidden === true;
 
               if (isHidden) {
                 return <Fragment key={index} />;
@@ -71,11 +82,10 @@ export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
                 >
                   <div className="grid grid-col-1 w-full">
                     {isUserMessage ? (
-                      <UserMessage content={content} parts={parts} />
+                      <UserMessage parts={parts} />
                     ) : (
                       <AssistantMessage
-                        content={content}
-                        annotations={message.annotations}
+                        parsedContent={parsedContent}
                         messageId={messageId}
                         onRewind={handleRewind}
                         onFork={handleFork}
@@ -85,7 +95,7 @@ export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
                         model={props.model}
                         provider={props.provider}
                         parts={parts}
-                        addToolResult={props.addToolResult}
+                        addToolOutput={props.addToolOutput}
                       />
                     )}
                   </div>

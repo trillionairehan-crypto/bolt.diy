@@ -1,38 +1,54 @@
 import { memo, Fragment } from 'react';
 import { Markdown } from './Markdown';
-import type { JSONValue } from 'ai';
 import Popover from '~/components/ui/Popover';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { WORK_DIR } from '~/utils/constants';
 import WithTooltip from '~/components/ui/Tooltip';
-import type { Message } from 'ai';
 import type { ProviderInfo } from '~/types/model';
 import type {
   TextUIPart,
   ReasoningUIPart,
-  ToolInvocationUIPart,
-  SourceUIPart,
   FileUIPart,
+  SourceUrlUIPart,
+  SourceDocumentUIPart,
+  ToolUIPart,
+  DynamicToolUIPart,
   StepStartUIPart,
-} from '@ai-sdk/ui-utils';
+  DataUIPart,
+  UIDataTypes,
+} from 'ai';
 import { ToolInvocations } from './ToolInvocations';
 import type { ToolCallAnnotation } from '~/types/context';
 
+type MessagePart =
+  | TextUIPart
+  | ReasoningUIPart
+  | FileUIPart
+  | SourceUrlUIPart
+  | SourceDocumentUIPart
+  | ToolUIPart
+  | DynamicToolUIPart
+  | StepStartUIPart
+  | DataUIPart<UIDataTypes>;
+
 interface AssistantMessageProps {
-  content: string;
-  annotations?: JSONValue[];
+  parsedContent: string;
   messageId?: string;
   onRewind?: (messageId: string) => void;
   onFork?: (messageId: string) => void;
-  append?: (message: Message) => void;
+  append?: (message: { text: string }) => void;
   chatMode?: 'discuss' | 'build';
   setChatMode?: (mode: 'discuss' | 'build') => void;
   model?: string;
   provider?: ProviderInfo;
-  parts:
-    | (TextUIPart | ReasoningUIPart | ToolInvocationUIPart | SourceUIPart | FileUIPart | StepStartUIPart)[]
-    | undefined;
-  addToolResult: ({ toolCallId, result }: { toolCallId: string; result: any }) => void;
+  parts: MessagePart[] | undefined;
+  addToolOutput: (input: {
+    state?: 'output-available';
+    tool: string;
+    toolCallId: string;
+    output: any;
+    errorText?: never;
+  }) => void;
 }
 
 function openArtifactInWorkbench(filePath: string) {
@@ -61,8 +77,7 @@ function normalizedFilePath(path: string) {
 
 export const AssistantMessage = memo(
   ({
-    content,
-    annotations,
+    parsedContent,
     messageId,
     onRewind,
     onFork,
@@ -72,35 +87,27 @@ export const AssistantMessage = memo(
     model,
     provider,
     parts,
-    addToolResult,
+    addToolOutput,
   }: AssistantMessageProps) => {
-    const filteredAnnotations = (annotations?.filter(
-      (annotation: JSONValue) =>
-        annotation && typeof annotation === 'object' && Object.keys(annotation).includes('type'),
-    ) || []) as { type: string; value: any } & { [key: string]: any }[];
+    // v5 UIMessage has no `annotations` field — chatSummary/codeContext/usage/toolCall are now
+    // persisted as non-transient `data-*` parts instead, so we read them off `parts`.
+    const chatSummary: string | undefined = (parts?.find((p: any) => p.type === 'data-chatSummary') as any)?.data
+      ?.summary;
+    const codeContext: string[] | undefined = (parts?.find((p: any) => p.type === 'data-codeContext') as any)?.data
+      ?.files;
 
-    let chatSummary: string | undefined = undefined;
+    const usage:
+      | {
+          completionTokens: number;
+          promptTokens: number;
+          totalTokens: number;
+        }
+      | undefined = (parts?.find((p: any) => p.type === 'data-usage') as any)?.data;
 
-    if (filteredAnnotations.find((annotation) => annotation.type === 'chatSummary')) {
-      chatSummary = filteredAnnotations.find((annotation) => annotation.type === 'chatSummary')?.summary;
-    }
-
-    let codeContext: string[] | undefined = undefined;
-
-    if (filteredAnnotations.find((annotation) => annotation.type === 'codeContext')) {
-      codeContext = filteredAnnotations.find((annotation) => annotation.type === 'codeContext')?.files;
-    }
-
-    const usage: {
-      completionTokens: number;
-      promptTokens: number;
-      totalTokens: number;
-    } = filteredAnnotations.find((annotation) => annotation.type === 'usage')?.value;
-
-    const toolInvocations = parts?.filter((part) => part.type === 'tool-invocation');
-    const toolCallAnnotations = filteredAnnotations.filter(
-      (annotation) => annotation.type === 'toolCall',
-    ) as ToolCallAnnotation[];
+    const toolInvocations = parts?.filter((part) => part.type === 'dynamic-tool');
+    const toolCallAnnotations = ((parts?.filter((p: any) => p.type === 'data-toolCall') as any[])?.map(
+      (p) => p.data,
+    ) ?? []) as ToolCallAnnotation[];
 
     return (
       <div className="overflow-hidden w-full">
@@ -177,13 +184,13 @@ export const AssistantMessage = memo(
           </div>
         </>
         <Markdown append={append} chatMode={chatMode} setChatMode={setChatMode} model={model} provider={provider} html>
-          {content}
+          {parsedContent}
         </Markdown>
         {toolInvocations && toolInvocations.length > 0 && (
           <ToolInvocations
             toolInvocations={toolInvocations}
             toolCallAnnotations={toolCallAnnotations}
-            addToolResult={addToolResult}
+            addToolOutput={addToolOutput}
           />
         )}
       </div>
