@@ -1,57 +1,82 @@
 import { json } from '@remix-run/cloudflare';
 import JSZip from 'jszip';
-import coralredUiCss from '../../design-handoff/coralred-ui.css?raw';
 import { designSchemeToHue } from '~/utils/paletteToHue';
+import {
+  coralredUiCss,
+  CORALRED_HEAD_MARKER,
+  CORALRED_HEAD_INJECTION,
+  CORALRED_BOLT_PROMPT,
+  CORALRED_INDEX_CSS,
+  CORALRED_APP_TSX,
+} from '~/utils/coralredKit';
 
-const CORALRED_HEAD_MARKER = 'coralred-ui.css';
+/**
+ * `not_found`: the repo genuinely doesn't exist (permanent, no retry) — surfaces as "template
+ * not found". `rate_limited`/`transient`: GitHub API hiccup, network error, or 5xx — these are
+ * retried, and if still failing after retries, surfaced distinctly so the client doesn't
+ * silently treat "GitHub had a bad second" the same as "this template was deleted".
+ */
+type GithubTemplateErrorCode = 'not_found' | 'rate_limited' | 'transient';
 
-const CORALRED_HEAD_INJECTION = `
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-    <link rel="stylesheet" href="/coralred-ui.css">
-  `;
+class GithubTemplateError extends Error {
+  code: GithubTemplateErrorCode;
 
-const CORALRED_BOLT_PROMPT = `By default, this template uses the Coralred design kit (coralred-ui.css, already linked in index.html's <head>).
-
-Use ONLY cr- classes and the kit's CSS variables (--hue, --accent, --bg, --text, --border, etc.) for all styling. Do NOT use Tailwind classes — this template does not use Tailwind. Never write raw color values (hex/rgb/oklch) or arbitrary px sizes; everything comes from the kit.
-
---hue is already set on <body> in index.html. Never change it, never add your own color logic on top of it.
-
-Use icons from lucide-react for logos.
-
-Use stock photos from Pexels (NEVER Unsplash) where appropriate, only valid URLs you know exist. Do not download the images, only link to them in image tags.
-`;
-
-const CORALRED_INDEX_CSS = `/* Project-specific custom styles go here.
-   The Coralred design kit (coralred-ui.css) is already loaded in index.html's <head> —
-   don't redeclare cr- classes or kit CSS variables (--hue, --accent, --bg, etc.) here. */
-`;
-
-const CORALRED_APP_TSX = `import { Sparkles } from 'lucide-react';
-
-function App() {
-  return (
-    <div className="cr-page">
-      <section className="cr-section cr-stack-16">
-        <span className="cr-eyebrow">CORALRED KIT</span>
-        <h1 className="cr-h1">Start prompting (or editing) to see magic happen :)</h1>
-        <p className="cr-body">
-          This starter uses the Coralred design kit — style everything with cr- classes and the
-          kit's CSS variables. Never raw colors, never arbitrary px sizes.
-        </p>
-        <button className="cr-btn">
-          <Sparkles size={16} />
-          Get started
-        </button>
-      </section>
-    </div>
-  );
+  constructor(code: GithubTemplateErrorCode, message: string) {
+    super(message);
+    this.code = code;
+  }
 }
 
-export default App;
-`;
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Fetches with retry for transient failures only. 404s are permanent (repo doesn't exist) and
+ * returned immediately without retrying. 429/5xx and network errors are retried up to
+ * `maxRetries` times with exponential backoff, since these were observed to happen transiently
+ * against a repo that demonstrably exists.
+ */
+async function fetchGithubWithRetry(url: string, init: RequestInit, maxRetries = 2, baseDelayMs = 300) {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, init);
+
+      if (response.ok || response.status === 404) {
+        return response;
+      }
+
+      const isRateLimited = response.status === 403 || response.status === 429;
+      lastError = new GithubTemplateError(
+        isRateLimited ? 'rate_limited' : 'transient',
+        `GitHub API ${isRateLimited ? 'rate limit' : 'error'}: ${response.status} ${response.statusText} (${url})`,
+      );
+
+      if (attempt < maxRetries) {
+        console.warn(`[github-template] attempt ${attempt + 1}/${maxRetries + 1} failed for ${url}: ${response.status}, retrying...`);
+        await sleep(baseDelayMs * 2 ** attempt);
+        continue;
+      }
+
+      return response;
+    } catch (networkError) {
+      lastError = new GithubTemplateError(
+        'transient',
+        `Network error fetching ${url}: ${networkError instanceof Error ? networkError.message : String(networkError)}`,
+      );
+
+      if (attempt < maxRetries) {
+        console.warn(`[github-template] attempt ${attempt + 1}/${maxRetries + 1} network error for ${url}, retrying...`, networkError);
+        await sleep(baseDelayMs * 2 ** attempt);
+        continue;
+      }
+    }
+  }
+
+  throw lastError;
+}
 
 /** Templates whose whole identity is Tailwind (shadcn/ui is built on it) — never strip Tailwind from these. */
 function isShadcnTemplate(repo: string) {
@@ -158,7 +183,7 @@ async function fetchRepoContentsCloudflare(repo: string, githubToken?: string) {
   const baseUrl = 'https://api.github.com';
 
   // Get repository info to find default branch
-  const repoResponse = await fetch(`${baseUrl}/repos/${repo}`, {
+  const repoResponse = await fetchGithubWithRetry(`${baseUrl}/repos/${repo}`, {
     headers: {
       Accept: 'application/vnd.github.v3+json',
       'User-Agent': 'bolt.diy-app',
@@ -166,15 +191,22 @@ async function fetchRepoContentsCloudflare(repo: string, githubToken?: string) {
     },
   });
 
+  if (repoResponse.status === 404) {
+    throw new GithubTemplateError('not_found', `Repository not found: ${repo}`);
+  }
+
   if (!repoResponse.ok) {
-    throw new Error(`Repository not found: ${repo}`);
+    throw new GithubTemplateError(
+      repoResponse.status === 403 || repoResponse.status === 429 ? 'rate_limited' : 'transient',
+      `Failed to fetch repository info for ${repo}: ${repoResponse.status} ${repoResponse.statusText}`,
+    );
   }
 
   const repoData = (await repoResponse.json()) as any;
   const defaultBranch = repoData.default_branch;
 
   // Get the tree recursively
-  const treeResponse = await fetch(`${baseUrl}/repos/${repo}/git/trees/${defaultBranch}?recursive=1`, {
+  const treeResponse = await fetchGithubWithRetry(`${baseUrl}/repos/${repo}/git/trees/${defaultBranch}?recursive=1`, {
     headers: {
       Accept: 'application/vnd.github.v3+json',
       'User-Agent': 'bolt.diy-app',
@@ -182,8 +214,15 @@ async function fetchRepoContentsCloudflare(repo: string, githubToken?: string) {
     },
   });
 
+  if (treeResponse.status === 404) {
+    throw new GithubTemplateError('not_found', `Repository tree not found: ${repo}`);
+  }
+
   if (!treeResponse.ok) {
-    throw new Error(`Failed to fetch repository tree: ${treeResponse.status}`);
+    throw new GithubTemplateError(
+      treeResponse.status === 403 || treeResponse.status === 429 ? 'rate_limited' : 'transient',
+      `Failed to fetch repository tree for ${repo}: ${treeResponse.status} ${treeResponse.statusText}`,
+    );
   }
 
   const treeData = (await treeResponse.json()) as any;
@@ -220,7 +259,7 @@ async function fetchRepoContentsCloudflare(repo: string, githubToken?: string) {
     const batch = files.slice(i, i + batchSize);
     const batchPromises = batch.map(async (file: any) => {
       try {
-        const contentResponse = await fetch(`${baseUrl}/repos/${repo}/contents/${file.path}`, {
+        const contentResponse = await fetchGithubWithRetry(`${baseUrl}/repos/${repo}/contents/${file.path}`, {
           headers: {
             Accept: 'application/vnd.github.v3+json',
             'User-Agent': 'bolt.diy-app',
@@ -229,7 +268,7 @@ async function fetchRepoContentsCloudflare(repo: string, githubToken?: string) {
         });
 
         if (!contentResponse.ok) {
-          console.warn(`Failed to fetch ${file.path}: ${contentResponse.status}`);
+          console.warn(`Failed to fetch ${file.path} after retries: ${contentResponse.status}`);
           return null;
         }
 
@@ -264,7 +303,7 @@ async function fetchRepoContentsZip(repo: string, githubToken?: string) {
   const baseUrl = 'https://api.github.com';
 
   // Get the latest release
-  const releaseResponse = await fetch(`${baseUrl}/repos/${repo}/releases/latest`, {
+  const releaseResponse = await fetchGithubWithRetry(`${baseUrl}/repos/${repo}/releases/latest`, {
     headers: {
       Accept: 'application/vnd.github.v3+json',
       'User-Agent': 'bolt.diy-app',
@@ -272,22 +311,36 @@ async function fetchRepoContentsZip(repo: string, githubToken?: string) {
     },
   });
 
+  if (releaseResponse.status === 404) {
+    throw new GithubTemplateError('not_found', `Repository or release not found: ${repo}`);
+  }
+
   if (!releaseResponse.ok) {
-    throw new Error(`GitHub API error: ${releaseResponse.status} - ${releaseResponse.statusText}`);
+    throw new GithubTemplateError(
+      releaseResponse.status === 403 || releaseResponse.status === 429 ? 'rate_limited' : 'transient',
+      `Failed to fetch latest release for ${repo}: ${releaseResponse.status} ${releaseResponse.statusText}`,
+    );
   }
 
   const releaseData = (await releaseResponse.json()) as any;
   const zipballUrl = releaseData.zipball_url;
 
   // Fetch the zipball
-  const zipResponse = await fetch(zipballUrl, {
+  const zipResponse = await fetchGithubWithRetry(zipballUrl, {
     headers: {
       ...(githubToken ? { Authorization: `Bearer ${githubToken}` } : {}),
     },
   });
 
   if (!zipResponse.ok) {
-    throw new Error(`Failed to fetch release zipball: ${zipResponse.status}`);
+    throw new GithubTemplateError(
+      zipResponse.status === 404
+        ? 'not_found'
+        : zipResponse.status === 403 || zipResponse.status === 429
+          ? 'rate_limited'
+          : 'transient',
+      `Failed to fetch release zipball for ${repo}: ${zipResponse.status} ${zipResponse.statusText}`,
+    );
   }
 
   // Get the zip content as ArrayBuffer
@@ -369,16 +422,25 @@ export async function loader({ request, context }: { request: Request; context: 
 
     return json(injectCoralredDesignKit(filteredFiles, hue, repo));
   } catch (error) {
-    console.error('Error processing GitHub template:', error);
-    console.error('Repository:', repo);
-    console.error('Error details:', error instanceof Error ? error.message : String(error));
+    const code: GithubTemplateErrorCode = error instanceof GithubTemplateError ? error.code : 'transient';
+    const message = error instanceof Error ? error.message : String(error);
+
+    console.error(`[github-template] repo=${repo} code=${code}: ${message}`);
+
+    const status = code === 'not_found' ? 404 : code === 'rate_limited' ? 429 : 502;
 
     return json(
       {
-        error: 'Failed to fetch template files',
-        details: error instanceof Error ? error.message : String(error),
+        error:
+          code === 'not_found'
+            ? 'Template repository not found'
+            : code === 'rate_limited'
+              ? 'GitHub API rate limit exceeded'
+              : 'Temporary error fetching template files — please try again',
+        code,
+        details: message,
       },
-      { status: 500 },
+      { status },
     );
   }
 }
