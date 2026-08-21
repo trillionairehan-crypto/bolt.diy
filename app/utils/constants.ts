@@ -7,10 +7,11 @@ export const MODIFICATIONS_TAG_NAME = 'bolt_file_modifications';
 export const MODEL_REGEX = /^\[Model: (.*?)\]\n\n/;
 export const PROVIDER_REGEX = /\[Provider: (.*?)\]\n\n/;
 /*
- * Temporarily rolled back from 'claude-sonnet-5' — the installed ai SDK (v4.3.16, three majors
- * behind latest) force-injects `temperature: 0` on every non-reasoning call regardless of what
- * the app code sends, and Sonnet 5 rejects any explicit temperature param ("temperature is
- * deprecated for this model"). Revert once the ai SDK is upgraded and this is verified fixed.
+ * Switched to 'claude-sonnet-5' 2026-08-21: the forced `temperature: 0` injection that used to
+ * make Sonnet 5 (and Opus 5) reject non-reasoning calls was tied to the old ai SDK (v4.3.16).
+ * Confirmed resolved after the v7 SDK migration (ai@7.0.70) via live generateText/streamText
+ * calls against claude-sonnet-5 through both api.llmcall.ts and api.chat.ts — both completed
+ * with finishReason "stop" and no temperature-related error.
  */
 export const DEFAULT_MODEL = 'claude-sonnet-5';
 export { SHOW_DEV_TOOLS } from './featureFlags';
