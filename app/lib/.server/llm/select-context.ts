@@ -1,4 +1,4 @@
-import { generateText, type ToolSet, type GenerateTextResult, type UIMessage } from 'ai';
+import { generateText, type UIMessage } from 'ai';
 import ignore from 'ignore';
 import type { IProviderSetting } from '~/types/model';
 import { IGNORE_PATTERNS, type FileMap } from './constants';
@@ -27,7 +27,7 @@ export async function selectContext(props: {
   promptId?: string;
   contextOptimization?: boolean;
   summary: string;
-  onEnd?: (resp: GenerateTextResult<ToolSet, never>) => void;
+  onEnd?: (resp: Awaited<ReturnType<typeof generateText>>) => void;
 }) {
   const { messages, env: serverEnv, apiKeys, files, providerSettings, summary, onEnd } = props;
   let currentModel = DEFAULT_MODEL;

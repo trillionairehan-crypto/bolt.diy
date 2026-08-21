@@ -1,4 +1,4 @@
-import { generateText, type ToolSet, type GenerateTextResult, type UIMessage } from 'ai';
+import { generateText, type UIMessage } from 'ai';
 import type { IProviderSetting } from '~/types/model';
 import { DEFAULT_MODEL, DEFAULT_PROVIDER, PROVIDER_LIST } from '~/utils/constants';
 import { extractCurrentContext, extractPropertiesFromMessage, extractTextContent, simplifyBoltActions } from './utils';
@@ -14,7 +14,7 @@ export async function createSummary(props: {
   providerSettings?: Record<string, IProviderSetting>;
   promptId?: string;
   contextOptimization?: boolean;
-  onEnd?: (resp: GenerateTextResult<ToolSet, never>) => void;
+  onEnd?: (resp: Awaited<ReturnType<typeof generateText>>) => void;
 }) {
   const { messages, env: serverEnv, apiKeys, providerSettings, onEnd } = props;
   let currentModel = DEFAULT_MODEL;
