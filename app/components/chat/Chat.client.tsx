@@ -19,7 +19,7 @@ import { useSettings } from '~/lib/hooks/useSettings';
 import type { ProviderInfo } from '~/types/model';
 import { useSearchParams } from '@remix-run/react';
 import { createSampler } from '~/utils/sampler';
-import { getTemplates, selectStarterTemplate } from '~/utils/selectStarterTemplate';
+import { getTemplates, getBaselineTemplate, selectStarterTemplate } from '~/utils/selectStarterTemplate';
 import { designSchemeToHue } from '~/utils/paletteToHue';
 import { logStore } from '~/lib/stores/logs';
 import { streamingState } from '~/lib/stores/streaming';
@@ -466,11 +466,8 @@ export const ChatImpl = memo(
 
         if (template !== 'blank') {
           const temResp = await getTemplates(template, title, designSchemeToHue(designScheme?.palette)).catch((e) => {
-            if (e.message.includes('rate limit')) {
-              toast.warning('Rate limit exceeded. Skipping starter template\n Continuing with blank template');
-            } else {
-              toast.warning('Failed to import starter template\n Continuing with blank template');
-            }
+            logger.warn(`Starter template import failed for "${template}", continuing with blank template:`, e);
+            toast.warning('템플릿을 불러오지 못해 기본 설정으로 생성합니다');
 
             return null;
           });
@@ -478,6 +475,7 @@ export const ChatImpl = memo(
           if (temResp) {
             const { assistantMessage, userMessage } = temResp;
             const userMessageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${promptContent}`;
+            const uploadedFileParts = await filesToFileParts(uploadedFiles);
 
             /*
              * NOTE: v4 relied on setMessages([...]) + reload() to seed a fake assistant turn and
@@ -489,7 +487,11 @@ export const ChatImpl = memo(
               {
                 id: `1-${new Date().getTime()}`,
                 role: 'user',
-                parts: [{ type: 'text', text: userMessageText }, ...imagesToFileParts(imageDataList)],
+                parts: [
+                  { type: 'text', text: userMessageText },
+                  ...imagesToFileParts(imageDataList),
+                  ...uploadedFileParts,
+                ],
               },
               {
                 id: `2-${new Date().getTime()}`,
@@ -521,14 +523,37 @@ export const ChatImpl = memo(
         }
       }
 
-      // If autoSelectTemplate is disabled or template selection failed, proceed with normal message
+      /*
+       * Reached when autoSelectTemplate is off, the LLM chose 'blank', or a GitHub template
+       * fetch failed — every one of these previously sent a bare prompt with zero files,
+       * meaning the design kit was never present. Seed the Coralred baseline (no GitHub
+       * dependency, can't fail the way a template fetch can) via the same synthetic-history
+       * mechanism used for real templates above.
+       */
+      const { assistantMessage, userMessage } = getBaselineTemplate(designSchemeToHue(designScheme?.palette));
       const userMessageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${promptContent}`;
-      const fileParts = [...imagesToFileParts(imageDataList), ...(await filesToFileParts(uploadedFiles))];
+      const uploadedFileParts = await filesToFileParts(uploadedFiles);
 
-      sendChatMessage({
-        text: userMessageText,
-        files: fileParts.length > 0 ? fileParts : undefined,
-      });
+      setMessages([
+        {
+          id: `1-${new Date().getTime()}`,
+          role: 'user',
+          parts: [{ type: 'text', text: userMessageText }, ...imagesToFileParts(imageDataList), ...uploadedFileParts],
+        },
+        {
+          id: `2-${new Date().getTime()}`,
+          role: 'assistant',
+          parts: [{ type: 'text', text: assistantMessage }],
+        },
+        {
+          id: `3-${new Date().getTime()}`,
+          role: 'user',
+          parts: [{ type: 'text', text: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${userMessage}` }],
+          metadata: { hidden: true },
+        },
+      ]);
+
+      regenerate();
       setFakeLoading(false);
       setInput('');
       Cookies.remove(PROMPT_COOKIE_KEY);
