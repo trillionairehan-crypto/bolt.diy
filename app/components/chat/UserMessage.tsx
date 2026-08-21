@@ -7,6 +7,7 @@ import { Markdown } from './Markdown';
 import type {
   TextUIPart,
   ReasoningUIPart,
+  ReasoningFileUIPart,
   FileUIPart,
   SourceUrlUIPart,
   SourceDocumentUIPart,
@@ -15,18 +16,21 @@ import type {
   StepStartUIPart,
   DataUIPart,
   UIDataTypes,
+  CustomContentUIPart,
 } from 'ai';
 
 type MessagePart =
   | TextUIPart
   | ReasoningUIPart
+  | ReasoningFileUIPart
   | FileUIPart
   | SourceUrlUIPart
   | SourceDocumentUIPart
   | ToolUIPart
   | DynamicToolUIPart
   | StepStartUIPart
-  | DataUIPart<UIDataTypes>;
+  | DataUIPart<UIDataTypes>
+  | CustomContentUIPart;
 
 interface UserMessageProps {
   parts: MessagePart[] | undefined;

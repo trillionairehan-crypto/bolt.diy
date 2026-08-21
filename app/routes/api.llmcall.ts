@@ -98,7 +98,7 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
     try {
       const result = await streamText({
         options: {
-          system,
+          instructions: system,
         },
         messages: [
           {
@@ -187,7 +187,7 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
 
       // Filter out unsupported parameters for reasoning models
       const baseParams = {
-        system,
+        instructions: system,
         messages: [
           {
             role: 'user' as const,

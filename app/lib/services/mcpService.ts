@@ -407,6 +407,7 @@ export class MCPService {
               result = await toolInstance.execute(part.input, {
                 messages: await convertToModelMessages(messages),
                 toolCallId,
+                context: undefined,
               });
             } catch (error) {
               logger.error(`error while calling tool "${toolName}":`, error);

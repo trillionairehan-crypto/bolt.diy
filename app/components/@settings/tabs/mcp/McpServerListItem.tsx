@@ -24,6 +24,10 @@ export default function McpServerListItem({ toolName, toolSchema }: McpToolProps
 
   const parameters = (toolSchema.inputSchema as ToolParameters)?.jsonSchema.properties || {};
   const requiredParams = (toolSchema.inputSchema as ToolParameters)?.jsonSchema.required || [];
+  const description =
+    typeof toolSchema.description === 'function'
+      ? toolSchema.description({ context: undefined })
+      : toolSchema.description;
 
   return (
     <div className="mt-2 ml-4 p-3 rounded-md bg-bolt-elements-background-depth-2 text-xs">
@@ -32,7 +36,7 @@ export default function McpServerListItem({ toolName, toolSchema }: McpToolProps
           {toolName}
         </h3>
 
-        <p className="text-bolt-elements-textSecondary">{toolSchema.description || 'No description available'}</p>
+        <p className="text-bolt-elements-textSecondary">{description || 'No description available'}</p>
 
         {Object.keys(parameters).length > 0 && (
           <div className="mt-2.5">

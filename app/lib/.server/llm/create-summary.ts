@@ -1,4 +1,4 @@
-import { generateText, type ToolSet, type GenerateTextResult, type UIMessage } from 'ai';
+import { generateText, type UIMessage } from 'ai';
 import type { IProviderSetting } from '~/types/model';
 import { DEFAULT_MODEL, DEFAULT_PROVIDER, PROVIDER_LIST } from '~/utils/constants';
 import { extractCurrentContext, extractPropertiesFromMessage, extractTextContent, simplifyBoltActions } from './utils';
@@ -14,9 +14,9 @@ export async function createSummary(props: {
   providerSettings?: Record<string, IProviderSetting>;
   promptId?: string;
   contextOptimization?: boolean;
-  onFinish?: (resp: GenerateTextResult<ToolSet, never>) => void;
+  onEnd?: (resp: Awaited<ReturnType<typeof generateText>>) => void;
 }) {
-  const { messages, env: serverEnv, apiKeys, providerSettings, onFinish } = props;
+  const { messages, env: serverEnv, apiKeys, providerSettings, onEnd } = props;
   let currentModel = DEFAULT_MODEL;
   let currentProvider = DEFAULT_PROVIDER.name;
   const processedMessages = messages.map((message) => {
@@ -100,7 +100,7 @@ ${summary.summary}`;
 
   // select files from the list of code file from the project that might be useful for the current request from the user
   const resp = await generateText({
-    system: `
+    instructions: `
         You are a software engineer. You are working on a project. you need to summarize the work till now and provide a summary of the chat till now.
 
         Please only use the following format to generate the summary:
@@ -188,8 +188,8 @@ Please provide a summary of the chat till now including the hitorical summary of
 
   const response = resp.text;
 
-  if (onFinish) {
-    onFinish(resp);
+  if (onEnd) {
+    onEnd(resp);
   }
 
   return response;

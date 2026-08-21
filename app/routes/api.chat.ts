@@ -3,7 +3,7 @@ import {
   createUIMessageStream,
   createUIMessageStreamResponse,
   generateId,
-  stepCountIs,
+  isStepCount,
   type UIMessage,
   type TextUIPart,
 } from 'ai';
@@ -141,7 +141,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
             providerSettings,
             promptId,
             contextOptimization,
-            onFinish(resp) {
+            onEnd(resp) {
               if (resp.usage) {
                 logger.debug('createSummary token usage', JSON.stringify(resp.usage));
                 cumulativeUsage.completionTokens += resp.usage.outputTokens || 0;
@@ -196,7 +196,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
             promptId,
             contextOptimization,
             summary,
-            onFinish(resp) {
+            onEnd(resp) {
               if (resp.usage) {
                 logger.debug('selectContext token usage', JSON.stringify(resp.usage));
                 cumulativeUsage.completionTokens += resp.usage.outputTokens || 0;
@@ -245,14 +245,14 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
           supabaseConnection: supabase,
           toolChoice: 'auto',
           tools: mcpService.toolsWithoutExecute,
-          stopWhen: stepCountIs(maxLLMSteps),
-          onStepFinish: ({ toolCalls }) => {
+          stopWhen: isStepCount(maxLLMSteps),
+          onStepEnd: ({ toolCalls }) => {
             // add tool call annotations for frontend processing
             toolCalls.forEach((toolCall) => {
               mcpService.processToolCall(toolCall, writer);
             });
           },
-          onFinish: async ({ text: content, finishReason, usage }) => {
+          onEnd: async ({ text: content, finishReason, usage }) => {
             logger.debug('usage', JSON.stringify(usage));
 
             if (usage) {
@@ -326,7 +326,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
             writer.merge(result.toUIMessageStream());
 
             (async () => {
-              for await (const part of result.fullStream) {
+              for await (const part of result.stream) {
                 if (part.type === 'error') {
                   const error: any = part.error;
                   logger.error(`${error}`);
@@ -369,7 +369,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
         });
 
         (async () => {
-          for await (const part of result.fullStream) {
+          for await (const part of result.stream) {
             streamRecovery.updateActivity();
 
             if (part.type === 'error') {

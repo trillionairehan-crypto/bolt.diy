@@ -1,4 +1,4 @@
-import type { LanguageModelV3 } from '@ai-sdk/provider';
+import type { LanguageModelV4 } from '@ai-sdk/provider';
 import type { IProviderSetting } from '~/types/model';
 
 export interface ModelInfo {
@@ -26,7 +26,7 @@ export interface ProviderInfo {
     serverEnv: Env;
     apiKeys?: Record<string, string>;
     providerSettings?: Record<string, IProviderSetting>;
-  }) => LanguageModelV3;
+  }) => LanguageModelV4;
   getApiKeyLink?: string;
   labelForGetApiKey?: string;
   icon?: string;
