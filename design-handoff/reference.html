@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>coralred-ui v2 — reference & contrast test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="./coralred-ui.css">
+<style>
+  /* 데모 스캐폴딩 전용 — 프레임 바깥 껍데기. 프레임 내부는 cr- 클래스만 사용 */
+  .demo-wrap { display:flex; flex-direction:column; gap:40px; padding:40px; max-width:1280px; margin:0 auto; }
+  .demo-frame { border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .demo-side { display:flex; min-height:520px; }
+  .demo-sidebar { width:220px; flex-shrink:0; border-right:1px solid var(--border); padding:16px 10px; display:flex; flex-direction:column; gap:2px; background:var(--bg); }
+  .demo-main { flex:1; min-width:0; background:var(--bg); }
+  .demo-header { height:56px; display:flex; align-items:center; justify-content:space-between; padding:0 24px; border-bottom:1px solid var(--border); }
+  .demo-bars { display:flex; align-items:flex-end; gap:6px; height:96px; }
+  .demo-bar { flex:1; background: color-mix(in oklch, var(--accent) 25%, var(--surface)); border-radius:3px 3px 0 0; }
+  .demo-bar.hot { background: var(--accent); }
+</style>
+</head>
+<body>
+<div class="demo-wrap">
+
+  <div class="cr-stack-4">
+    <span class="cr-eyebrow">CORALRED-UI V2 REFERENCE</span>
+    <span class="cr-caption">킷 클래스만으로 구성한 검증 페이지 — 자동 대비 스트립, 랜딩(라이트/hue 250), 대시보드(다크/hue 165)</span>
+  </div>
+
+  <!-- 자동 대비 검증 스트립: 문제 hue(노랑·라임·민트)에서 텍스트가 자동으로 검정 전환되는지 확인 -->
+  <div class="cr-stack-8">
+    <span class="cr-mono">CONTRAST STRIP — 동일한 .cr-btn, --hue만 변경</span>
+    <div class="cr-row-8" style="flex-wrap:wrap">
+      <span style="--hue:250"><button class="cr-btn">파랑 250</button></span>
+      <span style="--hue:330"><button class="cr-btn">핑크 330</button></span>
+      <span style="--hue:25"><button class="cr-btn">코랄 25</button></span>
+      <span style="--hue:95"><button class="cr-btn">노랑 95</button></span>
+      <span style="--hue:130"><button class="cr-btn">라임 130</button></span>
+      <span style="--hue:170"><button class="cr-btn">민트 170</button></span>
+      <button class="cr-btn danger">삭제 확정</button>
+      <button class="cr-btn" disabled>비활성</button>
+    </div>
+  </div>
+
+  <!-- 샘플 A: SaaS 랜딩 · light · hue 250 -->
+  <div class="cr-stack-8">
+    <span class="cr-mono">샘플 A — SaaS 랜딩 · light · --hue 250</span>
+    <div class="demo-frame" style="--hue:250; background:var(--bg)">
+      <div class="demo-header">
+        <div class="cr-row-8"><span class="cr-h2">플로우독</span></div>
+        <nav class="cr-row-16">
+          <span class="cr-nav-item">기능</span>
+          <span class="cr-nav-item">가격</span>
+          <span class="cr-nav-item">문서</span>
+        </nav>
+        <div class="cr-row-8">
+          <button class="cr-btn ghost">로그인</button>
+          <button class="cr-btn">무료로 시작</button>
+        </div>
+      </div>
+      <div class="cr-section" style="text-align:center">
+        <div class="cr-stack-16" style="align-items:center">
+          <span class="cr-badge">문서 자동화 2.0 출시</span>
+          <h1 class="cr-display">팀의 문서를<br>스스로 정리하는 워크스페이스</h1>
+          <p class="cr-body" style="max-width:480px; color:var(--muted)">흩어진 노션, 슬랙, 드라이브를 하나로. 찾는 시간은 줄이고 쓰는 시간만 남기세요.</p>
+          <div class="cr-row-8" style="justify-content:center">
+            <button class="cr-btn lg">무료로 시작하기</button>
+            <button class="cr-btn outline lg">데모 보기</button>
+          </div>
+          <span class="cr-caption">신용카드 없이 시작 · 14일 무료</span>
+        </div>
+      </div>
+      <div class="cr-page" style="padding-bottom:96px">
+        <div class="cr-grid-3">
+          <div class="cr-card cr-stack-8">
+            <span class="cr-eyebrow">01</span>
+            <span class="cr-h2" style="font-size:15px">자동 분류</span>
+            <span class="cr-caption">업로드하면 프로젝트별로 알아서 정리됩니다.</span>
+          </div>
+          <div class="cr-card cr-stack-8">
+            <span class="cr-eyebrow">02</span>
+            <span class="cr-h2" style="font-size:15px">의미 검색</span>
+            <span class="cr-caption">파일명이 아니라 내용으로 찾습니다.</span>
+          </div>
+          <div class="cr-card cr-stack-8">
+            <span class="cr-eyebrow">03</span>
+            <span class="cr-h2" style="font-size:15px">버전 추적</span>
+            <span class="cr-caption">누가 언제 바꿨는지 문서가 기억합니다.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 샘플 B: 대시보드 · dark · hue 165 -->
+  <div class="cr-stack-8">
+    <span class="cr-mono">샘플 B — 대시보드 · dark · --hue 165</span>
+    <div class="demo-frame" data-theme="dark" style="--hue:165">
+      <div class="demo-side">
+        <aside class="demo-sidebar">
+          <div class="cr-row-8" style="padding:6px 10px 16px"><span class="cr-h2" style="font-size:14px">셀러보드</span></div>
+          <div class="cr-nav-item active">개요</div>
+          <div class="cr-nav-item">주문</div>
+          <div class="cr-nav-item">상품</div>
+          <div class="cr-nav-item">고객</div>
+          <div class="cr-nav-item">정산</div>
+        </aside>
+        <div class="demo-main">
+          <div class="demo-header">
+            <span class="cr-h2" style="font-size:16px">개요</span>
+            <div class="cr-row-8">
+              <span class="cr-mono" style="border:1px solid var(--border-strong); border-radius:7px; padding:5px 10px; color:var(--muted)">최근 30일 ▾</span>
+              <button class="cr-btn">리포트 내보내기</button>
+            </div>
+          </div>
+          <div style="padding:20px 24px 24px">
+            <div class="cr-stack-16">
+              <div class="cr-grid-3">
+                <div class="cr-card cr-stack-4">
+                  <span class="cr-caption">총 매출</span>
+                  <span class="cr-h1" style="font-size:26px">₩42,180,000</span>
+                  <span class="cr-badge ok">↑ 18.2% 전월 대비</span>
+                </div>
+                <div class="cr-card cr-stack-4">
+                  <span class="cr-caption">주문 수</span>
+                  <span class="cr-h1" style="font-size:26px">1,284</span>
+                  <span class="cr-badge ok">↑ 6.1%</span>
+                </div>
+                <div class="cr-card cr-stack-4">
+                  <span class="cr-caption">반품률</span>
+                  <span class="cr-h1" style="font-size:26px">1.9%</span>
+                  <span class="cr-caption">지난달과 동일</span>
+                </div>
+              </div>
+              <div class="cr-card cr-stack-16">
+                <span class="cr-mono">일별 매출</span>
+                <div class="demo-bars">
+                  <div class="demo-bar" style="height:34%"></div><div class="demo-bar" style="height:48%"></div>
+                  <div class="demo-bar" style="height:42%"></div><div class="demo-bar" style="height:61%"></div>
+                  <div class="demo-bar" style="height:55%"></div><div class="demo-bar" style="height:72%"></div>
+                  <div class="demo-bar" style="height:66%"></div><div class="demo-bar" style="height:80%"></div>
+                  <div class="demo-bar" style="height:74%"></div><div class="demo-bar hot" style="height:92%"></div>
+                  <div class="demo-bar" style="height:84%"></div><div class="demo-bar" style="height:88%"></div>
+                </div>
+              </div>
+              <div class="cr-card" style="padding:0; overflow:hidden">
+                <table class="cr-table">
+                  <thead><tr><th>주문</th><th>고객</th><th>금액</th><th>상태</th></tr></thead>
+                  <tbody>
+                    <tr><td class="cr-mono">#ORD-2841</td><td>박서연</td><td class="cr-mono">₩89,000</td><td><span class="cr-badge ok">배송중</span></td></tr>
+                    <tr><td class="cr-mono">#ORD-2840</td><td>이도현</td><td class="cr-mono">₩156,000</td><td><span class="cr-badge warn">결제 대기</span></td></tr>
+                    <tr><td class="cr-mono">#ORD-2839</td><td>최유진</td><td class="cr-mono">₩45,000</td><td><span class="cr-badge err">반품 요청</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="cr-row-8">
+                <input class="cr-input" placeholder="주문 검색" style="flex:1">
+                <button class="cr-btn outline">필터</button>
+                <button class="cr-btn danger">선택 삭제</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
