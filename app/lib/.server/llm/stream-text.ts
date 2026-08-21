@@ -277,7 +277,7 @@ export async function streamText(props: {
       apiKeys,
       providerSettings,
     }),
-    system: chatMode === 'build' ? systemPrompt : discussPrompt(),
+    instructions: chatMode === 'build' ? systemPrompt : discussPrompt(),
     ...tokenParams,
     messages: await convertToModelMessages(processedMessages as any),
     ...filteredOptions,

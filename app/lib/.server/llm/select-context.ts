@@ -27,9 +27,9 @@ export async function selectContext(props: {
   promptId?: string;
   contextOptimization?: boolean;
   summary: string;
-  onFinish?: (resp: GenerateTextResult<ToolSet, never>) => void;
+  onEnd?: (resp: GenerateTextResult<ToolSet, never>) => void;
 }) {
-  const { messages, env: serverEnv, apiKeys, files, providerSettings, summary, onFinish } = props;
+  const { messages, env: serverEnv, apiKeys, files, providerSettings, summary, onEnd } = props;
   let currentModel = DEFAULT_MODEL;
   let currentProvider = DEFAULT_PROVIDER.name;
   const processedMessages = messages.map((message) => {
@@ -125,7 +125,7 @@ export async function selectContext(props: {
 
   // select files from the list of code file from the project that might be useful for the current request from the user
   const resp = await generateText({
-    system: `
+    instructions: `
         You are a software engineer. You are working on a project. You have access to the following files:
 
         AVAILABLE FILES PATHS
@@ -222,8 +222,8 @@ export async function selectContext(props: {
     filteredFiles[path] = files[fullPath];
   });
 
-  if (onFinish) {
-    onFinish(resp);
+  if (onEnd) {
+    onEnd(resp);
   }
 
   const totalFiles = Object.keys(filteredFiles).length;
