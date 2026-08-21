@@ -8,6 +8,7 @@ import type { ProviderInfo } from '~/types/model';
 import type {
   TextUIPart,
   ReasoningUIPart,
+  ReasoningFileUIPart,
   FileUIPart,
   SourceUrlUIPart,
   SourceDocumentUIPart,
@@ -16,6 +17,7 @@ import type {
   StepStartUIPart,
   DataUIPart,
   UIDataTypes,
+  CustomContentUIPart,
 } from 'ai';
 import { ToolInvocations } from './ToolInvocations';
 import type { ToolCallAnnotation } from '~/types/context';
@@ -23,13 +25,15 @@ import type { ToolCallAnnotation } from '~/types/context';
 type MessagePart =
   | TextUIPart
   | ReasoningUIPart
+  | ReasoningFileUIPart
   | FileUIPart
   | SourceUrlUIPart
   | SourceDocumentUIPart
   | ToolUIPart
   | DynamicToolUIPart
   | StepStartUIPart
-  | DataUIPart<UIDataTypes>;
+  | DataUIPart<UIDataTypes>
+  | CustomContentUIPart;
 
 interface AssistantMessageProps {
   parsedContent: string;
