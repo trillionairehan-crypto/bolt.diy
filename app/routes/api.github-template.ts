@@ -24,25 +24,107 @@ Use icons from lucide-react for logos.
 Use stock photos from Pexels (NEVER Unsplash) where appropriate, only valid URLs you know exist. Do not download the images, only link to them in image tags.
 `;
 
+const CORALRED_INDEX_CSS = `/* Project-specific custom styles go here.
+   The Coralred design kit (coralred-ui.css) is already loaded in index.html's <head> —
+   don't redeclare cr- classes or kit CSS variables (--hue, --accent, --bg, etc.) here. */
+`;
+
+const CORALRED_APP_TSX = `import { Sparkles } from 'lucide-react';
+
+function App() {
+  return (
+    <div className="cr-page">
+      <section className="cr-section cr-stack-16">
+        <span className="cr-eyebrow">CORALRED KIT</span>
+        <h1 className="cr-h1">Start prompting (or editing) to see magic happen :)</h1>
+        <p className="cr-body">
+          This starter uses the Coralred design kit — style everything with cr- classes and the
+          kit's CSS variables. Never raw colors, never arbitrary px sizes.
+        </p>
+        <button className="cr-btn">
+          <Sparkles size={16} />
+          Get started
+        </button>
+      </section>
+    </div>
+  );
+}
+
+export default App;
+`;
+
+/** Templates whose whole identity is Tailwind (shadcn/ui is built on it) — never strip Tailwind from these. */
+function isShadcnTemplate(repo: string) {
+  return repo.toLowerCase().includes('shadcn');
+}
+
+/**
+ * Removes the template's stock Tailwind wiring and replaces the stub App.tsx with a
+ * cr--class-based example, so the project doesn't have dead config or a stub that
+ * contradicts the "no Tailwind" instruction in .bolt/prompt. Skipped for shadcn templates,
+ * since shadcn/ui components are themselves built on Tailwind.
+ */
+function stripTailwindWiring(files: { name: string; path: string; content: string }[]) {
+  const withoutTailwindConfigs = files.filter(
+    (file) => file.path !== 'tailwind.config.js' && file.path !== 'postcss.config.js',
+  );
+
+  const packageJson = withoutTailwindConfigs.find((file) => file.path === 'package.json');
+
+  if (packageJson) {
+    try {
+      const parsed = JSON.parse(packageJson.content);
+
+      for (const dep of ['tailwindcss', 'postcss', 'autoprefixer']) {
+        delete parsed.devDependencies?.[dep];
+        delete parsed.dependencies?.[dep];
+      }
+
+      packageJson.content = JSON.stringify(parsed, null, 2) + '\n';
+    } catch {
+      // Malformed package.json — leave it as-is rather than risk corrupting it further.
+    }
+  }
+
+  const indexCss = withoutTailwindConfigs.find((file) => file.path === 'src/index.css');
+
+  if (indexCss) {
+    indexCss.content = CORALRED_INDEX_CSS;
+  }
+
+  const appTsx = withoutTailwindConfigs.find((file) => file.path === 'src/App.tsx');
+
+  if (appTsx) {
+    appTsx.content = CORALRED_APP_TSX;
+  }
+
+  return withoutTailwindConfigs;
+}
+
 /**
  * Injects the Coralred design kit into a fetched template:
  * - font links + coralred-ui.css into index.html's <head>
  * - the computed --hue value directly into index.html's <body> (never left for the LLM to guess)
  * - coralred-ui.css itself as a new file
  * - .bolt/prompt replaced with kit-based instructions (added if the template doesn't have one)
+ * - the template's stock Tailwind wiring removed and its stub App.tsx replaced
+ * All of the above (except font links/coralred-ui.css/--hue) are skipped for shadcn templates,
+ * since shadcn/ui — and the "don't use Tailwind" instruction — would directly contradict it.
  * Head/body/CSS injection is skipped when the template has no root index.html (e.g. Next.js,
- * Astro, Remix, SvelteKit templates) so nothing is left orphaned; .bolt/prompt is still replaced
- * regardless, since it applies however the template is styled.
+ * Astro, Remix, SvelteKit templates) so nothing is left orphaned.
  */
-function injectCoralredDesignKit(files: { name: string; path: string; content: string }[], hue: number) {
-  let result = files;
+function injectCoralredDesignKit(files: { name: string; path: string; content: string }[], hue: number, repo: string) {
+  const isShadcn = isShadcnTemplate(repo);
+  let result = isShadcn ? files : stripTailwindWiring(files);
 
-  const boltPrompt = result.find((file) => file.path === '.bolt/prompt');
+  if (!isShadcn) {
+    const boltPrompt = result.find((file) => file.path === '.bolt/prompt');
 
-  if (boltPrompt) {
-    boltPrompt.content = CORALRED_BOLT_PROMPT;
-  } else {
-    result = [...result, { name: 'prompt', path: '.bolt/prompt', content: CORALRED_BOLT_PROMPT }];
+    if (boltPrompt) {
+      boltPrompt.content = CORALRED_BOLT_PROMPT;
+    } else {
+      result = [...result, { name: 'prompt', path: '.bolt/prompt', content: CORALRED_BOLT_PROMPT }];
+    }
   }
 
   const indexHtml = result.find((file) => file.path === 'index.html');
@@ -285,7 +367,7 @@ export async function loader({ request, context }: { request: Request; context: 
     // Filter out .git files for both methods
     const filteredFiles = fileList.filter((file: any) => !file.path.startsWith('.git'));
 
-    return json(injectCoralredDesignKit(filteredFiles, hue));
+    return json(injectCoralredDesignKit(filteredFiles, hue, repo));
   } catch (error) {
     console.error('Error processing GitHub template:', error);
     console.error('Repository:', repo);
