@@ -3,6 +3,13 @@ import type { ProviderInfo } from '~/types/model';
 import type { Template } from '~/types/template';
 import { STARTER_TEMPLATES } from './constants';
 import { designSchemeToHue } from './paletteToHue';
+import {
+  coralredUiCss,
+  CORALRED_HEAD_INJECTION,
+  CORALRED_BOLT_PROMPT,
+  CORALRED_INDEX_CSS,
+  CORALRED_APP_TSX,
+} from './coralredKit';
 
 const starterTemplateSelectionPrompt = (templates: Template[]) => `
 You are an experienced developer who helps people choose the best starter template for their projects.
@@ -123,7 +130,15 @@ const getGitHubRepoContent = async (
     const response = await fetch(`/api/github-template?repo=${encodeURIComponent(repoName)}&hue=${hue}`);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const body = (await response.json().catch(() => null)) as { code?: string; error?: string } | null;
+      const code = body?.code;
+      const message =
+        code === 'not_found'
+          ? `Template not found: ${repoName}`
+          : code === 'rate_limited'
+            ? `rate limit exceeded fetching template: ${repoName}`
+            : (body?.error ?? `HTTP error! status: ${response.status}`);
+      throw new Error(message);
     }
 
     // Our API will return the files in the format we need
@@ -249,6 +264,118 @@ edit only the files that need to be changed, and you can create new files as nee
 NO NOT EDIT/WRITE ANY FILES THAT ALREADY EXIST IN THE PROJECT AND DOES NOT NEED TO BE MODIFIED
 ---
 Now that the Template is imported please continue with my original request
+
+IMPORTANT: Dont Forget to install the dependencies before running the app by using \`npm install && npm run dev\`
+`;
+
+  return {
+    assistantMessage,
+    userMessage,
+  };
+}
+
+const BASELINE_PACKAGE_JSON = `{
+  "name": "coralred-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lucide-react": "^0.344.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.2"
+  }
+}
+`;
+
+const BASELINE_VITE_CONFIG = `import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+});
+`;
+
+const BASELINE_MAIN_TSX = `import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
+import './index.css';
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+`;
+
+function buildBaselineIndexHtml(hue: number): string {
+  return `<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coralred App</title>
+${CORALRED_HEAD_INJECTION}</head>
+  <body style="--hue: ${hue};">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+`;
+}
+
+/**
+ * The Coralred baseline: a minimal, working Vite + React scaffold with the design kit already
+ * wired in from the start. Used via the same synthetic-history mechanism as getTemplates() —
+ * a fake assistant turn that "imports" these files, followed by a hidden user turn asking the
+ * LLM to continue — for both cases that currently fall through with zero files: the LLM
+ * choosing 'blank', and a GitHub template fetch failing. Doesn't touch GitHub at all, so it
+ * can't fail the way a template fetch can.
+ */
+export function getBaselineTemplate(hue: number) {
+  const files: { path: string; content: string }[] = [
+    { path: 'package.json', content: BASELINE_PACKAGE_JSON },
+    { path: 'vite.config.ts', content: BASELINE_VITE_CONFIG },
+    { path: 'index.html', content: buildBaselineIndexHtml(hue) },
+    { path: 'src/main.tsx', content: BASELINE_MAIN_TSX },
+    { path: 'src/App.tsx', content: CORALRED_APP_TSX },
+    { path: 'src/index.css', content: CORALRED_INDEX_CSS },
+    { path: 'public/coralred-ui.css', content: coralredUiCss },
+    { path: '.bolt/prompt', content: CORALRED_BOLT_PROMPT },
+  ];
+
+  const assistantMessage = `
+코랄레드가 기본 브랜드 킷으로 프로젝트를 초기화하고 있어요.
+<boltArtifact id="coralred-baseline" title="Create initial files" type="bundled">
+${files
+  .map(
+    (file) =>
+      `<boltAction type="file" filePath="${file.path}">
+${file.content}
+</boltAction>`,
+  )
+  .join('\n')}
+</boltArtifact>
+`;
+
+  const userMessage = `
+---
+baseline setup is done, and you can now use these files,
+edit only the files that need to be changed, and you can create new files as needed.
+NO NOT EDIT/WRITE ANY FILES THAT ALREADY EXIST IN THE PROJECT AND DOES NOT NEED TO BE MODIFIED
+---
+Now that the baseline is set up please continue with my original request
 
 IMPORTANT: Dont Forget to install the dependencies before running the app by using \`npm install && npm run dev\`
 `;
