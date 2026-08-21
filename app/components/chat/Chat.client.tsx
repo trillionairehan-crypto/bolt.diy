@@ -156,6 +156,12 @@ export const ChatImpl = memo(
     // v5 useChat() no longer returns `data`/`setData` for custom stream data — rebuilt via onData below.
     const [progressAnnotations, setProgressAnnotations] = useState<ProgressAnnotation[]>([]);
 
+    // Caps automatic retries for transport-level failures (e.g. QUIC connection drops on long
+    // streaming requests) at 1, so a request that keeps failing doesn't loop forever. Reset on
+    // successful completion.
+    const networkRetryCountRef = useRef(0);
+    const MAX_NETWORK_AUTO_RETRIES = 1;
+
     const {
       messages,
       status,
@@ -197,6 +203,7 @@ export const ChatImpl = memo(
       },
       onFinish: ({ message }) => {
         setProgressAnnotations([]);
+        networkRetryCountRef.current = 0;
 
         // Token usage logging was read from the v4 onFinish `response.usage` argument, which
         // no longer exists in v5's onFinish payload. Low-priority — revisit separately.
@@ -314,6 +321,18 @@ export const ChatImpl = memo(
           title = '서버 오류';
         }
 
+        if (
+          context === 'chat' &&
+          errorType === 'network' &&
+          networkRetryCountRef.current < MAX_NETWORK_AUTO_RETRIES
+        ) {
+          networkRetryCountRef.current += 1;
+          toast.warning('네트워크 연결이 끊겨서 다시 시도할게요...');
+          regenerate();
+
+          return;
+        }
+
         logStore.logError(`${context} request failed`, error, {
           component: 'Chat',
           action: 'request',
@@ -334,7 +353,7 @@ export const ChatImpl = memo(
         });
         setProgressAnnotations([]);
       },
-      [provider.name, stop],
+      [provider.name, stop, regenerate],
     );
 
     const clearApiErrorAlert = useCallback(() => {
