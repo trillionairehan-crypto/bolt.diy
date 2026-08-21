@@ -3,10 +3,14 @@ import { createScopedLogger } from '~/utils/logger';
 const logger = createScopedLogger('stream-recovery');
 
 export interface StreamRecoveryOptions {
+  /** How many stall-triggered retries to allow before giving up. Default 1. */
   maxRetries?: number;
+  /** Milliseconds of inactivity before a stream is considered stalled. */
   timeout?: number;
-  onTimeout?: () => void;
-  onRecovery?: () => void;
+  /** Called each time a stall is detected and a retry is still allowed. */
+  onStall?: (attempt: number) => void;
+  /** Called once when a stall persists after all retries are exhausted. */
+  onGiveUp?: () => void;
 }
 
 export class StreamRecoveryManager {
@@ -17,7 +21,7 @@ export class StreamRecoveryManager {
 
   constructor(private _options: StreamRecoveryOptions = {}) {
     this._options = {
-      maxRetries: 3,
+      maxRetries: 1,
       timeout: 30000, // 30 seconds default
       ..._options,
     };
@@ -43,33 +47,28 @@ export class StreamRecoveryManager {
 
     this._timeoutHandle = setTimeout(() => {
       if (this._isActive) {
-        logger.warn('Stream timeout detected');
+        logger.warn('Stream stall detected (no activity within timeout window)');
         this._handleTimeout();
       }
     }, this._options.timeout);
   }
 
   private _handleTimeout() {
-    if (this._retryCount >= (this._options.maxRetries || 3)) {
-      logger.error('Max retries reached for stream recovery');
+    if (this._retryCount >= (this._options.maxRetries ?? 1)) {
+      logger.error('Max retries reached for stream recovery — giving up');
+      this._options.onGiveUp?.();
       this.stop();
 
       return;
     }
 
     this._retryCount++;
-    logger.info(`Attempting stream recovery (attempt ${this._retryCount})`);
+    logger.info(`Stream stalled — attempting recovery (attempt ${this._retryCount})`);
 
-    if (this._options.onTimeout) {
-      this._options.onTimeout();
-    }
+    this._options.onStall?.(this._retryCount);
 
-    // Reset monitoring after recovery attempt
+    // Reset monitoring so the retried stream gets its own full timeout window.
     this._resetTimeout();
-
-    if (this._options.onRecovery) {
-      this._options.onRecovery();
-    }
   }
 
   stop() {

@@ -47,14 +47,6 @@ function parseCookies(cookieHeader: string): Record<string, string> {
 }
 
 async function chatAction({ context, request }: ActionFunctionArgs) {
-  const streamRecovery = new StreamRecoveryManager({
-    timeout: 45000,
-    maxRetries: 2,
-    onTimeout: () => {
-      logger.warn('Stream timeout - attempting recovery');
-    },
-  });
-
   const { messages, files, promptId, contextOptimization, supabase, chatMode, designScheme, maxLLMSteps } =
     await request.json<{
       messages: Messages;
@@ -104,8 +96,6 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
 
     const uiMessageStream = createUIMessageStream<UIMessage>({
       async execute({ writer }) {
-        streamRecovery.startMonitoring();
-
         const filePaths = getFilePaths(files || {});
         let filteredFiles: FileMap | undefined = undefined;
         let summary: string | undefined = undefined;
@@ -352,10 +342,10 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
           transient: true,
         });
 
-        const result = await streamText({
+        const buildStreamTextParams = (signal: AbortSignal) => ({
           messages: [...processedMessages],
           env: context.cloudflare?.env,
-          options,
+          options: { ...options, abortSignal: signal },
           apiKeys,
           files,
           providerSettings,
@@ -368,27 +358,94 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
           messageSliceId,
         });
 
-        (async () => {
-          for await (const part of result.stream) {
-            streamRecovery.updateActivity();
+        type StreamRun = { controller: AbortController; intentionallyAborted: boolean };
 
-            if (part.type === 'error') {
-              const error: any = part.error;
-              logger.error('Streaming error:', error);
-              streamRecovery.stop();
+        const consumeRun = async (run: StreamRun, result: Awaited<ReturnType<typeof streamText>>) => {
+          try {
+            for await (const part of result.stream) {
+              streamRecovery.updateActivity();
 
-              // Enhanced error handling for common streaming issues
-              if (error.message?.includes('Invalid JSON response')) {
-                logger.error('Invalid JSON response detected - likely malformed API response');
-              } else if (error.message?.includes('token')) {
-                logger.error('Token-related error detected - possible token limit exceeded');
+              if (part.type === 'error') {
+                if (run.intentionallyAborted) {
+                  return;
+                }
+
+                const error: any = part.error;
+                logger.error('Streaming error:', error);
+                streamRecovery.stop();
+
+                // Enhanced error handling for common streaming issues
+                if (error.message?.includes('Invalid JSON response')) {
+                  logger.error('Invalid JSON response detected - likely malformed API response');
+                } else if (error.message?.includes('token')) {
+                  logger.error('Token-related error detected - possible token limit exceeded');
+                }
+
+                return;
               }
-
-              return;
+            }
+            streamRecovery.stop();
+          } catch (err) {
+            if (!run.intentionallyAborted) {
+              logger.error('Streaming loop failed:', err);
             }
           }
-          streamRecovery.stop();
-        })();
+        };
+
+        let currentRun: StreamRun = { controller: new AbortController(), intentionallyAborted: false };
+        let result = await streamText(buildStreamTextParams(currentRun.controller.signal));
+
+        const streamRecovery = new StreamRecoveryManager({
+          timeout: 45000,
+          maxRetries: 1,
+          onStall: async () => {
+            logger.warn('Stream produced no output for 45s — retrying once with a fresh request');
+
+            writer.write({
+              type: 'data-progress',
+              data: {
+                type: 'progress',
+                label: 'response',
+                status: 'in-progress',
+                order: progressCounter++,
+                message: '응답이 지연되고 있어요. 다시 시도할게요...',
+              } satisfies ProgressAnnotation,
+              transient: true,
+            });
+
+            currentRun.intentionallyAborted = true;
+            currentRun.controller.abort();
+
+            try {
+              currentRun = { controller: new AbortController(), intentionallyAborted: false };
+              result = await streamText(buildStreamTextParams(currentRun.controller.signal));
+              streamRecovery.updateActivity();
+              consumeRun(currentRun, result);
+              writer.merge(result.toUIMessageStream());
+            } catch (retryError) {
+              logger.error('Retry attempt failed to start:', retryError);
+              writer.write({
+                type: 'error',
+                errorText: '응답 생성이 너무 오래 걸려 중단했어요. 다시 시도해주세요.',
+              });
+              streamRecovery.stop();
+            }
+          },
+          onGiveUp: () => {
+            logger.error('Stream recovery exhausted — ending stream with a clear error instead of hanging');
+
+            currentRun.intentionallyAborted = true;
+            currentRun.controller.abort();
+
+            writer.write({
+              type: 'error',
+              errorText: '응답 생성이 너무 오래 걸려 중단했어요. 다시 시도해주세요.',
+            });
+          },
+        });
+
+        streamRecovery.startMonitoring();
+        consumeRun(currentRun, result);
         writer.merge(result.toUIMessageStream());
       },
       onError: (error: any) => {
