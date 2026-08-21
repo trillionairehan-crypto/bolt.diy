@@ -117,53 +117,6 @@ export const ColorSchemeDialog: React.FC<ColorSchemeDialogProps> = ({ setDesignS
     </div>
   );
 
-  const renderTypographySection = () => (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-bolt-elements-textPrimary flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full bg-bolt-elements-item-contentAccent"></div>
-        Typography
-      </h3>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
-        {designFonts.map((f) => (
-          <button
-            key={f.key}
-            type="button"
-            onClick={() => handleFontToggle(f.key)}
-            className={`group p-4 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-bolt-elements-borderColorActive ${
-              font.includes(f.key)
-                ? 'bg-bolt-elements-item-backgroundAccent border-bolt-elements-borderColorActive shadow-lg'
-                : 'bg-bolt-elements-background-depth-3 border-bolt-elements-borderColor hover:border-bolt-elements-borderColorActive hover:bg-bolt-elements-bg-depth-2'
-            }`}
-          >
-            <div className="text-center space-y-2">
-              <div
-                className={`text-2xl font-medium transition-colors ${
-                  font.includes(f.key) ? 'text-bolt-elements-item-contentAccent' : 'text-bolt-elements-textPrimary'
-                }`}
-                style={{ fontFamily: f.key }}
-              >
-                {f.preview}
-              </div>
-              <div
-                className={`text-sm font-medium transition-colors ${
-                  font.includes(f.key) ? 'text-bolt-elements-item-contentAccent' : 'text-bolt-elements-textSecondary'
-                }`}
-              >
-                {f.label}
-              </div>
-              {font.includes(f.key) && (
-                <div className="w-6 h-6 mx-auto bg-bolt-elements-item-contentAccent rounded-full flex items-center justify-center">
-                  <span className="i-ph:check text-white text-sm" />
-                </div>
-              )}
-            </div>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-
   const renderFeaturesSection = () => (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold text-bolt-elements-textPrimary flex items-center gap-2">
@@ -293,7 +246,6 @@ export const ColorSchemeDialog: React.FC<ColorSchemeDialogProps> = ({ setDesignS
             <div className="flex gap-1 p-1 bg-bolt-elements-bg-depth-3 rounded-xl">
               {[
                 { key: 'colors', label: 'Colors', icon: 'i-ph:palette' },
-                { key: 'typography', label: 'Typography', icon: 'i-ph:text-aa' },
                 { key: 'features', label: 'Features', icon: 'i-ph:magic-wand' },
               ].map((tab) => (
                 <button
@@ -314,7 +266,6 @@ export const ColorSchemeDialog: React.FC<ColorSchemeDialogProps> = ({ setDesignS
             {/* Content Area */}
             <div className=" min-h-92 overflow-y-auto">
               {activeSection === 'colors' && renderColorSection()}
-              {activeSection === 'typography' && renderTypographySection()}
               {activeSection === 'features' && renderFeaturesSection()}
             </div>
 
