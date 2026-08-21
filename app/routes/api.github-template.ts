@@ -1,5 +1,37 @@
 import { json } from '@remix-run/cloudflare';
 import JSZip from 'jszip';
+import coralredUiCss from '../../design-handoff/coralred-ui.css?raw';
+
+const CORALRED_HEAD_MARKER = 'coralred-ui.css';
+
+const CORALRED_HEAD_INJECTION = `
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+    <link rel="stylesheet" href="/coralred-ui.css">
+  `;
+
+/**
+ * Injects the Coralred design kit (font links + coralred-ui.css) into a fetched template's
+ * index.html and adds the CSS file itself. Skipped entirely when the template has no root
+ * index.html (e.g. Next.js, Astro, Remix, SvelteKit templates) so nothing is left orphaned.
+ */
+function injectCoralredDesignKit(files: { name: string; path: string; content: string }[]) {
+  const indexHtml = files.find((file) => file.path === 'index.html');
+
+  if (!indexHtml) {
+    return files;
+  }
+
+  if (indexHtml.content.includes(CORALRED_HEAD_MARKER)) {
+    return files;
+  }
+
+  indexHtml.content = indexHtml.content.replace('</head>', `${CORALRED_HEAD_INJECTION}</head>`);
+
+  return [...files, { name: 'coralred-ui.css', path: 'public/coralred-ui.css', content: coralredUiCss }];
+}
 
 // Function to detect if we're running in Cloudflare
 function isCloudflareEnvironment(context: any): boolean {
@@ -225,7 +257,7 @@ export async function loader({ request, context }: { request: Request; context: 
     // Filter out .git files for both methods
     const filteredFiles = fileList.filter((file: any) => !file.path.startsWith('.git'));
 
-    return json(filteredFiles);
+    return json(injectCoralredDesignKit(filteredFiles));
   } catch (error) {
     console.error('Error processing GitHub template:', error);
     console.error('Repository:', repo);
