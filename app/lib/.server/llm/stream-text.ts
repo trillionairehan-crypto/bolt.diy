@@ -9,6 +9,7 @@ import { LLMManager } from '~/lib/modules/llm/manager';
 import { createScopedLogger } from '~/utils/logger';
 import { createFilesContext, extractPropertiesFromMessage } from './utils';
 import { discussPrompt } from '~/lib/common/prompts/discuss-prompt';
+import { CACHE_BREAKPOINT_MARKER } from '~/lib/common/prompts/new-prompt';
 import type { DesignScheme } from '~/types/design-scheme';
 
 export type Messages = UIMessage[];
@@ -41,6 +42,34 @@ function getCompletionTokenLimit(modelDetails: any): number {
 
   // 3. Final fallback to MAX_TOKENS, but cap at reasonable limit for safety
   return Math.min(MAX_TOKENS, 16384);
+}
+
+/**
+ * Splits systemPrompt at CACHE_BREAKPOINT_MARKER into a static prefix (marked with an
+ * Anthropic ephemeral cache_control breakpoint) and a dynamic suffix (uncached). Falls back
+ * to a plain string when the marker isn't present (e.g. 'original'/'optimized' prompt IDs).
+ */
+function buildCachedInstructions(systemPrompt: string) {
+  const markerIndex = systemPrompt.indexOf(CACHE_BREAKPOINT_MARKER);
+
+  if (markerIndex === -1) {
+    return systemPrompt;
+  }
+
+  const staticPart = systemPrompt.slice(0, markerIndex);
+  const dynamicPart = systemPrompt.slice(markerIndex + CACHE_BREAKPOINT_MARKER.length);
+
+  return [
+    {
+      role: 'system' as const,
+      content: staticPart,
+      providerOptions: { anthropic: { cacheControl: { type: 'ephemeral' } } },
+    },
+    {
+      role: 'system' as const,
+      content: dynamicPart,
+    },
+  ];
 }
 
 function sanitizeText(text: string): string {
@@ -277,7 +306,7 @@ export async function streamText(props: {
       apiKeys,
       providerSettings,
     }),
-    instructions: chatMode === 'build' ? systemPrompt : discussPrompt(),
+    instructions: chatMode === 'build' ? buildCachedInstructions(systemPrompt) : discussPrompt(),
     ...tokenParams,
     messages: await convertToModelMessages(processedMessages as any),
     ...filteredOptions,

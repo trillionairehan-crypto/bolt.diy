@@ -4,6 +4,13 @@ import { allowedHTMLElements } from '~/utils/markdown';
 import { stripIndents } from '~/utils/stripIndent';
 import { designSchemeToHue } from '~/utils/paletteToHue';
 
+/**
+ * Marks the boundary between the confirmed-static prefix (byte-identical across every
+ * request) and the per-request-variable suffix (Supabase state, design scheme, features).
+ * stream-text.ts splits on this to attach an Anthropic prompt-cache breakpoint to the prefix.
+ */
+export const CACHE_BREAKPOINT_MARKER = '<!-- coralred-cache-breakpoint -->';
+
 export const getFineTunedPrompt = (
   cwd: string = WORK_DIR,
   supabase?: {
@@ -177,6 +184,8 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
     - NEVER ask user to run commands (handled by Coralred)
     - Example: "The dev server is already running" without explaining how you know
 </running_shell_commands_info>
+
+${CACHE_BREAKPOINT_MARKER}
 
 <database_instructions>
   CRITICAL: Use Supabase for databases by default, unless specified otherwise.
