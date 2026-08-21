@@ -37,12 +37,14 @@ import type { ProgressAnnotation } from '~/types/context';
 const logger = createScopedLogger('Chat');
 
 /*
- * Locked: the installed ai SDK (v4.3.16) force-injects `temperature: 0` on every non-reasoning
- * call, and Opus 5 rejects any explicit temperature param the same way Sonnet 5 does. Promoting
- * to Opus 5 here would just trade one crash for another. Re-enable once the SDK is upgraded and
- * this is verified fixed.
+ * Unlocked 2026-08-21: the forced `temperature: 0` injection that used to make Opus 5 reject
+ * non-reasoning calls was tied to the old ai SDK (v4.3.16). Confirmed resolved after the v7
+ * SDK migration (ai@7.0.70) via direct source inspection (no default-temperature injection in
+ * prepareLanguageModelCallOptions) and live generateText/streamText calls against claude-opus-5
+ * through both api.llmcall.ts and api.chat.ts — both completed with finishReason "stop" and no
+ * temperature-related error.
  */
-const OPUS_PROMOTION_LOCKED = true;
+const OPUS_PROMOTION_LOCKED = false;
 
 // Error patterns that are almost always a one-line missing-import/typo fix — not worth Opus's cost.
 const SIMPLE_MISTAKE_PATTERN = /is not defined|is not a function|Cannot find module|has no exported member/i;
