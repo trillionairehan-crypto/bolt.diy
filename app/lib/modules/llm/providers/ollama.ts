@@ -1,9 +1,8 @@
-// TODO: ollama-ai-provider가 v5 미대응. 실사용 불가 확인됨(SHOW_DEV_TOOLS=false, baseUrl 미설정). 필요시 ollama-ai-provider-v2로 패키지 교체 필요
 import { BaseProvider } from '~/lib/modules/llm/base-provider';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import type { IProviderSetting } from '~/types/model';
-import type { LanguageModelV2 } from '@ai-sdk/provider';
-import { createOllama } from 'ollama-ai-provider';
+import type { LanguageModelV3 } from '@ai-sdk/provider';
+import { createOllama } from 'ollama-ai-provider-v2';
 import { logger } from '~/utils/logger';
 
 interface OllamaModelDetails {
@@ -116,7 +115,7 @@ export default class OllamaProvider extends BaseProvider {
     serverEnv?: Env;
     apiKeys?: Record<string, string>;
     providerSettings?: Record<string, IProviderSetting>;
-  }) => LanguageModelV2 = (options) => {
+  }) => LanguageModelV3 = (options) => {
     const { apiKeys, providerSettings, serverEnv, model } = options;
     const envRecord = this.convertEnvToRecord(serverEnv);
 
@@ -128,8 +127,10 @@ export default class OllamaProvider extends BaseProvider {
       baseURL: `${baseUrl}/api`,
     });
 
-    return ollamaProvider(model, {
-      numCtx: this.getDefaultNumCtx(serverEnv),
+    return ollamaProvider.chat(model, {
+      options: {
+        num_ctx: this.getDefaultNumCtx(serverEnv),
+      },
     });
   };
 }
