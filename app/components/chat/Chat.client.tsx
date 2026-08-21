@@ -20,11 +20,12 @@ import type { ProviderInfo } from '~/types/model';
 import { useSearchParams } from '@remix-run/react';
 import { createSampler } from '~/utils/sampler';
 import { getTemplates, selectStarterTemplate } from '~/utils/selectStarterTemplate';
+import { designSchemeToHue } from '~/utils/paletteToHue';
 import { logStore } from '~/lib/stores/logs';
 import { streamingState } from '~/lib/stores/streaming';
 import { filesToArtifacts } from '~/utils/fileUtils';
 import { supabaseConnection } from '~/lib/stores/supabase';
-import { defaultDesignScheme, type DesignScheme } from '~/types/design-scheme';
+import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import { useMCPStore } from '~/lib/stores/mcp';
 import type { LlmErrorAlertType } from '~/types/actions';
@@ -111,7 +112,12 @@ export const ChatImpl = memo(
     const [fakeLoading, setFakeLoading] = useState(false);
     const [clarifyingPrompt, setClarifyingPrompt] = useState<string | null>(null);
     const files = useStore(workbenchStore.files);
-    const [designScheme, setDesignScheme] = useState<DesignScheme>(defaultDesignScheme);
+    /*
+     * Stays undefined until the user actually saves a scheme via ColorSchemeDialog — this is
+     * how the backend tells "no custom scheme chosen" apart from "user picked this on purpose."
+     * ColorSchemeDialog falls back to defaultDesignScheme for its own editing UI regardless.
+     */
+    const [designScheme, setDesignScheme] = useState<DesignScheme | undefined>(undefined);
     const actionAlert = useStore(workbenchStore.alert);
     const deployAlert = useStore(workbenchStore.deployAlert);
     const supabaseConn = useStore(supabaseConnection);
@@ -459,7 +465,7 @@ export const ChatImpl = memo(
         });
 
         if (template !== 'blank') {
-          const temResp = await getTemplates(template, title).catch((e) => {
+          const temResp = await getTemplates(template, title, designSchemeToHue(designScheme?.palette)).catch((e) => {
             if (e.message.includes('rate limit')) {
               toast.warning('Rate limit exceeded. Skipping starter template\n Continuing with blank template');
             } else {

@@ -460,7 +460,7 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - Use custom icons or illustrations for components to reinforce the brand’s visual identity
 
   User Design Scheme:
-  - Brand hue: set --hue: ${hue} via inline style on <body> in index.html (e.g. <body style="--hue: ${hue};">). This value is computed from ${designScheme?.palette?.primary ? "the user's chosen brand color" : 'the Coralred default'} — never override it, and never write a different hue or any raw color code yourself.
+  - Brand hue: --hue: ${hue} is the fixed brand value for this project (computed from ${designScheme?.palette?.primary ? "the user's chosen brand color" : 'the Coralred default'}). If index.html already exists with --hue set on <body> (e.g. a starter template was just imported), it is already correct — do not change it. If you are creating index.html yourself, set it via inline style on <body> (e.g. <body style="--hue: ${hue};">). Either way, never write a different hue value or any raw color code yourself.
   ${preferMonospaceBody ? '- The user prefers a monospace feel: also use var(--font-mono) for body text (.cr-body), not just .cr-mono/.cr-eyebrow.\n  ' : ''}${
     designScheme?.features?.length
       ? `- FEATURES: ${JSON.stringify(designScheme.features)}`

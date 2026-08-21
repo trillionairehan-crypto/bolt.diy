@@ -1,6 +1,7 @@
 import { json } from '@remix-run/cloudflare';
 import JSZip from 'jszip';
 import coralredUiCss from '../../design-handoff/coralred-ui.css?raw';
+import { designSchemeToHue } from '~/utils/paletteToHue';
 
 const CORALRED_HEAD_MARKER = 'coralred-ui.css';
 
@@ -12,25 +13,49 @@ const CORALRED_HEAD_INJECTION = `
     <link rel="stylesheet" href="/coralred-ui.css">
   `;
 
+const CORALRED_BOLT_PROMPT = `By default, this template uses the Coralred design kit (coralred-ui.css, already linked in index.html's <head>).
+
+Use ONLY cr- classes and the kit's CSS variables (--hue, --accent, --bg, --text, --border, etc.) for all styling. Do NOT use Tailwind classes — this template does not use Tailwind. Never write raw color values (hex/rgb/oklch) or arbitrary px sizes; everything comes from the kit.
+
+--hue is already set on <body> in index.html. Never change it, never add your own color logic on top of it.
+
+Use icons from lucide-react for logos.
+
+Use stock photos from Pexels (NEVER Unsplash) where appropriate, only valid URLs you know exist. Do not download the images, only link to them in image tags.
+`;
+
 /**
- * Injects the Coralred design kit (font links + coralred-ui.css) into a fetched template's
- * index.html and adds the CSS file itself. Skipped entirely when the template has no root
- * index.html (e.g. Next.js, Astro, Remix, SvelteKit templates) so nothing is left orphaned.
+ * Injects the Coralred design kit into a fetched template:
+ * - font links + coralred-ui.css into index.html's <head>
+ * - the computed --hue value directly into index.html's <body> (never left for the LLM to guess)
+ * - coralred-ui.css itself as a new file
+ * - .bolt/prompt replaced with kit-based instructions (added if the template doesn't have one)
+ * Head/body/CSS injection is skipped when the template has no root index.html (e.g. Next.js,
+ * Astro, Remix, SvelteKit templates) so nothing is left orphaned; .bolt/prompt is still replaced
+ * regardless, since it applies however the template is styled.
  */
-function injectCoralredDesignKit(files: { name: string; path: string; content: string }[]) {
-  const indexHtml = files.find((file) => file.path === 'index.html');
+function injectCoralredDesignKit(files: { name: string; path: string; content: string }[], hue: number) {
+  let result = files;
 
-  if (!indexHtml) {
-    return files;
+  const boltPrompt = result.find((file) => file.path === '.bolt/prompt');
+
+  if (boltPrompt) {
+    boltPrompt.content = CORALRED_BOLT_PROMPT;
+  } else {
+    result = [...result, { name: 'prompt', path: '.bolt/prompt', content: CORALRED_BOLT_PROMPT }];
   }
 
-  if (indexHtml.content.includes(CORALRED_HEAD_MARKER)) {
-    return files;
+  const indexHtml = result.find((file) => file.path === 'index.html');
+
+  if (!indexHtml || indexHtml.content.includes(CORALRED_HEAD_MARKER)) {
+    return result;
   }
 
-  indexHtml.content = indexHtml.content.replace('</head>', `${CORALRED_HEAD_INJECTION}</head>`);
+  indexHtml.content = indexHtml.content
+    .replace('</head>', `${CORALRED_HEAD_INJECTION}</head>`)
+    .replace(/<body([^>]*)>/, `<body style="--hue: ${hue};"$1>`);
 
-  return [...files, { name: 'coralred-ui.css', path: 'public/coralred-ui.css', content: coralredUiCss }];
+  return [...result, { name: 'coralred-ui.css', path: 'public/coralred-ui.css', content: coralredUiCss }];
 }
 
 // Function to detect if we're running in Cloudflare
@@ -241,6 +266,9 @@ export async function loader({ request, context }: { request: Request; context: 
     return json({ error: 'Repository name is required' }, { status: 400 });
   }
 
+  const requestedHue = Number(url.searchParams.get('hue'));
+  const hue = Number.isInteger(requestedHue) && requestedHue >= 0 && requestedHue < 360 ? requestedHue : designSchemeToHue();
+
   try {
     // Access environment variables from Cloudflare context or process.env
     const githubToken =
@@ -257,7 +285,7 @@ export async function loader({ request, context }: { request: Request; context: 
     // Filter out .git files for both methods
     const filteredFiles = fileList.filter((file: any) => !file.path.startsWith('.git'));
 
-    return json(injectCoralredDesignKit(filteredFiles));
+    return json(injectCoralredDesignKit(filteredFiles, hue));
   } catch (error) {
     console.error('Error processing GitHub template:', error);
     console.error('Repository:', repo);

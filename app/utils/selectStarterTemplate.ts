@@ -2,6 +2,7 @@ import ignore from 'ignore';
 import type { ProviderInfo } from '~/types/model';
 import type { Template } from '~/types/template';
 import { STARTER_TEMPLATES } from './constants';
+import { designSchemeToHue } from './paletteToHue';
 
 const starterTemplateSelectionPrompt = (templates: Template[]) => `
 You are an experienced developer who helps people choose the best starter template for their projects.
@@ -113,10 +114,13 @@ export const selectStarterTemplate = async (options: { message: string; model: s
   }
 };
 
-const getGitHubRepoContent = async (repoName: string): Promise<{ name: string; path: string; content: string }[]> => {
+const getGitHubRepoContent = async (
+  repoName: string,
+  hue: number,
+): Promise<{ name: string; path: string; content: string }[]> => {
   try {
     // Instead of directly fetching from GitHub, use our own API endpoint as a proxy
-    const response = await fetch(`/api/github-template?repo=${encodeURIComponent(repoName)}`);
+    const response = await fetch(`/api/github-template?repo=${encodeURIComponent(repoName)}&hue=${hue}`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -132,7 +136,7 @@ const getGitHubRepoContent = async (repoName: string): Promise<{ name: string; p
   }
 };
 
-export async function getTemplates(templateName: string, title?: string) {
+export async function getTemplates(templateName: string, title?: string, hue: number = designSchemeToHue()) {
   const template = STARTER_TEMPLATES.find((t) => t.name == templateName);
 
   if (!template) {
@@ -140,7 +144,7 @@ export async function getTemplates(templateName: string, title?: string) {
   }
 
   const githubRepo = template.githubRepo;
-  const files = await getGitHubRepoContent(githubRepo);
+  const files = await getGitHubRepoContent(githubRepo, hue);
 
   let filteredFiles = files;
 
