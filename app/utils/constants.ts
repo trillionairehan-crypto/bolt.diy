@@ -12,7 +12,7 @@ export const PROVIDER_REGEX = /\[Provider: (.*?)\]\n\n/;
  * the app code sends, and Sonnet 5 rejects any explicit temperature param ("temperature is
  * deprecated for this model"). Revert once the ai SDK is upgraded and this is verified fixed.
  */
-export const DEFAULT_MODEL = 'claude-sonnet-4-5-20250929';
+export const DEFAULT_MODEL = 'claude-sonnet-5';
 export { SHOW_DEV_TOOLS } from './featureFlags';
 export const PROMPT_COOKIE_KEY = 'cachedPrompt';
 export const TOOL_EXECUTION_APPROVAL = {
