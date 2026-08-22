@@ -190,6 +190,8 @@ ${CACHE_BREAKPOINT_MARKER}
 <database_instructions>
   CRITICAL: Use Supabase for databases by default, unless specified otherwise.
 
+  CRITICAL: When Supabase is not configured/connected, the app MUST still render its full real UI with hardcoded mock data. A full-screen "Supabase 연결이 필요해요" guard screen that replaces the whole app is FORBIDDEN — full details and RIGHT/WRONG examples are in the CRITICAL — Supabase unconnected rule under Client Setup below. Apply that rule to every component you write in this response, including the root component and any auth screen.
+
   Supabase project setup handled separately by user! ${
     supabase
       ? !supabase.isConnected
@@ -260,12 +262,11 @@ ${CACHE_BREAKPOINT_MARKER}
         - The app MUST run and render even when VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are missing or empty.
         - Do NOT call createClient() unconditionally at module load. Check the env vars first, and export null (or a guard flag) when they are absent.
         - NEVER use an || '' empty-string fallback for env vars. createClient('') still throws. Use a boolean guard and null instead.
-        - When Supabase is not configured, render a friendly Korean setup screen instead of throwing. Example copy: '앱은 준비됐어요. 카카오 로그인을 쓰려면 Supabase 연결만 하면 돼요.' Include the setup steps briefly below it.
-        - All auth-dependent UI must degrade gracefully: show the setup notice, never a blank page or an uncaught error.
-        - If the setup screen uses an icon, always constrain its size explicitly, e.g.:
+        - When Supabase is not configured, do NOT block the screen with a setup notice — render the full app UI with mock data instead (see the CRITICAL — Supabase unconnected rule below). Never show a blank page or an uncaught error either.
+        - If any icon is used anywhere in this state, always constrain its size explicitly, e.g.:
           <AlertTriangle className="w-12 h-12 text-[color:var(--warn)]" />
           Never render an icon component without explicit width/height sizing — an unconstrained SVG fills its parent container and can end up covering the whole screen.
-        - Reason: the users of these generated apps are non-developers. An uncaught error screen makes them abandon the product immediately.
+        - Reason: the users of these generated apps are non-developers. An uncaught error screen — or a screen that only ever shows a setup notice instead of their app — makes them abandon the product immediately.
 
       ALWAYS write the Supabase client file exactly like this:
 
@@ -281,7 +282,78 @@ ${CACHE_BREAKPOINT_MARKER}
 
         export const supabase = createClient(url || '', key || '');
 
-      In the root component, check isSupabaseConfigured FIRST, before rendering anything that touches auth or the database. When false, render the setup screen described above instead.
+      In the root component, check isSupabaseConfigured FIRST, before rendering anything that touches auth or the database. When false, render the full UI with mock data instead — see the CRITICAL — Supabase unconnected rule directly below.
+
+      CRITICAL — Supabase unconnected: render mock UI, never a blocking guard screen:
+        - A full-screen "Supabase 연결이 필요해요" notice that replaces the entire app is FORBIDDEN. The user just described their app in Korean and wants to immediately see its shape and flow — a wall of setup instructions instead of their app feels broken, not helpful.
+        - When isSupabaseConfigured is false, render the SAME UI a connected user would see, seeded with a small hardcoded array of realistic sample data (2-4 items, in the app's own domain — e.g. sample todos, sample products, sample posts). Every interactive element (buttons, forms) still renders and is clickable; actions that would hit Supabase can simply no-op or show a toast while unconfigured.
+        - Communicate the state with ONE small banner near the top of the page — .cr-badge.warn, never a full-page takeover:
+
+            <span className="cr-badge warn">샘플 데이터로 보고 있어요. 실제 저장은 Supabase 연결 후 가능해요</span>
+
+        - This applies to every screen that would otherwise depend on Supabase, including auth-gated ones — default to the SIGNED-IN view with mock data (not a login form) when unconfigured, since a login form demonstrates nothing about the app the user asked for. A LoginScreen/onLogin button that the user must click before seeing their app is ALSO forbidden when unconfigured — it is just a softer version of the same blocking pattern. Skip straight to the signed-in view by initializing the user state to the mock user whenever Supabase is unconfigured, e.g. useState(isSupabaseConfigured ? null : MOCK_USER).
+        - The .cr-badge.warn banner is not optional — every generated file that renders the root view when unconfigured MUST include it in its JSX. A version of this feature that only mentions "sample data" in your chat reply, with no matching banner element in the code, does NOT satisfy this rule.
+
+        RIGHT (mock data + small banner, full UI still visible):
+
+          const MOCK_TODOS = [
+            { id: 'mock-1', title: '샘플 할 일 1', is_done: false },
+            { id: 'mock-2', title: '샘플 할 일 2', is_done: true },
+          ];
+
+          function App() {
+            const todos = isSupabaseConfigured ? realTodos : MOCK_TODOS;
+
+            return (
+              <div className="cr-page">
+                {!isSupabaseConfigured && (
+                  <span className="cr-badge warn">샘플 데이터로 보고 있어요. 실제 저장은 Supabase 연결 후 가능해요</span>
+                )}
+                <TodoList todos={todos} />
+              </div>
+            );
+          }
+
+        WRONG (blocks the whole UI — user never sees their app):
+
+          function App() {
+            if (!isSupabaseConfigured) {
+              return (
+                <div className="cr-page">
+                  <h2>Supabase 연결이 필요해요</h2>
+                  <p>채팅창 상단에서 Supabase를 먼저 연결해주세요.</p>
+                </div>
+              );
+            }
+            return <TodoList todos={realTodos} />;
+          }
+
+        ALSO WRONG (a login gate is the same blocking pattern in a softer disguise — user must click through before seeing their app):
+
+          function App() {
+            const [user, setUser] = useState<User | null>(null);
+            if (!user) {
+              return <LoginScreen onLogin={() => setUser(mockUser)} />;
+            }
+            return <TodoList todos={mockTodos} />;
+          }
+
+        RIGHT version of the same auth-gated app — skips the login screen entirely when unconfigured:
+
+          function App() {
+            const [user, setUser] = useState<User | null>(isSupabaseConfigured ? null : MOCK_USER);
+            if (!user) {
+              return <LoginScreen onLogin={setUser} />;
+            }
+            return (
+              <div className="cr-page">
+                {!isSupabaseConfigured && (
+                  <span className="cr-badge warn">샘플 데이터로 보고 있어요. 실제 저장은 Supabase 연결 후 가능해요</span>
+                )}
+                <TodoList todos={isSupabaseConfigured ? realTodos : mockTodos} />
+              </div>
+            );
+          }
 
       CRITICAL — package.json dependency:
         - Writing an import statement is NOT enough. Every time you import a package this prompt gives you a pinned version for — @supabase/supabase-js (^2.45.0) here, or @tosspayments/tosspayments-sdk (^2.7.1, see Payment above) — you MUST also add that exact package and version to package.json's "dependencies" in the SAME artifact. An import with no matching package.json entry means the package is never installed: Vite throws "Failed to resolve import" and the app fails to start at all — a worse failure than a runtime bug, because the user never even sees the app.
@@ -301,11 +373,12 @@ ${CACHE_BREAKPOINT_MARKER}
           // package.json "dependencies" has no "@supabase/supabase-js" entry
 
       Loading state when a service is not configured:
-      - When isSupabaseConfigured (or any similar guard) is false, you MUST immediately set every loading state to false and return early. Otherwise the app shows a spinner forever, which looks broken to the user.
+      - When isSupabaseConfigured (or any similar guard) is false, you MUST immediately set every loading state to false and return early — and seed state with the mock data from the CRITICAL — Supabase unconnected rule above, not an empty array. Otherwise the app shows a spinner forever, or a real UI with an empty state — neither shows the user their app.
       - Correct pattern:
 
           useEffect(() => {
             if (!isSupabaseConfigured) {
+              setTodos(MOCK_TODOS);
               setIsLoading(false);
               return;
             }
@@ -330,9 +403,9 @@ ${CACHE_BREAKPOINT_MARKER}
             return true;
           }
 
-      - Check isKakaoConfigured before rendering any Kakao login button or calling any Kakao API. When false, show the Korean setup notice instead.
-      - This same principle applies to EVERY external SDK that requires a key: Toss Payments, Kakao AlimTalk, Kakao Postcode. Never let a missing key crash the app at load time.
-      - If the setup notice uses an icon, always constrain its size explicitly, e.g.:
+      - Check isKakaoConfigured before rendering any Kakao login button or calling any Kakao API. When false, do NOT show a blocking setup notice — follow the same CRITICAL — Supabase unconnected rule above: render the full UI with mock data and a small .cr-badge.warn banner, and make the Kakao-dependent button/action a no-op (or toast) instead of hiding the whole screen.
+      - This same principle applies to EVERY external SDK that requires a key: Toss Payments, Kakao AlimTalk, Kakao Postcode. Never let a missing key crash the app at load time, and never replace the whole app with a setup screen for it.
+      - If a small inline notice uses an icon, always constrain its size explicitly, e.g.:
         <AlertTriangle className="w-12 h-12 text-[color:var(--warn)]" />
         Never render an icon component without explicit width/height sizing — an unconstrained SVG fills its parent container and can end up covering the whole screen.
 
