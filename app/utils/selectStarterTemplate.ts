@@ -285,7 +285,7 @@ const BASELINE_PACKAGE_JSON = `{
     "preview": "vite preview"
   },
   "dependencies": {
-    "lucide-react": "^0.344.0",
+    "lucide-react": "^0.485.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
