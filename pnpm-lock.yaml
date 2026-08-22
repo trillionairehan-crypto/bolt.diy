@@ -405,6 +405,9 @@ importers:
       '@types/js-cookie':
         specifier: ^3.0.6
         version: 3.0.6
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
       '@types/path-browserify':
         specifier: ^1.0.3
         version: 1.0.3
