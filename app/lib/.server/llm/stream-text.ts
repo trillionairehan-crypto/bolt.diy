@@ -31,11 +31,13 @@ const logger = createScopedLogger('stream-text');
  * Sonnet 5 / Opus 5 think adaptively by default even with no `thinking` param sent at all —
  * confirmed live via coralred.kr repro (2026-08-22): Anthropic opens a `content_block_start`
  * type "thinking" unprompted, and the silent thinking phase can run 45s+ with zero stream
- * output, tripping stream-recovery's stall timeout. Capping effort and hiding the (unused —
- * this UI never renders reasoning) thinking text keeps quality for complex multi-file
- * generation while bounding the silent phase.
+ * output, tripping stream-recovery's stall timeout. Capping effort to 'medium' (still adaptive)
+ * did NOT bound this reliably — an A/B test the same day (short prompt, fresh chat, effort:
+ * medium) still hit a full 45s stall on attempt 1, while the exact same prompt against Sonnet
+ * 4.5 (no thinking at all) had zero stall and a ~4s time-to-first-token. So thinking is
+ * disabled outright here rather than capped.
  */
-const ADAPTIVE_THINKING_MODELS = ['claude-sonnet-5', 'claude-opus-5'];
+const NO_THINKING_MODELS = ['claude-sonnet-5', 'claude-opus-5'];
 
 function getCompletionTokenLimit(modelDetails: any): number {
   // 1. If model specifies completion tokens, use that
@@ -309,8 +311,8 @@ export async function streamText(props: {
     ),
   );
 
-  const isAnthropicAdaptiveThinkingModel =
-    provider.name === 'Anthropic' && ADAPTIVE_THINKING_MODELS.some((name) => modelDetails.name.includes(name));
+  const isAnthropicNoThinkingModel =
+    provider.name === 'Anthropic' && NO_THINKING_MODELS.some((name) => modelDetails.name.includes(name));
 
   const streamParams = {
     model: provider.getModelInstance({
@@ -327,14 +329,13 @@ export async function streamText(props: {
     // Set temperature to 1 for reasoning models (required by OpenAI API)
     ...(isReasoning ? { temperature: 1 } : {}),
 
-    ...(isAnthropicAdaptiveThinkingModel
+    ...(isAnthropicNoThinkingModel
       ? {
           providerOptions: {
             ...(filteredOptions as any).providerOptions,
             anthropic: {
               ...(filteredOptions as any).providerOptions?.anthropic,
-              thinking: { type: 'adaptive', display: 'omitted' },
-              effort: 'medium',
+              thinking: { type: 'disabled' },
             },
           },
         }
