@@ -596,6 +596,10 @@ export const Menu = () => {
             <span>|</span>
             <span>coralred@coralred.kr</span>
             <span>|</span>
+            <a href="/pricing" className="hover:text-gray-600 dark:hover:text-gray-400 hover:underline">
+              요금제
+            </a>
+            <span>|</span>
             <a href="/terms" className="hover:text-gray-600 dark:hover:text-gray-400 hover:underline">
               이용약관
             </a>
