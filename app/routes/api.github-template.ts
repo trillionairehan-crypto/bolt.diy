@@ -126,6 +126,68 @@ function stripTailwindWiring(files: { name: string; path: string; content: strin
   return withoutTailwindConfigs;
 }
 
+const LUCIDE_REACT_MIN_VERSION: [number, number, number] = [0, 485, 0];
+
+/**
+ * Parses a simple "^X.Y.Z" (or bare "X.Y.Z") version string into a comparable tuple. Returns
+ * null for anything more complex (range operators other than ^, "latest", a workspace protocol,
+ * etc.) — those are left untouched rather than risk misinterpreting them.
+ */
+function parseSimpleVersion(version: string): [number, number, number] | null {
+  const match = /^\^?(\d+)\.(\d+)\.(\d+)$/.exec(version.trim());
+
+  if (!match) {
+    return null;
+  }
+
+  return [Number(match[1]), Number(match[2]), Number(match[3])];
+}
+
+function isOlderThan(version: string, minVersion: [number, number, number]): boolean {
+  const parsed = parseSimpleVersion(version);
+
+  if (!parsed) {
+    return false;
+  }
+
+  for (let i = 0; i < 3; i++) {
+    if (parsed[i] !== minVersion[i]) {
+      return parsed[i] < minVersion[i];
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Some starter templates pin a stale lucide-react version whose older icon names (e.g.
+ * AlertTriangle) were later renamed (TriangleAlert) with the old name kept only as an alias
+ * from ^0.485.0 onward. The LLM sometimes writes the newer name regardless of what the template
+ * pins, which produces a hard "no such export" failure against an old pin — the same problem
+ * BASELINE_PACKAGE_JSON in selectStarterTemplate.ts was bumped to fix. Only bumps in place when
+ * lucide-react is already a dependency and older than 0.485.0 — never adds it to a template that
+ * doesn't use it, and never touches a pin that's already newer.
+ */
+function bumpLucideReactVersion(files: { name: string; path: string; content: string }[]) {
+  const packageJson = files.find((file) => file.path === 'package.json');
+
+  if (!packageJson) {
+    return;
+  }
+
+  try {
+    const parsed = JSON.parse(packageJson.content);
+    const current = parsed.dependencies?.['lucide-react'];
+
+    if (typeof current === 'string' && isOlderThan(current, LUCIDE_REACT_MIN_VERSION)) {
+      parsed.dependencies['lucide-react'] = '^0.485.0';
+      packageJson.content = JSON.stringify(parsed, null, 2) + '\n';
+    }
+  } catch {
+    // Malformed package.json — leave it as-is rather than risk corrupting it further.
+  }
+}
+
 /**
  * Injects the Coralred design kit into a fetched template:
  * - font links + coralred-ui.css into index.html's <head>
@@ -133,14 +195,20 @@ function stripTailwindWiring(files: { name: string; path: string; content: strin
  * - coralred-ui.css itself as a new file
  * - .bolt/prompt replaced with kit-based instructions (added if the template doesn't have one)
  * - the template's stock Tailwind wiring removed and its stub App.tsx replaced
- * All of the above (except font links/coralred-ui.css/--hue) are skipped for shadcn templates,
- * since shadcn/ui — and the "don't use Tailwind" instruction — would directly contradict it.
+ * - a stale pinned lucide-react version bumped to ^0.485.0, if present (see bumpLucideReactVersion)
+ * All of the above (except font links/coralred-ui.css/--hue/the lucide-react bump) are skipped
+ * for shadcn templates, since shadcn/ui — and the "don't use Tailwind" instruction — would
+ * directly contradict it.
  * Head/body/CSS injection is skipped when the template has no root index.html (e.g. Next.js,
  * Astro, Remix, SvelteKit templates) so nothing is left orphaned.
  */
 function injectCoralredDesignKit(files: { name: string; path: string; content: string }[], hue: number, repo: string) {
   const isShadcn = isShadcnTemplate(repo);
   let result = isShadcn ? files : stripTailwindWiring(files);
+
+  // Applies to every template, shadcn included — the stale-version problem is unrelated to
+  // Tailwind, and shadcn templates use lucide-react too (see e.g. vite-shadcn).
+  bumpLucideReactVersion(result);
 
   if (!isShadcn) {
     const boltPrompt = result.find((file) => file.path === '.bolt/prompt');
