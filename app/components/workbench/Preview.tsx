@@ -692,7 +692,9 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
       } else if (event.data.type === 'VITE_COMPILE_ERROR') {
         // Reuses the same actionAlert(source:'preview') pipeline that runtime errors already
         // feed into — Chat.client.tsx's auto-fix effect doesn't need to know where this came from.
-        workbenchStore.actionAlert.set({
+        // setPreviewAlert (not actionAlert.set directly) debounces against
+        // checkArtifactFileReferences catching the exact same problem moments earlier.
+        workbenchStore.setPreviewAlert({
           type: 'preview',
           title: 'Compile Error',
           description: typeof event.data.message === 'string' ? event.data.message : 'Vite compile error',

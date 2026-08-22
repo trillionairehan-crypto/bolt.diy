@@ -46,7 +46,7 @@ if (!import.meta.env.SSR) {
           if (message.type === 'PREVIEW_UNCAUGHT_EXCEPTION' || message.type === 'PREVIEW_UNHANDLED_REJECTION') {
             const isPromise = message.type === 'PREVIEW_UNHANDLED_REJECTION';
             const title = isPromise ? 'Unhandled Promise Rejection' : 'Uncaught Exception';
-            workbenchStore.actionAlert.set({
+            workbenchStore.setPreviewAlert({
               type: 'preview',
               title,
               description: 'message' in message ? message.message : 'Unknown error',

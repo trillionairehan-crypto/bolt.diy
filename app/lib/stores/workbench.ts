@@ -18,8 +18,11 @@ import { description } from '~/lib/persistence';
 import Cookies from 'js-cookie';
 import { createSampler } from '~/utils/sampler';
 import type { ActionAlert, DeployAlert, SupabaseAlert } from '~/types/actions';
+import { createScopedLogger } from '~/utils/logger';
+import { findMissingRelativeImports, formatMissingImportsAlert } from '~/lib/runtime/file-reference-postprocess';
 
 const { saveAs } = fileSaver;
+const logger = createScopedLogger('WorkbenchStore');
 
 export interface ArtifactState {
   id: string;
@@ -57,6 +60,17 @@ export class WorkbenchStore {
   modifiedFiles = new Set<string>();
   artifactIdList: string[] = [];
   #globalExecutionQueue = Promise.resolve();
+
+  /*
+   * Two independent detectors feed source:'preview' actionAlerts for what's often the exact
+   * same underlying problem: checkArtifactFileReferences (proactive, runs in-memory right after
+   * an artifact closes) and the VITE_COMPILE_ERROR overlay detection in Preview.tsx (reactive,
+   * needs a full dev-server round trip). Without this, the same root cause could burn two of the
+   * auto-fix budget's two total retries — see setPreviewAlert.
+   */
+  #lastPreviewAlertAt = 0;
+  #PREVIEW_ALERT_COOLDOWN_MS = 8000;
+
   constructor() {
     if (import.meta.hot) {
       import.meta.hot.data.artifacts = this.artifacts;
@@ -81,6 +95,92 @@ export class WorkbenchStore {
 
   addToExecutionQueue(callback: () => Promise<void>) {
     this.#globalExecutionQueue = this.#globalExecutionQueue.then(() => callback());
+  }
+
+  /**
+   * Resolves once every action queued so far (across every artifact) has finished executing —
+   * in particular, every file write that was queued has actually landed on webcontainer.fs and
+   * been reflected into `this.files` (FilesStore.saveFile updates that map synchronously right
+   * after the write, not via the async watcher — see files.ts). Used by
+   * checkArtifactFileReferences to know it's safe to read `this.files` as authoritative for an
+   * artifact that just closed.
+   */
+  waitForExecutionQueueIdle(): Promise<void> {
+    return this.#globalExecutionQueue;
+  }
+
+  /**
+   * Setter for source:'preview' actionAlerts specifically. Debounces consecutive preview alerts
+   * within a short window so the same underlying problem, caught by two different detectors
+   * moments apart, doesn't trigger two separate auto-fix attempts (see the field comment above).
+   * Alerts with a different or no `source` (e.g. 'Dev Server Failed') are never debounced.
+   */
+  setPreviewAlert(alert: ActionAlert) {
+    if (alert.source === 'preview') {
+      const now = Date.now();
+
+      if (now - this.#lastPreviewAlertAt < this.#PREVIEW_ALERT_COOLDOWN_MS) {
+        logger.debug('Suppressing preview actionAlert — one already fired within the cooldown window', alert.title);
+        return;
+      }
+
+      this.#lastPreviewAlertAt = now;
+    }
+
+    this.actionAlert.set(alert);
+  }
+
+  /**
+   * Proactively checks a just-closed artifact's written files for relative imports that don't
+   * resolve to any file that was actually written — the LLM occasionally imports a file it
+   * forgets to create. Never throws: a failure here must not break the app, so any error is
+   * logged and swallowed. When nothing is missing, this is a no-op (no alert, no noise).
+   */
+  async checkArtifactFileReferences(artifactId: string): Promise<void> {
+    try {
+      await this.waitForExecutionQueueIdle();
+
+      const artifact = this.#getArtifact(artifactId);
+
+      if (!artifact) {
+        return;
+      }
+
+      const fileActions = Object.values(artifact.runner.actions.get()).filter((action) => action.type === 'file');
+
+      if (fileActions.length === 0) {
+        return;
+      }
+
+      const wc = await webcontainer;
+      const writtenFiles = fileActions.map((action) => ({
+        path: path.isAbsolute(action.filePath) ? action.filePath : path.join(wc.workdir, action.filePath),
+        content: action.content,
+      }));
+
+      const currentFiles = this.files.get();
+      const fileExists = (absolutePath: string) => currentFiles[absolutePath]?.type === 'file';
+
+      const missing = findMissingRelativeImports(writtenFiles, fileExists);
+
+      if (missing.length === 0) {
+        return;
+      }
+
+      logger.debug(`Found ${missing.length} unresolved relative import(s) in artifact ${artifactId}`);
+
+      const { description, content } = formatMissingImportsAlert(missing, wc.workdir);
+
+      this.setPreviewAlert({
+        type: 'preview',
+        title: 'Missing File',
+        description,
+        content,
+        source: 'preview',
+      });
+    } catch (error) {
+      logger.error('checkArtifactFileReferences failed', error);
+    }
   }
 
   get previews() {
