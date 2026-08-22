@@ -35,6 +35,7 @@ import LlmErrorAlert from './LLMApiAlert';
 import { getGenerationsRemaining } from '~/lib/freeTrial';
 import { authUserStore } from '~/lib/stores/auth';
 import PromptClarification from './PromptClarification';
+import type { GenerationDirectives } from '~/lib/onboarding/answer-directives';
 
 /*
  * Lazy-loaded: Workbench.client.tsx pulls in the workbenchStore singleton (ActionRunner,
@@ -58,7 +59,7 @@ interface BaseChatProps {
   showChat?: boolean;
   chatStarted?: boolean;
   clarifyingPrompt?: string | null;
-  onClarificationComplete?: (finalPrompt: string) => void;
+  onClarificationComplete?: (finalPrompt: string, directives: GenerationDirectives) => void;
   isStreaming?: boolean;
   onStreamingChange?: (streaming: boolean) => void;
   messages?: UIMessage[];
@@ -397,7 +398,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
             {clarifyingPrompt ? (
               <PromptClarification
                 initialPrompt={clarifyingPrompt}
-                onComplete={(finalPrompt) => onClarificationComplete?.(finalPrompt)}
+                onComplete={(finalPrompt, directives) => onClarificationComplete?.(finalPrompt, directives)}
               />
             ) : (
               <>

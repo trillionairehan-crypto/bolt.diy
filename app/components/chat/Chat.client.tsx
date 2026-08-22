@@ -25,7 +25,8 @@ import { logStore } from '~/lib/stores/logs';
 import { streamingState } from '~/lib/stores/streaming';
 import { filesToArtifacts } from '~/utils/fileUtils';
 import { supabaseConnection } from '~/lib/stores/supabase';
-import type { DesignScheme } from '~/types/design-scheme';
+import { defaultDesignScheme, type DesignScheme } from '~/types/design-scheme';
+import { hueToRepresentativeHex, type GenerationDirectives } from '~/lib/onboarding/answer-directives';
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import { useMCPStore } from '~/lib/stores/mcp';
 import type { LlmErrorAlertType } from '~/types/actions';
@@ -464,9 +465,17 @@ export const ChatImpl = memo(
       return true;
     };
 
-    // Runs the actual generation for a brand-new app (post-clarification, or skipped straight through).
-    const generateNewApp = async (promptContent: string) => {
+    /*
+     * Runs the actual generation for a brand-new app (post-clarification, or skipped straight
+     * through). designSchemeOverride, when given, is used INSTEAD OF the designScheme state for
+     * this call's hue computation — needed because handleClarificationComplete calls
+     * setDesignScheme(...) and generateNewApp(...) back to back, and React state updates are
+     * async, so the designScheme closure here would otherwise still see the pre-update value.
+     */
+    const generateNewApp = async (promptContent: string, designSchemeOverride?: DesignScheme) => {
       runAnimation();
+
+      const effectiveDesignScheme = designSchemeOverride ?? designScheme;
 
       if (!(await checkGenerationsAllowed())) {
         return;
@@ -488,7 +497,7 @@ export const ChatImpl = memo(
         });
 
         if (template !== 'blank') {
-          const temResp = await getTemplates(template, title, designSchemeToHue(designScheme?.palette)).catch((e) => {
+          const temResp = await getTemplates(template, title, designSchemeToHue(effectiveDesignScheme?.palette)).catch((e) => {
             logger.warn(`Starter template import failed for "${template}", continuing with blank template:`, e);
             toast.warning('템플릿을 불러오지 못해 기본 설정으로 생성합니다');
 
@@ -553,7 +562,7 @@ export const ChatImpl = memo(
        * dependency, can't fail the way a template fetch can) via the same synthetic-history
        * mechanism used for real templates above.
        */
-      const { assistantMessage, userMessage } = getBaselineTemplate(designSchemeToHue(designScheme?.palette));
+      const { assistantMessage, userMessage } = getBaselineTemplate(designSchemeToHue(effectiveDesignScheme?.palette));
       const userMessageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${promptContent}`;
       const uploadedFileParts = await filesToFileParts(uploadedFiles);
 
@@ -590,9 +599,21 @@ export const ChatImpl = memo(
     };
 
     // Called by PromptClarification once the user finishes answering (or skips) — resumes generation.
-    const handleClarificationComplete = (finalPrompt: string) => {
+    const handleClarificationComplete = (finalPrompt: string, directives: GenerationDirectives) => {
       setClarifyingPrompt(null);
-      generateNewApp(finalPrompt);
+
+      const hueHex = directives.hue !== undefined ? hueToRepresentativeHex(directives.hue) : undefined;
+      const designSchemeOverride: DesignScheme | undefined = hueHex
+        ? { ...defaultDesignScheme, palette: { ...defaultDesignScheme.palette, primary: hueHex } }
+        : undefined;
+
+      // Also persisted to state (not just passed as an override) so ColorSchemeDialog and any
+      // later generation in this session reflect the mood answer too, not just this first call.
+      if (designSchemeOverride) {
+        setDesignScheme(designSchemeOverride);
+      }
+
+      generateNewApp(finalPrompt, designSchemeOverride);
     };
 
     /**
