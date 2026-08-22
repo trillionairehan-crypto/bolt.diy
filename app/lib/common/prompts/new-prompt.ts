@@ -283,6 +283,23 @@ ${CACHE_BREAKPOINT_MARKER}
 
       In the root component, check isSupabaseConfigured FIRST, before rendering anything that touches auth or the database. When false, render the setup screen described above instead.
 
+      CRITICAL — package.json dependency:
+        - Writing an import statement is NOT enough. Every time you import a package this prompt gives you a pinned version for — @supabase/supabase-js (^2.45.0) here, or @tosspayments/tosspayments-sdk (^2.7.1, see Payment above) — you MUST also add that exact package and version to package.json's "dependencies" in the SAME artifact. An import with no matching package.json entry means the package is never installed: Vite throws "Failed to resolve import" and the app fails to start at all — a worse failure than a runtime bug, because the user never even sees the app.
+        - This applies immediately the first time you write the import, not "eventually" — do not defer adding the dependency to a later turn.
+
+        RIGHT — both land together:
+
+          import { createClient } from '@supabase/supabase-js';
+          // ...and in the same artifact, package.json:
+          "dependencies": {
+            "@supabase/supabase-js": "^2.45.0"
+          }
+
+        WRONG (import added, package.json left untouched — app never starts):
+
+          import { createClient } from '@supabase/supabase-js';
+          // package.json "dependencies" has no "@supabase/supabase-js" entry
+
       Loading state when a service is not configured:
       - When isSupabaseConfigured (or any similar guard) is false, you MUST immediately set every loading state to false and return early. Otherwise the app shows a spinner forever, which looks broken to the user.
       - Correct pattern:

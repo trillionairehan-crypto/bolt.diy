@@ -7,6 +7,7 @@ import { unreachable } from '~/utils/unreachable';
 import type { ActionCallbackData } from './message-parser';
 import type { BoltShell } from '~/utils/shell';
 import { LOCAL_PREVIEW_STORAGE_KEY, postFileToLocalPreviewServer } from '~/lib/stores/previews';
+import { addMissingDependencies, extractKnownPackageImports } from './dependency-postprocess';
 
 const logger = createScopedLogger('ActionRunner');
 
@@ -74,6 +75,14 @@ export class ActionRunner {
   onSupabaseAlert?: (alert: SupabaseAlert) => void;
   onDeployAlert?: (alert: DeployAlert) => void;
   buildOutput?: { path: string; exitCode: number; output: string };
+
+  /*
+   * Packages seen imported (from KNOWN_PACKAGE_VERSIONS) before package.json itself has been
+   * written yet, in case a file action lands out of the prompt's prescribed "package.json
+   * first" order. Reconciled into package.json the moment it does get written; see
+   * #runFileAction.
+   */
+  #pendingRequiredPackages = new Set<string>();
 
   constructor(
     webcontainerPromise: Promise<WebContainer>,
@@ -331,14 +340,74 @@ export class ActionRunner {
       }
     }
 
+    let content = action.content;
+
+    if (relativePath === 'package.json') {
+      // Reconcile any packages seen imported earlier (out of the prescribed write order) before
+      // package.json lands, so its content is patched even in that case.
+      if (this.#pendingRequiredPackages.size > 0) {
+        const patched = addMissingDependencies(content, this.#pendingRequiredPackages);
+
+        if (patched !== content) {
+          logger.debug(
+            `Auto-added missing package.json dependencies (imported before package.json was written): ${[...this.#pendingRequiredPackages].join(', ')}`,
+          );
+          content = patched;
+        }
+
+        this.#pendingRequiredPackages.clear();
+      }
+    } else {
+      const knownImports = extractKnownPackageImports(content);
+
+      if (knownImports.size > 0) {
+        await this.#reconcilePackageJsonDependencies(webcontainer, knownImports);
+      }
+    }
+
     try {
-      await webcontainer.fs.writeFile(relativePath, action.content);
+      await webcontainer.fs.writeFile(relativePath, content);
       logger.debug(`File written ${relativePath}`);
     } catch (error) {
       logger.error('Failed to write file\n\n', error);
     }
 
-    this.#mirrorFileToLocalPreviewServer(relativePath, action.content);
+    this.#mirrorFileToLocalPreviewServer(relativePath, content);
+  }
+
+  /*
+   * Reads the current package.json from the webcontainer FS and adds any of `knownImports` that
+   * are missing from its dependencies, using the pinned versions in KNOWN_PACKAGE_VERSIONS —
+   * this is what actually fixes the common case (package.json already written earlier, a later
+   * file imports e.g. @supabase/supabase-js without updating it). If package.json doesn't exist
+   * yet, queues the packages in #pendingRequiredPackages so #runFileAction reconciles them once
+   * package.json itself is written.
+   */
+  async #reconcilePackageJsonDependencies(webcontainer: WebContainer, knownImports: Set<string>) {
+    let existing: string;
+
+    try {
+      existing = await webcontainer.fs.readFile('package.json', 'utf-8');
+    } catch {
+      for (const pkg of knownImports) {
+        this.#pendingRequiredPackages.add(pkg);
+      }
+
+      return;
+    }
+
+    const patched = addMissingDependencies(existing, knownImports);
+
+    if (patched === existing) {
+      return;
+    }
+
+    try {
+      await webcontainer.fs.writeFile('package.json', patched);
+      logger.debug(`Auto-added missing package.json dependencies: ${[...knownImports].join(', ')}`);
+    } catch (error) {
+      logger.error('Failed to patch package.json with missing dependencies\n\n', error);
+    }
   }
 
   /*
