@@ -1,10 +1,25 @@
+import { lazy, Suspense } from 'react';
 import { useStore } from '@nanostores/react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { chatStore } from '~/lib/stores/chat';
 import { sidebarOpenStore, toggleSidebar } from '~/lib/stores/sidebar';
 import { classNames } from '~/utils/classNames';
-import { HeaderActionButtons } from './HeaderActionButtons.client';
 import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
+
+/*
+ * Lazy-loaded: HeaderActionButtons only imports `workbenchStore` to read `previews` for the
+ * Deploy button, but that store module eagerly instantiates a singleton pulling in ActionRunner,
+ * EditorStore, FilesStore, PreviewsStore, TerminalStore, JSZip, Octokit, and the WebContainer
+ * bootstrap. Header renders unconditionally on the main route, so a static import here forced
+ * that entire workbench dependency graph into the initial page-load bundle (~1MB gzipped, all
+ * under a single "Header" chunk) before the user ever opens the workbench. This defers that cost
+ * to when HeaderActionButtons actually mounts (chat.started === true). The ideal fix is a
+ * lighter-weight selector that doesn't require importing the whole store module at all — this is
+ * the quick, low-risk mitigation in the meantime.
+ */
+const HeaderActionButtons = lazy(() =>
+  import('./HeaderActionButtons.client').then((module) => ({ default: module.HeaderActionButtons })),
+);
 
 export function Header() {
   const chat = useStore(chatStore);
@@ -43,7 +58,9 @@ export function Header() {
           <ClientOnly>
             {() => (
               <div className="">
-                <HeaderActionButtons chatStarted={chat.started} />
+                <Suspense fallback={null}>
+                  <HeaderActionButtons chatStarted={chat.started} />
+                </Suspense>
               </div>
             )}
           </ClientOnly>

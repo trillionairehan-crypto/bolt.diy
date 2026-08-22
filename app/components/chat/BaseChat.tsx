@@ -3,10 +3,9 @@
  * Preventing TS checks with files presented in the video for a better presentation.
  */
 import type { JSONValue, UIMessage } from 'ai';
-import React, { type RefCallback, useEffect, useState } from 'react';
+import React, { type RefCallback, useEffect, useState, lazy, Suspense } from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { Menu } from '~/components/sidebar/Menu.client';
-import { Workbench } from '~/components/workbench/Workbench.client';
 import { classNames } from '~/utils/classNames';
 import { PROVIDER_LIST, SHOW_DEV_TOOLS } from '~/utils/constants';
 import { Messages } from './Messages.client';
@@ -36,6 +35,19 @@ import LlmErrorAlert from './LLMApiAlert';
 import { getGenerationsRemaining } from '~/lib/freeTrial';
 import { authUserStore } from '~/lib/stores/auth';
 import PromptClarification from './PromptClarification';
+
+/*
+ * Lazy-loaded: Workbench.client.tsx pulls in the workbenchStore singleton (ActionRunner,
+ * EditorStore, FilesStore, PreviewsStore, TerminalStore, JSZip, Octokit, the WebContainer
+ * bootstrap). BaseChat renders unconditionally on the main chat route and previously imported
+ * this statically, so that whole graph loaded on first paint regardless of whether the workbench
+ * was ever opened — this was the dominant contributor to the ~1MB gzipped shared chunk (lazy-
+ * loading Header's own, much smaller, import of the same store barely moved that number, since
+ * this import alone already forced the bundle eagerly).
+ */
+const Workbench = lazy(() =>
+  import('~/components/workbench/Workbench.client').then((module) => ({ default: module.Workbench })),
+);
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
@@ -549,7 +561,9 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
           </div>
           <ClientOnly>
             {() => (
-              <Workbench chatStarted={chatStarted} isStreaming={isStreaming} setSelectedElement={setSelectedElement} />
+              <Suspense fallback={null}>
+                <Workbench chatStarted={chatStarted} isStreaming={isStreaming} setSelectedElement={setSelectedElement} />
+              </Suspense>
             )}
           </ClientOnly>
         </div>
