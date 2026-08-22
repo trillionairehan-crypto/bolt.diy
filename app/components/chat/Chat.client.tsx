@@ -698,14 +698,15 @@ export const ChatImpl = memo(
 
       const prompt = buildFixPrompt(true, actionAlert.content);
 
-      // On the last automatic retry, promote to Opus for anything that isn't an obvious one-line mistake.
+      // On the first preview error, promote to Opus for anything that isn't an obvious one-line mistake —
+      // two strikes isn't needed, one failed preview is enough to call it a failed builder attempt.
       // modelOverride is passed straight into sendMessage's 3rd argument — it only affects the
       // [Model:/Provider:] tag baked into THIS message's text. It never calls setModel/setProvider or
       // touches the selectedModel/selectedProvider cookies, so the component's model/provider state is
       // untouched and the very next message (retry or user-typed) reads that unchanged state fresh.
       let modelOverride: { model: string; providerName: string } | undefined;
 
-      if (attempts === 1) {
+      if (attempts === 0) {
         if (SIMPLE_MISTAKE_PATTERN.test(actionAlert.description)) {
           logger.debug('Auto-fix: 단순 실수로 판단, Sonnet 유지');
         } else if (OPUS_PROMOTION_LOCKED) {
