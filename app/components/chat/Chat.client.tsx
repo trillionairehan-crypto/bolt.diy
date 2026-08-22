@@ -281,10 +281,14 @@ export const ChatImpl = memo(
         stop();
         setFakeLoading(false);
 
+        // statusCode defaults to 0 (not 500) — a plain-text error we can't parse as JSON (e.g.
+        // stream-recovery's own give-up message, or AI_InvalidPromptError) must NOT be silently
+        // treated as a 500 server error below, or it gets misclassified as 'network' and
+        // auto-regenerate() fires on an error that has nothing to do with the network.
         let errorInfo = {
           message: '알 수 없는 오류가 발생했어요.',
           isRetryable: true,
-          statusCode: 500,
+          statusCode: 0,
           provider: provider.name,
           type: 'unknown' as const,
           retryDelay: 0,
@@ -631,7 +635,12 @@ export const ChatImpl = memo(
         return;
       }
 
-      if (error != null) {
+      // Only drop the trailing message if it's the failed/incomplete assistant turn — not
+      // unconditionally. Without the role check, every retry while `error` is still set (e.g.
+      // repeated clicks after a failure that keeps failing) chops one more message off the end
+      // each time, eventually emptying the whole array and making every subsequent send fail
+      // instantly with "messages must not be empty".
+      if (error != null && messages[messages.length - 1]?.role === 'assistant') {
         setMessages(messages.slice(0, -1));
       }
 

@@ -195,6 +195,11 @@ ${value.content}
 
           logStore.logError('Failed to load chat messages or snapshot', error); // Updated error message
           toast.error('Failed to load chat: ' + error.message); // More specific error
+
+          // Without this, a failed load leaves `ready` false forever and the chat UI
+          // (gated on `ready` in Chat.client.tsx) stays stuck on its loading state —
+          // even across reloads, since the same load fails the same way every time.
+          setReady(true);
         });
     } else {
       // Handle case where there is no mixedId (e.g., new chat)
