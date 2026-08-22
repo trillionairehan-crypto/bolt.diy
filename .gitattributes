@@ -1,0 +1,4 @@
+# Normalize all text files to LF in the repository, regardless of the checkout platform's
+# line-ending conventions (this repo has core.autocrlf=true on Windows checkouts, which was
+# causing every text file to be checked out as CRLF and tripping eslint's linebreak-style rule).
+* text=auto eol=lf
