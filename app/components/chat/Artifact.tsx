@@ -36,11 +36,14 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
 
   const actions = useStore(
     computed(artifact.runner.actions, (actions) => {
-      // Filter out Supabase actions except for migrations
-      return Object.values(actions).filter((action) => {
-        // Exclude actions with type 'supabase' or actions that contain 'supabase' in their content
-        return action.type !== 'supabase' && !(action.type === 'shell' && action.content?.includes('supabase'));
-      });
+      // Filter out Supabase actions except for migrations. Keep the action's own map key (its
+      // stable actionId) alongside it so the list below can key on identity instead of index.
+      return Object.entries(actions)
+        .filter(([, action]) => {
+          // Exclude actions with type 'supabase' or actions that contain 'supabase' in their content
+          return action.type !== 'supabase' && !(action.type === 'shell' && action.content?.includes('supabase'));
+        })
+        .map(([id, action]) => ({ id, ...action }));
     }),
   );
 
@@ -177,7 +180,7 @@ function ShellCodeBlock({ classsName, code }: ShellCodeBlockProps) {
 }
 
 interface ActionListProps {
-  actions: ActionState[];
+  actions: (ActionState & { id: string })[];
 }
 
 const actionVariants = {
@@ -198,12 +201,12 @@ const ActionList = memo(({ actions }: ActionListProps) => {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
       <ul className="list-none space-y-2.5">
         {actions.map((action, index) => {
-          const { status, type, content } = action;
+          const { id, status, type, content } = action;
           const isLast = index === actions.length - 1;
 
           return (
             <motion.li
-              key={index}
+              key={id}
               variants={actionVariants}
               initial="hidden"
               animate="visible"

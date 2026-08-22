@@ -65,17 +65,22 @@ export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
               const isFirst = index === 0;
               const parsedContent = parsedMessages[index] || '';
 
+              // Stable per-message key so the same logical message keeps its identity across
+              // renders even when it swaps between Fragment (hidden) and div (visible) —
+              // index-based keys caused React to reuse the wrong DOM node in that swap.
+              const messageKey = messageId || `message-${index}`;
+
               // v5 UIMessage has no `annotations` field — hidden messages are now flagged via
               // `message.metadata.hidden` instead (see generateNewApp() in Chat.client.tsx).
               const isHidden = (message as any).metadata?.hidden === true;
 
               if (isHidden) {
-                return <Fragment key={index} />;
+                return <Fragment key={messageKey} />;
               }
 
               return (
                 <div
-                  key={index}
+                  key={messageKey}
                   className={classNames('flex gap-4 py-3 w-full rounded-lg', {
                     'mt-4': !isFirst,
                   })}

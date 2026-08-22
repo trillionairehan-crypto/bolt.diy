@@ -1,4 +1,4 @@
-import { memo, useMemo, useState, useEffect, useCallback } from 'react';
+import { memo, useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import { workbenchStore } from '~/lib/stores/workbench';
 import type { FileMap } from '~/lib/stores/files';
@@ -421,30 +421,31 @@ const CodeLine = memo(
     const bgColor = diffLineStyles[type];
 
     const renderContent = () => {
-      if (type === 'unchanged' || !block.charChanges) {
-        const highlightedCode = highlighter
-          ? highlighter
-              .codeToHtml(content, { lang: language, theme: theme === 'dark' ? 'github-dark' : 'github-light' })
-              .replace(/<\/?pre[^>]*>/g, '')
-              .replace(/<\/?code[^>]*>/g, '')
-          : content;
-        return <span dangerouslySetInnerHTML={{ __html: highlightedCode }} />;
-      }
+      /*
+       * Always render the same shape — a Fragment wrapping an array of <span> segments —
+       * whether there's one whole-line segment or several char-level ones. Alternating between
+       * a bare <span> and a Fragment-of-<span>s at the same position (driven by transient
+       * charChanges content while a file streams in) was itself a source of DOM reconciliation
+       * mismatches: same tree position, different element type, on nodes carrying
+       * dangerouslySetInnerHTML.
+       */
+      const segments: Array<{ value: string; type: 'added' | 'removed' | 'unchanged' }> =
+        type === 'unchanged' || !block.charChanges ? [{ value: content, type: 'unchanged' }] : block.charChanges;
 
       return (
         <>
-          {block.charChanges.map((change, index) => {
-            const changeClass = changeColorStyles[change.type];
+          {segments.map((segment, index) => {
+            const changeClass = changeColorStyles[segment.type];
 
             const highlightedCode = highlighter
               ? highlighter
-                  .codeToHtml(change.value, {
+                  .codeToHtml(segment.value, {
                     lang: language,
                     theme: theme === 'dark' ? 'github-dark' : 'github-light',
                   })
                   .replace(/<\/?pre[^>]*>/g, '')
                   .replace(/<\/?code[^>]*>/g, '')
-              : change.value;
+              : segment.value;
 
             return <span key={index} className={changeClass} dangerouslySetInnerHTML={{ __html: highlightedCode }} />;
           })}
@@ -477,6 +478,7 @@ const FileInfo = memo(
     isFullscreen,
     beforeCode,
     afterCode,
+    isStreamingUpdate,
   }: {
     filename: string;
     hasChanges: boolean;
@@ -484,6 +486,7 @@ const FileInfo = memo(
     isFullscreen: boolean;
     beforeCode: string;
     afterCode: string;
+    isStreamingUpdate?: boolean;
   }) => {
     // Calculate additions and deletions from the current document
     const { additions, deletions } = useMemo(() => {
@@ -534,6 +537,7 @@ const FileInfo = memo(
           ) : (
             <span className="text-green-700 dark:text-green-400">No Changes</span>
           )}
+          {isStreamingUpdate && <span className="text-bolt-elements-textTertiary text-xs">Streaming…</span>}
           <FullscreenButton onClick={onToggleFullscreen} isFullscreen={isFullscreen} />
         </span>
       </div>
@@ -584,18 +588,59 @@ const getSharedHighlighter = async () => {
   return highlighterInstance;
 };
 
+const DIFF_RECOMPUTE_DEBOUNCE_MS = 300;
+
 const InlineDiffComparison = memo(({ beforeCode, afterCode, filename, language }: CodeComparisonProps) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Use state to hold the shared highlighter instance
   const [highlighter, setHighlighter] = useState<any>(null);
   const theme = useStore(themeStore);
+  const selectedView = useStore(workbenchStore.currentView);
+  const isVisible = selectedView === 'diff';
 
   const toggleFullscreen = useCallback(() => {
     setIsFullscreen((prev) => !prev);
   }, []);
 
-  const { unifiedBlocks, hasChanges, isBinary, error } = useProcessChanges(beforeCode, afterCode);
+  /*
+   * This view stays mounted (just translated off-screen via the Code/Diff/Preview slider) even
+   * when the diff tab isn't active, so recomputing + re-rendering the full line-by-line diff on
+   * every streamed token — visible or not — was the root cause of the removeChild crashes: React
+   * kept reconciling a rapidly-shifting list in the background, and switching tabs exposed
+   * whatever mismatch had already accumulated. `stableCode` is the only input the diff below
+   * actually reacts to, and it's only updated:
+   *   (a) immediately, the moment the diff tab becomes visible — so it's never stale on switch, or
+   *   (b) after streaming pauses for DIFF_RECOMPUTE_DEBOUNCE_MS while already visible.
+   * While hidden it's simply never touched, so useProcessChanges doesn't recompute at all.
+   */
+  const [stableCode, setStableCode] = useState({ beforeCode, afterCode });
+  const wasVisibleRef = useRef(isVisible);
+
+  useEffect(() => {
+    if (!isVisible) {
+      wasVisibleRef.current = false;
+      return undefined;
+    }
+
+    const justBecameVisible = !wasVisibleRef.current;
+    wasVisibleRef.current = true;
+
+    if (justBecameVisible) {
+      setStableCode({ beforeCode, afterCode });
+      return undefined;
+    }
+
+    const timer = setTimeout(() => {
+      setStableCode({ beforeCode, afterCode });
+    }, DIFF_RECOMPUTE_DEBOUNCE_MS);
+
+    return () => clearTimeout(timer);
+  }, [isVisible, beforeCode, afterCode]);
+
+  const isStreamingUpdate = isVisible && (beforeCode !== stableCode.beforeCode || afterCode !== stableCode.afterCode);
+
+  const { unifiedBlocks, hasChanges, isBinary, error } = useProcessChanges(stableCode.beforeCode, stableCode.afterCode);
 
   useEffect(() => {
     // Fetch the shared highlighter instance
@@ -632,8 +677,9 @@ const InlineDiffComparison = memo(({ beforeCode, afterCode, filename, language }
           hasChanges={hasChanges}
           onToggleFullscreen={toggleFullscreen}
           isFullscreen={isFullscreen}
-          beforeCode={beforeCode}
-          afterCode={afterCode}
+          beforeCode={stableCode.beforeCode}
+          afterCode={stableCode.afterCode}
+          isStreamingUpdate={isStreamingUpdate}
         />
         <div className={diffPanelStyles}>
           {hasChanges ? (
@@ -652,7 +698,12 @@ const InlineDiffComparison = memo(({ beforeCode, afterCode, filename, language }
               ))}
             </div>
           ) : (
-            <NoChangesView beforeCode={beforeCode} language={language} highlighter={highlighter} theme={theme} />
+            <NoChangesView
+              beforeCode={stableCode.beforeCode}
+              language={language}
+              highlighter={highlighter}
+              theme={theme}
+            />
           )}
         </div>
       </div>

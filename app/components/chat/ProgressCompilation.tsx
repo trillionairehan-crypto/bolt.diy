@@ -60,8 +60,8 @@ export default function ProgressCompilation({ data }: { data?: ProgressAnnotatio
                   exit={{ height: '0px' }}
                   transition={{ duration: 0.15 }}
                 >
-                  {progressList.map((x, i) => {
-                    return <ProgressItem key={i} progress={x} />;
+                  {progressList.map((x) => {
+                    return <ProgressItem key={x.label} progress={x} />;
                   })}
                 </motion.div>
               ) : (
