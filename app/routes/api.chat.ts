@@ -360,10 +360,24 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
 
         type StreamRun = { controller: AbortController; intentionallyAborted: boolean };
 
-        const consumeRun = async (run: StreamRun, result: Awaited<ReturnType<typeof streamText>>) => {
+        const consumeRun = async (
+          run: StreamRun,
+          result: Awaited<ReturnType<typeof streamText>>,
+          recovery: StreamRecoveryManager,
+        ) => {
           try {
             for await (const part of result.stream) {
-              streamRecovery.updateActivity();
+              recovery.updateActivity();
+
+              if (part.type === 'abort') {
+                /*
+                 * Intentional abort (stall retry or client disconnect), not a real completion.
+                 * Whoever triggered the abort owns cleanup/next steps — don't touch `recovery` here.
+                 * (A stale run's normal-completion `stop()` used to race with the retry's own timer —
+                 * each run now gets its own StreamRecoveryManager, so this is now also just belt-and-braces.)
+                 */
+                return;
+              }
 
               if (part.type === 'error') {
                 if (run.intentionallyAborted) {
@@ -372,7 +386,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
 
                 const error: any = part.error;
                 logger.error('Streaming error:', error);
-                streamRecovery.stop();
+                recovery.stop();
 
                 // Enhanced error handling for common streaming issues
                 if (error.message?.includes('Invalid JSON response')) {
@@ -384,7 +398,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
                 return;
               }
             }
-            streamRecovery.stop();
+            recovery.stop();
           } catch (err) {
             if (!run.intentionallyAborted) {
               logger.error('Streaming loop failed:', err);
@@ -395,57 +409,78 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
         let currentRun: StreamRun = { controller: new AbortController(), intentionallyAborted: false };
         let result = await streamText(buildStreamTextParams(currentRun.controller.signal));
 
-        const streamRecovery = new StreamRecoveryManager({
-          timeout: 45000,
-          maxRetries: 1,
-          onStall: async () => {
-            logger.warn('Stream produced no output for 45s — retrying once with a fresh request');
+        const MAX_STALL_RETRIES = 1;
+        let stallRetryCount = 0;
 
-            writer.write({
-              type: 'data-progress',
-              data: {
-                type: 'progress',
-                label: 'response',
-                status: 'in-progress',
-                order: progressCounter++,
-                message: '응답이 지연되고 있어요. 다시 시도할게요...',
-              } satisfies ProgressAnnotation,
-              transient: true,
-            });
+        /*
+         * Each run (the original stream and every retry) gets its own StreamRecoveryManager
+         * instead of sharing one. Sharing one instance meant the original run's own consumeRun
+         * loop — still alive in the background after being intentionally aborted — would call
+         * `.stop()` on normal loop completion once it saw the abort, permanently killing the
+         * *retry's* timer (StreamRecoveryManager.stop() can't be restarted). That's why a stalled
+         * retry never reached onGiveUp: the second 45s timer had already been cleared. Giving each
+         * run its own instance (maxRetries: 0, so it always fires onGiveUp on its own single
+         * timeout) removes the shared mutable state entirely; retry-vs-give-up is now decided
+         * here via `stallRetryCount`, not inside the manager.
+         */
+        const createStreamRecovery = (): StreamRecoveryManager =>
+          new StreamRecoveryManager({
+            timeout: 45000,
+            maxRetries: 0,
+            onGiveUp: async () => {
+              if (stallRetryCount >= MAX_STALL_RETRIES) {
+                logger.error('Stream recovery exhausted — ending stream with a clear error instead of hanging');
 
-            currentRun.intentionallyAborted = true;
-            currentRun.controller.abort();
+                currentRun.intentionallyAborted = true;
+                currentRun.controller.abort();
 
-            try {
-              currentRun = { controller: new AbortController(), intentionallyAborted: false };
-              result = await streamText(buildStreamTextParams(currentRun.controller.signal));
-              streamRecovery.updateActivity();
-              consumeRun(currentRun, result);
-              writer.merge(result.toUIMessageStream());
-            } catch (retryError) {
-              logger.error('Retry attempt failed to start:', retryError);
+                writer.write({
+                  type: 'error',
+                  errorText: '응답 생성이 너무 오래 걸려 중단했어요. 다시 시도해주세요.',
+                });
+
+                return;
+              }
+
+              stallRetryCount++;
+              logger.warn(`Stream produced no output for 45s — retrying (attempt ${stallRetryCount})`);
+
               writer.write({
-                type: 'error',
-                errorText: '응답 생성이 너무 오래 걸려 중단했어요. 다시 시도해주세요.',
+                type: 'data-progress',
+                data: {
+                  type: 'progress',
+                  label: 'response',
+                  status: 'in-progress',
+                  order: progressCounter++,
+                  message: '응답이 지연되고 있어요. 다시 시도할게요...',
+                } satisfies ProgressAnnotation,
+                transient: true,
               });
-              streamRecovery.stop();
-            }
-          },
-          onGiveUp: () => {
-            logger.error('Stream recovery exhausted — ending stream with a clear error instead of hanging');
 
-            currentRun.intentionallyAborted = true;
-            currentRun.controller.abort();
+              currentRun.intentionallyAborted = true;
+              currentRun.controller.abort();
 
-            writer.write({
-              type: 'error',
-              errorText: '응답 생성이 너무 오래 걸려 중단했어요. 다시 시도해주세요.',
-            });
-          },
-        });
+              try {
+                currentRun = { controller: new AbortController(), intentionallyAborted: false };
+                result = await streamText(buildStreamTextParams(currentRun.controller.signal));
 
+                const retryRecovery = createStreamRecovery();
+                retryRecovery.startMonitoring();
+                consumeRun(currentRun, result, retryRecovery);
+                writer.merge(result.toUIMessageStream());
+              } catch (retryError) {
+                logger.error('Retry attempt failed to start:', retryError);
+                writer.write({
+                  type: 'error',
+                  errorText: '응답 생성이 너무 오래 걸려 중단했어요. 다시 시도해주세요.',
+                });
+              }
+            },
+          });
+
+        const streamRecovery = createStreamRecovery();
         streamRecovery.startMonitoring();
-        consumeRun(currentRun, result);
+        consumeRun(currentRun, result, streamRecovery);
         writer.merge(result.toUIMessageStream());
       },
       onError: (error: any) => {

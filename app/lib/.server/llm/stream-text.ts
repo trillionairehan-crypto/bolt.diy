@@ -27,6 +27,16 @@ export interface StreamingOptions extends Omit<Parameters<typeof _streamText>[0]
 
 const logger = createScopedLogger('stream-text');
 
+/*
+ * Sonnet 5 / Opus 5 think adaptively by default even with no `thinking` param sent at all —
+ * confirmed live via coralred.kr repro (2026-08-22): Anthropic opens a `content_block_start`
+ * type "thinking" unprompted, and the silent thinking phase can run 45s+ with zero stream
+ * output, tripping stream-recovery's stall timeout. Capping effort and hiding the (unused —
+ * this UI never renders reasoning) thinking text keeps quality for complex multi-file
+ * generation while bounding the silent phase.
+ */
+const ADAPTIVE_THINKING_MODELS = ['claude-sonnet-5', 'claude-opus-5'];
+
 function getCompletionTokenLimit(modelDetails: any): number {
   // 1. If model specifies completion tokens, use that
   if (modelDetails.maxCompletionTokens && modelDetails.maxCompletionTokens > 0) {
@@ -299,6 +309,9 @@ export async function streamText(props: {
     ),
   );
 
+  const isAnthropicAdaptiveThinkingModel =
+    provider.name === 'Anthropic' && ADAPTIVE_THINKING_MODELS.some((name) => modelDetails.name.includes(name));
+
   const streamParams = {
     model: provider.getModelInstance({
       model: modelDetails.name,
@@ -313,6 +326,19 @@ export async function streamText(props: {
 
     // Set temperature to 1 for reasoning models (required by OpenAI API)
     ...(isReasoning ? { temperature: 1 } : {}),
+
+    ...(isAnthropicAdaptiveThinkingModel
+      ? {
+          providerOptions: {
+            ...(filteredOptions as any).providerOptions,
+            anthropic: {
+              ...(filteredOptions as any).providerOptions?.anthropic,
+              thinking: { type: 'adaptive', display: 'omitted' },
+              effort: 'medium',
+            },
+          },
+        }
+      : {}),
   };
 
   // DEBUG: Log final streaming parameters
