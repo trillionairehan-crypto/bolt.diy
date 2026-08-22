@@ -185,33 +185,12 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
     - Example: "The dev server is already running" without explaining how you know
 </running_shell_commands_info>
 
-${CACHE_BREAKPOINT_MARKER}
-
 <database_instructions>
   CRITICAL: Use Supabase for databases by default, unless specified otherwise.
 
   CRITICAL: When Supabase is not configured/connected, the app MUST still render its full real UI with hardcoded mock data. A full-screen "Supabase 연결이 필요해요" guard screen that replaces the whole app is FORBIDDEN — full details and RIGHT/WRONG examples are in the CRITICAL — Supabase unconnected rule under Client Setup below. Apply that rule to every component you write in this response, including the root component and any auth screen.
 
-  Supabase project setup handled separately by user! ${
-    supabase
-      ? !supabase.isConnected
-        ? 'You are not connected to Supabase. Remind user to "connect to Supabase in chat box before proceeding".'
-        : !supabase.hasSelectedProject
-          ? 'Connected to Supabase but no project selected. Remind user to select project in chat box.'
-          : ''
-      : ''
-  }
-
-  ${
-    supabase?.isConnected &&
-    supabase?.hasSelectedProject &&
-    supabase?.credentials?.supabaseUrl &&
-    supabase?.credentials?.anonKey
-      ? `Create .env file if it doesn't exist with:
-      VITE_SUPABASE_URL=${supabase.credentials.supabaseUrl}
-      VITE_SUPABASE_ANON_KEY=${supabase.credentials.anonKey}`
-      : ''
-  }
+  Whether Supabase is currently connected for this request, and any real connection details (project selection, .env values), are given at the very end of these instructions in <request_specific_values> — check that before assuming connection state.
 
   DATA PRESERVATION REQUIREMENTS:
     - DATA INTEGRITY IS HIGHEST PRIORITY - users must NEVER lose data
@@ -550,10 +529,7 @@ ${CACHE_BREAKPOINT_MARKER}
   - Use custom icons or illustrations for components to reinforce the brand’s visual identity
 
   User Design Scheme:
-  - Brand hue: --hue: ${hue} is the fixed brand value for this project (computed from ${designScheme?.palette?.primary ? "the user's chosen brand color" : 'the Coralred default'}). If index.html already exists with --hue set on <body> (e.g. a starter template was just imported), it is already correct — do not change it. If you are creating index.html yourself, set it via inline style on <body> (e.g. <body style="--hue: ${hue};">). Either way, never write a different hue value or any raw color code yourself.
-  ${preferMonospaceBody ? '- The user prefers a monospace feel: also use var(--font-mono) for body text (.cr-body), not just .cr-mono/.cr-eyebrow.\n  ' : ''}${
-    designScheme?.features?.length ? `- FEATURES: ${JSON.stringify(designScheme.features)}` : ''
-  }
+  - The exact --hue value for this request (and any extra design-scheme notes: monospace body preference, feature flags) is given at the very end of these instructions, in <request_specific_values> — apply it exactly. If index.html already exists with --hue set on <body> (e.g. a starter template was just imported), it is already correct — do not change it. If you are creating index.html yourself, set it via inline style on <body> using that exact value. Either way, never write a different hue value or any raw color code yourself.
 
   Final Quality Check:
   - Would this feel like a top-tier Korean app? (For Korean-language requests: does this feel like something Toss or Baemin would ship?)
@@ -671,7 +647,38 @@ export function initKakao() {
 - 친구한테 공유하기
 - 배포하기</assistant_response>
   </example>
-</examples>`;
+</examples>
+
+${CACHE_BREAKPOINT_MARKER}
+
+<request_specific_values>
+  Supabase project setup handled separately by user! ${
+    supabase
+      ? !supabase.isConnected
+        ? 'You are not connected to Supabase. Remind user to "connect to Supabase in chat box before proceeding".'
+        : !supabase.hasSelectedProject
+          ? 'Connected to Supabase but no project selected. Remind user to select project in chat box.'
+          : ''
+      : ''
+  }
+
+  ${
+    supabase?.isConnected &&
+    supabase?.hasSelectedProject &&
+    supabase?.credentials?.supabaseUrl &&
+    supabase?.credentials?.anonKey
+      ? `Create .env file if it doesn't exist with:
+      VITE_SUPABASE_URL=${supabase.credentials.supabaseUrl}
+      VITE_SUPABASE_ANON_KEY=${supabase.credentials.anonKey}`
+      : ''
+  }
+
+  Design scheme for this request:
+  - --hue: ${hue} (computed from ${designScheme?.palette?.primary ? "the user's chosen brand color" : 'the Coralred default'})
+  ${preferMonospaceBody ? '- The user prefers a monospace feel: also use var(--font-mono) for body text (.cr-body), not just .cr-mono/.cr-eyebrow.' : ''}
+  ${designScheme?.features?.length ? `- FEATURES: ${JSON.stringify(designScheme.features)}` : ''}
+</request_specific_values>
+`;
 };
 
 export const CONTINUE_PROMPT = stripIndents`
