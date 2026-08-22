@@ -39,8 +39,7 @@ interface UserMessageProps {
 export function UserMessage({ parts }: UserMessageProps) {
   // Extract images from parts - look for file parts with image mime types
   const images =
-    parts?.filter((part): part is FileUIPart => part.type === 'file' && !!part.mediaType?.startsWith('image/')) ||
-    [];
+    parts?.filter((part): part is FileUIPart => part.type === 'file' && !!part.mediaType?.startsWith('image/')) || [];
 
   const textContent = stripMetadata(parts);
 
@@ -73,5 +72,6 @@ function stripMetadata(parts: MessagePart[] | undefined) {
     .join('');
 
   const artifactRegex = /<boltArtifact\s+[^>]*>[\s\S]*?<\/boltArtifact>/gm;
+
   return content.replace(MODEL_REGEX, '').replace(PROVIDER_REGEX, '').replace(artifactRegex, '');
 }

@@ -15,8 +15,10 @@ import { path } from '~/utils/path';
 export interface MissingImportRef {
   /** Absolute (WORK_DIR-based) path of the file that contains the broken import. */
   importerPath: string;
+
   /** The raw specifier as written, e.g. './lib/supabase'. */
   specifier: string;
+
   /** 1-based line number the import appears on in the importer's content. */
   line: number;
 }
@@ -148,7 +150,9 @@ export function formatMissingImportsAlert(
       ? `${firstRelative}에서 import한 '${first.specifier}' 파일이 없어요`
       : `${firstRelative} 등에서 import한 파일 ${missing.length}개가 없어요`;
 
-  const lines = missing.map((ref) => `- ${toRelative(ref.importerPath)}:${ref.line} imports '${ref.specifier}', but no file was written for it`);
+  const lines = missing.map(
+    (ref) => `- ${toRelative(ref.importerPath)}:${ref.line} imports '${ref.specifier}', but no file was written for it`,
+  );
 
   const content = [
     'The following relative imports point to files that were never created in this response:',

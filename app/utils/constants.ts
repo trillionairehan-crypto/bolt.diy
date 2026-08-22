@@ -6,6 +6,7 @@ export const WORK_DIR = `/home/${WORK_DIR_NAME}`;
 export const MODIFICATIONS_TAG_NAME = 'bolt_file_modifications';
 export const MODEL_REGEX = /^\[Model: (.*?)\]\n\n/;
 export const PROVIDER_REGEX = /\[Provider: (.*?)\]\n\n/;
+
 /*
  * Switched to 'claude-sonnet-5' 2026-08-21: the forced `temperature: 0` injection that used to
  * make Sonnet 5 (and Opus 5) reject non-reasoning calls was tied to the old ai SDK (v4.3.16).

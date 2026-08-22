@@ -561,9 +561,7 @@ ${CACHE_BREAKPOINT_MARKER}
   User Design Scheme:
   - Brand hue: --hue: ${hue} is the fixed brand value for this project (computed from ${designScheme?.palette?.primary ? "the user's chosen brand color" : 'the Coralred default'}). If index.html already exists with --hue set on <body> (e.g. a starter template was just imported), it is already correct — do not change it. If you are creating index.html yourself, set it via inline style on <body> (e.g. <body style="--hue: ${hue};">). Either way, never write a different hue value or any raw color code yourself.
   ${preferMonospaceBody ? '- The user prefers a monospace feel: also use var(--font-mono) for body text (.cr-body), not just .cr-mono/.cr-eyebrow.\n  ' : ''}${
-    designScheme?.features?.length
-      ? `- FEATURES: ${JSON.stringify(designScheme.features)}`
-      : ''
+    designScheme?.features?.length ? `- FEATURES: ${JSON.stringify(designScheme.features)}` : ''
   }
 
   Final Quality Check:

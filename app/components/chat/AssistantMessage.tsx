@@ -93,8 +93,10 @@ export const AssistantMessage = memo(
     parts,
     addToolOutput,
   }: AssistantMessageProps) => {
-    // v5 UIMessage has no `annotations` field — chatSummary/codeContext/usage/toolCall are now
-    // persisted as non-transient `data-*` parts instead, so we read them off `parts`.
+    /*
+     * v5 UIMessage has no `annotations` field — chatSummary/codeContext/usage/toolCall are now
+     * persisted as non-transient `data-*` parts instead, so we read them off `parts`.
+     */
     const chatSummary: string | undefined = (parts?.find((p: any) => p.type === 'data-chatSummary') as any)?.data
       ?.summary;
     const codeContext: string[] | undefined = (parts?.find((p: any) => p.type === 'data-codeContext') as any)?.data
@@ -109,9 +111,8 @@ export const AssistantMessage = memo(
       | undefined = (parts?.find((p: any) => p.type === 'data-usage') as any)?.data;
 
     const toolInvocations = parts?.filter((part) => part.type === 'dynamic-tool');
-    const toolCallAnnotations = ((parts?.filter((p: any) => p.type === 'data-toolCall') as any[])?.map(
-      (p) => p.data,
-    ) ?? []) as ToolCallAnnotation[];
+    const toolCallAnnotations = ((parts?.filter((p: any) => p.type === 'data-toolCall') as any[])?.map((p) => p.data) ??
+      []) as ToolCallAnnotation[];
 
     return (
       <div className="overflow-hidden w-full">

@@ -19,9 +19,11 @@ const messageParser = new EnhancedStreamingMessageParser({
 
       workbenchStore.updateArtifact(data, { closed: true });
 
-      // Fire-and-forget: message-parser.ts doesn't await this callback, so this never blocks
-      // streaming/parsing. checkArtifactFileReferences awaits the execution queue internally
-      // (so it only reads `files` once everything's actually written) and never throws.
+      /*
+       * Fire-and-forget: message-parser.ts doesn't await this callback, so this never blocks
+       * streaming/parsing. checkArtifactFileReferences awaits the execution queue internally
+       * (so it only reads `files` once everything's actually written) and never throws.
+       */
       if (data.artifactId) {
         void workbenchStore.checkArtifactFileReferences(data.artifactId);
       }

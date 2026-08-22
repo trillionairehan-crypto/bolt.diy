@@ -107,6 +107,7 @@ export default class OpenRouterProvider extends BaseProvider {
     const openRouter = createOpenRouter({
       apiKey,
     });
+
     return openRouter.chat(model);
   }
 }

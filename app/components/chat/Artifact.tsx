@@ -36,8 +36,10 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
 
   const actions = useStore(
     computed(artifact.runner.actions, (actions) => {
-      // Filter out Supabase actions except for migrations. Keep the action's own map key (its
-      // stable actionId) alongside it so the list below can key on identity instead of index.
+      /*
+       * Filter out Supabase actions except for migrations. Keep the action's own map key (its
+       * stable actionId) alongside it so the list below can key on identity instead of index.
+       */
       return Object.entries(actions)
         .filter(([, action]) => {
           // Exclude actions with type 'supabase' or actions that contain 'supabase' in their content

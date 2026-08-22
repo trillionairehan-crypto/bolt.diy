@@ -88,8 +88,10 @@ export function extractCurrentContext(messages: UIMessage[]) {
     return { summary: undefined, codeContext: undefined };
   }
 
-  // v5 UIMessage has no `annotations` field — chatSummary/codeContext are now persisted as
-  // non-transient `data-*` parts instead (see api.chat.ts), so we read them off `parts`.
+  /*
+   * v5 UIMessage has no `annotations` field — chatSummary/codeContext are now persisted as
+   * non-transient `data-*` parts instead (see api.chat.ts), so we read them off `parts`.
+   */
   const chatSummaryPart = lastAssistantMessage.parts?.find((p: any) => p.type === 'data-chatSummary') as any;
   const codeContextPart = lastAssistantMessage.parts?.find((p: any) => p.type === 'data-codeContext') as any;
 

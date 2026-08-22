@@ -5,10 +5,13 @@ const logger = createScopedLogger('stream-recovery');
 export interface StreamRecoveryOptions {
   /** How many stall-triggered retries to allow before giving up. Default 1. */
   maxRetries?: number;
+
   /** Milliseconds of inactivity before a stream is considered stalled. */
   timeout?: number;
+
   /** Called each time a stall is detected and a retry is still allowed. */
   onStall?: (attempt: number) => void;
+
   /** Called once when a stall persists after all retries are exhausted. */
   onGiveUp?: () => void;
 }

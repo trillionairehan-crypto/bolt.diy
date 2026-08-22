@@ -292,9 +292,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
             processedMessages.push({
               id: generateId(),
               role: 'user',
-              parts: [
-                { type: 'text', text: `[Model: ${model}]\n\n[Provider: ${provider}]\n\n${CONTINUE_PROMPT}` },
-              ],
+              parts: [{ type: 'text', text: `[Model: ${model}]\n\n[Provider: ${provider}]\n\n${CONTINUE_PROMPT}` }],
             });
 
             const result = await streamText({
@@ -492,9 +490,11 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
         }
 
         if (errorMessage.includes('Invalid JSON response')) {
-          // 자연스러운 한국어 문구를 위해 'api key' 부분 문자열을 없앴다. 이 메시지는
-          // Chat.client.tsx의 errorType 판별(authentication/rate_limit/quota) 어디에도
-          // 매치되지 않아 statusCode 기본값(500)에 따라 '서버 오류'로 분류된다 — 의도된 동작.
+          /*
+           * 자연스러운 한국어 문구를 위해 'api key' 부분 문자열을 없앴다. 이 메시지는
+           * Chat.client.tsx의 errorType 판별(authentication/rate_limit/quota) 어디에도
+           * 매치되지 않아 statusCode 기본값(500)에 따라 '서버 오류'로 분류된다 — 의도된 동작.
+           */
           return 'AI 서비스가 올바르지 않은 응답을 보냈어요. 모델 이름이 잘못됐거나 요청이 많거나 서버에 문제가 있을 수 있어요. 다른 모델을 선택하거나 API 키 설정을 확인해주세요.';
         }
 
@@ -503,9 +503,11 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
           errorMessage.includes('unauthorized') ||
           errorMessage.includes('authentication')
         ) {
-          // 자연스러운 한국어 문구를 위해 'api key' 부분 문자열을 없앴다. 그 결과 이 메시지는
-          // Chat.client.tsx의 errorType 판별에서 더 이상 '인증 오류'로 매치되지 않고
-          // statusCode 기본값(500)에 따라 '서버 오류'로 분류된다 — 의도된 동작.
+          /*
+           * 자연스러운 한국어 문구를 위해 'api key' 부분 문자열을 없앴다. 그 결과 이 메시지는
+           * Chat.client.tsx의 errorType 판별에서 더 이상 '인증 오류'로 매치되지 않고
+           * statusCode 기본값(500)에 따라 '서버 오류'로 분류된다 — 의도된 동작.
+           */
           return 'API 키가 없거나 올바르지 않아요. 설정을 확인해주세요.';
         }
 
@@ -514,9 +516,11 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
         }
 
         if (errorMessage.includes('rate limit') || errorMessage.includes('429')) {
-          // 자연스러운 한국어 문구를 위해 'rate limit' 부분 문자열을 없앴다. 그 결과 이 메시지는
-          // Chat.client.tsx의 errorType 판별에서 더 이상 '요청 한도 초과'로 매치되지 않고
-          // statusCode 기본값(500)에 따라 '서버 오류'로 분류된다 — 의도된 동작.
+          /*
+           * 자연스러운 한국어 문구를 위해 'rate limit' 부분 문자열을 없앴다. 그 결과 이 메시지는
+           * Chat.client.tsx의 errorType 판별에서 더 이상 '요청 한도 초과'로 매치되지 않고
+           * statusCode 기본값(500)에 따라 '서버 오류'로 분류된다 — 의도된 동작.
+           */
           return '너무 많이 요청해서 잠시 제한됐어요. 잠깐 기다렸다가 다시 시도해주세요.';
         }
 

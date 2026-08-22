@@ -27,9 +27,7 @@ export function LegalPageLayout({ title, effectiveDate, children }: LegalPageLay
         <h1 className="text-2xl sm:text-3xl font-bold text-bolt-elements-textPrimary mb-2">{title}</h1>
         <p className="text-sm text-bolt-elements-textSecondary mb-10">시행일자: {effectiveDate}</p>
 
-        <div className="space-y-8 text-sm sm:text-base leading-relaxed text-bolt-elements-textPrimary">
-          {children}
-        </div>
+        <div className="space-y-8 text-sm sm:text-base leading-relaxed text-bolt-elements-textPrimary">{children}</div>
 
         <div className="mt-16 pt-6 border-t border-bolt-elements-borderColor">
           <a href="/" className="text-sm font-medium text-[#FF5A36] hover:underline">

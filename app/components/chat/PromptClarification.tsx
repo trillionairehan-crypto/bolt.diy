@@ -18,8 +18,10 @@ interface PromptClarificationProps {
   onComplete: (finalPrompt: string, directives: GenerationDirectives) => void;
 }
 
-// 'waitingForDynamic': the 4 fixed questions are all answered but generateAppQuestions() hasn't
-// resolved yet — held here for up to DYNAMIC_WAIT_MS before concluding with fixed answers only.
+/*
+ * 'waitingForDynamic': the 4 fixed questions are all answered but generateAppQuestions() hasn't
+ * resolved yet — held here for up to DYNAMIC_WAIT_MS before concluding with fixed answers only.
+ */
 type Status = 'questions' | 'waitingForDynamic' | 'summary';
 
 const DYNAMIC_WAIT_MS = 3000;
@@ -51,9 +53,11 @@ function buildFinalPromptAndDirectives(
       return {};
     }
 
-    // Free-text fallback ("직접 입력") and every app-specific (isDynamic) question have no fixed
-    // id answer-directives.ts knows about — both become a plain "질문: 답변" line instead, same
-    // as the old behavior. Only the 4 fixed questions go through mapAnswerToDirectives.
+    /*
+     * Free-text fallback ("직접 입력") and every app-specific (isDynamic) question have no fixed
+     * id answer-directives.ts knows about — both become a plain "질문: 답변" line instead, same
+     * as the old behavior. Only the 4 fixed questions go through mapAnswerToDirectives.
+     */
     if (answer.optionId === 'custom' || question.isDynamic) {
       return { promptAdditions: [`${question.question} ${answer.label}`] };
     }
@@ -74,10 +78,12 @@ function buildFinalPromptAndDirectives(
 }
 
 export default function PromptClarification({ initialPrompt, onComplete }: PromptClarificationProps) {
-  // Starts with just the 4 fixed questions — synchronous, no loading state needed. Up to 2
-  // app-specific questions get appended once generateAppQuestions() resolves (see the mount
-  // effect below); if the user reaches the end of the fixed 4 before that happens, the
-  // 'waitingForDynamic' status briefly holds for them — see the effect further down.
+  /*
+   * Starts with just the 4 fixed questions — synchronous, no loading state needed. Up to 2
+   * app-specific questions get appended once generateAppQuestions() resolves (see the mount
+   * effect below); if the user reaches the end of the fixed 4 before that happens, the
+   * 'waitingForDynamic' status briefly holds for them — see the effect further down.
+   */
   const [questions, setQuestions] = useState<ClarifyQuestionDef[]>(() => selectQuestions(undefined, QUESTION_BANK));
   const [dynamicStatus, setDynamicStatus] = useState<'pending' | 'resolved'>('pending');
   const [status, setStatus] = useState<Status>('questions');
@@ -118,9 +124,11 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
     setStatus('summary');
   };
 
-  // Handles both directions of the wait: if generateAppQuestions already resolved by the time we
-  // enter 'waitingForDynamic' (fast path — either new questions already landed, or it came back
-  // empty), resolve immediately; otherwise wait up to DYNAMIC_WAIT_MS for it to resolve mid-wait.
+  /*
+   * Handles both directions of the wait: if generateAppQuestions already resolved by the time we
+   * enter 'waitingForDynamic' (fast path — either new questions already landed, or it came back
+   * empty), resolve immediately; otherwise wait up to DYNAMIC_WAIT_MS for it to resolve mid-wait.
+   */
   useEffect(() => {
     if (status !== 'waitingForDynamic') {
       return;
@@ -162,8 +170,10 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
       return;
     }
 
-    // Reached the end of what we currently know about. Advance the pointer regardless — if
-    // generateAppQuestions appends more questions, this is exactly the index they land on.
+    /*
+     * Reached the end of what we currently know about. Advance the pointer regardless — if
+     * generateAppQuestions appends more questions, this is exactly the index they land on.
+     */
     setCurrentStep(currentStep + 1);
 
     if (dynamicStatus === 'pending') {
@@ -245,7 +255,12 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
                   type="button"
                   onClick={() => recordAnswer(unsureOption)}
                   className="w-full min-h-11 text-left rounded-2xl border-2 border-dashed px-5 py-3 text-sm font-medium transition-colors hover:brightness-95 active:scale-[0.99]"
-                  style={{ borderColor: BRAND.border, color: BRAND.text, opacity: 0.55, backgroundColor: 'transparent' }}
+                  style={{
+                    borderColor: BRAND.border,
+                    color: BRAND.text,
+                    opacity: 0.55,
+                    backgroundColor: 'transparent',
+                  }}
                 >
                   {unsureOption.label}
                 </button>

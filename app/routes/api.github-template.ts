@@ -55,7 +55,9 @@ async function fetchGithubWithRetry(url: string, init: RequestInit, maxRetries =
       );
 
       if (attempt < maxRetries) {
-        console.warn(`[github-template] attempt ${attempt + 1}/${maxRetries + 1} failed for ${url}: ${response.status}, retrying...`);
+        console.warn(
+          `[github-template] attempt ${attempt + 1}/${maxRetries + 1} failed for ${url}: ${response.status}, retrying...`,
+        );
         await sleep(baseDelayMs * 2 ** attempt);
         continue;
       }
@@ -68,7 +70,10 @@ async function fetchGithubWithRetry(url: string, init: RequestInit, maxRetries =
       );
 
       if (attempt < maxRetries) {
-        console.warn(`[github-template] attempt ${attempt + 1}/${maxRetries + 1} network error for ${url}, retrying...`, networkError);
+        console.warn(
+          `[github-template] attempt ${attempt + 1}/${maxRetries + 1} network error for ${url}, retrying...`,
+          networkError,
+        );
         await sleep(baseDelayMs * 2 ** attempt);
         continue;
       }
@@ -206,8 +211,10 @@ function injectCoralredDesignKit(files: { name: string; path: string; content: s
   const isShadcn = isShadcnTemplate(repo);
   let result = isShadcn ? files : stripTailwindWiring(files);
 
-  // Applies to every template, shadcn included — the stale-version problem is unrelated to
-  // Tailwind, and shadcn templates use lucide-react too (see e.g. vite-shadcn).
+  /*
+   * Applies to every template, shadcn included — the stale-version problem is unrelated to
+   * Tailwind, and shadcn templates use lucide-react too (see e.g. vite-shadcn).
+   */
   bumpLucideReactVersion(result);
 
   if (!isShadcn) {
@@ -470,7 +477,8 @@ export async function loader({ request, context }: { request: Request; context: 
   }
 
   const requestedHue = Number(url.searchParams.get('hue'));
-  const hue = Number.isInteger(requestedHue) && requestedHue >= 0 && requestedHue < 360 ? requestedHue : designSchemeToHue();
+  const hue =
+    Number.isInteger(requestedHue) && requestedHue >= 0 && requestedHue < 360 ? requestedHue : designSchemeToHue();
 
   try {
     // Access environment variables from Cloudflare context or process.env

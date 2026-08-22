@@ -83,9 +83,7 @@ export function SupabaseConnection() {
           disabled={connecting}
           onClick={() => setIsDialogOpen(!isDialogOpen)}
           className="hover:bg-bolt-elements-item-backgroundActive !text-white flex items-center gap-2"
-          title={
-            isConnected ? '데이터베이스가 연결됐어요' : '앱에 로그인과 데이터 저장 기능을 쓰려면 연결이 필요해요'
-          }
+          title={isConnected ? '데이터베이스가 연결됐어요' : '앱에 로그인과 데이터 저장 기능을 쓰려면 연결이 필요해요'}
         >
           <img
             className="w-4 h-4"

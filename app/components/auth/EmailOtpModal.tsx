@@ -130,8 +130,8 @@ export function EmailOtpModal({ open, onClose }: EmailOtpModalProps) {
             ) : (
               <>
                 <p className="text-sm text-bolt-elements-textSecondary">
-                  <span className="font-medium text-bolt-elements-textPrimary">{email}</span>(으)로 발송된 6자리
-                  인증 코드를 입력해주세요.
+                  <span className="font-medium text-bolt-elements-textPrimary">{email}</span>(으)로 발송된 6자리 인증
+                  코드를 입력해주세요.
                 </p>
 
                 <div>

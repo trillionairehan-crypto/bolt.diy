@@ -159,7 +159,11 @@ export class StreamingMessageParser {
               content += '\n';
             }
 
-            if ('type' in currentAction && currentAction.type === 'file' && /\.(tsx|jsx)$/.test(currentAction.filePath)) {
+            if (
+              'type' in currentAction &&
+              currentAction.type === 'file' &&
+              /\.(tsx|jsx)$/.test(currentAction.filePath)
+            ) {
               content = postProcessReactFile(currentAction.filePath, content);
             }
 

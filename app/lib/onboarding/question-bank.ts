@@ -11,18 +11,23 @@
  * questions.
  */
 
-/** Not populated by any question yet — the extension point for a future app-type classifier to
+/**
+ * Not populated by any question yet — the extension point for a future app-type classifier to
  * select a different/extra question set. Every question below applies to every type today
- * (appliesTo omitted), so selectQuestions() currently just returns the whole bank unfiltered. */
+ * (appliesTo omitted), so selectQuestions() currently just returns the whole bank unfiltered.
+ */
 export type AppTypeTag = 'ecommerce' | 'booking' | 'community' | 'portfolio' | 'tool';
 
 export interface ClarifyOption<TValue = unknown> {
   /** Stable machine key, e.g. 'solo'. Used for the "custom text" escape hatch: id 'custom'. */
   id: string;
+
   /** Korean button label. */
   label: string;
+
   /** Structured value answer-directives.ts's mapAnswerToDirectives consumes. null for "unsure". */
   value: TValue;
+
   /** Marks the "잘 모르겠어요" option so the UI can render it distinctly (last, muted). */
   isUnsure?: boolean;
 }
@@ -31,11 +36,15 @@ export interface ClarifyQuestionDef<TValue = unknown> {
   id: string;
   question: string;
   options: ClarifyOption<TValue>[];
+
   /** undefined = common question, always included. See AppTypeTag. */
   appliesTo?: AppTypeTag[];
-  /** Set (by generateAppQuestions.ts, not the LLM) on app-specific questions generated per
+
+  /**
+   * Set (by generateAppQuestions.ts, not the LLM) on app-specific questions generated per
    * request. Tells buildFinalPromptAndDirectives in PromptClarification.tsx to synthesize the
-   * answer as free text instead of routing it through answer-directives.ts's fixed-id switch. */
+   * answer as free text instead of routing it through answer-directives.ts's fixed-id switch.
+   */
   isDynamic?: boolean;
 }
 

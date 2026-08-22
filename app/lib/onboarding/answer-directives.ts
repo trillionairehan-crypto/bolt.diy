@@ -15,9 +15,13 @@
 export interface GenerationDirectives {
   /** Natural-language lines appended to the prompt under "추가로 알려주신 내용:". */
   promptAdditions: string[];
-  /** Whether the generated app should use Supabase at all. Undefined = no opinion (defer to
-   * new-prompt.ts's own "don't add auth unless it's actually needed" judgment). */
+
+  /**
+   * Whether the generated app should use Supabase at all. Undefined = no opinion (defer to
+   * new-prompt.ts's own "don't add auth unless it's actually needed" judgment).
+   */
   connectSupabase?: boolean;
+
   /** OKLCH hue (0-359) for the design kit's --hue token. Undefined = keep the brand default. */
   hue?: number;
 }
@@ -57,8 +61,10 @@ export function mapAnswerToDirectives(questionId: string, value: unknown): Parti
             ],
           };
         default:
-          // Unsure — no safe app-wide default audience exists; guessing risks contradicting
-          // what the user's own request already implied.
+          /*
+           * Unsure — no safe app-wide default audience exists; guessing risks contradicting
+           * what the user's own request already implied.
+           */
           return EMPTY;
       }
 
@@ -74,7 +80,9 @@ export function mapAnswerToDirectives(questionId: string, value: unknown): Parti
         case 'withoutAuth':
           return {
             connectSupabase: true,
-            promptAdditions: ['로그인 없이도 데이터가 저장되는 구조로 만들어주세요 (공용 데이터 또는 기기별 로컬 저장과 Supabase 동기화).'],
+            promptAdditions: [
+              '로그인 없이도 데이터가 저장되는 구조로 만들어주세요 (공용 데이터 또는 기기별 로컬 저장과 Supabase 동기화).',
+            ],
           };
         case 'none':
           return {
@@ -84,9 +92,11 @@ export function mapAnswerToDirectives(questionId: string, value: unknown): Parti
             ],
           };
         default:
-          // Unsure — deliberately don't set connectSupabase at all, so new-prompt.ts's existing
-          // "don't add auth unless the app actually needs per-user data" rule keeps deciding,
-          // instead of a guessed default overriding an already-reasonable judgment.
+          /*
+           * Unsure — deliberately don't set connectSupabase at all, so new-prompt.ts's existing
+           * "don't add auth unless the app actually needs per-user data" rule keeps deciding,
+           * instead of a guessed default overriding an already-reasonable judgment.
+           */
           return EMPTY;
       }
 
@@ -100,7 +110,9 @@ export function mapAnswerToDirectives(questionId: string, value: unknown): Parti
           };
         case 'desktop':
           return {
-            promptAdditions: ['데스크톱에서 주로 사용될 앱이에요 — 사이드바, 다단 구성처럼 넓은 화면을 활용한 레이아웃을 고려해도 좋아요.'],
+            promptAdditions: [
+              '데스크톱에서 주로 사용될 앱이에요 — 사이드바, 다단 구성처럼 넓은 화면을 활용한 레이아웃을 고려해도 좋아요.',
+            ],
           };
         default:
           // 'both' and unsure both mean "no bias" — the baseline is already responsive.
@@ -114,9 +126,11 @@ export function mapAnswerToDirectives(questionId: string, value: unknown): Parti
         case 'friendly':
           return { hue: FRIENDLY_HUE };
         case 'minimal':
-          // The kit's --accent chroma is fixed in CSS (design-handoff/coralred-ui.css), only hue
-          // is a variable — there's no way to make it read as "desaturated" through --hue alone,
-          // so minimal stays a prompt instruction instead of a hue value.
+          /*
+           * The kit's --accent chroma is fixed in CSS (design-handoff/coralred-ui.css), only hue
+           * is a variable — there's no way to make it read as "desaturated" through --hue alone,
+           * so minimal stays a prompt instruction instead of a hue value.
+           */
           return { promptAdditions: ['액센트 색 사용을 최소화하고, 강조가 꼭 필요한 곳에만 쓰세요.'] };
         default:
           return EMPTY;

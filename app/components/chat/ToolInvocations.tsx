@@ -92,10 +92,7 @@ export const ToolInvocations = memo(({ toolInvocations, toolCallAnnotations, add
     setShowDetails((prev) => !prev);
   };
 
-  const toolCalls = useMemo(
-    () => toolInvocations.filter((inv) => inv.state === 'input-available'),
-    [toolInvocations],
-  );
+  const toolCalls = useMemo(() => toolInvocations.filter((inv) => inv.state === 'input-available'), [toolInvocations]);
 
   const toolResults = useMemo(
     () => toolInvocations.filter((inv) => inv.state === 'output-available'),

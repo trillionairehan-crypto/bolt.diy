@@ -690,10 +690,12 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
           setSelectedElement?.(element);
         });
       } else if (event.data.type === 'VITE_COMPILE_ERROR') {
-        // Reuses the same actionAlert(source:'preview') pipeline that runtime errors already
-        // feed into — Chat.client.tsx's auto-fix effect doesn't need to know where this came from.
-        // setPreviewAlert (not actionAlert.set directly) debounces against
-        // checkArtifactFileReferences catching the exact same problem moments earlier.
+        /*
+         * Reuses the same actionAlert(source:'preview') pipeline that runtime errors already
+         * feed into — Chat.client.tsx's auto-fix effect doesn't need to know where this came from.
+         * setPreviewAlert (not actionAlert.set directly) debounces against
+         * checkArtifactFileReferences catching the exact same problem moments earlier.
+         */
         workbenchStore.setPreviewAlert({
           type: 'preview',
           title: 'Compile Error',
@@ -711,9 +713,11 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
     return () => window.removeEventListener('message', handleMessage);
   }, [isInspectorMode]);
 
-  // Gates the preview iframe behind a loading state until the very first successful compile —
-  // once true, this never resets, so a later compile error never takes away a screen the user
-  // already saw. See VITE_COMPILE_OK/VITE_COMPILE_ERROR handling above and the timeout fallback below.
+  /*
+   * Gates the preview iframe behind a loading state until the very first successful compile —
+   * once true, this never resets, so a later compile error never takes away a screen the user
+   * already saw. See VITE_COMPILE_OK/VITE_COMPILE_ERROR handling above and the timeout fallback below.
+   */
   const [hasRenderedOnce, setHasRenderedOnce] = useState(false);
 
   useEffect(() => {
@@ -721,9 +725,11 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
       return;
     }
 
-    // Vite gives no explicit "nothing is wrong" signal, and the overlay/#root detection in
-    // inspector-script.js can miss edge cases — this is the hard ceiling that guarantees the
-    // preview is never stuck behind the loading state indefinitely.
+    /*
+     * Vite gives no explicit "nothing is wrong" signal, and the overlay/#root detection in
+     * inspector-script.js can miss edge cases — this is the hard ceiling that guarantees the
+     * preview is never stuck behind the loading state indefinitely.
+     */
     const timeoutId = setTimeout(() => {
       setHasRenderedOnce(true);
     }, 15000);

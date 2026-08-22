@@ -113,6 +113,7 @@ export const ChatImpl = memo(
     const [fakeLoading, setFakeLoading] = useState(false);
     const [clarifyingPrompt, setClarifyingPrompt] = useState<string | null>(null);
     const files = useStore(workbenchStore.files);
+
     /*
      * Stays undefined until the user actually saves a scheme via ColorSchemeDialog — this is
      * how the backend tells "no custom scheme chosen" apart from "user picked this on purpose."
@@ -134,6 +135,7 @@ export const ChatImpl = memo(
       }
 
       const savedModel = Cookies.get('selectedModel');
+
       return savedModel || DEFAULT_MODEL;
     });
     const [provider, setProvider] = useState(() => {
@@ -142,6 +144,7 @@ export const ChatImpl = memo(
       }
 
       const savedProvider = Cookies.get('selectedProvider');
+
       return (PROVIDER_LIST.find((p) => p.name === savedProvider) || DEFAULT_PROVIDER) as ProviderInfo;
     });
     const { showChat } = useStore(chatStore);
@@ -157,9 +160,11 @@ export const ChatImpl = memo(
     // v5 useChat() no longer returns `data`/`setData` for custom stream data — rebuilt via onData below.
     const [progressAnnotations, setProgressAnnotations] = useState<ProgressAnnotation[]>([]);
 
-    // Caps automatic retries for transport-level failures (e.g. QUIC connection drops on long
-    // streaming requests) at 1, so a request that keeps failing doesn't loop forever. Reset on
-    // successful completion.
+    /*
+     * Caps automatic retries for transport-level failures (e.g. QUIC connection drops on long
+     * streaming requests) at 1, so a request that keeps failing doesn't loop forever. Reset on
+     * successful completion.
+     */
     const networkRetryCountRef = useRef(0);
     const MAX_NETWORK_AUTO_RETRIES = 1;
 
@@ -206,8 +211,10 @@ export const ChatImpl = memo(
         setProgressAnnotations([]);
         networkRetryCountRef.current = 0;
 
-        // Token usage logging was read from the v4 onFinish `response.usage` argument, which
-        // no longer exists in v5's onFinish payload. Low-priority — revisit separately.
+        /*
+         * Token usage logging was read from the v4 onFinish `response.usage` argument, which
+         * no longer exists in v5's onFinish payload. Low-priority — revisit separately.
+         */
         void message;
 
         logger.debug('Finished streaming');
@@ -282,10 +289,12 @@ export const ChatImpl = memo(
         stop();
         setFakeLoading(false);
 
-        // statusCode defaults to 0 (not 500) — a plain-text error we can't parse as JSON (e.g.
-        // stream-recovery's own give-up message, or AI_InvalidPromptError) must NOT be silently
-        // treated as a 500 server error below, or it gets misclassified as 'network' and
-        // auto-regenerate() fires on an error that has nothing to do with the network.
+        /*
+         * statusCode defaults to 0 (not 500) — a plain-text error we can't parse as JSON (e.g.
+         * stream-recovery's own give-up message, or AI_InvalidPromptError) must NOT be silently
+         * treated as a 500 server error below, or it gets misclassified as 'network' and
+         * auto-regenerate() fires on an error that has nothing to do with the network.
+         */
         let errorInfo = {
           message: '알 수 없는 오류가 발생했어요.',
           isRetryable: true,
@@ -326,11 +335,7 @@ export const ChatImpl = memo(
           title = '서버 오류';
         }
 
-        if (
-          context === 'chat' &&
-          errorType === 'network' &&
-          networkRetryCountRef.current < MAX_NETWORK_AUTO_RETRIES
-        ) {
+        if (context === 'chat' && errorType === 'network' && networkRetryCountRef.current < MAX_NETWORK_AUTO_RETRIES) {
           networkRetryCountRef.current += 1;
           toast.warning('네트워크 연결이 끊겨서 다시 시도할게요...');
           regenerate();
@@ -443,8 +448,10 @@ export const ChatImpl = memo(
       setSidebarOpen(true);
     };
 
-    // Gates generation on the remaining-count check. If the check itself fails (network/RPC error),
-    // fails closed — blocks generation rather than letting a broken check pass everyone through.
+    /*
+     * Gates generation on the remaining-count check. If the check itself fails (network/RPC error),
+     * fails closed — blocks generation rather than letting a broken check pass everyone through.
+     */
     const checkGenerationsAllowed = async (): Promise<boolean> => {
       let remaining: boolean;
 
@@ -497,12 +504,14 @@ export const ChatImpl = memo(
         });
 
         if (template !== 'blank') {
-          const temResp = await getTemplates(template, title, designSchemeToHue(effectiveDesignScheme?.palette)).catch((e) => {
-            logger.warn(`Starter template import failed for "${template}", continuing with blank template:`, e);
-            toast.warning('템플릿을 불러오지 못해 기본 설정으로 생성합니다');
+          const temResp = await getTemplates(template, title, designSchemeToHue(effectiveDesignScheme?.palette)).catch(
+            (e) => {
+              logger.warn(`Starter template import failed for "${template}", continuing with blank template:`, e);
+              toast.warning('템플릿을 불러오지 못해 기본 설정으로 생성합니다');
 
-            return null;
-          });
+              return null;
+            },
+          );
 
           if (temResp) {
             const { assistantMessage, userMessage } = temResp;
@@ -607,8 +616,10 @@ export const ChatImpl = memo(
         ? { ...defaultDesignScheme, palette: { ...defaultDesignScheme.palette, primary: hueHex } }
         : undefined;
 
-      // Also persisted to state (not just passed as an override) so ColorSchemeDialog and any
-      // later generation in this session reflect the mood answer too, not just this first call.
+      /*
+       * Also persisted to state (not just passed as an override) so ColorSchemeDialog and any
+       * later generation in this session reflect the mood answer too, not just this first call.
+       */
       if (designSchemeOverride) {
         setDesignScheme(designSchemeOverride);
       }
@@ -656,11 +667,13 @@ export const ChatImpl = memo(
         return;
       }
 
-      // Only drop the trailing message if it's the failed/incomplete assistant turn — not
-      // unconditionally. Without the role check, every retry while `error` is still set (e.g.
-      // repeated clicks after a failure that keeps failing) chops one more message off the end
-      // each time, eventually emptying the whole array and making every subsequent send fail
-      // instantly with "messages must not be empty".
+      /*
+       * Only drop the trailing message if it's the failed/incomplete assistant turn — not
+       * unconditionally. Without the role check, every retry while `error` is still set (e.g.
+       * repeated clicks after a failure that keeps failing) chops one more message off the end
+       * each time, eventually emptying the whole array and making every subsequent send fail
+       * instantly with "messages must not be empty".
+       */
       if (error != null && messages[messages.length - 1]?.role === 'assistant') {
         setMessages(messages.slice(0, -1));
       }
@@ -704,8 +717,10 @@ export const ChatImpl = memo(
       textareaRef.current?.blur();
     };
 
-    // Auto-retries preview runtime errors by asking Coralred to fix them, up to a small cap.
-    // Terminal errors are out of scope here — those keep the existing manual "물어보기" flow.
+    /*
+     * Auto-retries preview runtime errors by asking Coralred to fix them, up to a small cap.
+     * Terminal errors are out of scope here — those keep the existing manual "물어보기" flow.
+     */
     useEffect(() => {
       if (!actionAlert || actionAlert.source !== 'preview') {
         return;
@@ -719,12 +734,14 @@ export const ChatImpl = memo(
 
       const prompt = buildFixPrompt(true, actionAlert.content);
 
-      // On the first preview error, promote to Opus for anything that isn't an obvious one-line mistake —
-      // two strikes isn't needed, one failed preview is enough to call it a failed builder attempt.
-      // modelOverride is passed straight into sendMessage's 3rd argument — it only affects the
-      // [Model:/Provider:] tag baked into THIS message's text. It never calls setModel/setProvider or
-      // touches the selectedModel/selectedProvider cookies, so the component's model/provider state is
-      // untouched and the very next message (retry or user-typed) reads that unchanged state fresh.
+      /*
+       * On the first preview error, promote to Opus for anything that isn't an obvious one-line mistake —
+       * two strikes isn't needed, one failed preview is enough to call it a failed builder attempt.
+       * modelOverride is passed straight into sendMessage's 3rd argument — it only affects the
+       * [Model:/Provider:] tag baked into THIS message's text. It never calls setModel/setProvider or
+       * touches the selectedModel/selectedProvider cookies, so the component's model/provider state is
+       * untouched and the very next message (retry or user-typed) reads that unchanged state fresh.
+       */
       let modelOverride: { model: string; providerName: string } | undefined;
 
       if (attempts === 0) {

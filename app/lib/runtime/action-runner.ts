@@ -343,8 +343,10 @@ export class ActionRunner {
     let content = action.content;
 
     if (relativePath === 'package.json') {
-      // Reconcile any packages seen imported earlier (out of the prescribed write order) before
-      // package.json lands, so its content is patched even in that case.
+      /*
+       * Reconcile any packages seen imported earlier (out of the prescribed write order) before
+       * package.json lands, so its content is patched even in that case.
+       */
       if (this.#pendingRequiredPackages.size > 0) {
         const patched = addMissingDependencies(content, this.#pendingRequiredPackages);
 
