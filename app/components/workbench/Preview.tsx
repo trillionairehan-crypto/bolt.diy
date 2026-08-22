@@ -689,6 +689,18 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
         navigator.clipboard.writeText(element.displayText).then(() => {
           setSelectedElement?.(element);
         });
+      } else if (event.data.type === 'VITE_COMPILE_ERROR') {
+        // Reuses the same actionAlert(source:'preview') pipeline that runtime errors already
+        // feed into — Chat.client.tsx's auto-fix effect doesn't need to know where this came from.
+        workbenchStore.actionAlert.set({
+          type: 'preview',
+          title: 'Compile Error',
+          description: typeof event.data.message === 'string' ? event.data.message : 'Vite compile error',
+          content: typeof event.data.stack === 'string' ? event.data.stack : '',
+          source: 'preview',
+        });
+      } else if (event.data.type === 'VITE_COMPILE_OK') {
+        setHasRenderedOnce(true);
       }
     };
 
@@ -696,6 +708,26 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
 
     return () => window.removeEventListener('message', handleMessage);
   }, [isInspectorMode]);
+
+  // Gates the preview iframe behind a loading state until the very first successful compile —
+  // once true, this never resets, so a later compile error never takes away a screen the user
+  // already saw. See VITE_COMPILE_OK/VITE_COMPILE_ERROR handling above and the timeout fallback below.
+  const [hasRenderedOnce, setHasRenderedOnce] = useState(false);
+
+  useEffect(() => {
+    if (!iframeUrl || hasRenderedOnce) {
+      return;
+    }
+
+    // Vite gives no explicit "nothing is wrong" signal, and the overlay/#root detection in
+    // inspector-script.js can miss edge cases — this is the hard ceiling that guarantees the
+    // preview is never stuck behind the loading state indefinitely.
+    const timeoutId = setTimeout(() => {
+      setHasRenderedOnce(true);
+    }, 15000);
+
+    return () => clearTimeout(timeoutId);
+  }, [iframeUrl, hasRenderedOnce]);
 
   const toggleInspectorMode = () => {
     const newInspectorMode = !isInspectorMode;
@@ -1062,6 +1094,15 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
                 setIsSelectionMode={setIsSelectionMode}
                 containerRef={iframeRef}
               />
+              {!useLocalPreviewServer && !hasRenderedOnce && (
+                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">
+                  <div
+                    className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress"
+                    style={{ fontSize: '2rem' }}
+                  />
+                  <p className="text-sm text-bolt-elements-textTertiary">코드를 확인하고 있어요...</p>
+                </div>
+              )}
             </>
           ) : (
             <div className="flex w-full h-full justify-center items-center bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">

@@ -289,4 +289,175 @@
 
   // Auto-inject if inspector is already active
   window.parent.postMessage({ type: 'INSPECTOR_READY' }, '*');
+
+  // --- Vite compile-error / first-successful-render detection ---
+  // Vite has no explicit "compiled OK" signal — it only speaks up when something breaks
+  // (by appending a <vite-error-overlay> custom element to the document). So "OK" here is
+  // inferred positively (the app's #root actually got rendered into) rather than assumed
+  // from silence, and reported once per overlay lifecycle to avoid spamming the parent.
+  (function () {
+    var compileErrorActive = false;
+    var firstRenderConfirmed = false;
+
+    function post(type, extra) {
+      var payload = { type: type };
+      if (extra) {
+        for (var key in extra) {
+          if (Object.prototype.hasOwnProperty.call(extra, key)) {
+            payload[key] = extra[key];
+          }
+        }
+      }
+      window.parent.postMessage(payload, '*');
+    }
+
+    function extractOverlayInfo(overlayEl) {
+      try {
+        var root = overlayEl.shadowRoot;
+
+        if (!root) {
+          return { message: 'Vite compile error', stack: '' };
+        }
+
+        var messageEl = root.querySelector('.message-body') || root.querySelector('.message');
+        var fileEl = root.querySelector('.file');
+        var frameEl = root.querySelector('.frame');
+        var message = ((messageEl && messageEl.textContent) || '').trim();
+        var file = ((fileEl && fileEl.textContent) || '').trim();
+        var frame = ((frameEl && frameEl.textContent) || '').trim();
+
+        if (!message) {
+          // Selectors didn't match this Vite version's overlay markup — fall back to raw text.
+          message = ((root.textContent || 'Vite compile error').trim()).slice(0, 500);
+        }
+
+        return { message: message, stack: [file, frame].filter(Boolean).join('\n').slice(0, 4000) };
+      } catch (e) {
+        return { message: 'Vite compile error', stack: '' };
+      }
+    }
+
+    function findOverlay(node) {
+      if (!node || node.nodeType !== 1) {
+        return null;
+      }
+
+      if (node.tagName && node.tagName.toLowerCase() === 'vite-error-overlay') {
+        return node;
+      }
+
+      return node.querySelector ? node.querySelector('vite-error-overlay') : null;
+    }
+
+    function confirmFirstRender() {
+      if (firstRenderConfirmed || compileErrorActive) {
+        return;
+      }
+
+      firstRenderConfirmed = true;
+      post('VITE_COMPILE_OK');
+    }
+
+    function onOverlayAdded(overlayEl) {
+      if (compileErrorActive) {
+        return;
+      }
+
+      compileErrorActive = true;
+
+      var info = extractOverlayInfo(overlayEl);
+      post('VITE_COMPILE_ERROR', { message: info.message, stack: info.stack });
+    }
+
+    function onOverlayRemoved() {
+      if (!compileErrorActive) {
+        return;
+      }
+
+      compileErrorActive = false;
+      confirmFirstRender();
+    }
+
+    var overlayObserver = new MutationObserver(function (mutations) {
+      for (var i = 0; i < mutations.length; i++) {
+        var addedNodes = mutations[i].addedNodes;
+
+        for (var j = 0; j < addedNodes.length; j++) {
+          var added = findOverlay(addedNodes[j]);
+
+          if (added) {
+            onOverlayAdded(added);
+          }
+        }
+
+        var removedNodes = mutations[i].removedNodes;
+
+        for (var k = 0; k < removedNodes.length; k++) {
+          var removed = findOverlay(removedNodes[k]);
+
+          if (removed) {
+            onOverlayRemoved();
+          }
+        }
+      }
+    });
+
+    overlayObserver.observe(document.documentElement, { childList: true, subtree: true });
+
+    var existingOverlay = document.querySelector('vite-error-overlay');
+
+    if (existingOverlay) {
+      onOverlayAdded(existingOverlay);
+    }
+
+    // Positive signal: the app's root container actually received content.
+    function watchRootMount() {
+      var root = document.getElementById('root');
+
+      if (!root) {
+        // index.html may still be parsing — retry shortly instead of giving up.
+        setTimeout(watchRootMount, 50);
+        return;
+      }
+
+      if (root.childNodes.length > 0) {
+        confirmFirstRender();
+        return;
+      }
+
+      var rootObserver = new MutationObserver(function () {
+        if (root.childNodes.length > 0) {
+          confirmFirstRender();
+          rootObserver.disconnect();
+        }
+      });
+      rootObserver.observe(root, { childList: true });
+    }
+
+    watchRootMount();
+
+    // Fallback for the case where main.tsx is broken badly enough that Vite can't even
+    // serve it and the HMR socket never connects — so the overlay never appears either.
+    document.addEventListener(
+      'error',
+      function (event) {
+        var target = event.target;
+
+        if (!target || target.tagName !== 'SCRIPT' || target.type !== 'module') {
+          return;
+        }
+
+        if (compileErrorActive) {
+          return;
+        }
+
+        compileErrorActive = true;
+        post('VITE_COMPILE_ERROR', {
+          message: 'Entry script failed to load: ' + (target.getAttribute('src') || 'unknown'),
+          stack: '',
+        });
+      },
+      true,
+    );
+  })();
 })();
