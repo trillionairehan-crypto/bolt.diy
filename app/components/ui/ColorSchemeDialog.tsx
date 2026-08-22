@@ -3,7 +3,7 @@ import { Dialog, DialogTitle, DialogDescription, DialogRoot } from './Dialog';
 import { Button } from './Button';
 import { IconButton } from './IconButton';
 import type { DesignScheme } from '~/types/design-scheme';
-import { defaultDesignScheme, designFeatures, designFonts, paletteRoles } from '~/types/design-scheme';
+import { defaultDesignScheme, designFeatures, paletteRoles } from '~/types/design-scheme';
 
 export interface ColorSchemeDialogProps {
   designScheme?: DesignScheme;
@@ -42,10 +42,6 @@ export const ColorSchemeDialog: React.FC<ColorSchemeDialogProps> = ({ setDesignS
 
   const handleFeatureToggle = (key: string) => {
     setFeatures((prev) => (prev.includes(key) ? prev.filter((f) => f !== key) : [...prev, key]));
-  };
-
-  const handleFontToggle = (key: string) => {
-    setFont((prev) => (prev.includes(key) ? prev.filter((f) => f !== key) : [...prev, key]));
   };
 
   const handleSave = () => {

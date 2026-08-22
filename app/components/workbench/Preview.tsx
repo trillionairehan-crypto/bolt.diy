@@ -722,7 +722,7 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
 
   useEffect(() => {
     if (!iframeUrl || hasRenderedOnce) {
-      return;
+      return undefined;
     }
 
     /*

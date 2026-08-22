@@ -114,7 +114,6 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const concludeWithAnswers = (finalAnswers: Record<string, RecordedAnswer>) => {
@@ -131,7 +130,7 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
    */
   useEffect(() => {
     if (status !== 'waitingForDynamic') {
-      return;
+      return undefined;
     }
 
     if (dynamicStatus === 'resolved') {
@@ -141,7 +140,7 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
         concludeWithAnswers(answers);
       }
 
-      return;
+      return undefined;
     }
 
     const timeoutId = setTimeout(() => {
@@ -149,7 +148,6 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
     }, DYNAMIC_WAIT_MS);
 
     return () => clearTimeout(timeoutId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, dynamicStatus, questions.length, currentStep]);
 
   const handleSkip = () => onComplete(initialPrompt, EMPTY_DIRECTIVES);

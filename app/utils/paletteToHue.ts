@@ -20,12 +20,13 @@ export function hexToOklchHue(hex: string): number | null {
   const m = 0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b;
   const s = 0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b;
 
-  const l_ = Math.cbrt(l);
-  const m_ = Math.cbrt(m);
-  const s_ = Math.cbrt(s);
+  // Named after the OKLab spec's own l'/m'/s' notation (cube roots of the LMS-like values above).
+  const lPrime = Math.cbrt(l);
+  const mPrime = Math.cbrt(m);
+  const sPrime = Math.cbrt(s);
 
-  const a = 1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_;
-  const bLab = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_;
+  const a = 1.9779984951 * lPrime - 2.428592205 * mPrime + 0.4505937099 * sPrime;
+  const bLab = 0.0259040371 * lPrime + 0.7827717662 * mPrime - 0.808675766 * sPrime;
 
   if (Math.abs(a) < 1e-6 && Math.abs(bLab) < 1e-6) {
     // Achromatic (grayscale) color — hue is undefined, fall back to the brand default.

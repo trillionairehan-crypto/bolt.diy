@@ -6,6 +6,10 @@ export const authUserStore = atom<User | null>(null);
 
 export function initAuthListener() {
   if (!platformSupabase) {
+    /*
+     * No-op cleanup — matches the shape of the real unsubscribe function returned below, so
+     * callers can treat the return value uniformly regardless of whether auth is configured.
+     */
     return () => {};
   }
 

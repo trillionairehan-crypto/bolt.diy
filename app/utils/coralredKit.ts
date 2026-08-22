@@ -4,7 +4,7 @@
  * - selectStarterTemplate.ts's baseline template, used when no GitHub template applies
  *   (blank selection, or a failed fetch) so the kit is never skipped either way.
  */
-import coralredUiCss from '../../design-handoff/coralred-ui.css?raw';
+import coralredUiCss from '~design-handoff/coralred-ui.css?raw';
 
 export { coralredUiCss };
 
