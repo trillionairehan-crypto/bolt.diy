@@ -79,7 +79,7 @@ export function UserMessage({ parts }: UserMessageProps) {
  * user's original prompt is shown (the synthesized survey answers after the marker still went to
  * the model in the actual sent message; this only affects what's displayed).
  */
-function splitDisplayText(parts: MessagePart[] | undefined): { text: string; additionsCount: number } {
+export function splitDisplayText(parts: MessagePart[] | undefined): { text: string; additionsCount: number } {
   const content = (parts ?? [])
     .filter((part): part is TextUIPart => part.type === 'text')
     .map((part) => part.text)

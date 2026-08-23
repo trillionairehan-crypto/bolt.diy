@@ -10,7 +10,15 @@ export const KNOWN_PACKAGE_VERSIONS: Record<string, string> = {
   '@tosspayments/tosspayments-sdk': '^2.7.1',
 };
 
-const IMPORT_SPECIFIER_RE = /(?:import\s[\s\S]*?\sfrom\s|require\()\s*['"]([^'"]+)['"]/g;
+/*
+ * [^'"]*? (not [\s\S]*?) for the "import ... from" gap so the lazy quantifier can't backtrack
+ * across an earlier, unrelated import statement's own quoted specifier — see the identical fix
+ * (with the full explanation) in file-reference-postprocess.ts's RELATIVE_IMPORT_RE, found via
+ * writing this file's own B1 test suite. Also matches a bare `import('<pkg>')` dynamic import
+ * (file-reference-postprocess.ts's sibling regex already did; this one hadn't caught up, so a
+ * lazy-loaded known package — e.g. `await import('@supabase/supabase-js')` — went undetected).
+ */
+const IMPORT_SPECIFIER_RE = /(?:import\s[^'"]*?\sfrom\s|import\s*\(|require\()\s*['"]([^'"]+)['"]/g;
 
 /**
  * Scans a source file's content for `import ... from '<pkg>'` / `require('<pkg>')` specifiers

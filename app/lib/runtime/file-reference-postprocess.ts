@@ -34,9 +34,19 @@ function isScannableSourceFile(filePath: string): boolean {
  * `import('<path>')`, and `require('<path>')` — but only relative specifiers (starting with
  * `.`), so bare package names (react, lucide-react, ...) never match here; those are
  * dependency-postprocess.ts's problem, not this module's.
+ *
+ * The "import ... from" gap is [^'"]*? (not [\s\S]*?, found via B1 test writing — see
+ * file-reference-postprocess.spec.ts): a lazy [\s\S]*? backtracks across an ENTIRE earlier
+ * import statement whenever that earlier statement's own specifier doesn't start with `.` (e.g.
+ * `import React from 'react';\nimport Foo from './Foo';` — the engine skips past 'react' since
+ * it doesn't match `(\.[^'"]*)`, landing on './Foo' but with match.index still at the *first*
+ * import), corrupting the reported line number. Excluding quote characters from the gap means
+ * the engine can't jump over a quoted specifier at all, so a non-matching earlier import fails
+ * the whole attempt at its own position instead of bleeding into the next statement — still
+ * spans multi-line named-import lists fine, since those don't contain quote characters.
  */
 const RELATIVE_IMPORT_RE =
-  /(?:\b(?:import|export)\b[\s\S]*?\sfrom\s|\bimport\s*\(|\brequire\s*\()\s*['"](\.[^'"]*)['"]/g;
+  /(?:\b(?:import|export)\b[^'"]*?\sfrom\s|\bimport\s*\(|\brequire\s*\()\s*['"](\.[^'"]*)['"]/g;
 
 /** Extracts relative import/re-export/dynamic-import/require specifiers with their line numbers. */
 export function extractRelativeImports(content: string): Array<{ specifier: string; line: number }> {
