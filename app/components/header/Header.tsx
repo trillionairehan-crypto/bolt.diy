@@ -9,6 +9,7 @@ import { classNames } from '~/utils/classNames';
 import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
 import { Logo } from '~/components/ui/Logo';
 import { LoginModal } from '~/components/auth/LoginModal';
+import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
 
 /*
  * Lazy-loaded: HeaderActionButtons only imports `workbenchStore` to read `previews` for the
@@ -70,6 +71,7 @@ export function Header() {
             <a href="/pricing" className="text-sm font-medium hover:opacity-80" style={{ color: LANDING_TEXT_COLOR }}>
               요금제
             </a>
+            <ThemeSwitch className="!text-[#FAF7F0] hover:!opacity-80" />
             {authUser ? (
               <button
                 type="button"
@@ -106,7 +108,8 @@ export function Header() {
             </span>
             <ClientOnly>
               {() => (
-                <div className="">
+                <div className="flex items-center gap-1">
+                  <ThemeSwitch />
                   <Suspense fallback={null}>
                     <HeaderActionButtons chatStarted={chat.started} />
                   </Suspense>

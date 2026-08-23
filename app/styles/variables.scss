@@ -1,6 +1,8 @@
 /* Color Tokens Light Theme */
 :root,
 :root[data-theme='light'] {
+  color-scheme: light;
+
   /* Coralred kit primitives — brand hue is the only value a future rebrand should need to touch.
      Formulas mirror design-handoff/coralred-ui.css exactly, so this stays in sync with the kit. */
   --hue: 33;
@@ -136,6 +138,8 @@
 
 /* Color Tokens Dark Theme */
 :root[data-theme='dark'] {
+  color-scheme: dark;
+
   /* Coralred kit primitives (dark) — formulas mirror design-handoff/coralred-ui.css. */
   --bg: oklch(0.14 0.006 var(--hue));
   --surface: oklch(0.19 0.008 var(--hue));
