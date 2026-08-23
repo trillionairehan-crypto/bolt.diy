@@ -681,7 +681,7 @@ export const ChatImpl = memo(
       let finalMessageContent = messageContent;
 
       if (selectedElement) {
-        console.log('Selected Element:', selectedElement);
+        logger.debug('Selected Element:', selectedElement);
 
         const elementInfo = `<div class=\"__boltSelectedElement__\" data-element='${JSON.stringify(selectedElement)}'>${JSON.stringify(`${selectedElement.displayText}`)}</div>`;
         finalMessageContent = messageContent + elementInfo;

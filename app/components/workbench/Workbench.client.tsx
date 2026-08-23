@@ -27,7 +27,7 @@ import { Slider, type SliderOptions } from '~/components/ui/Slider';
 import { workbenchStore, type WorkbenchViewType } from '~/lib/stores/workbench';
 import { classNames } from '~/utils/classNames';
 import { cubicEasingFn } from '~/utils/easings';
-import { renderLogger } from '~/utils/logger';
+import { createScopedLogger, renderLogger } from '~/utils/logger';
 import { EditorPanel } from './EditorPanel';
 import { Preview } from './Preview';
 import useViewport from '~/lib/hooks';
@@ -40,6 +40,8 @@ import { useChatHistory } from '~/lib/persistence';
 import { streamingState } from '~/lib/stores/streaming';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ConfirmationDialog } from '~/components/ui/Dialog';
+
+const logger = createScopedLogger('Workbench');
 
 interface WorkspaceProps {
   chatStarted?: boolean;
@@ -443,7 +445,7 @@ export const Workbench = memo(
         await workbenchStore.syncFiles(directoryHandle);
         toast.success('파일을 저장했어요');
       } catch (error) {
-        console.error('Error syncing files:', error);
+        logger.error('Error syncing files:', error);
         toast.error('파일을 저장하지 못했어요');
       } finally {
         setIsSyncing(false);
