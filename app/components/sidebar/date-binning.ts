@@ -1,4 +1,5 @@
 import { format, isAfter, isThisWeek, isThisYear, isToday, isYesterday, subDays } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import type { ChatHistoryItem } from '~/lib/persistence';
 
 type Bin = { category: string; items: ChatHistoryItem[] };
@@ -38,9 +39,9 @@ function dateCategory(date: Date) {
     return '어제';
   }
 
-  if (isThisWeek(date)) {
-    // e.g., "Mon" instead of "Monday"
-    return format(date, 'EEE');
+  if (isThisWeek(date, { locale: ko })) {
+    // e.g., "월" instead of "월요일"
+    return format(date, 'EEE', { locale: ko });
   }
 
   const thirtyDaysAgo = subDays(new Date(), 30);
@@ -50,10 +51,10 @@ function dateCategory(date: Date) {
   }
 
   if (isThisYear(date)) {
-    // e.g., "Jan" instead of "January"
-    return format(date, 'LLL');
+    // e.g., "1월"
+    return format(date, 'M월', { locale: ko });
   }
 
-  // e.g., "Jan 2023" instead of "January 2023"
-  return format(date, 'LLL yyyy');
+  // e.g., "2023년 1월"
+  return format(date, 'yyyy년 M월', { locale: ko });
 }
