@@ -1,5 +1,5 @@
 import { motion, type Variants } from 'framer-motion';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
   Dialog,
@@ -10,7 +10,6 @@ import {
   dialogBackdropVariants,
 } from '~/components/ui/Dialog';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
-import { ControlPanel } from '~/components/@settings/core/ControlPanel';
 import { SettingsButton } from '~/components/ui/SettingsButton';
 import { Button } from '~/components/ui/Button';
 import { db, deleteById, getAll, chatId, type ChatHistoryItem, useChatHistory } from '~/lib/persistence';
@@ -27,6 +26,17 @@ import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
 import { LoginModal } from '~/components/auth/LoginModal';
 import { Skeleton } from '~/components/ui/Skeleton';
 import { EmptyStateIllustration } from '~/components/ui/EmptyStateIllustration';
+
+/*
+ * overnight3 B2: lazy-loaded, same rationale/pattern as Header.tsx's HeaderActionButtons —
+ * ControlPanel pulls in every settings tab (providers, connections, event logs, etc.), but Menu
+ * renders on essentially every page load while ControlPanel itself is only ever shown once the
+ * user actually opens Settings. A static import here forced all of that into the sidebar's chunk
+ * unconditionally; this defers it to first open instead.
+ */
+const ControlPanel = lazy(() =>
+  import('~/components/@settings/core/ControlPanel').then((module) => ({ default: module.ControlPanel })),
+);
 
 const menuVariants = {
   closed: {
@@ -590,7 +600,9 @@ export const Menu = () => {
         </div>
       </motion.div>
 
-      <ControlPanel open={isSettingsOpen} onClose={handleSettingsClose} />
+      <Suspense fallback={null}>
+        <ControlPanel open={isSettingsOpen} onClose={handleSettingsClose} />
+      </Suspense>
       <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </>
   );
