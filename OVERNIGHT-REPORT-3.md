@@ -105,3 +105,18 @@
   2. 재배포/삭제 기능이 정말 필요하다면, 서버사이드 배포 토큰(코랄레드 자체 Netlify/Vercel 앱 연동)을 새로 구축해야 함 — 지금 구조(사용자 개인 토큰, 브라우저 직접 호출)로는 불가능. 이건 이번 세션 범위를 크게 벗어나는 인프라 작업이라 손대지 않음.
 
 ---
+
+## PART B
+
+### B1: 테스트 스위트
+
+- [상태: 완료] 커밋 `b027453`
+- vitest는 이미 설치·설정되어 있었음(`pnpm test`, `vite.config.ts`의 `test` 블록, 기존 스펙 3개/52케이스) — 새로 도입할 필요 없이 바로 확장.
+- 지시받은 6개 모듈 대상 정상+경계 케이스 작성: `dependency-postprocess`, `file-reference-postprocess`, `answer-directives`(mapAnswerToDirectives 전체 질문×옵션 매핑 + 몰라요 분기 + mergeDirectives), `generateAppQuestions`(fetch 모킹으로 파싱/펜스 제거/실패 폴백 전부), `paletteToHue`(hexToOklchHue 브랜드 hex 값들), `UserMessage`의 `splitDisplayText`(ONBOARDING_ADDITIONS_MARKER 분리 로직) — `splitDisplayText`는 테스트 가능하도록 export 추가(동작 변경 없음).
+- 기존 52개 + 신규 98개 = **150개 전부 통과**.
+- **⚠️ 테스트 작성 중 실제 프로덕션 버그 2건 발견 — 테스트로 버그를 그대로 고정시키지 않고 원인을 수정함**:
+  1. `file-reference-postprocess.ts`의 `RELATIVE_IMPORT_RE`: 정규식의 지연 수량자(`[\s\S]*?`)가 앞선 import문의 특이자가 상대경로가 아니면(예: `import React from 'react'`) 그 import문 전체를 건너뛰어 버려서, 두 번째 이후 import의 깨진 참조에 대해 **잘못된 줄 번호**를 보고하고 있었음. 이건 auto-fix 프롬프트에 실제로 들어가는 값이라 실사용자 영향이 있는 버그. `[^'"]*?`로 교체(따옴표를 건너뛸 수 없게 해서 앞 import문 전체를 건너뛰지 못하게 막음)해서 수정.
+  2. `dependency-postprocess.ts`의 `IMPORT_SPECIFIER_RE`: 형제 모듈(`file-reference-postprocess.ts`)과 달리 `import(...)` 형태의 동적 임포트를 지원하지 않아서, `await import('@supabase/supabase-js')`처럼 지연 로드하는 알려진 패키지가 package.json 누락 감지에서 빠지고 있었음. 동일한 안정성 수정과 함께 동적 import 지원 추가.
+- **검증**: `pnpm test`(pre-commit에는 안 걸림, 지시대로 별도 실행) 150/150 통과, typecheck/lint/build 클린(정규식 2건은 프로덕션 코드 변경이라 전체 파이프라인 재검증함).
+
+---
