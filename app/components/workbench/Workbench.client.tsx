@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/react';
 import { motion, type HTMLMotionProps, type Variants } from 'framer-motion';
 import { computed } from 'nanostores';
-import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { lazy, memo, Suspense, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { Popover, Transition } from '@headlessui/react';
 import { useLocation } from '@remix-run/react';
@@ -9,8 +9,15 @@ import type { UIMessage } from 'ai';
 import { diffLines, type Change } from 'diff';
 import { getLanguageFromExtension } from '~/utils/getLanguageFromExtension';
 import type { FileHistory } from '~/types/actions';
-import { DiffView } from './DiffView';
 import { DiffViewErrorBoundary } from './DiffViewErrorBoundary';
+
+/*
+ * overnight3 B2: lazy-loaded — Workbench.client.tsx is already the deferred half of the app (see
+ * BaseChat.tsx's own lazy(() => import('./Workbench.client'))), but within it DiffView is only
+ * ever rendered when selectedView === 'diff'. Someone who only ever looks at the code/preview
+ * tabs never needs this cost at all.
+ */
+const DiffView = lazy(() => import('./DiffView').then((module) => ({ default: module.DiffView })));
 import {
   type OnChangeCallback as OnEditorChange,
   type OnScrollCallback as OnEditorScroll,
@@ -618,7 +625,9 @@ export const Workbench = memo(
                     {selectedView === 'diff' && (
                       <div className="absolute inset-0">
                         <DiffViewErrorBoundary>
-                          <DiffView fileHistory={fileHistory} setFileHistory={setFileHistory} />
+                          <Suspense fallback={null}>
+                            <DiffView fileHistory={fileHistory} setFileHistory={setFileHistory} />
+                          </Suspense>
                         </DiffViewErrorBoundary>
                       </div>
                     )}
