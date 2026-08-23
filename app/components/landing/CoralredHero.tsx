@@ -2,7 +2,7 @@ import { useState, type CSSProperties } from 'react';
 import { useStore } from '@nanostores/react';
 import { authUserStore } from '~/lib/stores/auth';
 import { setSidebarOpen } from '~/lib/stores/sidebar';
-import { EmailOtpModal } from '~/components/auth/EmailOtpModal';
+import { LoginModal } from '~/components/auth/LoginModal';
 import styles from './CoralredHero.module.scss';
 
 interface CoralredHeroProps {
@@ -127,7 +127,7 @@ export function CoralredHero({ onFocusPrompt }: CoralredHeroProps) {
         </a>
       </div>
 
-      <EmailOtpModal open={showLogin} onClose={() => setShowLogin(false)} />
+      <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
     </div>
   );
 }

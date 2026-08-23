@@ -3,9 +3,9 @@ import { motion } from 'framer-motion';
 import { useStore } from '@nanostores/react';
 import { classNames } from '~/utils/classNames';
 import { profileStore } from '~/lib/stores/profile';
-import { authUserStore, signInWithGoogle, signInWithKakao, signOut } from '~/lib/stores/auth';
+import { authUserStore, signOut } from '~/lib/stores/auth';
 import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
-import { EmailOtpModal } from '~/components/auth/EmailOtpModal';
+import { LoginModal } from '~/components/auth/LoginModal';
 import { useState } from 'react';
 import type { TabType, Profile } from './types';
 
@@ -19,7 +19,7 @@ const SHOW_DEBUG_TOOLS = false;
 export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
   const profile = useStore(profileStore) as Profile;
   const authUser = useStore(authUserStore);
-  const [isEmailOtpOpen, setIsEmailOtpOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   return (
     <DropdownMenu.Root>
@@ -138,55 +138,21 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
           )}
 
           {isPlatformSupabaseConfigured && !authUser && (
-            <>
-              <DropdownMenu.Item
-                className={classNames(
-                  'flex items-center gap-2 px-4 py-2.5',
-                  'text-sm text-gray-700 dark:text-gray-200',
-                  'hover:bg-purple-50 dark:hover:bg-purple-500/10',
-                  'hover:text-purple-500 dark:hover:text-purple-400',
-                  'cursor-pointer transition-all duration-200',
-                  'outline-none',
-                  'group',
-                )}
-                onClick={() => signInWithGoogle()}
-              >
-                <div className="i-ph:google-logo w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
-                구글로 로그인
-              </DropdownMenu.Item>
-
-              <DropdownMenu.Item
-                className={classNames(
-                  'flex items-center gap-2 px-4 py-2.5',
-                  'text-sm text-gray-700 dark:text-gray-200',
-                  'hover:bg-purple-50 dark:hover:bg-purple-500/10',
-                  'hover:text-purple-500 dark:hover:text-purple-400',
-                  'cursor-pointer transition-all duration-200',
-                  'outline-none',
-                  'group',
-                )}
-                onClick={() => signInWithKakao()}
-              >
-                <div className="i-ph:chat-circle-dots-fill w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
-                카카오로 로그인
-              </DropdownMenu.Item>
-
-              <DropdownMenu.Item
-                className={classNames(
-                  'flex items-center gap-2 px-4 py-2.5',
-                  'text-sm text-gray-700 dark:text-gray-200',
-                  'hover:bg-purple-50 dark:hover:bg-purple-500/10',
-                  'hover:text-purple-500 dark:hover:text-purple-400',
-                  'cursor-pointer transition-all duration-200',
-                  'outline-none',
-                  'group',
-                )}
-                onClick={() => setIsEmailOtpOpen(true)}
-              >
-                <div className="i-ph:envelope-simple-fill w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
-                이메일로 로그인
-              </DropdownMenu.Item>
-            </>
+            <DropdownMenu.Item
+              className={classNames(
+                'flex items-center gap-2 px-4 py-2.5',
+                'text-sm text-gray-700 dark:text-gray-200',
+                'hover:bg-purple-50 dark:hover:bg-purple-500/10',
+                'hover:text-purple-500 dark:hover:text-purple-400',
+                'cursor-pointer transition-all duration-200',
+                'outline-none',
+                'group',
+              )}
+              onClick={() => setIsLoginModalOpen(true)}
+            >
+              <div className="i-ph:sign-in w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
+              로그인
+            </DropdownMenu.Item>
           )}
 
           <div className="my-1 border-t border-gray-200/50 dark:border-gray-800/50" />
@@ -218,7 +184,7 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
 
-      <EmailOtpModal open={isEmailOtpOpen} onClose={() => setIsEmailOtpOpen(false)} />
+      <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </DropdownMenu.Root>
   );
 };

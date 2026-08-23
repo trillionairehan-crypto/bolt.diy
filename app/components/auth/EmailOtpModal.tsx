@@ -37,7 +37,7 @@ export function EmailOtpModal({ open, onClose }: EmailOtpModalProps) {
       await sendEmailOtp(email);
       setStep('code');
     } catch {
-      setError('인증 코드 발송에 실패했습니다. 이메일 주소를 확인해주세요.');
+      setError('인증 코드를 보내지 못했어요. 이메일 주소를 확인해주세요.');
     } finally {
       setLoading(false);
     }
@@ -55,7 +55,7 @@ export function EmailOtpModal({ open, onClose }: EmailOtpModalProps) {
       await verifyEmailOtp(email, code);
       onClose();
     } catch {
-      setError('인증 코드가 올바르지 않습니다. 다시 확인해주세요.');
+      setError('인증 코드가 올바르지 않아요. 다시 확인해주세요.');
     } finally {
       setLoading(false);
     }
