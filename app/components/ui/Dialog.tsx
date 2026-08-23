@@ -116,7 +116,7 @@ export const Dialog = memo(({ children, className, showCloseButton = true, onClo
       <RadixDialog.Content asChild>
         <motion.div
           className={classNames(
-            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-950 rounded-lg shadow-xl border border-bolt-elements-borderColor z-[9999] w-[min(520px,calc(100vw-2rem))] max-h-[calc(100vh-4rem)] overflow-y-auto focus:outline-none',
+            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[var(--surface-2)] rounded-lg shadow-[var(--shadow-overlay,0_20px_50px_rgba(23,16,14,0.18))] border border-bolt-elements-borderColor z-[9999] w-[min(520px,calc(100vw-2rem))] max-h-[calc(100vh-4rem)] overflow-y-auto focus:outline-none',
             className,
           )}
           initial="closed"

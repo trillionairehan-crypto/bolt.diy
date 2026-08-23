@@ -34,7 +34,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
         }}
       >
         {open && !showEmail && (
-          <Dialog className="max-w-[400px] w-[calc(100%-2rem)] rounded-2xl bg-bolt-elements-background-depth-1 p-6">
+          <Dialog className="max-w-[400px] w-[calc(100%-2rem)] rounded-2xl p-6">
             <div className="flex flex-col items-center text-center mb-6">
               <Logo height={32} />
               <DialogTitle className="!justify-center !text-xl !font-bold !mt-4 !mb-1">시작해볼까요?</DialogTitle>
@@ -55,7 +55,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
               <button
                 type="button"
                 onClick={() => signInWithGoogle()}
-                className="w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium bg-[var(--surface)] text-[var(--text)] border border-[var(--border-strong)] hover:bg-[var(--surface-2)] transition-colors"
               >
                 <img
                   src="https://cdn.simpleicons.org/google/4285F4"

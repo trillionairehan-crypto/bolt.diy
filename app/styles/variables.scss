@@ -8,6 +8,7 @@
   --hue: 33;
   --bg: oklch(0.985 0.002 var(--hue));
   --surface: oklch(1 0 0);
+  --surface-2: oklch(0.995 0.001 var(--hue));
   --border: oklch(0.92 0.006 var(--hue));
   --border-strong: oklch(0.88 0.008 var(--hue));
   --muted: oklch(0.55 0.01 var(--hue));
@@ -140,19 +141,27 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  /* Coralred kit primitives (dark) — formulas mirror design-handoff/coralred-ui.css. */
-  --bg: oklch(0.14 0.006 var(--hue));
-  --surface: oklch(0.19 0.008 var(--hue));
-  --border: oklch(0.26 0.008 var(--hue));
-  --border-strong: oklch(0.3 0.01 var(--hue));
-  --muted: oklch(0.62 0.01 var(--hue));
-  --text: oklch(0.93 0.005 var(--hue));
-  --accent: oklch(0.66 0.17 var(--hue));
-  --accent-hover: oklch(0.72 0.17 var(--hue));
-  --accent-soft: oklch(0.22 0.03 var(--hue));
-  --accent-ring: oklch(0.35 0.06 var(--hue));
-  --accent-text: var(--accent);
+  /*
+   * Coralred kit primitives (dark) — hand-tuned overnight2 (2026-08-24): the previous pass mirrored
+   * design-handoff/coralred-ui.css's formulas verbatim, but at low chroma + low lightness the hue
+   * washed out to near-neutral, reading as plain black instead of a warm dark surface. These carry
+   * a touch more chroma throughout, and add --surface-2 as an explicit third elevation step for
+   * modals/popovers/dropdowns (previously those reused ad-hoc literals with no consistent layering).
+   */
+  --bg: oklch(0.15 0.015 var(--hue));
+  --surface: oklch(0.185 0.017 var(--hue));
+  --surface-2: oklch(0.215 0.019 var(--hue));
+  --border: oklch(0.27 0.018 var(--hue));
+  --border-strong: oklch(0.33 0.02 var(--hue));
+  --muted: oklch(0.66 0.015 var(--hue));
+  --text: oklch(0.95 0.008 var(--hue));
+  --accent: oklch(0.68 0.19 var(--hue));
+  --accent-hover: oklch(0.73 0.19 var(--hue));
+  --accent-soft: oklch(0.235 0.05 var(--hue));
+  --accent-ring: oklch(0.45 0.09 var(--hue));
+  --accent-text: oklch(0.72 0.17 var(--hue));
   --on-accent: var(--bg);
+  --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.5);
   --ok: oklch(0.7 0.14 155);
   --ok-bg: oklch(0.22 0.03 155);
   --warn: oklch(0.75 0.12 85);
@@ -165,21 +174,21 @@
 
   --bolt-elements-bg-depth-1: var(--bg);
   --bolt-elements-bg-depth-2: var(--surface);
-  --bolt-elements-bg-depth-3: oklch(0.24 0.01 var(--hue));
+  --bolt-elements-bg-depth-3: var(--surface-2);
   --bolt-elements-bg-depth-4: color-mix(in oklch, var(--border) 50%, transparent);
 
   --bolt-elements-textPrimary: var(--text);
   --bolt-elements-textSecondary: var(--muted);
   --bolt-elements-textTertiary: oklch(0.5 0.01 var(--hue));
 
-  --bolt-elements-code-background: oklch(0.24 0.01 var(--hue));
+  --bolt-elements-code-background: var(--surface-2);
   --bolt-elements-code-text: var(--text);
 
   --bolt-elements-button-primary-background: var(--accent-soft);
   --bolt-elements-button-primary-backgroundHover: var(--accent-ring);
   --bolt-elements-button-primary-text: var(--accent-text);
 
-  --bolt-elements-button-secondary-background: oklch(0.24 0.01 var(--hue));
+  --bolt-elements-button-secondary-background: var(--surface-2);
   --bolt-elements-button-secondary-backgroundHover: oklch(0.3 0.012 var(--hue));
   --bolt-elements-button-secondary-text: var(--text);
 
@@ -202,13 +211,13 @@
   --bolt-elements-artifacts-background: var(--surface);
   --bolt-elements-artifacts-backgroundHover: color-mix(in oklch, var(--border) 50%, transparent);
   --bolt-elements-artifacts-borderColor: var(--bolt-elements-borderColor);
-  --bolt-elements-artifacts-inlineCode-background: oklch(0.24 0.01 var(--hue));
+  --bolt-elements-artifacts-inlineCode-background: var(--surface-2);
   --bolt-elements-artifacts-inlineCode-text: var(--text);
 
   --bolt-elements-actions-background: var(--surface);
-  --bolt-elements-actions-code-background: oklch(0.24 0.01 var(--hue));
+  --bolt-elements-actions-code-background: var(--surface-2);
 
-  --bolt-elements-messages-background: oklch(0.24 0.01 var(--hue));
+  --bolt-elements-messages-background: var(--surface-2);
   --bolt-elements-messages-linkColor: var(--accent-text);
   --bolt-elements-messages-code-background: oklch(0.17 0.008 var(--hue));
   --bolt-elements-messages-inlineCode-background: oklch(0.32 0.012 var(--hue));
@@ -220,7 +229,7 @@
   --bolt-elements-icon-secondary: var(--muted);
   --bolt-elements-icon-tertiary: oklch(0.5 0.01 var(--hue));
 
-  --bolt-elements-dividerColor: oklch(0.24 0.01 var(--hue));
+  --bolt-elements-dividerColor: var(--surface-2);
 
   --bolt-elements-prompt-background: color-mix(in oklch, var(--bg) 80%, transparent);
 

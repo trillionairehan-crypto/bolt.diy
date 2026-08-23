@@ -24,9 +24,21 @@ function initStore() {
   return DEFAULT_THEME;
 }
 
+const THEME_TRANSITION_MS = 200;
+
 export function toggleTheme() {
   const currentTheme = themeStore.get();
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+  const html = document.querySelector('html');
+
+  /*
+   * Transition class applied only for the duration of the flip, not left on permanently — an
+   * always-on `transition: background-color` on every element would fire on every unrelated
+   * re-render too, not just this one.
+   */
+  html?.classList.add('theme-transitioning');
+  setTimeout(() => html?.classList.remove('theme-transitioning'), THEME_TRANSITION_MS + 50);
 
   // Update the theme store
   themeStore.set(newTheme);
@@ -35,7 +47,7 @@ export function toggleTheme() {
   localStorage.setItem(kTheme, newTheme);
 
   // Update the HTML attribute
-  document.querySelector('html')?.setAttribute('data-theme', newTheme);
+  html?.setAttribute('data-theme', newTheme);
 
   // Update user profile if it exists
   try {

@@ -21,6 +21,44 @@ body {
     sans-serif;
 }
 
+// Global scrollbar treatment (both themes) — .modern-scrollbar above overrides this per-element
+// where a slimmer 2px thumb is wanted; this is the default for everything else (sidebar, dialogs).
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-strong);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted);
+}
+
+::selection {
+  background-color: var(--accent-ring);
+}
+
+:root[data-theme='dark'] ::selection {
+  background-color: oklch(0.4 0.1 var(--hue));
+}
+
+// Applied briefly to <html> by toggleTheme() (theme.ts), then removed — deliberately not an
+// always-on transition (that would tax every unrelated re-render, not just the theme flip).
+.theme-transitioning,
+.theme-transitioning * {
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease;
+}
+
 :root {
   --gradient-opacity: 0.8;
   --primary-color: rgba(158, 117, 240, var(--gradient-opacity));
