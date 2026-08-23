@@ -48,4 +48,6 @@ changelogUI.md
 docs/instructions/Roadmap.md
 .cursorrules
 *.md
+# design-handoff docs are canonical references (brand spec, voice guide, etc.) — must be tracked
+!design-handoff/*.md
 .qodo
