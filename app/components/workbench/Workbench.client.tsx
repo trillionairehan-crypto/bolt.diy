@@ -8,6 +8,7 @@ import { diffLines, type Change } from 'diff';
 import { getLanguageFromExtension } from '~/utils/getLanguageFromExtension';
 import type { FileHistory } from '~/types/actions';
 import { DiffView } from './DiffView';
+import { DiffViewErrorBoundary } from './DiffViewErrorBoundary';
 import {
   type OnChangeCallback as OnEditorChange,
   type OnScrollCallback as OnEditorScroll,
@@ -495,12 +496,13 @@ export const Workbench = memo(
                       onFileReset={onFileReset}
                     />
                   </View>
-                  <View
-                    initial={{ x: '100%' }}
-                    animate={{ x: selectedView === 'diff' ? '0%' : selectedView === 'code' ? '100%' : '-100%' }}
-                  >
-                    <DiffView fileHistory={fileHistory} setFileHistory={setFileHistory} />
-                  </View>
+                  {selectedView === 'diff' && (
+                    <div className="absolute inset-0">
+                      <DiffViewErrorBoundary>
+                        <DiffView fileHistory={fileHistory} setFileHistory={setFileHistory} />
+                      </DiffViewErrorBoundary>
+                    </div>
+                  )}
                   <View initial={{ x: '100%' }} animate={{ x: selectedView === 'preview' ? '0%' : '100%' }}>
                     <Preview setSelectedElement={setSelectedElement} />
                   </View>
