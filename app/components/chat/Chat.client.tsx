@@ -9,7 +9,14 @@ import { useMessageParser, usePromptEnhancer, useShortcuts } from '~/lib/hooks';
 import { description, useChatHistory } from '~/lib/persistence';
 import { chatStore } from '~/lib/stores/chat';
 import { workbenchStore } from '~/lib/stores/workbench';
-import { DEFAULT_MODEL, DEFAULT_PROVIDER, PROMPT_COOKIE_KEY, PROVIDER_LIST, SHOW_DEV_TOOLS } from '~/utils/constants';
+import {
+  DEFAULT_MODEL,
+  DEFAULT_PROVIDER,
+  PROMPT_COOKIE_KEY,
+  PROVIDER_LIST,
+  SHOW_DEV_TOOLS,
+  CORALRED_NEW_METERING,
+} from '~/utils/constants';
 import { cubicEasingFn } from '~/utils/easings';
 import { createScopedLogger, renderLogger } from '~/utils/logger';
 import { BaseChat } from './BaseChat';
@@ -30,7 +37,12 @@ import { hueToRepresentativeHex, type GenerationDirectives } from '~/lib/onboard
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import { useMCPStore } from '~/lib/stores/mcp';
 import type { LlmErrorAlertType } from '~/types/actions';
-import { hasGenerationsRemaining, incrementGenerationsUsed } from '~/lib/freeTrial';
+import {
+  hasGenerationsRemaining,
+  incrementGenerationsUsed,
+  hasV2GenerationsRemaining,
+  incrementV2GenerationsUsed,
+} from '~/lib/freeTrial';
 import { authUserStore } from '~/lib/stores/auth';
 import { buildFixPrompt } from '~/utils/buildFixPrompt';
 import { setSidebarOpen } from '~/lib/stores/sidebar';
@@ -465,7 +477,7 @@ export const ChatImpl = memo(
       let remaining: boolean;
 
       try {
-        remaining = await hasGenerationsRemaining();
+        remaining = CORALRED_NEW_METERING ? await hasV2GenerationsRemaining() : await hasGenerationsRemaining();
       } catch (error) {
         logger.error('Failed to check free generation limit', error);
         toast.error('일시적인 오류가 발생했어요. 잠시 후 다시 시도해주세요.');
@@ -479,6 +491,18 @@ export const ChatImpl = memo(
       }
 
       return true;
+    };
+
+    /*
+     * overnight3 A5: single spot both call sites below use to record a real generation, so the
+     * v2/legacy split lives in exactly one place. See CORALRED_NEW_METERING's own doc comment.
+     */
+    const recordGenerationUsed = async () => {
+      try {
+        await (CORALRED_NEW_METERING ? incrementV2GenerationsUsed() : incrementGenerationsUsed());
+      } catch (error) {
+        logger.error('Failed to record generation usage', error);
+      }
     };
 
     /*
@@ -497,11 +521,7 @@ export const ChatImpl = memo(
         return;
       }
 
-      try {
-        await incrementGenerationsUsed();
-      } catch (error) {
-        logger.error('Failed to record generation usage', error);
-      }
+      await recordGenerationUsed();
 
       setFakeLoading(true);
 
@@ -645,6 +665,7 @@ export const ChatImpl = memo(
       _event: React.UIEvent,
       messageInput?: string,
       modelOverride?: { model: string; providerName: string },
+      isAutoFix: boolean = false,
     ) => {
       const messageContent = messageInput || input;
 
@@ -674,6 +695,20 @@ export const ChatImpl = memo(
         setClarifyingPrompt(finalMessageContent);
 
         return;
+      }
+
+      /*
+       * overnight3 A5: under the OLD (flag-off) metering, follow-up messages after the first one
+       * were never counted at all — a real, currently-shipped gap (see OVERNIGHT-REPORT-3.md's A5
+       * section). Deliberately left as-is here so flag-off behavior is unchanged; this block only
+       * runs under the new metering, and never for auto-fix retries (those aren't a user utterance).
+       */
+      if (CORALRED_NEW_METERING && !isAutoFix) {
+        if (!(await checkGenerationsAllowed())) {
+          return;
+        }
+
+        await recordGenerationUsed();
       }
 
       /*
@@ -765,7 +800,7 @@ export const ChatImpl = memo(
       }
 
       chatStore.setKey('autoFixAttempts', attempts + 1);
-      sendMessage({} as any, prompt, modelOverride);
+      sendMessage({} as any, prompt, modelOverride, true);
       workbenchStore.clearAlert();
     }, [actionAlert]);
 

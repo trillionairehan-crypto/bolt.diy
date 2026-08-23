@@ -23,7 +23,7 @@ export const ONBOARDING_ADDITIONS_MARKER = '\n\n추가로 알려주신 내용:\n
  * with finishReason "stop" and no temperature-related error.
  */
 export const DEFAULT_MODEL = 'claude-sonnet-5';
-export { SHOW_DEV_TOOLS } from './featureFlags';
+export { SHOW_DEV_TOOLS, CORALRED_NEW_METERING } from './featureFlags';
 export const PROMPT_COOKIE_KEY = 'cachedPrompt';
 export const TOOL_EXECUTION_APPROVAL = {
   APPROVE: 'Yes, approved.',
