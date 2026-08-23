@@ -45,7 +45,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
               <button
                 type="button"
                 onClick={() => signInWithKakao()}
-                className="w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-opacity hover:opacity-90"
+                className="w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-opacity duration-150 ease-out hover:opacity-90 active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bolt-elements-focus"
                 style={{ background: '#FEE500', color: '#191919' }}
               >
                 <img src="https://cdn.simpleicons.org/kakaotalk" crossOrigin="anonymous" alt="" className="w-4 h-4" />
@@ -55,7 +55,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
               <button
                 type="button"
                 onClick={() => signInWithGoogle()}
-                className="w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium bg-[var(--surface)] text-[var(--text)] border border-[var(--border-strong)] hover:bg-[var(--surface-2)] transition-colors"
+                className="w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium bg-[var(--surface)] text-[var(--text)] border border-[var(--border-strong)] hover:bg-[var(--surface-2)] active:bg-[var(--border)] transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bolt-elements-focus"
               >
                 <img
                   src="https://cdn.simpleicons.org/google/4285F4"
@@ -75,7 +75,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
               <button
                 type="button"
                 onClick={() => setShowEmail(true)}
-                className="w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium bg-bolt-elements-background-depth-2 text-bolt-elements-textPrimary hover:bg-bolt-elements-background-depth-3 transition-colors"
+                className="w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium bg-bolt-elements-background-depth-2 text-bolt-elements-textPrimary hover:bg-bolt-elements-background-depth-3 active:bg-bolt-elements-background-depth-4 transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bolt-elements-focus"
               >
                 <div className="i-ph:envelope-simple w-4 h-4" />
                 이메일로 시작하기
