@@ -227,6 +227,12 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         recognition.continuous = true;
         recognition.interimResults = true;
 
+        /*
+         * Korean-only service — relying on the browser/OS locale caused garbled recognition for
+         * Korean speech whenever that locale wasn't already ko-KR.
+         */
+        recognition.lang = 'ko-KR';
+
         recognition.onresult = (event) => {
           const transcript = Array.from(event.results)
             .map((result) => result[0])

@@ -15,7 +15,7 @@ export const SpeechRecognitionButton = ({
 }) => {
   return (
     <IconButton
-      title={isListening ? 'Stop listening' : 'Start speech recognition'}
+      title={isListening ? '듣기 중지' : '음성으로 입력하기'}
       disabled={disabled}
       className={classNames('transition-all', {
         'text-bolt-elements-item-contentAccent': isListening,

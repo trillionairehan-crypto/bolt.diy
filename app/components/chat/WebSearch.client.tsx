@@ -102,7 +102,7 @@ export function WebSearch({ onSearchResult, disabled = false }: WebSearchProps) 
   return (
     <div ref={containerRef} className="relative">
       <IconButton
-        title="Fetch URL content"
+        title="참고할 사이트 주소 넣기"
         disabled={disabled || isSearching}
         onClick={() => setIsOpen(!isOpen)}
         className="transition-all"
@@ -110,7 +110,7 @@ export function WebSearch({ onSearchResult, disabled = false }: WebSearchProps) 
         {isSearching ? (
           <div className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress text-xl animate-spin" />
         ) : (
-          <div className="i-ph:globe text-xl" />
+          <div className="i-ph:link text-xl" />
         )}
       </IconButton>
       {isOpen && (
