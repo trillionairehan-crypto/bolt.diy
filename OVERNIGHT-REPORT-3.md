@@ -120,3 +120,17 @@
 - **검증**: `pnpm test`(pre-commit에는 안 걸림, 지시대로 별도 실행) 150/150 통과, typecheck/lint/build 클린(정규식 2건은 프로덕션 코드 변경이라 전체 파이프라인 재검증함).
 
 ---
+
+### B2: 성능
+
+- [상태: 완료] 커밋 `ee923f9`, `085a310`, `fca8edb`, `9e2f260`
+- `rollup-plugin-visualizer` 설치, `vite.config.ts`에 `ANALYZE=true`일 때만 켜지는 플러그인으로 배선(평소 빌드엔 전혀 영향 없음). `ANALYZE=true pnpm run build`로 실제 생성한 `bundle-analysis.html`(트리맵) 커밋.
+- **지연 로드 2건, 각각 개별 커밋(되돌리기 쉽게)**:
+  1. `ControlPanel`(설정 다이얼로그) — round2의 `HeaderActionButtons` 지연 로드와 동일한 패턴/사유. `Menu.client.tsx`(사이드바, 거의 모든 페이지에서 렌더)가 설정을 한 번도 안 열어도 모든 설정 탭 코드를 정적으로 끌고 오고 있었음. `lazy()`+`Suspense`로 전환. **실측**: 분리 전 "Header" 공유 청크가 2.16MB였는데, 분리 후 ControlPanel만 별도 청크로 약 295KB(gzip) — 설정을 안 여는 사용자는 이 바이트를 아예 안 받음.
+  2. `DiffView`(워크벤치 "차이점" 탭) — `Workbench.client.tsx` 자체는 이미 지연 로드지만 그 안의 `DiffView`는 `selectedView === 'diff'`일 때만 필요한데 정적 import였음. **실측**: Workbench 청크 863KB → 851.6KB(gzip 약 11KB 감소).
+- **폰트**: `root.tsx`에 Pretendard CDN(`cdn.jsdelivr.net`)으로 `preconnect` 추가. **확인만(지시대로)**: 앱 전체에서 실제 쓰는 굵기는 100/300/400/500/600/700뿐인데, CDN이 서빙하는 `pretendard.min.css`(static 전체 번들)는 9개 굵기(100~900) 전부 포함돼서 800/900은 완전히 미사용 — 다만 이 파일은 레포 밖 CDN이라 직접 서브셋 불가능하고, 실제 존재하는 개별 굵기별 URL을 확인 없이 추측해서 바꾸면 사이트 전체 폰트가 깨질 위험이 있어 이번엔 손대지 않음(아래 아침 확인 항목).
+- **랜딩 LCP — 확인만**: `CoralredHero.tsx`/관련 SCSS grep 결과 `<img>`/`background-image` 전무, 전부 CSS+인라인 SVG로 이미 가벼움 — 수정 불필요 확인.
+- **검증**: 4개 커밋 전부 typecheck/lint/build 클린, 분석 빌드로 청크 크기 변화를 직접 실측해서 확인.
+- **아침 확인 필요**: 폰트 굵기를 줄이려면 jsdelivr에서 실제로 서빙되는 개별 굵기 파일 경로(또는 variable font 파일)를 브라우저로 직접 확인한 뒤 교체 — 잘못된 URL로 바꾸면 사이트 전체 폰트가 깨지는 눈에 띄는 리스크라 반드시 사람이 확인 후 진행.
+
+---
