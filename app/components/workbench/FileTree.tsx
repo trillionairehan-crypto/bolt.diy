@@ -8,6 +8,7 @@ import { diffLines, type Change } from 'diff';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { toast } from 'react-toastify';
 import { path } from '~/utils/path';
+import { EmptyStateIllustration } from '~/components/ui/EmptyStateIllustration';
 
 const logger = createScopedLogger('FileTree');
 
@@ -141,6 +142,14 @@ export const FileTree = memo(
         logger.error(error);
       }
     };
+
+    if (filteredFileList.length === 0) {
+      return (
+        <div className={classNames('text-sm', className, 'overflow-y-auto modern-scrollbar')}>
+          <EmptyStateIllustration caption="파일이 없어요" />
+        </div>
+      );
+    }
 
     return (
       <div className={classNames('text-sm', className, 'overflow-y-auto modern-scrollbar')}>

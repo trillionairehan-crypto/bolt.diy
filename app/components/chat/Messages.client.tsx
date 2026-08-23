@@ -116,7 +116,28 @@ export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
             })
           : null}
         {isStreaming && (
-          <div className="text-center w-full  text-bolt-elements-item-contentAccent i-svg-spinners:3-dots-fade text-4xl mt-4"></div>
+          <div className="flex justify-center w-full mt-4">
+            <div
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium"
+              style={{ background: 'var(--accent-soft)', color: 'var(--accent-text)' }}
+            >
+              <span className="flex gap-1">
+                <span
+                  className="w-1.5 h-1.5 rounded-full animate-[cr-dot-pulse_1.2s_ease-in-out_infinite]"
+                  style={{ background: '#FF5330', animationDelay: '0ms' }}
+                />
+                <span
+                  className="w-1.5 h-1.5 rounded-full animate-[cr-dot-pulse_1.2s_ease-in-out_infinite]"
+                  style={{ background: '#FF5330', animationDelay: '150ms' }}
+                />
+                <span
+                  className="w-1.5 h-1.5 rounded-full animate-[cr-dot-pulse_1.2s_ease-in-out_infinite]"
+                  style={{ background: '#FF5330', animationDelay: '300ms' }}
+                />
+              </span>
+              만드는 중이에요
+            </div>
+          </div>
         )}
       </div>
     );

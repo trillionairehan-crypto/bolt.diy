@@ -25,6 +25,8 @@ import { sidebarOpenStore, setSidebarOpen } from '~/lib/stores/sidebar';
 import { authUserStore, initAuthListener } from '~/lib/stores/auth';
 import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
 import { LoginModal } from '~/components/auth/LoginModal';
+import { Skeleton } from '~/components/ui/Skeleton';
+import { EmptyStateIllustration } from '~/components/ui/EmptyStateIllustration';
 
 const menuVariants = {
   closed: {
@@ -78,6 +80,7 @@ export const Menu = () => {
   const { duplicateCurrentChat, exportChat } = useChatHistory();
   const menuRef = useRef<HTMLDivElement>(null);
   const [list, setList] = useState<ChatHistoryItem[]>([]);
+  const [isLoadingList, setIsLoadingList] = useState(true);
   const open = useStore(sidebarOpenStore);
   const [dialogContent, setDialogContent] = useState<DialogContent>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -94,10 +97,14 @@ export const Menu = () => {
 
   const loadEntries = useCallback(() => {
     if (db) {
+      setIsLoadingList(true);
       getAll(db)
         .then((list) => list.filter((item) => item.urlId && item.description))
         .then(setList)
-        .catch((error) => toast.error(error.message));
+        .catch((error) => toast.error(error.message))
+        .finally(() => setIsLoadingList(false));
+    } else {
+      setIsLoadingList(false);
     }
   }, []);
 
@@ -433,10 +440,16 @@ export const Menu = () => {
             )}
           </div>
           <div className="flex-1 overflow-auto px-3 pb-3">
-            {filteredList.length === 0 && (
-              <div className="px-4 text-gray-500 dark:text-gray-400 text-sm">
-                {list.length === 0 ? '아직 대화가 없어요' : '찾는 대화가 없어요'}
+            {isLoadingList ? (
+              <div className="space-y-2 px-1 pt-1">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-9 w-full" />
+                ))}
               </div>
+            ) : (
+              filteredList.length === 0 && (
+                <EmptyStateIllustration caption={list.length === 0 ? '아직 대화가 없어요' : '찾는 대화가 없어요'} />
+              )
             )}
             <DialogRoot open={dialogContent !== null}>
               {binDates(filteredList).map(({ category, items }) => (

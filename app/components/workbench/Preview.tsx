@@ -15,6 +15,7 @@ import {
 } from '~/lib/stores/previews';
 import { path } from '~/utils/path';
 import { WORK_DIR } from '~/utils/constants';
+import { Skeleton } from '~/components/ui/Skeleton';
 
 type ResizeSide = 'left' | 'right' | null;
 
@@ -1105,18 +1106,24 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
                 containerRef={iframeRef}
               />
               {!useLocalPreviewServer && !hasRenderedOnce && (
-                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">
-                  <div
-                    className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress"
-                    style={{ fontSize: '2rem' }}
-                  />
-                  <p className="text-sm text-bolt-elements-textTertiary">코드를 확인하고 있어요...</p>
+                <div className="absolute inset-0 z-10 flex flex-col gap-3 p-6 bg-bolt-elements-background-depth-1">
+                  <Skeleton className="h-6 w-1/3" />
+                  <Skeleton className="h-32 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <div className="flex-1 flex flex-col items-center justify-center gap-2">
+                    <div
+                      className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress"
+                      style={{ fontSize: '1.5rem' }}
+                    />
+                    <p className="text-sm text-bolt-elements-textTertiary">코드를 확인하고 있어요</p>
+                  </div>
                 </div>
               )}
             </>
           ) : (
             <div className="flex w-full h-full justify-center items-center bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">
-              No preview available
+              미리볼 화면이 없어요
             </div>
           )}
 
