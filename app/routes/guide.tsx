@@ -113,7 +113,9 @@ export default function Guide() {
         {ARTICLES.map((article) => (
           <div key={article.slug} id={article.slug} className="cr-card cr-stack-16">
             <h2 className="cr-h1">{article.title}</h2>
-            <div className="cr-stack-8">{article.body}</div>
+            <div className="cr-stack-16" style={{ lineHeight: 1.7 }}>
+              {article.body}
+            </div>
           </div>
         ))}
       </section>

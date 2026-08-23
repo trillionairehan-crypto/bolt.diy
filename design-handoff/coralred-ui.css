@@ -19,6 +19,7 @@
 *, ::before, ::after {
   --bg: oklch(0.985 0.002 var(--hue));
   --surface: oklch(1 0 0);
+  --surface-2: oklch(0.995 0.001 var(--hue));
   --border: oklch(0.92 0.006 var(--hue));
   --border-strong: oklch(0.88 0.008 var(--hue));
   --muted: oklch(0.55 0.01 var(--hue));
@@ -39,18 +40,22 @@
   --err: oklch(0.5 0.15 25);    --err-bg: oklch(0.95 0.03 25);
 }
 [data-theme="dark"], [data-theme="dark"] *, [data-theme="dark"] ::before, [data-theme="dark"] ::after {
-  --bg: oklch(0.14 0.006 var(--hue));
-  --surface: oklch(0.19 0.008 var(--hue));
-  --border: oklch(0.26 0.008 var(--hue));
-  --border-strong: oklch(0.3 0.01 var(--hue));
-  --muted: oklch(0.62 0.01 var(--hue));
-  --text: oklch(0.93 0.005 var(--hue));
-  --accent: oklch(0.66 0.17 var(--hue));
-  --accent-hover: oklch(0.72 0.17 var(--hue));
-  --accent-soft: oklch(0.22 0.03 var(--hue));
-  --accent-ring: oklch(0.35 0.06 var(--hue));
-  --accent-text: var(--accent);          /* 어두운 배경 위에선 L 0.66이 전 hue에서 읽힘 */
+  /* overnight2 (2026-08-24): re-tuned with more chroma — the previous values read as near-neutral
+     black at this lightness. Kept in sync with app/styles/variables.scss's dark block by hand. */
+  --bg: oklch(0.15 0.015 var(--hue));
+  --surface: oklch(0.185 0.017 var(--hue));
+  --surface-2: oklch(0.215 0.019 var(--hue));
+  --border: oklch(0.27 0.018 var(--hue));
+  --border-strong: oklch(0.33 0.02 var(--hue));
+  --muted: oklch(0.66 0.015 var(--hue));
+  --text: oklch(0.95 0.008 var(--hue));
+  --accent: oklch(0.68 0.19 var(--hue));
+  --accent-hover: oklch(0.73 0.19 var(--hue));
+  --accent-soft: oklch(0.235 0.05 var(--hue));
+  --accent-ring: oklch(0.45 0.09 var(--hue));
+  --accent-text: oklch(0.72 0.17 var(--hue));
   --on-accent: var(--bg);                /* 다크: 밝은 액센트 채움 위 어두운 텍스트 — 전 hue 안전 */
+  --shadow-overlay: 0 8px 32px rgba(0, 0, 0, .5);
   --ok: oklch(0.7 0.14 155);  --ok-bg: oklch(0.22 0.03 155);
   --warn: oklch(0.75 0.12 85); --warn-bg: oklch(0.24 0.02 85);
   --err: oklch(0.68 0.16 25);  --err-bg: oklch(0.24 0.03 25);
@@ -117,14 +122,22 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 textarea.cr-input { height: auto; min-height: 96px; padding: 10px 12px; resize: vertical; line-height: 1.55; }
 .cr-label { font-size: 13px; font-weight: 500; color: var(--muted); }
 
-/* card — 그림자 없음 */
-.cr-card { border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); padding: 20px; }
+/* card — 기본 그림자 없음, hover에서만 살짝 리프트 */
+.cr-card {
+  border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); padding: 20px;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.cr-card:hover { transform: translateY(-2px); border-color: var(--border-strong); }
+@media (prefers-reduced-motion: reduce) {
+  .cr-card:hover { transform: none; }
+}
 
 /* badge — 의미색은 여기와 작은 텍스트에만 */
 .cr-badge {
   display: inline-flex; align-items: center; gap: 6px;
-  font-size: 13px; font-weight: 500; padding: 3px 10px; border-radius: 999px;
+  font-size: 13px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
   background: var(--accent-soft); color: var(--accent-text);
+  border: 1px solid color-mix(in oklch, var(--accent) 25%, transparent);
 }
 .cr-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 .cr-badge.ok { background: var(--ok-bg); color: var(--ok); }

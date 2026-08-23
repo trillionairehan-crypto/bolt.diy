@@ -193,11 +193,17 @@ export function ErrorBoundary() {
           color: '#FAF7F0',
         }}
       >
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '0.5rem' }} aria-hidden="true">
+          <div style={{ width: 20, height: 20, borderRadius: 7, background: '#FAF7F0' }} />
+          <div style={{ width: 20, height: 20, borderRadius: 7, background: '#FFB5A3', marginTop: 10 }} />
+          <div style={{ width: 20, height: 20, borderRadius: 7, background: '#FAF7F0', opacity: 0.7 }} />
+        </div>
         <Logo variant="onCoral" height={32} />
         <p style={{ fontSize: '1rem', margin: 0, marginTop: '0.5rem' }}>이 페이지는 없어요</p>
         <p style={{ fontSize: '0.85rem', opacity: 0.8, margin: 0 }}>주소를 다시 확인해주세요</p>
         <a
           href="/"
+          className="not-found-home-link"
           style={{
             background: '#FAF7F0',
             color: '#FF5330',
@@ -207,10 +213,16 @@ export function ErrorBoundary() {
             fontWeight: 600,
             textDecoration: 'none',
             marginTop: '0.5rem',
+            transition: 'opacity 150ms ease, transform 150ms ease',
           }}
         >
           홈으로 가기
         </a>
+        <style>{`
+          .not-found-home-link:hover { opacity: 0.9; }
+          .not-found-home-link:active { transform: scale(0.97); }
+          .not-found-home-link:focus-visible { outline: 2px solid #FAF7F0; outline-offset: 3px; }
+        `}</style>
       </div>
     );
   }
