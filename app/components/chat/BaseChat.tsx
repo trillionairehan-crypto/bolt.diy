@@ -719,6 +719,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                   chatStarted={chatStarted}
                   isStreaming={isStreaming}
                   setSelectedElement={setSelectedElement}
+                  messages={messages}
                 />
               </Suspense>
             )}

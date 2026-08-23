@@ -1,9 +1,11 @@
 import { useStore } from '@nanostores/react';
 import { motion, type HTMLMotionProps, type Variants } from 'framer-motion';
 import { computed } from 'nanostores';
-import { memo, useCallback, useEffect, useState, useMemo } from 'react';
+import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { Popover, Transition } from '@headlessui/react';
+import { useLocation } from '@remix-run/react';
+import type { UIMessage } from 'ai';
 import { diffLines, type Change } from 'diff';
 import { getLanguageFromExtension } from '~/utils/getLanguageFromExtension';
 import type { FileHistory } from '~/types/actions';
@@ -30,6 +32,7 @@ import { ExportChatButton } from '~/components/chat/chatExportAndImport/ExportCh
 import { useChatHistory } from '~/lib/persistence';
 import { streamingState } from '~/lib/stores/streaming';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { ConfirmationDialog } from '~/components/ui/Dialog';
 
 interface WorkspaceProps {
   chatStarted?: boolean;
@@ -39,6 +42,7 @@ interface WorkspaceProps {
   };
   updateChatMestaData?: (metadata: any) => void;
   setSelectedElement?: (element: ElementInfo | null) => void;
+  messages?: UIMessage[];
 }
 
 const viewTransition = { ease: cubicEasingFn };
@@ -288,10 +292,76 @@ export const Workbench = memo(
     metadata: _metadata,
     updateChatMestaData: _updateChatMestaData,
     setSelectedElement,
+    messages,
   }: WorkspaceProps) => {
     renderLogger.trace('Workbench');
 
     const [fileHistory, setFileHistory] = useState<Record<string, FileHistory>>({});
+
+    /*
+     * The chat message list has no persisted per-message timestamp (UIMessage carries none, and
+     * adding one would mean new storage). This stamps "first time this component observed the
+     * message" instead — accurate for checkpoints that arrive during the current session, but
+     * messages already present at mount (a reloaded chat) all get stamped with the same mount
+     * time. Documented as a known limitation rather than presented as a precise history.
+     */
+    const checkpointTimestamps = useRef<Map<string, number>>(new Map());
+    const [rewindTarget, setRewindTarget] = useState<{ id: string; label: string } | null>(null);
+    const location = useLocation();
+
+    useEffect(() => {
+      const now = Date.now();
+
+      for (const message of messages ?? []) {
+        if (message.role === 'assistant' && message.id && !checkpointTimestamps.current.has(message.id)) {
+          checkpointTimestamps.current.set(message.id, now);
+        }
+      }
+    }, [messages]);
+
+    const checkpoints = useMemo(() => {
+      return (messages ?? [])
+        .filter((message) => message.role === 'assistant' && message.id)
+        .map((message) => {
+          const summaryPart = message.parts?.find((part: any) => part.type === 'data-chatSummary') as any;
+          const summary = summaryPart?.data?.summary as string | undefined;
+          const textPart = message.parts?.find((part: any) => part.type === 'text') as any;
+          const fallback = ((textPart?.text as string) || '')
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .slice(0, 28);
+
+          return {
+            id: message.id,
+            label: summary || fallback || '응답',
+            time: checkpointTimestamps.current.get(message.id),
+          };
+        })
+        .reverse();
+    }, [messages]);
+
+    const formatCheckpointTime = (time: number | undefined) => {
+      if (!time) {
+        return null;
+      }
+
+      return new Intl.DateTimeFormat('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true }).format(
+        new Date(time),
+      );
+    };
+
+    const requestRewind = (id: string, label: string) => setRewindTarget({ id, label });
+
+    const confirmRewind = () => {
+      if (!rewindTarget) {
+        return;
+      }
+
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set('rewindTo', rewindTarget.id);
+      window.location.search = searchParams.toString();
+    };
 
     // const modifiedFiles = Array.from(useStore(workbenchStore.unsavedFiles).keys());
 
@@ -375,150 +445,202 @@ export const Workbench = memo(
 
     return (
       chatStarted && (
-        <motion.div
-          initial="closed"
-          animate={showWorkbench ? 'open' : 'closed'}
-          variants={workbenchVariants}
-          className="z-workbench"
-        >
-          <div
-            className={classNames(
-              'fixed top-[calc(var(--header-height)+1.2rem)] bottom-6 w-[var(--workbench-inner-width)] z-0 transition-[left,width] duration-200 bolt-ease-cubic-bezier',
-              {
-                'w-full': isSmallViewport,
-                'left-0': showWorkbench && isSmallViewport,
-                'left-[var(--workbench-left)]': showWorkbench,
-                'left-[100%]': !showWorkbench,
-              },
-            )}
+        <>
+          <motion.div
+            initial="closed"
+            animate={showWorkbench ? 'open' : 'closed'}
+            variants={workbenchVariants}
+            className="z-workbench"
           >
-            <div className="absolute inset-0 px-2 lg:px-4">
-              <div className="h-full flex flex-col bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor shadow-sm rounded-lg overflow-hidden">
-                <div
-                  className="flex items-center px-3 py-2 border-b border-bolt-elements-borderColor gap-1.5"
-                  style={{
-                    backdropFilter: 'blur(12px)',
-                    background: 'color-mix(in oklch, var(--bg) 85%, transparent)',
-                  }}
-                >
-                  <button
-                    className={`${showChat ? 'i-ph:sidebar-simple-fill' : 'i-ph:sidebar-simple'} text-lg text-bolt-elements-textSecondary mr-1`}
-                    title={showChat ? '채팅 숨기기' : '채팅 보이기'}
-                    aria-label={showChat ? '채팅 숨기기' : '채팅 보이기'}
-                    disabled={!canHideChat || isSmallViewport}
-                    onClick={() => {
-                      if (canHideChat) {
-                        chatStore.setKey('showChat', !showChat);
-                      }
+            <div
+              className={classNames(
+                'fixed top-[calc(var(--header-height)+1.2rem)] bottom-6 w-[var(--workbench-inner-width)] z-0 transition-[left,width] duration-200 bolt-ease-cubic-bezier',
+                {
+                  'w-full': isSmallViewport,
+                  'left-0': showWorkbench && isSmallViewport,
+                  'left-[var(--workbench-left)]': showWorkbench,
+                  'left-[100%]': !showWorkbench,
+                },
+              )}
+            >
+              <div className="absolute inset-0 px-2 lg:px-4">
+                <div className="h-full flex flex-col bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor shadow-sm rounded-lg overflow-hidden">
+                  <div
+                    className="flex items-center px-3 py-2 border-b border-bolt-elements-borderColor gap-1.5"
+                    style={{
+                      backdropFilter: 'blur(12px)',
+                      background: 'color-mix(in oklch, var(--bg) 85%, transparent)',
                     }}
-                  />
-                  <Slider selected={selectedView} options={sliderOptions} setSelected={setSelectedView} />
-                  <div className="ml-auto" />
-                  {selectedView === 'code' && (
-                    <div className="flex overflow-y-auto">
-                      {/* Export Chat Button */}
-                      <ExportChatButton exportChat={exportChat} />
+                  >
+                    <button
+                      className={`${showChat ? 'i-ph:sidebar-simple-fill' : 'i-ph:sidebar-simple'} text-lg text-bolt-elements-textSecondary mr-1`}
+                      title={showChat ? '채팅 숨기기' : '채팅 보이기'}
+                      aria-label={showChat ? '채팅 숨기기' : '채팅 보이기'}
+                      disabled={!canHideChat || isSmallViewport}
+                      onClick={() => {
+                        if (canHideChat) {
+                          chatStore.setKey('showChat', !showChat);
+                        }
+                      }}
+                    />
+                    <Slider selected={selectedView} options={sliderOptions} setSelected={setSelectedView} />
+                    <div className="ml-auto" />
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger asChild>
+                        <IconButton icon="i-ph:clock-counter-clockwise" title="이전 시점으로 되돌리기" />
+                      </DropdownMenu.Trigger>
+                      <DropdownMenu.Content
+                        className={classNames(
+                          'min-w-[280px] max-h-[360px] overflow-y-auto z-[250]',
+                          'bg-[var(--surface-2)] text-bolt-elements-textPrimary',
+                          'rounded-lg shadow-[var(--shadow-overlay,0_20px_50px_rgba(23,16,14,0.18))]',
+                          'border border-bolt-elements-borderColor',
+                          'animate-in fade-in-0 zoom-in-95',
+                          'py-1',
+                        )}
+                        sideOffset={5}
+                        align="end"
+                      >
+                        <div className="px-3 py-1.5 text-xs text-bolt-elements-textTertiary">
+                          되돌아갈 시점을 골라주세요
+                        </div>
+                        {checkpoints.length === 0 && (
+                          <div className="px-3 py-2 text-sm text-bolt-elements-textTertiary">
+                            아직 되돌아갈 시점이 없어요
+                          </div>
+                        )}
+                        {checkpoints.map((checkpoint) => (
+                          <DropdownMenu.Item
+                            key={checkpoint.id}
+                            className="cursor-pointer flex flex-col items-start w-full px-3 py-2 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive gap-0.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-bolt-elements-focus transition-colors duration-150 ease-out"
+                            onClick={() => requestRewind(checkpoint.id, checkpoint.label)}
+                          >
+                            {formatCheckpointTime(checkpoint.time) && (
+                              <span className="text-xs text-bolt-elements-textTertiary">
+                                {formatCheckpointTime(checkpoint.time)}
+                              </span>
+                            )}
+                            <span className="truncate w-full">{checkpoint.label}</span>
+                          </DropdownMenu.Item>
+                        ))}
+                      </DropdownMenu.Content>
+                    </DropdownMenu.Root>
+                    {selectedView === 'code' && (
+                      <div className="flex overflow-y-auto">
+                        {/* Export Chat Button */}
+                        <ExportChatButton exportChat={exportChat} />
 
-                      {/* Sync Button */}
-                      <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden ml-1">
-                        <DropdownMenu.Root>
-                          <DropdownMenu.Trigger
-                            disabled={isSyncing || streaming}
+                        {/* Sync Button */}
+                        <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden ml-1">
+                          <DropdownMenu.Root>
+                            <DropdownMenu.Trigger
+                              disabled={isSyncing || streaming}
+                              className="rounded-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-accent-500 text-white hover:text-bolt-elements-item-contentAccent [&:not(:disabled,.disabled)]:hover:bg-bolt-elements-button-primary-backgroundHover outline-accent-500 flex gap-1.7"
+                            >
+                              {isSyncing ? '저장 중...' : '저장'}
+                              <span className={classNames('i-ph:caret-down transition-transform')} />
+                            </DropdownMenu.Trigger>
+                            <DropdownMenu.Content
+                              className={classNames(
+                                'min-w-[240px] z-[250]',
+                                'bg-white dark:bg-[#141414]',
+                                'rounded-lg shadow-lg',
+                                'border border-gray-200/50 dark:border-gray-800/50',
+                                'animate-in fade-in-0 zoom-in-95',
+                                'py-1',
+                              )}
+                              sideOffset={5}
+                              align="end"
+                            >
+                              <DropdownMenu.Item
+                                className={classNames(
+                                  'cursor-pointer flex items-center w-full px-4 py-2 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive gap-2 rounded-md group relative',
+                                )}
+                                onClick={handleSyncFiles}
+                                disabled={isSyncing}
+                              >
+                                <div className="flex items-center gap-2">
+                                  {isSyncing ? (
+                                    <div className="i-ph:spinner" />
+                                  ) : (
+                                    <div className="i-ph:cloud-arrow-down" />
+                                  )}
+                                  <span>{isSyncing ? '저장 중...' : '파일 저장'}</span>
+                                </div>
+                              </DropdownMenu.Item>
+                            </DropdownMenu.Content>
+                          </DropdownMenu.Root>
+                        </div>
+
+                        {/* Toggle Terminal Button */}
+                        <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden ml-1">
+                          <button
+                            onClick={() => {
+                              workbenchStore.toggleTerminal(!workbenchStore.showTerminal.get());
+                            }}
                             className="rounded-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-accent-500 text-white hover:text-bolt-elements-item-contentAccent [&:not(:disabled,.disabled)]:hover:bg-bolt-elements-button-primary-backgroundHover outline-accent-500 flex gap-1.7"
                           >
-                            {isSyncing ? '저장 중...' : '저장'}
-                            <span className={classNames('i-ph:caret-down transition-transform')} />
-                          </DropdownMenu.Trigger>
-                          <DropdownMenu.Content
-                            className={classNames(
-                              'min-w-[240px] z-[250]',
-                              'bg-white dark:bg-[#141414]',
-                              'rounded-lg shadow-lg',
-                              'border border-gray-200/50 dark:border-gray-800/50',
-                              'animate-in fade-in-0 zoom-in-95',
-                              'py-1',
-                            )}
-                            sideOffset={5}
-                            align="end"
-                          >
-                            <DropdownMenu.Item
-                              className={classNames(
-                                'cursor-pointer flex items-center w-full px-4 py-2 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive gap-2 rounded-md group relative',
-                              )}
-                              onClick={handleSyncFiles}
-                              disabled={isSyncing}
-                            >
-                              <div className="flex items-center gap-2">
-                                {isSyncing ? (
-                                  <div className="i-ph:spinner" />
-                                ) : (
-                                  <div className="i-ph:cloud-arrow-down" />
-                                )}
-                                <span>{isSyncing ? '저장 중...' : '파일 저장'}</span>
-                              </div>
-                            </DropdownMenu.Item>
-                          </DropdownMenu.Content>
-                        </DropdownMenu.Root>
+                            <div className="i-ph:terminal" />
+                            터미널
+                          </button>
+                        </div>
                       </div>
+                    )}
 
-                      {/* Toggle Terminal Button */}
-                      <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden ml-1">
-                        <button
-                          onClick={() => {
-                            workbenchStore.toggleTerminal(!workbenchStore.showTerminal.get());
-                          }}
-                          className="rounded-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-accent-500 text-white hover:text-bolt-elements-item-contentAccent [&:not(:disabled,.disabled)]:hover:bg-bolt-elements-button-primary-backgroundHover outline-accent-500 flex gap-1.7"
-                        >
-                          <div className="i-ph:terminal" />
-                          터미널
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedView === 'diff' && (
-                    <FileModifiedDropdown fileHistory={fileHistory} onSelectFile={handleSelectFile} />
-                  )}
-                  <IconButton
-                    icon="i-ph:x-circle"
-                    className="-mr-1"
-                    size="xl"
-                    onClick={() => {
-                      workbenchStore.showWorkbench.set(false);
-                    }}
-                  />
-                </div>
-                <div className="relative flex-1 overflow-hidden">
-                  <View initial={{ x: '0%' }} animate={{ x: selectedView === 'code' ? '0%' : '-100%' }}>
-                    <EditorPanel
-                      editorDocument={currentDocument}
-                      isStreaming={isStreaming}
-                      selectedFile={selectedFile}
-                      files={files}
-                      unsavedFiles={unsavedFiles}
-                      fileHistory={fileHistory}
-                      onFileSelect={onFileSelect}
-                      onEditorScroll={onEditorScroll}
-                      onEditorChange={onEditorChange}
-                      onFileSave={onFileSave}
-                      onFileReset={onFileReset}
+                    {selectedView === 'diff' && (
+                      <FileModifiedDropdown fileHistory={fileHistory} onSelectFile={handleSelectFile} />
+                    )}
+                    <IconButton
+                      icon="i-ph:x-circle"
+                      className="-mr-1"
+                      size="xl"
+                      onClick={() => {
+                        workbenchStore.showWorkbench.set(false);
+                      }}
                     />
-                  </View>
-                  {selectedView === 'diff' && (
-                    <div className="absolute inset-0">
-                      <DiffViewErrorBoundary>
-                        <DiffView fileHistory={fileHistory} setFileHistory={setFileHistory} />
-                      </DiffViewErrorBoundary>
-                    </div>
-                  )}
-                  <View initial={{ x: '100%' }} animate={{ x: selectedView === 'preview' ? '0%' : '100%' }}>
-                    <Preview setSelectedElement={setSelectedElement} />
-                  </View>
+                  </div>
+                  <div className="relative flex-1 overflow-hidden">
+                    <View initial={{ x: '0%' }} animate={{ x: selectedView === 'code' ? '0%' : '-100%' }}>
+                      <EditorPanel
+                        editorDocument={currentDocument}
+                        isStreaming={isStreaming}
+                        selectedFile={selectedFile}
+                        files={files}
+                        unsavedFiles={unsavedFiles}
+                        fileHistory={fileHistory}
+                        onFileSelect={onFileSelect}
+                        onEditorScroll={onEditorScroll}
+                        onEditorChange={onEditorChange}
+                        onFileSave={onFileSave}
+                        onFileReset={onFileReset}
+                      />
+                    </View>
+                    {selectedView === 'diff' && (
+                      <div className="absolute inset-0">
+                        <DiffViewErrorBoundary>
+                          <DiffView fileHistory={fileHistory} setFileHistory={setFileHistory} />
+                        </DiffViewErrorBoundary>
+                      </div>
+                    )}
+                    <View initial={{ x: '100%' }} animate={{ x: selectedView === 'preview' ? '0%' : '100%' }}>
+                      <Preview setSelectedElement={setSelectedElement} />
+                    </View>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+          <ConfirmationDialog
+            isOpen={!!rewindTarget}
+            onClose={() => setRewindTarget(null)}
+            onConfirm={confirmRewind}
+            title="이 시점으로 되돌릴까요?"
+            description={`"${rewindTarget?.label ?? ''}" 시점 이후에 만든 내용이 사라져요.`}
+            confirmLabel="되돌리기"
+            cancelLabel="취소"
+            variant="destructive"
+          />
+        </>
       )
     );
   },
