@@ -394,7 +394,7 @@ export const Menu = () => {
               <button
                 type="button"
                 onClick={() => signInWithGoogle()}
-                className="w-full flex items-center justify-center gap-2 bg-[#FF5A36]/10 dark:bg-[#FF5A36]/10 text-[#FF5A36] dark:text-[#FF5A36] hover:bg-[#FF5A36]/20 dark:hover:bg-[#FF5A36]/20 rounded-lg px-4 py-2 transition-colors text-sm font-medium"
+                className="w-full flex items-center justify-center gap-2 bg-[#FF5330]/10 dark:bg-[#FF5330]/10 text-[#FF5330] dark:text-[#FF5330] hover:bg-[#FF5330]/20 dark:hover:bg-[#FF5330]/20 rounded-lg px-4 py-2 transition-colors text-sm font-medium"
               >
                 구글로 로그인
               </button>
@@ -421,7 +421,7 @@ export const Menu = () => {
             <div className="flex gap-2">
               <a
                 href="/"
-                className="flex-1 flex gap-2 items-center bg-[#FF5A36]/10 dark:bg-[#FF5A36]/10 text-[#FF5A36] dark:text-[#FF5A36] hover:bg-[#FF5A36]/20 dark:hover:bg-[#FF5A36]/20 rounded-lg px-4 py-2 transition-colors"
+                className="flex-1 flex gap-2 items-center bg-[#FF5330]/10 dark:bg-[#FF5330]/10 text-[#FF5330] dark:text-[#FF5330] hover:bg-[#FF5330]/20 dark:hover:bg-[#FF5330]/20 rounded-lg px-4 py-2 transition-colors"
               >
                 <span className="inline-block i-ph:plus-circle h-4 w-4" />
                 <span className="text-sm font-medium">새로 시작하기</span>
@@ -431,7 +431,7 @@ export const Menu = () => {
                 className={classNames(
                   'flex gap-1 items-center rounded-lg px-3 py-2 transition-colors',
                   selectionMode
-                    ? 'bg-[#FF5A36] dark:bg-[#FF5A36] text-white border border-[#E44A28] dark:border-[#E44A28]'
+                    ? 'bg-[#FF5330] dark:bg-[#FF5330] text-white border border-[#E44A28] dark:border-[#E44A28]'
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700',
                 )}
                 aria-label={selectionMode ? 'Exit selection mode' : 'Enter selection mode'}
@@ -444,7 +444,7 @@ export const Menu = () => {
                 <span className="i-ph:magnifying-glass h-4 w-4 text-gray-400 dark:text-gray-500" />
               </div>
               <input
-                className="w-full bg-gray-50 dark:bg-gray-900 relative pl-9 pr-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF5A36]/50 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-800"
+                className="w-full bg-gray-50 dark:bg-gray-900 relative pl-9 pr-3 py-2 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#FF5330]/50 text-sm text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 border border-gray-200 dark:border-gray-800"
                 type="search"
                 placeholder="채팅 검색..."
                 onChange={handleSearchChange}

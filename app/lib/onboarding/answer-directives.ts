@@ -27,7 +27,7 @@ export interface GenerationDirectives {
 }
 
 const TRUST_HUE = 222; // calm teal-blue — see hueToRepresentativeHex for the hex this decodes from
-const FRIENDLY_HUE = 34; // brand default (#FF5A36), matches paletteToHue.ts's CORALRED_DEFAULT_HUE
+const FRIENDLY_HUE = 33; // brand default (#FF5330), matches paletteToHue.ts's CORALRED_DEFAULT_HUE
 
 const EMPTY: Partial<GenerationDirectives> = {};
 
@@ -176,12 +176,12 @@ export function mergeDirectives(parts: Array<Partial<GenerationDirectives>>): Ge
  * The only two hue values mapAnswerToDirectives ever produces right now. designSchemeToHue
  * (paletteToHue.ts) only reads DesignScheme.palette.primary as a hex color and derives the hue
  * from it — there's no direct "set this hue" entry point — so this is the representative hex
- * for each, verified against the real hexToOklchHue conversion (34 matches the brand default's
- * own documented hex #FF5A36; 222 is #0891B2, chosen because it decodes to ~220 as intended).
+ * for each, verified against the real hexToOklchHue conversion (33 matches the brand default's
+ * own documented hex #FF5330; 222 is #0891B2, chosen because it decodes to ~220 as intended).
  * A lookup table (not a general hue->hex inverse) is enough since only these two values exist.
  */
 const HUE_REPRESENTATIVE_HEX: Record<number, string> = {
-  [FRIENDLY_HUE]: '#FF5A36',
+  [FRIENDLY_HUE]: '#FF5330',
   [TRUST_HUE]: '#0891B2',
 };
 

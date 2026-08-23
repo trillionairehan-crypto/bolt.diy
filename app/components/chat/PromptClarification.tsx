@@ -33,8 +33,8 @@ interface RecordedAnswer {
 }
 
 const BRAND = {
-  background: '#FAF7F2',
-  accent: '#FF5A36',
+  background: '#FAF7F0',
+  accent: '#FF5330',
   text: '#1A1A1A',
   border: '#EAE0D5',
 };

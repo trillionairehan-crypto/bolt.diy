@@ -39,11 +39,11 @@ export function hexToOklchHue(hex: string): number | null {
   return Math.round((hueDeg + 360) % 360);
 }
 
-const CORALRED_DEFAULT_HUE = 34; // measured OKLCH hue of #FF5A36 (Coralred's actual brand accent)
+const CORALRED_DEFAULT_HUE = 33; // measured OKLCH hue of #FF5330 (Coralred's actual brand accent)
 
 /**
  * Derives the design kit's --hue value from a DesignScheme palette's primary color.
- * Falls back to the Coralred brand default (34) when no palette/primary color is present
+ * Falls back to the Coralred brand default (33) when no palette/primary color is present
  * or the color can't be parsed — this is also the free-tier default.
  */
 export function designSchemeToHue(palette?: { [key: string]: string }): number {

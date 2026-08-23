@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Logo } from '~/components/ui/Logo';
 
 interface LegalPageLayoutProps {
   title: string;
@@ -11,15 +12,7 @@ export function LegalPageLayout({ title, effectiveDate, children }: LegalPageLay
     <div className="min-h-full w-full bg-bolt-elements-background-depth-1">
       <header className="flex items-center px-4 border-b border-bolt-elements-borderColor h-[var(--header-height)]">
         <a href="/" className="flex items-center gap-2">
-          <div
-            className="flex items-center justify-center shrink-0"
-            style={{ width: 28, height: 28, borderRadius: '22%', backgroundColor: '#FF5A36' }}
-          >
-            <span style={{ color: '#FAF7F2', fontWeight: 800, fontSize: 16, lineHeight: 1 }}>C</span>
-          </div>
-          <span className="text-bolt-elements-textPrimary" style={{ fontWeight: 700, fontSize: 20 }}>
-            coralred
-          </span>
+          <Logo height={24} />
         </a>
       </header>
 
@@ -30,7 +23,7 @@ export function LegalPageLayout({ title, effectiveDate, children }: LegalPageLay
         <div className="space-y-8 text-sm sm:text-base leading-relaxed text-bolt-elements-textPrimary">{children}</div>
 
         <div className="mt-16 pt-6 border-t border-bolt-elements-borderColor">
-          <a href="/" className="text-sm font-medium text-[#FF5A36] hover:underline">
+          <a href="/" className="text-sm font-medium text-[#FF5330] hover:underline">
             ← 코랄레드 홈으로 돌아가기
           </a>
         </div>

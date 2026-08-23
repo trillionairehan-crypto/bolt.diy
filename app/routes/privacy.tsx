@@ -175,7 +175,7 @@ export default function Privacy() {
           <li>성명: {PRIVACY_OFFICER_NAME}</li>
           <li>
             이메일:{' '}
-            <a href={`mailto:${PRIVACY_OFFICER_EMAIL}`} className="text-[#FF5A36] hover:underline">
+            <a href={`mailto:${PRIVACY_OFFICER_EMAIL}`} className="text-[#FF5330] hover:underline">
               {PRIVACY_OFFICER_EMAIL}
             </a>
           </li>

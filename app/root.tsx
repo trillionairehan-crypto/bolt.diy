@@ -56,6 +56,15 @@ export const Head = createHead(() => (
   <>
     <meta charSet="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/* Site-wide OG defaults — individual routes still control <title>/description via their own
+        meta() export; these just make sure link previews (e.g. KakaoTalk) always have an image. */}
+    <meta property="og:site_name" content="코랄레드" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="코랄레드" />
+    <meta property="og:description" content="코딩 몰라도 한국어 한마디로 웹사이트와 앱을 만들어요" />
+    <meta property="og:image" content="https://coralred.kr/coralred-icon-2048.png" />
+    <meta property="og:url" content="https://coralred.kr" />
+    <meta name="twitter:card" content="summary_large_image" />
     <Meta />
     <Links />
     <script dangerouslySetInnerHTML={{ __html: inlineThemeCode }} />

@@ -5,6 +5,7 @@ import { chatStore } from '~/lib/stores/chat';
 import { sidebarOpenStore, toggleSidebar } from '~/lib/stores/sidebar';
 import { classNames } from '~/utils/classNames';
 import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
+import { Logo } from '~/components/ui/Logo';
 
 /*
  * Lazy-loaded: HeaderActionButtons only imports `workbenchStore` to read `previews` for the
@@ -41,13 +42,7 @@ export function Header() {
           className="i-ph:sidebar-simple-duotone text-xl"
         />
         <a href="/" className="flex items-center gap-2">
-          <div
-            className="flex items-center justify-center shrink-0"
-            style={{ width: 28, height: 28, borderRadius: '22%', backgroundColor: '#FF5A36' }}
-          >
-            <span style={{ color: '#FAF7F2', fontWeight: 800, fontSize: 16, lineHeight: 1 }}>C</span>
-          </div>
-          <span style={{ color: '#1A1A1A', fontWeight: 700, fontSize: 20 }}>coralred</span>
+          <Logo height={24} />
         </a>
       </div>
       {chat.started && ( // Display ChatDescription and HeaderActionButtons only when the chat has started.

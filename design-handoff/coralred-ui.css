@@ -6,7 +6,7 @@
 
 *, ::before, ::after { box-sizing: border-box; }
 :root {
-  --hue: 34; /* 사용자 브랜드 hue — 빌더가 치환하는 유일한 값. 어느 요소에서든 재정의 가능 (기본값은 #FF5A36의 실측 OKLCH hue) */
+  --hue: 33; /* 사용자 브랜드 hue — 빌더가 치환하는 유일한 값. 어느 요소에서든 재정의 가능 (기본값은 #FF5330 기준 실측 OKLCH hue) */
   --font-sans: 'Schibsted Grotesk', 'Pretendard Variable', Pretendard,
                -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
   --font-mono: 'IBM Plex Mono', 'Pretendard Variable', Pretendard, monospace;

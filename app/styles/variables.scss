@@ -1,88 +1,116 @@
 /* Color Tokens Light Theme */
 :root,
 :root[data-theme='light'] {
-  --bolt-elements-borderColor: theme('colors.alpha.gray.10');
-  --bolt-elements-borderColorActive: theme('colors.accent.600');
+  /* Coralred kit primitives — brand hue is the only value a future rebrand should need to touch.
+     Formulas mirror design-handoff/coralred-ui.css exactly, so this stays in sync with the kit. */
+  --hue: 33;
+  --bg: oklch(0.985 0.002 var(--hue));
+  --surface: oklch(1 0 0);
+  --border: oklch(0.92 0.006 var(--hue));
+  --border-strong: oklch(0.88 0.008 var(--hue));
+  --muted: oklch(0.55 0.01 var(--hue));
+  --text: oklch(0.2 0.008 var(--hue));
+  --accent: oklch(0.58 0.19 var(--hue));
+  --accent-hover: oklch(0.52 0.19 var(--hue));
+  --accent-soft: oklch(0.97 0.015 var(--hue));
+  --accent-ring: oklch(0.9 0.06 var(--hue));
+  --accent-text: oklch(from var(--accent) min(l, 0.5) calc(c * 0.92) h);
+  --on-accent: rgb(from var(--accent)
+    calc((150 - (r * 0.299 + g * 0.587 + b * 0.114)) * infinity)
+    calc((150 - (r * 0.299 + g * 0.587 + b * 0.114)) * infinity)
+    calc((150 - (r * 0.299 + g * 0.587 + b * 0.114)) * infinity));
+  --ok: oklch(0.45 0.12 155);
+  --ok-bg: oklch(0.95 0.03 155);
+  --warn: oklch(0.5 0.11 85);
+  --warn-bg: oklch(0.95 0.03 85);
+  --err: oklch(0.5 0.15 25);
+  --err-bg: oklch(0.95 0.03 25);
 
-  --bolt-elements-bg-depth-1: #faf7f2;
-  --bolt-elements-bg-depth-2: theme('colors.gray.50');
-  --bolt-elements-bg-depth-3: theme('colors.gray.200');
-  --bolt-elements-bg-depth-4: theme('colors.alpha.gray.5');
+  --bolt-elements-borderColor: var(--border);
+  --bolt-elements-borderColorActive: var(--accent);
 
-  --bolt-elements-textPrimary: #1a1a1a;
-  --bolt-elements-textSecondary: theme('colors.gray.600');
-  --bolt-elements-textTertiary: theme('colors.gray.500');
+  --bolt-elements-bg-depth-1: var(--bg);
+  --bolt-elements-bg-depth-2: var(--surface);
+  --bolt-elements-bg-depth-3: oklch(0.93 0.006 var(--hue));
+  --bolt-elements-bg-depth-4: color-mix(in oklch, var(--border) 50%, transparent);
 
-  --bolt-elements-code-background: theme('colors.gray.100');
-  --bolt-elements-code-text: theme('colors.gray.950');
+  --bolt-elements-textPrimary: var(--text);
+  --bolt-elements-textSecondary: var(--muted);
+  --bolt-elements-textTertiary: oklch(0.62 0.01 var(--hue));
 
-  --bolt-elements-button-primary-background: theme('colors.alpha.accent.10');
-  --bolt-elements-button-primary-backgroundHover: theme('colors.alpha.accent.20');
-  --bolt-elements-button-primary-text: theme('colors.accent.500');
+  --bolt-elements-code-background: oklch(0.95 0.004 var(--hue));
+  --bolt-elements-code-text: var(--text);
 
-  --bolt-elements-button-secondary-background: theme('colors.alpha.gray.5');
-  --bolt-elements-button-secondary-backgroundHover: theme('colors.alpha.gray.10');
-  --bolt-elements-button-secondary-text: theme('colors.gray.950');
+  --bolt-elements-button-primary-background: var(--accent-soft);
+  --bolt-elements-button-primary-backgroundHover: var(--accent-ring);
+  --bolt-elements-button-primary-text: var(--accent-text);
 
-  --bolt-elements-button-danger-background: theme('colors.alpha.red.10');
-  --bolt-elements-button-danger-backgroundHover: theme('colors.alpha.red.20');
-  --bolt-elements-button-danger-text: theme('colors.red.500');
+  --bolt-elements-button-secondary-background: oklch(0.95 0.004 var(--hue));
+  --bolt-elements-button-secondary-backgroundHover: oklch(0.91 0.006 var(--hue));
+  --bolt-elements-button-secondary-text: var(--text);
 
-  --bolt-elements-item-contentDefault: theme('colors.alpha.gray.50');
-  --bolt-elements-item-contentActive: theme('colors.gray.950');
-  --bolt-elements-item-contentAccent: theme('colors.accent.700');
-  --bolt-elements-item-contentDanger: theme('colors.red.500');
+  --bolt-elements-button-danger-background: var(--err-bg);
+  --bolt-elements-button-danger-backgroundHover: oklch(from var(--err-bg) calc(l - 0.05) c h);
+  --bolt-elements-button-danger-text: var(--err);
+
+  --bolt-elements-item-contentDefault: var(--muted);
+  --bolt-elements-item-contentActive: var(--text);
+  --bolt-elements-item-contentAccent: var(--accent-text);
+  --bolt-elements-item-contentDanger: var(--err);
   --bolt-elements-item-backgroundDefault: rgba(0, 0, 0, 0);
-  --bolt-elements-item-backgroundActive: theme('colors.alpha.gray.5');
-  --bolt-elements-item-backgroundAccent: theme('colors.alpha.accent.10');
-  --bolt-elements-item-backgroundDanger: theme('colors.alpha.red.10');
+  --bolt-elements-item-backgroundActive: color-mix(in oklch, var(--border) 60%, transparent);
+  --bolt-elements-item-backgroundAccent: var(--accent-soft);
+  --bolt-elements-item-backgroundDanger: var(--err-bg);
 
-  --bolt-elements-loader-background: theme('colors.alpha.gray.10');
-  --bolt-elements-loader-progress: theme('colors.accent.500');
+  --bolt-elements-loader-background: var(--border);
+  --bolt-elements-loader-progress: var(--accent);
 
-  --bolt-elements-artifacts-background: #ffffff;
-  --bolt-elements-artifacts-backgroundHover: theme('colors.alpha.gray.2');
+  --bolt-elements-artifacts-background: var(--surface);
+  --bolt-elements-artifacts-backgroundHover: oklch(0.97 0.004 var(--hue));
   --bolt-elements-artifacts-borderColor: var(--bolt-elements-borderColor);
-  --bolt-elements-artifacts-inlineCode-background: theme('colors.gray.100');
+  --bolt-elements-artifacts-inlineCode-background: oklch(0.95 0.004 var(--hue));
   --bolt-elements-artifacts-inlineCode-text: var(--bolt-elements-textPrimary);
 
-  --bolt-elements-actions-background: #ffffff;
-  --bolt-elements-actions-code-background: theme('colors.gray.800');
+  --bolt-elements-actions-background: var(--surface);
+  --bolt-elements-actions-code-background: oklch(0.25 0.01 var(--hue));
 
-  --bolt-elements-messages-background: theme('colors.gray.100');
-  --bolt-elements-messages-linkColor: theme('colors.accent.500');
-  --bolt-elements-messages-code-background: theme('colors.gray.800');
-  --bolt-elements-messages-inlineCode-background: theme('colors.gray.200');
-  --bolt-elements-messages-inlineCode-text: theme('colors.gray.800');
+  --bolt-elements-messages-background: oklch(0.95 0.004 var(--hue));
+  --bolt-elements-messages-linkColor: var(--accent-text);
+  --bolt-elements-messages-code-background: oklch(0.25 0.01 var(--hue));
+  --bolt-elements-messages-inlineCode-background: oklch(0.9 0.006 var(--hue));
+  --bolt-elements-messages-inlineCode-text: oklch(0.25 0.01 var(--hue));
 
-  --bolt-elements-icon-success: theme('colors.green.500');
-  --bolt-elements-icon-error: theme('colors.red.500');
-  --bolt-elements-icon-primary: theme('colors.gray.950');
-  --bolt-elements-icon-secondary: theme('colors.gray.600');
-  --bolt-elements-icon-tertiary: theme('colors.gray.500');
+  --bolt-elements-icon-success: var(--ok);
+  --bolt-elements-icon-error: var(--err);
+  --bolt-elements-icon-primary: var(--text);
+  --bolt-elements-icon-secondary: var(--muted);
+  --bolt-elements-icon-tertiary: oklch(0.62 0.01 var(--hue));
 
-  --bolt-elements-dividerColor: theme('colors.gray.100');
+  --bolt-elements-dividerColor: oklch(0.95 0.004 var(--hue));
 
-  --bolt-elements-prompt-background: #ffffff;
+  --bolt-elements-prompt-background: var(--surface);
 
-  --bolt-elements-sidebar-dropdownShadow: theme('colors.alpha.gray.10');
-  --bolt-elements-sidebar-buttonBackgroundDefault: theme('colors.alpha.accent.10');
-  --bolt-elements-sidebar-buttonBackgroundHover: theme('colors.alpha.accent.20');
-  --bolt-elements-sidebar-buttonText: theme('colors.accent.700');
+  --bolt-elements-sidebar-dropdownShadow: var(--border);
+  --bolt-elements-sidebar-buttonBackgroundDefault: var(--accent-soft);
+  --bolt-elements-sidebar-buttonBackgroundHover: var(--accent-ring);
+  --bolt-elements-sidebar-buttonText: var(--accent-text);
 
-  --bolt-elements-preview-addressBar-background: theme('colors.gray.100');
-  --bolt-elements-preview-addressBar-backgroundHover: theme('colors.alpha.gray.5');
-  --bolt-elements-preview-addressBar-backgroundActive: #ffffff;
+  --bolt-elements-preview-addressBar-background: oklch(0.95 0.004 var(--hue));
+  --bolt-elements-preview-addressBar-backgroundHover: oklch(0.9 0.008 var(--hue));
+  --bolt-elements-preview-addressBar-backgroundActive: var(--surface);
   --bolt-elements-preview-addressBar-text: var(--bolt-elements-textSecondary);
   --bolt-elements-preview-addressBar-textActive: var(--bolt-elements-textPrimary);
 
-  --bolt-elements-terminals-background: #ffffff;
+  --bolt-elements-terminals-background: var(--surface);
   --bolt-elements-terminals-buttonBackground: var(--bolt-elements-bg-depth-4);
 
-  --bolt-elements-cta-background: theme('colors.gray.100');
-  --bolt-elements-cta-text: theme('colors.gray.950');
+  --bolt-elements-cta-background: oklch(0.95 0.004 var(--hue));
+  --bolt-elements-cta-text: var(--text);
 
-  /* Terminal Colors */
+  /* Terminal Colors — fixed ANSI identity colors, deliberately NOT hue-tinted.
+     A terminal's red/green/blue etc. need to stay recognizable as those colors;
+     re-deriving them from the brand hue would make them all read as shades of
+     orange and defeat the point of ANSI coloring. */
   --bolt-terminal-background: var(--bolt-elements-terminals-background);
   --bolt-terminal-foreground: #333333;
   --bolt-terminal-selection-background: #00000040;
@@ -108,77 +136,97 @@
 
 /* Color Tokens Dark Theme */
 :root[data-theme='dark'] {
-  --bolt-elements-borderColor: theme('colors.alpha.white.10');
-  --bolt-elements-borderColorActive: theme('colors.accent.500');
+  /* Coralred kit primitives (dark) — formulas mirror design-handoff/coralred-ui.css. */
+  --bg: oklch(0.14 0.006 var(--hue));
+  --surface: oklch(0.19 0.008 var(--hue));
+  --border: oklch(0.26 0.008 var(--hue));
+  --border-strong: oklch(0.3 0.01 var(--hue));
+  --muted: oklch(0.62 0.01 var(--hue));
+  --text: oklch(0.93 0.005 var(--hue));
+  --accent: oklch(0.66 0.17 var(--hue));
+  --accent-hover: oklch(0.72 0.17 var(--hue));
+  --accent-soft: oklch(0.22 0.03 var(--hue));
+  --accent-ring: oklch(0.35 0.06 var(--hue));
+  --accent-text: var(--accent);
+  --on-accent: var(--bg);
+  --ok: oklch(0.7 0.14 155);
+  --ok-bg: oklch(0.22 0.03 155);
+  --warn: oklch(0.75 0.12 85);
+  --warn-bg: oklch(0.24 0.02 85);
+  --err: oklch(0.68 0.16 25);
+  --err-bg: oklch(0.24 0.03 25);
 
-  --bolt-elements-bg-depth-1: theme('colors.gray.950');
-  --bolt-elements-bg-depth-2: theme('colors.gray.900');
-  --bolt-elements-bg-depth-3: theme('colors.gray.800');
-  --bolt-elements-bg-depth-4: theme('colors.alpha.white.5');
+  --bolt-elements-borderColor: var(--border);
+  --bolt-elements-borderColorActive: var(--accent);
 
-  --bolt-elements-textPrimary: theme('colors.white');
-  --bolt-elements-textSecondary: theme('colors.gray.400');
-  --bolt-elements-textTertiary: theme('colors.gray.500');
+  --bolt-elements-bg-depth-1: var(--bg);
+  --bolt-elements-bg-depth-2: var(--surface);
+  --bolt-elements-bg-depth-3: oklch(0.24 0.01 var(--hue));
+  --bolt-elements-bg-depth-4: color-mix(in oklch, var(--border) 50%, transparent);
 
-  --bolt-elements-code-background: theme('colors.gray.800');
-  --bolt-elements-code-text: theme('colors.white');
+  --bolt-elements-textPrimary: var(--text);
+  --bolt-elements-textSecondary: var(--muted);
+  --bolt-elements-textTertiary: oklch(0.5 0.01 var(--hue));
 
-  --bolt-elements-button-primary-background: theme('colors.alpha.accent.10');
-  --bolt-elements-button-primary-backgroundHover: theme('colors.alpha.accent.20');
-  --bolt-elements-button-primary-text: theme('colors.accent.500');
+  --bolt-elements-code-background: oklch(0.24 0.01 var(--hue));
+  --bolt-elements-code-text: var(--text);
 
-  --bolt-elements-button-secondary-background: theme('colors.alpha.white.5');
-  --bolt-elements-button-secondary-backgroundHover: theme('colors.alpha.white.10');
-  --bolt-elements-button-secondary-text: theme('colors.white');
+  --bolt-elements-button-primary-background: var(--accent-soft);
+  --bolt-elements-button-primary-backgroundHover: var(--accent-ring);
+  --bolt-elements-button-primary-text: var(--accent-text);
 
-  --bolt-elements-button-danger-background: theme('colors.alpha.red.10');
-  --bolt-elements-button-danger-backgroundHover: theme('colors.alpha.red.20');
-  --bolt-elements-button-danger-text: theme('colors.red.500');
+  --bolt-elements-button-secondary-background: oklch(0.24 0.01 var(--hue));
+  --bolt-elements-button-secondary-backgroundHover: oklch(0.3 0.012 var(--hue));
+  --bolt-elements-button-secondary-text: var(--text);
 
-  --bolt-elements-item-contentDefault: theme('colors.alpha.white.50');
-  --bolt-elements-item-contentActive: theme('colors.white');
-  --bolt-elements-item-contentAccent: theme('colors.accent.500');
-  --bolt-elements-item-contentDanger: theme('colors.red.500');
+  --bolt-elements-button-danger-background: var(--err-bg);
+  --bolt-elements-button-danger-backgroundHover: oklch(from var(--err-bg) calc(l + 0.05) c h);
+  --bolt-elements-button-danger-text: var(--err);
+
+  --bolt-elements-item-contentDefault: var(--muted);
+  --bolt-elements-item-contentActive: var(--text);
+  --bolt-elements-item-contentAccent: var(--accent-text);
+  --bolt-elements-item-contentDanger: var(--err);
   --bolt-elements-item-backgroundDefault: rgba(255, 255, 255, 0);
-  --bolt-elements-item-backgroundActive: theme('colors.alpha.white.10');
-  --bolt-elements-item-backgroundAccent: theme('colors.alpha.accent.10');
-  --bolt-elements-item-backgroundDanger: theme('colors.alpha.red.10');
+  --bolt-elements-item-backgroundActive: color-mix(in oklch, var(--border) 60%, transparent);
+  --bolt-elements-item-backgroundAccent: var(--accent-soft);
+  --bolt-elements-item-backgroundDanger: var(--err-bg);
 
-  --bolt-elements-loader-background: theme('colors.alpha.gray.10');
-  --bolt-elements-loader-progress: theme('colors.accent.500');
+  --bolt-elements-loader-background: var(--border);
+  --bolt-elements-loader-progress: var(--accent);
 
-  --bolt-elements-artifacts-background: theme('colors.gray.900');
-  --bolt-elements-artifacts-backgroundHover: theme('colors.alpha.white.5');
+  --bolt-elements-artifacts-background: var(--surface);
+  --bolt-elements-artifacts-backgroundHover: color-mix(in oklch, var(--border) 50%, transparent);
   --bolt-elements-artifacts-borderColor: var(--bolt-elements-borderColor);
-  --bolt-elements-artifacts-inlineCode-background: theme('colors.gray.800');
-  --bolt-elements-artifacts-inlineCode-text: theme('colors.white');
+  --bolt-elements-artifacts-inlineCode-background: oklch(0.24 0.01 var(--hue));
+  --bolt-elements-artifacts-inlineCode-text: var(--text);
 
-  --bolt-elements-actions-background: theme('colors.gray.900');
-  --bolt-elements-actions-code-background: theme('colors.gray.800');
+  --bolt-elements-actions-background: var(--surface);
+  --bolt-elements-actions-code-background: oklch(0.24 0.01 var(--hue));
 
-  --bolt-elements-messages-background: theme('colors.gray.800');
-  --bolt-elements-messages-linkColor: theme('colors.accent.500');
-  --bolt-elements-messages-code-background: theme('colors.gray.900');
-  --bolt-elements-messages-inlineCode-background: theme('colors.gray.700');
+  --bolt-elements-messages-background: oklch(0.24 0.01 var(--hue));
+  --bolt-elements-messages-linkColor: var(--accent-text);
+  --bolt-elements-messages-code-background: oklch(0.17 0.008 var(--hue));
+  --bolt-elements-messages-inlineCode-background: oklch(0.32 0.012 var(--hue));
   --bolt-elements-messages-inlineCode-text: var(--bolt-elements-textPrimary);
 
-  --bolt-elements-icon-success: theme('colors.green.400');
-  --bolt-elements-icon-error: theme('colors.red.400');
-  --bolt-elements-icon-primary: theme('colors.gray.950');
-  --bolt-elements-icon-secondary: theme('colors.gray.600');
-  --bolt-elements-icon-tertiary: theme('colors.gray.500');
+  --bolt-elements-icon-success: var(--ok);
+  --bolt-elements-icon-error: var(--err);
+  --bolt-elements-icon-primary: var(--text);
+  --bolt-elements-icon-secondary: var(--muted);
+  --bolt-elements-icon-tertiary: oklch(0.5 0.01 var(--hue));
 
-  --bolt-elements-dividerColor: theme('colors.gray.100');
+  --bolt-elements-dividerColor: oklch(0.24 0.01 var(--hue));
 
-  --bolt-elements-prompt-background: theme('colors.alpha.gray.80');
+  --bolt-elements-prompt-background: color-mix(in oklch, var(--bg) 80%, transparent);
 
-  --bolt-elements-sidebar-dropdownShadow: theme('colors.alpha.gray.30');
-  --bolt-elements-sidebar-buttonBackgroundDefault: theme('colors.alpha.accent.10');
-  --bolt-elements-sidebar-buttonBackgroundHover: theme('colors.alpha.accent.20');
-  --bolt-elements-sidebar-buttonText: theme('colors.accent.500');
+  --bolt-elements-sidebar-dropdownShadow: color-mix(in oklch, black 30%, transparent);
+  --bolt-elements-sidebar-buttonBackgroundDefault: var(--accent-soft);
+  --bolt-elements-sidebar-buttonBackgroundHover: var(--accent-ring);
+  --bolt-elements-sidebar-buttonText: var(--accent-text);
 
   --bolt-elements-preview-addressBar-background: var(--bolt-elements-bg-depth-1);
-  --bolt-elements-preview-addressBar-backgroundHover: theme('colors.alpha.white.5');
+  --bolt-elements-preview-addressBar-backgroundHover: color-mix(in oklch, var(--border) 50%, transparent);
   --bolt-elements-preview-addressBar-backgroundActive: var(--bolt-elements-bg-depth-1);
   --bolt-elements-preview-addressBar-text: var(--bolt-elements-textSecondary);
   --bolt-elements-preview-addressBar-textActive: var(--bolt-elements-textPrimary);
@@ -186,10 +234,10 @@
   --bolt-elements-terminals-background: var(--bolt-elements-bg-depth-1);
   --bolt-elements-terminals-buttonBackground: var(--bolt-elements-bg-depth-3);
 
-  --bolt-elements-cta-background: theme('colors.alpha.white.10');
-  --bolt-elements-cta-text: theme('colors.white');
+  --bolt-elements-cta-background: color-mix(in oklch, var(--border) 60%, transparent);
+  --bolt-elements-cta-text: var(--text);
 
-  /* Terminal Colors */
+  /* Terminal Colors — fixed ANSI identity colors, deliberately NOT hue-tinted (see light block). */
   --bolt-terminal-background: var(--bolt-elements-terminals-background);
   --bolt-terminal-foreground: #eff0eb;
   --bolt-terminal-selection-background: #97979b33;

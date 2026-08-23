@@ -74,7 +74,7 @@ export function EmailOtpModal({ open, onClose }: EmailOtpModalProps) {
         <Dialog className="max-w-[420px] p-6">
           <div className="space-y-4">
             <DialogTitle>
-              <div className="i-ph:envelope-simple-fill w-5 h-5 text-[#FF5A36]" />
+              <div className="i-ph:envelope-simple-fill w-5 h-5 text-[#FF5330]" />
               이메일로 로그인
             </DialogTitle>
 
@@ -93,7 +93,7 @@ export function EmailOtpModal({ open, onClose }: EmailOtpModalProps) {
                       'bg-[#F8F8F8] dark:bg-[#1A1A1A]',
                       'border border-[#E5E5E5] dark:border-[#333333]',
                       'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-                      'focus:outline-none focus:ring-1 focus:ring-[#FF5A36]',
+                      'focus:outline-none focus:ring-1 focus:ring-[#FF5330]',
                       'disabled:opacity-50',
                     )}
                   />
@@ -111,7 +111,7 @@ export function EmailOtpModal({ open, onClose }: EmailOtpModalProps) {
                     disabled={loading || !email}
                     className={classNames(
                       'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
-                      'bg-[#FF5A36] text-white',
+                      'bg-[#FF5330] text-white',
                       'hover:bg-[#E64F2F]',
                       'disabled:opacity-50 disabled:cursor-not-allowed',
                     )}
@@ -149,7 +149,7 @@ export function EmailOtpModal({ open, onClose }: EmailOtpModalProps) {
                       'bg-[#F8F8F8] dark:bg-[#1A1A1A]',
                       'border border-[#E5E5E5] dark:border-[#333333]',
                       'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-                      'focus:outline-none focus:ring-1 focus:ring-[#FF5A36]',
+                      'focus:outline-none focus:ring-1 focus:ring-[#FF5330]',
                       'disabled:opacity-50',
                     )}
                   />
@@ -176,7 +176,7 @@ export function EmailOtpModal({ open, onClose }: EmailOtpModalProps) {
                     disabled={loading || code.length !== 6}
                     className={classNames(
                       'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
-                      'bg-[#FF5A36] text-white',
+                      'bg-[#FF5330] text-white',
                       'hover:bg-[#E64F2F]',
                       'disabled:opacity-50 disabled:cursor-not-allowed',
                     )}

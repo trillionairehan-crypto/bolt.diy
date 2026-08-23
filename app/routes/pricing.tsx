@@ -1,5 +1,6 @@
 import type { LinksFunction, MetaFunction } from '@remix-run/cloudflare';
 import { Check } from 'lucide-react';
+import { Logo } from '~/components/ui/Logo';
 import coralredUiCssUrl from '~design-handoff/coralred-ui.css?url';
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: coralredUiCssUrl }];
@@ -108,13 +109,7 @@ export default function Pricing() {
       `}</style>
 
       <a href="/" className="cr-row-8" style={{ width: 'fit-content' }}>
-        <div
-          className="flex items-center justify-center shrink-0"
-          style={{ width: 28, height: 28, borderRadius: '22%', background: 'var(--accent)', display: 'flex' }}
-        >
-          <span style={{ color: 'var(--on-accent)', fontWeight: 800, fontSize: 16, lineHeight: 1 }}>C</span>
-        </div>
-        <span className="cr-h2">coralred</span>
+        <Logo height={24} />
       </a>
 
       <section className="cr-section cr-stack-16" style={{ paddingBottom: 48 }}>

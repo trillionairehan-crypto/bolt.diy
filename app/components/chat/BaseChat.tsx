@@ -417,11 +417,11 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       {freeGenerationsRemaining > 0 ? (
                         <>
                           무료 체험{' '}
-                          <span style={{ color: '#FF5A36', fontWeight: 600 }}>{freeGenerationsRemaining}회</span>{' '}
+                          <span style={{ color: '#FF5330', fontWeight: 600 }}>{freeGenerationsRemaining}회</span>{' '}
                           남았어요
                         </>
                       ) : (
-                        <span style={{ color: '#FF5A36', fontWeight: 600 }}>무료 체험을 모두 사용했어요</span>
+                        <span style={{ color: '#FF5330', fontWeight: 600 }}>무료 체험을 모두 사용했어요</span>
                       )}
                     </p>
                   </div>
