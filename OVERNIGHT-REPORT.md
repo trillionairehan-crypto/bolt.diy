@@ -89,7 +89,32 @@
 
 ## 작업 4: 설정 탭 정리
 
-- [상태: 진행 예정]
+- [상태: 부분완료] (숨김 처리와 핵심 문구 스윕은 완료, 남긴 탭들의 내부 콘텐츠 전수 스윕은 시간상 못 함)
+- [한 일]
+  - 전체 탭 목록 확인(`constants.tsx`의 `DEFAULT_TAB_CONFIG`): profile, settings, notifications, features, data, cloud-providers, local-providers, github, gitlab, netlify, vercel, supabase, event-logs, mcp — 14개
+  - `ControlPanel.tsx`의 `visibleTabs` 필터에 `DEV_ONLY_TAB_IDS` 기반 조건 추가 (github/gitlab/netlify/vercel/mcp/event-logs/local-providers/cloud-providers → `SHOW_DEV_TOOLS`가 `false`일 때 숨김). **탭 정의(`DEFAULT_TAB_CONFIG`)가 아니라 렌더링 단계에서 필터링**한 게 핵심 판단 — `DEFAULT_TAB_CONFIG.visible`만 바꾸면 이미 설정을 한 번이라도 연 사용자는 localStorage(`bolt_tab_configuration`)에 저장된 예전 값(전부 `visible:true`)이 우선 적용돼서 안 숨겨짐. 렌더링 시점 필터라 기존 사용자 localStorage 상태와 무관하게 항상 적용되고, 플래그 하나만 뒤집으면 즉시 복구됨(탭 컴포넌트 자체는 import도 그대로 살아있어서 삭제 아님)
+  - 남긴 탭(profile/settings/notifications/features/data/supabase)의 `TAB_LABELS`/`TAB_DESCRIPTIONS`를 voice.md 원칙대로 한국어로: "프로필/설정/알림/새 기능/데이터/저장 기능" + 명령형 아닌 서술형 한 줄 설명. `ControlPanel.tsx`의 다이얼로그 제목("Control Panel"→"설정", "Tab Management"→"탭 관리")과 탭 타일 상태 배지(새 기능 개수/안 읽은 알림 개수/연결 문제 메시지)도 같이 스윕
+  - 숨긴 탭들의 `TAB_LABELS`/`TAB_DESCRIPTIONS`는 일부러 영어 그대로 둠 — 화면에 안 보이는 데다, 굳이 깊은 개발자 전문용어를 번역하는 데 시간을 쓰는 것보다 남은 작업(5, 6번)에 시간을 쓰는 게 낫다고 판단
+- [판단과 근거] (표)
+
+  | 탭 | 처리 | 이유 |
+  |---|---|---|
+  | github/gitlab/netlify/vercel | 숨김 | 코드 배포·연동 대상이 비개발자 타겟엔 불필요, 지난 세션에도 "개발자용 연동 탭이라 단순화하면 오히려 역효과"로 이미 스코프 제외됐던 것과 같은 판단 |
+  | mcp | 숨김 | Model Context Protocol 서버 설정은 명백히 고급/개발자 기능 |
+  | event-logs | 숨김 | 디버그 로그 뷰어, 일반 사용자가 쓸 일 없음 |
+  | local-providers | 숨김 | 로컬 LLM(Ollama 등) 연결 — 비개발자가 로컬 서버를 띄울 일 없음 |
+  | cloud-providers | 숨김 | 자체 API 키 입력 UI — 이 제품은 호스팅형이라 서버가 모델을 대신 처리하고 있고(`Model Settings` 버튼도 이미 `SHOW_DEV_TOOLS` 뒤에 있음), 같은 맥락으로 판단 |
+  | profile/settings/notifications | 유지 | 계정/환경설정/알림은 일반 사용자에게 필요한 기본 설정 |
+  | features | 유지 | 새 기능 안내는 마케팅성으로 유지할 가치 있음 |
+  | data | 유지 | 자기 데이터/저장 공간 관리는 일반 사용자도 필요 |
+  | supabase | 유지 | "저장 기능 켜기"는 입력창에서부터 이미 전면 노출되는 핵심 기능이라 설정에서도 접근 가능해야 함 |
+- [아침 확인 체크리스트]
+  - [ ] 설정 다이얼로그를 열어서 8개 탭(GitHub/GitLab/Netlify/Vercel/MCP/Event Logs/Local Providers/Cloud Providers)이 실제로 안 보이는지
+  - [ ] 남은 6개 탭(프로필/설정/알림/새 기능/데이터/저장 기능) 라벨이 한국어로 잘 보이는지
+  - [ ] "저장 기능" 탭을 열어 Supabase 연결 플로우가 정상 작동하는지(로직은 안 건드렸지만 확인 필요)
+  - [ ] 숨긴 탭이 정말 필요할 때(디버깅 등) `SHOW_DEV_TOOLS`를 `true`로 바꾸면 8개 다 돌아오는지 — 코드는 확인했지만 실제 토글은 아침에
+  - [ ] 남긴 탭들의 내부 콘텐츠(폼 라벨, 버튼 등)는 이번에 손 안 댐 — 필요하면 별도 작업으로 요청
+- [커밋 해시] 96dd2da
 
 ---
 
