@@ -3,6 +3,7 @@ import { Fragment } from 'react';
 import { classNames } from '~/utils/classNames';
 import { AssistantMessage } from './AssistantMessage';
 import { UserMessage } from './UserMessage';
+import { MessageErrorBoundary } from './MessageErrorBoundary';
 import { useLocation } from '@remix-run/react';
 import { db, chatId } from '~/lib/persistence/useChatHistory';
 import { forkChat } from '~/lib/persistence/db';
@@ -90,23 +91,25 @@ export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
                   })}
                 >
                   <div className="grid grid-col-1 w-full">
-                    {isUserMessage ? (
-                      <UserMessage parts={parts} />
-                    ) : (
-                      <AssistantMessage
-                        parsedContent={parsedContent}
-                        messageId={messageId}
-                        onRewind={handleRewind}
-                        onFork={handleFork}
-                        append={props.append}
-                        chatMode={props.chatMode}
-                        setChatMode={props.setChatMode}
-                        model={props.model}
-                        provider={props.provider}
-                        parts={parts}
-                        addToolOutput={props.addToolOutput}
-                      />
-                    )}
+                    <MessageErrorBoundary>
+                      {isUserMessage ? (
+                        <UserMessage parts={parts} />
+                      ) : (
+                        <AssistantMessage
+                          parsedContent={parsedContent}
+                          messageId={messageId}
+                          onRewind={handleRewind}
+                          onFork={handleFork}
+                          append={props.append}
+                          chatMode={props.chatMode}
+                          setChatMode={props.setChatMode}
+                          model={props.model}
+                          provider={props.provider}
+                          parts={parts}
+                          addToolOutput={props.addToolOutput}
+                        />
+                      )}
+                    </MessageErrorBoundary>
                   </div>
                 </div>
               );

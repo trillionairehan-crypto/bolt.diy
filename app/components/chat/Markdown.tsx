@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown, { type Components } from 'react-markdown';
 import type { BundledLanguage } from 'shiki';
 import { createScopedLogger } from '~/utils/logger';
@@ -10,6 +10,9 @@ import ThoughtBox from './ThoughtBox';
 import type { ProviderInfo } from '~/types/model';
 
 const logger = createScopedLogger('MarkdownComponent');
+
+// See STREAMING_THROTTLE_MS usage below for why this exists.
+const STREAMING_THROTTLE_MS = 60;
 
 interface MarkdownProps {
   children: string;
@@ -25,6 +28,31 @@ interface MarkdownProps {
 export const Markdown = memo(
   ({ children, html = false, limitedMarkdown = false, append, setChatMode, model, provider }: MarkdownProps) => {
     logger.trace('Render');
+
+    /*
+     * `children` grows on every streamed chunk, and with `html` on, rehypeRaw re-parses whatever
+     * raw HTML has arrived so far — including transiently unclosed/malformed tags — into a fresh
+     * tree each time. That tree's shape can swing a lot between one partial snapshot and the
+     * next, which is a plausible source of the removeChild crash this throttle was added for
+     * (React's reconciler getting a barrage of structurally-different trees faster than it can
+     * commit). Throttling (not debouncing — a pure trailing debounce would freeze the visible
+     * text until streaming pauses) caps re-renders to roughly once per STREAMING_THROTTLE_MS
+     * without ever waiting longer than that for the final chunk to show up.
+     */
+    const [renderedChildren, setRenderedChildren] = useState(children);
+    const lastRenderRef = useRef(Date.now());
+
+    useEffect(() => {
+      const elapsed = Date.now() - lastRenderRef.current;
+      const remaining = Math.max(0, STREAMING_THROTTLE_MS - elapsed);
+
+      const timeout = setTimeout(() => {
+        setRenderedChildren(children);
+        lastRenderRef.current = Date.now();
+      }, remaining);
+
+      return () => clearTimeout(timeout);
+    }, [children]);
 
     const components = useMemo(() => {
       return {
@@ -182,7 +210,7 @@ export const Markdown = memo(
         remarkPlugins={remarkPlugins(limitedMarkdown)}
         rehypePlugins={rehypePlugins(html)}
       >
-        {stripCodeFenceFromArtifact(children)}
+        {stripCodeFenceFromArtifact(renderedChildren)}
       </ReactMarkdown>
     );
   },
