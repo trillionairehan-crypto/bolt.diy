@@ -1,6 +1,6 @@
 import { useStore } from '@nanostores/react';
 import type { LinksFunction } from '@remix-run/cloudflare';
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from '@remix-run/react';
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, isRouteErrorResponse, useRouteError } from '@remix-run/react';
 import tailwindReset from '@unocss/reset/tailwind-compat.css?url';
 import { themeStore } from './lib/stores/theme';
 import { stripIndents } from './utils/stripIndent';
@@ -12,6 +12,7 @@ import { ClientOnly } from 'remix-utils/client-only';
 import { cssTransition, ToastContainer } from 'react-toastify';
 import { createScopedLogger } from './utils/logger';
 import { initGlobalErrorRecovery } from './utils/globalErrorRecovery';
+import { Logo } from './components/ui/Logo';
 
 import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';
 import globalStyles from './styles/index.scss?url';
@@ -169,10 +170,50 @@ export default function App() {
  */
 export function ErrorBoundary() {
   const error = useRouteError();
+  const is404 = isRouteErrorResponse(error) && error.status === 404;
 
   useEffect(() => {
     logger.error('Root route error boundary caught', error);
   }, [error]);
+
+  if (is404) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100dvh',
+          width: '100%',
+          gap: '1rem',
+          textAlign: 'center',
+          padding: '2rem',
+          background: '#FF5330',
+          color: '#FAF7F0',
+        }}
+      >
+        <Logo variant="onCoral" height={32} />
+        <p style={{ fontSize: '1rem', margin: 0, marginTop: '0.5rem' }}>이 페이지는 없어요</p>
+        <p style={{ fontSize: '0.85rem', opacity: 0.8, margin: 0 }}>주소를 다시 확인해주세요</p>
+        <a
+          href="/"
+          style={{
+            background: '#FAF7F0',
+            color: '#FF5330',
+            borderRadius: '999px',
+            padding: '10px 20px',
+            fontSize: '0.875rem',
+            fontWeight: 600,
+            textDecoration: 'none',
+            marginTop: '0.5rem',
+          }}
+        >
+          홈으로 가기
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div
