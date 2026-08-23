@@ -590,6 +590,29 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                     </div>
                   )}
                 </div>
+                {!chatStarted && (
+                  <footer className="mt-16 px-4 lg:px-10 py-6 border-t border-bolt-elements-borderColor text-xs text-bolt-elements-textTertiary flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                    <span>코랄레드</span>
+                    <span>·</span>
+                    <span>대표 한성민</span>
+                    <span>·</span>
+                    <span>사업자등록번호 383-23-02498</span>
+                    <span>·</span>
+                    <span>coralred@coralred.kr</span>
+                    <span>·</span>
+                    <a href="/pricing" className="hover:text-bolt-elements-textSecondary hover:underline">
+                      요금제
+                    </a>
+                    <span>·</span>
+                    <a href="/terms" className="hover:text-bolt-elements-textSecondary hover:underline">
+                      이용약관
+                    </a>
+                    <span>·</span>
+                    <a href="/privacy" className="hover:text-bolt-elements-textSecondary hover:underline">
+                      개인정보처리방침
+                    </a>
+                  </footer>
+                )}
               </>
             )}
           </div>

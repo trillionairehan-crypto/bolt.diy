@@ -1,11 +1,14 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { chatStore } from '~/lib/stores/chat';
-import { sidebarOpenStore, toggleSidebar } from '~/lib/stores/sidebar';
+import { sidebarOpenStore, toggleSidebar, setSidebarOpen } from '~/lib/stores/sidebar';
+import { authUserStore } from '~/lib/stores/auth';
+import { profileStore } from '~/lib/stores/profile';
 import { classNames } from '~/utils/classNames';
 import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
 import { Logo } from '~/components/ui/Logo';
+import { LoginModal } from '~/components/auth/LoginModal';
 
 /*
  * Lazy-loaded: HeaderActionButtons only imports `workbenchStore` to read `previews` for the
@@ -22,45 +25,98 @@ const HeaderActionButtons = lazy(() =>
   import('./HeaderActionButtons.client').then((module) => ({ default: module.HeaderActionButtons })),
 );
 
+const LANDING_TEXT_COLOR = '#FAF7F0';
+
 export function Header() {
   const chat = useStore(chatStore);
   const sidebarOpen = useStore(sidebarOpenStore);
+  const authUser = useStore(authUserStore);
+  const profile = useStore(profileStore);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  /*
+   * The landing hero is a full-bleed coral section — the header sits directly above it in normal
+   * document flow (not layered), so it needs its own matching coral background, not `transparent`,
+   * to read as one continuous surface instead of a white bar over a coral block.
+   */
+  const isLanding = !chat.started;
 
   return (
-    <header
-      className={classNames('flex items-center px-4 border-b h-[var(--header-height)]', {
-        'border-transparent': !chat.started,
-        'border-bolt-elements-borderColor': chat.started,
-      })}
-    >
-      <div className="flex items-center gap-2 z-logo text-bolt-elements-textPrimary cursor-pointer">
-        <button
-          type="button"
-          onClick={toggleSidebar}
-          aria-label="사이드바 열기/닫기"
-          aria-expanded={sidebarOpen}
-          className="i-ph:sidebar-simple-duotone text-xl"
-        />
-        <a href="/" className="flex items-center gap-2">
-          <Logo height={24} />
-        </a>
-      </div>
-      {chat.started && ( // Display ChatDescription and HeaderActionButtons only when the chat has started.
-        <>
-          <span className="flex-1 px-4 truncate text-center text-bolt-elements-textPrimary">
-            <ClientOnly>{() => <ChatDescription />}</ClientOnly>
-          </span>
-          <ClientOnly>
-            {() => (
-              <div className="">
-                <Suspense fallback={null}>
-                  <HeaderActionButtons chatStarted={chat.started} />
-                </Suspense>
-              </div>
+    <>
+      <header
+        className={classNames('flex items-center px-4 border-b h-[var(--header-height)]', {
+          'border-transparent': isLanding,
+          'border-bolt-elements-borderColor': chat.started,
+        })}
+        style={isLanding ? { background: '#FF5330' } : undefined}
+      >
+        <div className="flex items-center gap-2 z-logo text-bolt-elements-textPrimary cursor-pointer">
+          {!isLanding && (
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              aria-label="사이드바 열기/닫기"
+              aria-expanded={sidebarOpen}
+              className="i-ph:sidebar-simple-duotone text-xl"
+            />
+          )}
+          <a href="/" className="flex items-center gap-2">
+            <Logo height={24} textColor={isLanding ? LANDING_TEXT_COLOR : undefined} />
+          </a>
+        </div>
+
+        {isLanding && (
+          <div className="flex-1 flex items-center justify-end gap-5">
+            <a href="/pricing" className="text-sm font-medium hover:opacity-80" style={{ color: LANDING_TEXT_COLOR }}>
+              요금제
+            </a>
+            {authUser ? (
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                className="flex items-center gap-2 text-sm font-medium hover:opacity-80"
+                style={{ color: LANDING_TEXT_COLOR }}
+              >
+                내 프로젝트
+                <span className="flex items-center justify-center w-7 h-7 rounded-full overflow-hidden bg-white/20 shrink-0">
+                  {profile?.avatar ? (
+                    <img src={profile.avatar} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="i-ph:user-fill text-sm" style={{ color: LANDING_TEXT_COLOR }} />
+                  )}
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsLoginModalOpen(true)}
+                className="text-sm font-medium hover:opacity-80"
+                style={{ color: LANDING_TEXT_COLOR }}
+              >
+                로그인
+              </button>
             )}
-          </ClientOnly>
-        </>
-      )}
-    </header>
+          </div>
+        )}
+
+        {chat.started && ( // Display ChatDescription and HeaderActionButtons only when the chat has started.
+          <>
+            <span className="flex-1 px-4 truncate text-center text-bolt-elements-textPrimary">
+              <ClientOnly>{() => <ChatDescription />}</ClientOnly>
+            </span>
+            <ClientOnly>
+              {() => (
+                <div className="">
+                  <Suspense fallback={null}>
+                    <HeaderActionButtons chatStarted={chat.started} />
+                  </Suspense>
+                </div>
+              )}
+            </ClientOnly>
+          </>
+        )}
+      </header>
+      <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+    </>
   );
 }

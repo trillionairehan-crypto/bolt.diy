@@ -1,10 +1,13 @@
 interface LogoProps {
   height?: number;
   className?: string;
+
+  /** Wordmark text color. Defaults to the theme text token; override for non-standard surfaces (e.g. the coral hero header). */
+  textColor?: string;
 }
 
 /** Coralred mark, inline SVG (same coordinates as public/logo/coralred-symbol.svg). */
-export function Logo({ height = 24, className }: LogoProps) {
+export function Logo({ height = 24, className, textColor = 'var(--bolt-elements-textPrimary)' }: LogoProps) {
   return (
     <span className={className} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
       <svg viewBox="0 0 512 512" width={height} height={height} aria-hidden="true">
@@ -15,7 +18,7 @@ export function Logo({ height = 24, className }: LogoProps) {
         <rect x="289" y="84" width="84" height="84" rx="26" fill="#FFB5A3" />
         <rect x="289" y="344" width="84" height="84" rx="26" fill="#FFB5A3" />
       </svg>
-      <span style={{ color: 'var(--bolt-elements-textPrimary)', fontWeight: 700, fontSize: 18 }}>코랄레드</span>
+      <span style={{ color: textColor, fontWeight: 700, fontSize: 18 }}>코랄레드</span>
     </span>
   );
 }

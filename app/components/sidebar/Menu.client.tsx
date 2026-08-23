@@ -18,14 +18,13 @@ import { cubicEasingFn } from '~/utils/easings';
 import { HistoryItem } from './HistoryItem';
 import { binDates } from './date-binning';
 import { useSearchFilter } from '~/lib/hooks/useSearchFilter';
-import useViewport from '~/lib/hooks';
 import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { profileStore } from '~/lib/stores/profile';
 import { sidebarOpenStore, setSidebarOpen } from '~/lib/stores/sidebar';
-import { authUserStore, initAuthListener, signInWithGoogle, signInWithKakao } from '~/lib/stores/auth';
+import { authUserStore, initAuthListener } from '~/lib/stores/auth';
 import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
-import { EmailOtpModal } from '~/components/auth/EmailOtpModal';
+import { LoginModal } from '~/components/auth/LoginModal';
 
 const menuVariants = {
   closed: {
@@ -78,7 +77,6 @@ function CurrentDateTime() {
 export const Menu = () => {
   const { duplicateCurrentChat, exportChat } = useChatHistory();
   const menuRef = useRef<HTMLDivElement>(null);
-  const isSmallViewport = useViewport(1024);
   const [list, setList] = useState<ChatHistoryItem[]>([]);
   const open = useStore(sidebarOpenStore);
   const [dialogContent, setDialogContent] = useState<DialogContent>(null);
@@ -87,7 +85,7 @@ export const Menu = () => {
   const authUser = useStore(authUserStore);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [isEmailOtpOpen, setIsEmailOtpOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const { filteredItems: filteredList, handleSearchChange } = useSearchFilter({
     items: list,
@@ -298,31 +296,6 @@ export const Menu = () => {
     }
   }, [open, selectionMode]);
 
-  useEffect(() => {
-    const enterThreshold = 20;
-    const exitThreshold = 20;
-
-    function onMouseMove(event: MouseEvent) {
-      if (isSettingsOpen || isSmallViewport) {
-        return;
-      }
-
-      if (event.pageX < enterThreshold) {
-        setSidebarOpen(true);
-      }
-
-      if (menuRef.current && event.clientX > menuRef.current.getBoundingClientRect().right + exitThreshold) {
-        setSidebarOpen(false);
-      }
-    }
-
-    window.addEventListener('mousemove', onMouseMove);
-
-    return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-    };
-  }, [isSettingsOpen, isSmallViewport]);
-
   const handleDuplicate = async (id: string) => {
     await duplicateCurrentChat(id);
     loadEntries(); // Reload the list after duplication
@@ -390,27 +363,13 @@ export const Menu = () => {
             </div>
           </div>
           {!authUser && isPlatformSupabaseConfigured && (
-            <div className="px-4 pb-3 flex flex-col gap-2">
+            <div className="px-4 pb-3">
               <button
                 type="button"
-                onClick={() => signInWithGoogle()}
+                onClick={() => setIsLoginModalOpen(true)}
                 className="w-full flex items-center justify-center gap-2 bg-[#FF5330]/10 dark:bg-[#FF5330]/10 text-[#FF5330] dark:text-[#FF5330] hover:bg-[#FF5330]/20 dark:hover:bg-[#FF5330]/20 rounded-lg px-4 py-2 transition-colors text-sm font-medium"
               >
-                구글로 로그인
-              </button>
-              <button
-                type="button"
-                onClick={() => signInWithKakao()}
-                className="w-full flex items-center justify-center gap-2 bg-[#FEE500] hover:bg-[#FEE500]/80 text-black rounded-lg px-4 py-2 transition-colors text-sm font-medium"
-              >
-                카카오로 로그인
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsEmailOtpOpen(true)}
-                className="w-full flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg px-4 py-2 transition-colors text-sm font-medium"
-              >
-                이메일로 로그인
+                로그인
               </button>
             </div>
           )}
@@ -612,7 +571,7 @@ export const Menu = () => {
       </motion.div>
 
       <ControlPanel open={isSettingsOpen} onClose={handleSettingsClose} />
-      <EmailOtpModal open={isEmailOtpOpen} onClose={() => setIsEmailOtpOpen(false)} />
+      <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </>
   );
 };
