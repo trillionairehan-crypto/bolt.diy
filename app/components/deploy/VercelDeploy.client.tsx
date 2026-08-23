@@ -7,7 +7,9 @@ import { path } from '~/utils/path';
 import { useState } from 'react';
 import type { ActionCallbackData } from '~/lib/runtime/message-parser';
 import { chatId } from '~/lib/persistence/useChatHistory';
+import { description } from '~/lib/persistence';
 import { formatBuildFailureOutput } from './deployUtils';
+import { recordDeployedApp } from '~/lib/deployedApps';
 
 export function useVercelDeploy() {
   const [isDeploying, setIsDeploying] = useState(false);
@@ -214,6 +216,13 @@ export function useVercelDeploy() {
       deployArtifact.runner.handleDeployAction('complete', 'complete', {
         url: data.deploy.url,
         source: 'vercel',
+      });
+
+      recordDeployedApp({
+        chatId: currentChatId,
+        appName: description.get() || 'Untitled',
+        url: data.deploy.url,
+        provider: 'vercel',
       });
 
       // Show success toast notification

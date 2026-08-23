@@ -7,7 +7,9 @@ import { path } from '~/utils/path';
 import { useState } from 'react';
 import type { ActionCallbackData } from '~/lib/runtime/message-parser';
 import { chatId } from '~/lib/persistence/useChatHistory';
+import { description } from '~/lib/persistence';
 import { formatBuildFailureOutput } from './deployUtils';
+import { recordDeployedApp } from '~/lib/deployedApps';
 
 export function useNetlifyDeploy() {
   const [isDeploying, setIsDeploying] = useState(false);
@@ -222,9 +224,17 @@ export function useNetlifyDeploy() {
       }
 
       // Notify that deployment completed successfully
+      const deployedUrl = deploymentStatus.ssl_url || deploymentStatus.url;
       deployArtifact.runner.handleDeployAction('complete', 'complete', {
-        url: deploymentStatus.ssl_url || deploymentStatus.url,
+        url: deployedUrl,
         source: 'netlify',
+      });
+
+      recordDeployedApp({
+        chatId: currentChatId,
+        appName: description.get() || 'Untitled',
+        url: deployedUrl,
+        provider: 'netlify',
       });
 
       // Show success toast notification

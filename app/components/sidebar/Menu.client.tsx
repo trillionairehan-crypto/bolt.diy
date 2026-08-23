@@ -556,6 +556,13 @@ export const Menu = () => {
           <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 px-4 py-3">
             <div className="flex items-center gap-3">
               <SettingsButton onClick={handleSettingsClick} />
+              <a
+                href="/apps"
+                title="내 앱"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-xl text-[#666] hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive/10 transition-colors"
+              >
+                <span className="i-ph:rocket-launch" />
+              </a>
             </div>
             <ThemeSwitch />
           </div>
