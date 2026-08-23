@@ -1,17 +1,30 @@
 .container {
-  width: min(480px, 88vw);
-  aspect-ratio: 1 / 1;
-  position: relative;
-  container-type: inline-size;
-  margin: 0 auto;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .tileFloat {
   position: absolute;
+  pointer-events: auto;
   animation-name: cr-float;
   animation-timing-function: ease-in-out;
   animation-direction: alternate;
   animation-iteration-count: infinite;
+}
+
+// Ambient decoration only below this — hidden once it'd crowd the centered column.
+@media (max-width: 1279px) {
+  .tileLeft {
+    display: none;
+  }
+}
+
+@media (max-width: 1023px) {
+  .tileFloat {
+    display: none;
+  }
 }
 
 @keyframes cr-float {
@@ -40,8 +53,8 @@
   animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
   animation-fill-mode: both;
   transition:
-    transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
-    box-shadow 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes cr-enter {
@@ -60,25 +73,30 @@
   box-shadow: 0 20px 40px rgba(23, 16, 14, 0.25);
 }
 
+.tile:active {
+  transform: scale(0.98);
+  box-shadow: 0 8px 20px rgba(23, 16, 14, 0.2);
+}
+
 .tile:focus-visible {
   outline: 3px solid rgba(250, 247, 240, 0.9);
   outline-offset: 3px;
 }
 
 .dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: currentColor;
   flex-shrink: 0;
 }
 
 .label {
-  font-size: clamp(11px, 3cqw, 15px);
+  font-size: 11px;
   font-weight: 700;
   text-align: center;
   line-height: 1.2;
-  padding: 0 6px;
+  padding: 0 4px;
 }
 
 .examplesHighlight {
@@ -110,5 +128,11 @@
     transform: none;
     box-shadow: none;
     filter: brightness(0.92);
+  }
+
+  .tile:active {
+    transform: none;
+    box-shadow: none;
+    filter: brightness(0.85);
   }
 }

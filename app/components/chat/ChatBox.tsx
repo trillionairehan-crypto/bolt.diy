@@ -18,8 +18,23 @@ import type { ProviderInfo } from '~/types/model';
 import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import { WebSearch } from './WebSearch.client';
+import { RotatingPlaceholder } from './RotatingPlaceholder';
 
 const SHOW_ENHANCE_BUTTON = false;
+
+/*
+ * Landing card is a fixed cream surface regardless of theme (same convention as the coral hero
+ * itself — literal hex, not tokens, because this specific surface must NOT flip with dark mode).
+ * Every `--bolt-elements-*` variable the card's descendants read (WebSearch popover, IconButton,
+ * the Shift+Return kbd hint, etc.) is re-scoped to these values on the card wrapper via inline
+ * CSS custom properties, so none of those child components need their own isLanding prop.
+ */
+const LANDING_CARD_BG = '#FAF7F0';
+const LANDING_CARD_BG_2 = '#F2EADD';
+const LANDING_INK = '#2B211C';
+const LANDING_MUTED = '#8A7A70';
+const LANDING_BORDER = '#E8DFD3';
+const LANDING_HOVER = 'rgba(43, 33, 28, 0.06)';
 
 interface ChatBoxProps {
   isModelSettingsCollapsed: boolean;
@@ -63,13 +78,26 @@ interface ChatBoxProps {
   setDesignScheme?: (scheme: DesignScheme) => void;
   selectedElement?: ElementInfo | null;
   setSelectedElement?: ((element: ElementInfo | null) => void) | undefined;
+  isLanding?: boolean;
 }
 
 export const ChatBox: React.FC<ChatBoxProps> = (props) => {
+  const isLanding = props.isLanding ?? false;
+
   return (
     <div
       className={classNames(
-        'relative bg-bolt-elements-background-depth-2 backdrop-blur p-3 rounded-lg border border-bolt-elements-borderColor relative w-full max-w-chat mx-auto z-prompt',
+        'relative backdrop-blur p-3 relative w-full max-w-chat mx-auto z-prompt',
+        isLanding
+          ? [
+              'rounded-[20px]',
+              'shadow-[0_1px_2px_rgba(23,16,14,0.10),0_12px_40px_rgba(23,16,14,0.18)]',
+              'focus-within:shadow-[0_1px_2px_rgba(23,16,14,0.10),0_20px_54px_rgba(23,16,14,0.24)]',
+              'focus-within:ring-[3px] focus-within:ring-[rgba(250,247,240,0.35)]',
+              'focus-within:-translate-y-px',
+              'transition-[box-shadow,transform] duration-150 ease-[cubic-bezier(.2,.6,.3,1)]',
+            ].join(' ')
+          : 'bg-bolt-elements-background-depth-2 rounded-lg border border-bolt-elements-borderColor',
 
         /*
          * {
@@ -77,6 +105,23 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
          * },
          */
       )}
+      style={
+        isLanding
+          ? ({
+              background: LANDING_CARD_BG,
+              '--bolt-elements-textPrimary': LANDING_INK,
+              '--bolt-elements-textSecondary': LANDING_MUTED,
+              '--bolt-elements-textTertiary': LANDING_MUTED,
+              '--bolt-elements-item-contentDefault': LANDING_MUTED,
+              '--bolt-elements-item-contentActive': LANDING_INK,
+              '--bolt-elements-item-contentAccent': '#FF5330',
+              '--bolt-elements-item-backgroundActive': LANDING_HOVER,
+              '--bolt-elements-borderColor': LANDING_BORDER,
+              '--bolt-elements-background-depth-1': LANDING_CARD_BG,
+              '--bolt-elements-background-depth-2': LANDING_CARD_BG_2,
+            } as React.CSSProperties)
+          : undefined
+      }
     >
       <svg className={classNames(styles.PromptEffectContainer)}>
         <defs>
@@ -171,13 +216,20 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
         </div>
       )}
       <div
-        className={classNames('relative shadow-xs border border-bolt-elements-borderColor backdrop-blur rounded-lg')}
+        className={classNames(
+          'relative backdrop-blur rounded-lg',
+          isLanding ? '' : 'shadow-xs border border-bolt-elements-borderColor',
+        )}
       >
+        <ClientOnly>
+          {() => <RotatingPlaceholder visible={isLanding && props.input.length === 0} color={LANDING_MUTED} />}
+        </ClientOnly>
         <textarea
           ref={props.textareaRef}
           data-gramm="false"
           data-gramm_editor="false"
           data-enable-grammarly="false"
+          aria-label={isLanding ? '만들고 싶은 것을 설명해주세요' : undefined}
           className={classNames(
             'w-full pl-4 pt-4 pr-16 outline-none resize-none text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary bg-transparent text-sm',
             'transition-all duration-200',
@@ -240,10 +292,10 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           }}
           onPaste={props.handlePaste}
           style={{
-            minHeight: props.TEXTAREA_MIN_HEIGHT,
+            minHeight: isLanding ? Math.max(props.TEXTAREA_MIN_HEIGHT, 88) : props.TEXTAREA_MIN_HEIGHT,
             maxHeight: props.TEXTAREA_MAX_HEIGHT,
           }}
-          placeholder={props.chatMode === 'build' ? '어떤 걸 만들고 싶으세요?' : '무엇이든 물어보세요'}
+          placeholder={isLanding ? '' : props.chatMode === 'build' ? '어떤 걸 만들고 싶으세요?' : '무엇이든 물어보세요'}
           translate="no"
         />
         <div className="flex justify-between items-center text-sm p-4 pt-3">

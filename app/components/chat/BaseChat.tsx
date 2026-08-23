@@ -36,6 +36,8 @@ import { authUserStore } from '~/lib/stores/auth';
 import PromptClarification from './PromptClarification';
 import type { GenerationDirectives } from '~/lib/onboarding/answer-directives';
 import { CoralredHero } from '~/components/landing/CoralredHero';
+import { ScrollHint } from '~/components/landing/ScrollHint';
+import { Logo } from '~/components/ui/Logo';
 
 /*
  * Lazy-loaded: Workbench.client.tsx pulls in the workbenchStore singleton (ActionRunner,
@@ -53,7 +55,7 @@ const Workbench = lazy(() =>
 const TEXTAREA_MIN_HEIGHT = 76;
 
 const LANDING_STEPS = [
-  { number: '01', title: '말하면', description: '만들고 싶은 걸 한국어로 설명하세요' },
+  { number: '01', title: '말하면', description: '만들고 싶은 걸 한국어로 설명해요' },
   { number: '02', title: '만들어져요', description: 'AI가 화면과 기능을 전부 만들어요' },
   { number: '03', title: '바로 써요', description: '주소가 생기고, 링크로 공유할 수 있어요' },
 ];
@@ -414,45 +416,14 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
               />
             ) : (
               <>
-                <div
-                  className={classNames({
-                    'lg:grid lg:grid-cols-2 lg:items-center lg:gap-12 px-4 lg:px-10 py-10 lg:py-14 -mx-2 sm:-mx-6':
-                      !chatStarted,
-                  })}
-                  style={!chatStarted ? { background: '#FF5330' } : undefined}
-                >
-                  <div className="flex flex-col min-w-0">
-                    {!chatStarted && (
-                      <div id="intro" className="max-w-xl">
-                        <h1
-                          className="mb-4 animate-fade-in"
-                          style={{
-                            color: '#FAF7F0',
-                            fontWeight: 700,
-                            letterSpacing: '-0.03em',
-                            fontSize: 'clamp(34px, 5vw, 56px)',
-                            lineHeight: 1.15,
-                          }}
-                        >
-                          말하면,
-                          <br />
-                          앱이 됩니다
-                        </h1>
-                        <p
-                          className="text-md lg:text-xl mb-6 animate-fade-in animation-delay-200"
-                          style={{ color: '#FAF7F0' }}
-                        >
-                          코딩 없이, 한국어로 설명하면 앱이 완성돼요.
-                        </p>
-                      </div>
-                    )}
-                    <StickToBottom
-                      className={classNames('pt-6 px-2 sm:px-6 relative', {
-                        'h-full flex flex-col modern-scrollbar': chatStarted,
-                      })}
-                      resize="smooth"
-                      initial="smooth"
-                    >
+                {(() => {
+                  /*
+                   * Shared between both branches below so the alerts/progress/free-trial-notice/
+                   * ChatBox wiring (30+ props) isn't duplicated — only the surrounding chrome
+                   * (headline, card centering, StickToBottom's own className) differs by state.
+                   */
+                  const chatBoxSection = (
+                    <>
                       <StickToBottom.Content className="flex flex-col gap-4 relative ">
                         <ClientOnly>
                           {() => {
@@ -516,7 +487,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                         </div>
                         {progressAnnotations && <ProgressCompilation data={progressAnnotations} />}
                         <p
-                          className="text-xs px-1"
+                          className={classNames('text-xs px-1', { 'text-right': !chatStarted })}
                           style={{ color: '#FAF7F0', opacity: 0.75, display: chatStarted ? 'none' : undefined }}
                         >
                           {freeGenerationsRemaining > 0 ? (
@@ -573,45 +544,101 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           selectedElement={selectedElement}
                           setSelectedElement={setSelectedElement}
                           onWebSearchResult={onWebSearchResult}
+                          isLanding={!chatStarted}
                         />
                       </div>
-                    </StickToBottom>
-                    <div className="flex flex-col justify-center">
-                      {!chatStarted && SHOW_DEV_TOOLS && (
-                        <div className="flex justify-center gap-2">
-                          {ImportButtons(importChat)}
-                          <GitCloneButton importChat={importChat} />
-                        </div>
+                    </>
+                  );
+
+                  return (
+                    <div
+                      className={classNames('relative overflow-hidden', {
+                        'flex flex-col items-center justify-center px-4 py-16': !chatStarted,
+                      })}
+                      style={!chatStarted ? { background: '#FF5330', minHeight: '88vh' } : undefined}
+                    >
+                      {!chatStarted && (
+                        <ClientOnly>
+                          {() => <CoralredHero onFocusPrompt={() => textareaRef?.current?.focus()} />}
+                        </ClientOnly>
                       )}
-                      <div className="flex flex-col gap-5">
-                        {/*
-                          ExamplePrompts (suggestion chips) intentionally not rendered on the
-                          landing hero — component kept intact for possible reuse elsewhere later.
-                        */}
-                        {!chatStarted && SHOW_DEV_TOOLS && <StarterTemplates />}
+                      <div className="flex flex-col min-w-0 relative z-10 w-full">
+                        {!chatStarted ? (
+                          <div className="w-full mx-auto flex flex-col items-center" style={{ maxWidth: 760 }}>
+                            <div id="intro" className="flex flex-col items-center text-center mb-7 animate-fade-in">
+                              <Logo variant="onCoral" height={28} />
+                              <h1
+                                className="mt-6"
+                                style={{
+                                  color: '#FAF7F0',
+                                  fontWeight: 800,
+                                  letterSpacing: '-0.02em',
+                                  fontSize: 'clamp(30px, 4.2vw, 44px)',
+                                  lineHeight: 1.15,
+                                }}
+                              >
+                                오늘 뭘 만들까요?
+                              </h1>
+                            </div>
+                            <StickToBottom className="relative w-full" resize="smooth" initial="smooth">
+                              {chatBoxSection}
+                            </StickToBottom>
+                            <p
+                              className="text-center mt-4 animate-fade-in animation-delay-200"
+                              style={{ color: 'rgba(250, 247, 240, 0.7)', fontSize: 13 }}
+                            >
+                              코딩 없이, 한국어로 설명하면 앱이 완성돼요
+                            </p>
+                          </div>
+                        ) : (
+                          <StickToBottom
+                            className="pt-6 px-2 sm:px-6 relative h-full flex flex-col modern-scrollbar"
+                            resize="smooth"
+                            initial="smooth"
+                          >
+                            {chatBoxSection}
+                          </StickToBottom>
+                        )}
+                        <div className="flex flex-col justify-center">
+                          {!chatStarted && SHOW_DEV_TOOLS && (
+                            <div className="flex justify-center gap-2">
+                              {ImportButtons(importChat)}
+                              <GitCloneButton importChat={importChat} />
+                            </div>
+                          )}
+                          <div className="flex flex-col gap-5">
+                            {/*
+                              ExamplePrompts (suggestion chips) intentionally not rendered on the
+                              landing hero — component kept intact for possible reuse elsewhere later.
+                            */}
+                            {!chatStarted && SHOW_DEV_TOOLS && <StarterTemplates />}
+                          </div>
+                        </div>
                       </div>
+                      {!chatStarted && <ScrollHint />}
                     </div>
-                  </div>
-                  {!chatStarted && (
-                    <div className="mt-12 lg:mt-0">
-                      <ClientOnly>
-                        {() => <CoralredHero onFocusPrompt={() => textareaRef?.current?.focus()} />}
-                      </ClientOnly>
-                    </div>
-                  )}
-                </div>
+                  );
+                })()}
                 {!chatStarted && (
-                  <section style={{ background: 'var(--bg)', padding: '96px 0' }}>
+                  <section style={{ background: 'var(--bg)', padding: '140px 0' }}>
                     <div className="max-w-[1120px] mx-auto px-8">
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-8">
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {LANDING_STEPS.map((step) => (
-                          <div key={step.title} className="flex flex-col gap-2">
+                          <div
+                            key={step.title}
+                            className="flex flex-col gap-3 p-6 rounded-2xl transition-transform duration-150 ease-out hover:-translate-y-0.5"
+                            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+                          >
                             <span
+                              className="flex items-center justify-center"
                               style={{
-                                color: 'var(--accent)',
-                                fontSize: 32,
+                                width: 48,
+                                height: 48,
+                                borderRadius: 14,
+                                background: '#FF5330',
+                                color: '#FAF7F0',
+                                fontSize: 18,
                                 fontWeight: 700,
-                                letterSpacing: '-0.02em',
                               }}
                             >
                               {step.number}
@@ -628,18 +655,18 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 {/* 쇼케이스 섹션(만든 앱 스크린샷) 자리 — 스크린샷 준비되면 3단계 섹션과 요금제 티저 사이에 추가 */}
 
                 {!chatStarted && (
-                  <section style={{ background: 'var(--accent-soft)', padding: '96px 0' }}>
+                  <section style={{ background: '#FF5330', padding: '96px 0' }}>
                     <div className="max-w-[1120px] mx-auto px-8 text-center">
-                      <p style={{ color: 'var(--text)', fontSize: 20, fontWeight: 600, marginBottom: 24 }}>
-                        무료로 시작해서, 필요할 때 올리세요
+                      <p style={{ color: '#FAF7F0', fontSize: 20, fontWeight: 600, marginBottom: 24 }}>
+                        무료로 시작해서, 필요할 때 올려요
                       </p>
                       <a
                         href="/pricing"
-                        className="inline-flex items-center justify-center rounded-md px-4"
+                        className="inline-flex items-center justify-center rounded-md px-4 transition-opacity duration-150 hover:opacity-90 active:opacity-80"
                         style={{
                           height: 36,
-                          background: 'var(--accent)',
-                          color: 'var(--on-accent)',
+                          background: '#FAF7F0',
+                          color: '#FF5330',
                           fontSize: 14,
                           fontWeight: 500,
                         }}
