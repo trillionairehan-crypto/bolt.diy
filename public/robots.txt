@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /chat/
+Disallow: /api/
+Disallow: /webcontainer/
+Disallow: /git/
+
+Sitemap: https://coralred.kr/sitemap.xml
