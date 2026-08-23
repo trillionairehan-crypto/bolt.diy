@@ -54,3 +54,31 @@
 - [커밋 해시] 3743798
 
 ---
+
+## 작업 2: 다크모드 재설계
+
+- [상태: 완료] (핵심 토큰·구조는 전부 반영, 하드코딩 회색 스윕은 최고 임팩트 2곳만 하고 나머지는 플래그)
+- [한 일]
+  - `variables.scss`의 다크 원시 토큰을 지시서 값 그대로 정확히 교체(`--bg`/`--surface`/`--border`/`--border-strong`/`--muted`/`--text`/`--accent`/`--accent-hover`/`--accent-soft`/`--accent-ring`/`--accent-text`) + `--surface-2` 신규 추가
+  - **진짜 원인 발견**: 다크 블록 안에 `oklch(0.24 0.01 var(--hue))`라는 리터럴이 `bg-depth-3`/`code-background`/`button-secondary-background`/`artifacts-inlineCode-background`/`actions-code-background`/`messages-background`/`dividerColor` 등 7곳에 동일하게 박혀 있었음 — 전부 같은 값이라는 건 원래 "같은 개념(3단계 표면)"이었다는 뜻이라, 전부 `var(--surface-2)`로 통일 치환. 이제 `--bg`(0.15) < `--surface`(0.185) < `--surface-2`(0.215) < `--border`(0.27) < `--border-strong`(0.33)로 명확한 층위가 생김(품질 헌장 Q3)
+  - 라이트 테마에도 `--surface-2: oklch(0.995 0.001 var(--hue))` 추가(지시서 예시값 그대로)
+  - **더 큰 발견**: `Dialog.tsx`(로그인/Supabase 연결/삭제 확인 등 앱의 거의 모든 모달이 공유하는 컴포넌트)가 `bg-white dark:bg-gray-950`라는 **코랄레드 토큰 시스템과 완전히 무관한 Tailwind 기본 회색**을 쓰고 있었음 — 이게 "어젯밤 다크가 순수 검정처럼 보였다"는 지적의 실제 원인일 가능성이 높음(따뜻한 oklch 팔레트가 아예 안 거쳐가는 경로였음). `bg-[var(--surface-2)]`로 교체 + 그림자도 `--shadow-overlay`(다크 전용, `0 8px 32px rgba(0,0,0,.5)`) 연동, 라이트는 기존 그림자 폴백 유지
+  - `LoginModal.tsx`: 자체 `bg-bolt-elements-background-depth-1` 오버라이드를 제거해서 위에서 고친 Dialog 기본값(`--surface-2`)을 그대로 받게 함. 구글 버튼은 지시서대로 "다크 중립"(`--surface` + `--border-strong` 테두리 + `--text`)으로 전환 — 원래 계획이던 "구글 브랜드는 라이트 고정"에서 오늘 지시서가 명시적으로 다르게 지정해서 그대로 따름(판단 근거 참고)
+  - `AvatarDropdown.tsx`의 드롭다운 배경도 같은 하드코딩 패턴(`bg-white dark:bg-[#141414]`)이라 `--surface-2`로 교체
+  - `::-webkit-scrollbar`(10px, thumb `--border-strong` radius 8px, hover `--muted`) + `::selection`(라이트 `--accent-ring`, 다크 `oklch(0.4 0.1 var(--hue))`) 전역 추가. 기존 `.modern-scrollbar` 유틸(채팅 스크롤 영역 전용, 2px 얇은 버전)은 그대로 두고 안 건드림 — 이건 전역 기본값이라 나머지 모든 스크롤 영역(사이드바, 다이얼로그 등)에 적용됨
+  - 테마 토글: `theme.ts`의 `toggleTheme()`에서 `<html>`에 `.theme-transitioning` 클래스를 붙였다가 250ms 후 제거하는 방식으로 구현(상시 transition 아님). CSS는 `.theme-transitioning, .theme-transitioning *`에 `background-color/border-color/color 200ms`만 한시 적용
+  - 3단계 섹션의 다크 대응은 작업 1에서 이미 `var(--surface)`+`1px solid var(--border)`로 만들어놔서 이번 토큰 교체로 자동 개선됨 — 추가 작업 불필요, 확인만
+- [판단과 근거]
+  - 구글 버튼을 "항상 라이트 고정"에서 "다크 중립 토큰"으로 바꾼 건 오늘 지시서가 명시적으로 그렇게 요청해서 그대로 따른 것 — 실제 구글 브랜드 가이드라인상으로는 라이트 고정이 표준이긴 하지만, 오늘 지시가 더 구체적이고 최신이라 우선함
+  - 하드코딩 회색(`dark:bg-gray-950`류) 패턴이 최소 9개 파일에 더 있는 걸 grep으로 확인했지만(`ControlPanel.tsx`/`Menu.client.tsx`/`Preview.tsx`/`Workbench.client.tsx`/`BranchSelector.tsx`/`GitCloneButton.tsx`/`TabTile.tsx`), 오늘 밤 시간 안에 전부 스윕하면 남은 작업(3~7)에 쓸 시간이 없다고 판단해서 **가장 많이 보이는 두 곳(Dialog 공유 컴포넌트, 계정 드롭다운)만 고치고 나머지는 정직하게 플래그**만 남김 — Dialog.tsx 하나가 실질적으로 앱 모달의 대다수를 커버해서 임팩트 대비 시간 효율이 가장 좋다고 판단
+- [아침 확인 체크리스트]
+  - [ ] **가장 중요**: 다크모드로 전환해서 실제로 "따뜻한 어두운 표면"으로 보이는지, 어젯밤처럼 순정 검정으로 안 보이는지
+  - [ ] 로그인 모달을 다크에서 열어서 배경이 페이지 배경과 구분되는 표면으로 보이는지, 구글 버튼이 어색하지 않은지
+  - [ ] 모달/드롭다운(Supabase 연결, 계정 드롭다운, 삭제 확인)이 라이트/다크 양쪽에서 인접 표면과 구분되는지
+  - [ ] 스크롤바가 새 스타일(10px, 둥근 thumb)로 보이는지, hover 시 색이 바뀌는지
+  - [ ] 텍스트 드래그 선택 시 하이라이트 색이 브랜드에 맞는지
+  - [ ] 테마 토글 클릭 시 색이 급변하지 않고 부드럽게 전환되는지(200ms)
+  - [ ] **남은 하드코딩 회색 9개 파일**은 이번에 손 안 댐 — 필요하면 별도 요청, 위치는 grep `dark:bg-gray-950|dark:bg-black|dark:bg-\[#141414\]`로 바로 찾을 수 있음
+- [커밋 해시] 368026f
+
+---
