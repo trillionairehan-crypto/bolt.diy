@@ -690,6 +690,13 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
         navigator.clipboard.writeText(element.displayText).then(() => {
           setSelectedElement?.(element);
         });
+
+        // One click = one selection — turn the picker off so a stray second click can't replace it.
+        setIsInspectorMode(false);
+
+        if (iframeRef.current?.contentWindow) {
+          iframeRef.current.contentWindow.postMessage({ type: 'INSPECTOR_ACTIVATE', active: false }, '*');
+        }
       } else if (event.data.type === 'VITE_COMPILE_ERROR') {
         /*
          * Reuses the same actionAlert(source:'preview') pipeline that runtime errors already
@@ -842,7 +849,7 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
             className={
               isInspectorMode ? 'bg-bolt-elements-background-depth-3 !text-bolt-elements-item-contentAccent' : ''
             }
-            title={isInspectorMode ? '요소 검사 끄기' : '요소 검사 켜기'}
+            title={isInspectorMode ? '선택 그만하기' : '선택해서 고치기'}
           />
           <IconButton
             icon={isFullscreen ? 'i-ph:arrows-in' : 'i-ph:arrows-out'}
