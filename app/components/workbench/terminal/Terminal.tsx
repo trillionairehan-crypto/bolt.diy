@@ -8,6 +8,17 @@ import { getTerminalTheme } from './theme';
 
 const logger = createScopedLogger('Terminal');
 
+/*
+ * Guard used before any operation that makes xterm re-measure/re-render (theme changes, fit()).
+ * A terminal whose container is display:none (inactive tab) or has a collapsed 0-size ancestor
+ * (workbench closed, terminal panel collapsed) reports 0 here — offsetWidth/Height are 0 for
+ * both display:none elements and elements with a display:none/0-size ancestor, so this catches
+ * every case that would otherwise crash xterm's RenderService.
+ */
+function isContainerVisible(element: HTMLDivElement | null): boolean {
+  return !!element && element.offsetWidth > 0 && element.offsetHeight > 0;
+}
+
 export interface TerminalRef {
   reloadStyles: () => void;
   getTerminal: () => XTerm | undefined;
@@ -75,9 +86,27 @@ export const Terminal = memo(
         const resizeObserver = new ResizeObserver((entries) => {
           // Debounce resize events
           if (entries.length > 0) {
+            const { width, height } = entries[0].contentRect;
+
+            /*
+             * A hidden/collapsed terminal container (display:none tab, or a resizable panel
+             * collapsed to 0) reports a zero-size entry here. Calling fit() on it crashes xterm's
+             * RenderService ("Cannot read properties of undefined (reading 'dimensions')") because
+             * the renderer never got real metrics to work from — skip until it's actually visible.
+             */
+            if (width === 0 || height === 0) {
+              return;
+            }
+
             try {
               fitAddon.fit();
               onTerminalResize?.(terminal.cols, terminal.rows);
+
+              /*
+               * If a theme change was skipped earlier while this container was hidden (see the
+               * theme-sync effect below), this is the first safe moment to catch it back up.
+               */
+              terminal.options.theme = getTerminalTheme(readonly ? { cursor: '#00000000' } : {});
             } catch (error) {
               logger.error(`Resize error [${id}]:`, error);
             }
@@ -104,10 +133,17 @@ export const Terminal = memo(
       useEffect(() => {
         const terminal = terminalRef.current!;
 
-        // we render a transparent cursor in case the terminal is readonly
-        terminal.options.theme = getTerminalTheme(readonly ? { cursor: '#00000000' } : {});
+        if (!isContainerVisible(terminalElementRef.current)) {
+          return;
+        }
 
-        terminal.options.disableStdin = readonly;
+        try {
+          // we render a transparent cursor in case the terminal is readonly
+          terminal.options.theme = getTerminalTheme(readonly ? { cursor: '#00000000' } : {});
+          terminal.options.disableStdin = readonly;
+        } catch (error) {
+          logger.error(`Theme sync error [${id}]:`, error);
+        }
       }, [theme, readonly]);
 
       useImperativeHandle(ref, () => {
@@ -115,8 +151,14 @@ export const Terminal = memo(
           reloadStyles: () => {
             const terminal = terminalRef.current;
 
-            if (terminal) {
+            if (!terminal || !isContainerVisible(terminalElementRef.current)) {
+              return;
+            }
+
+            try {
               terminal.options.theme = getTerminalTheme(readonly ? { cursor: '#00000000' } : {});
+            } catch (error) {
+              logger.error(`reloadStyles error [${id}]:`, error);
             }
           },
           getTerminal: () => {
