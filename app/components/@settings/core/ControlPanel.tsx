@@ -8,6 +8,7 @@ import { useNotifications } from '~/lib/hooks/useNotifications';
 import { useConnectionStatus } from '~/lib/hooks/useConnectionStatus';
 import { tabConfigurationStore, resetTabConfiguration } from '~/lib/stores/settings';
 import { profileStore } from '~/lib/stores/profile';
+import { SHOW_DEV_TOOLS } from '~/utils/constants';
 import type { TabType, Profile } from './types';
 import { TAB_LABELS, DEFAULT_TAB_CONFIG, TAB_DESCRIPTIONS } from './constants';
 import { DialogTitle } from '~/components/ui/Dialog';
@@ -37,6 +38,22 @@ interface ControlPanelProps {
 
 // Beta status for experimental features
 const BETA_TABS = new Set<TabType>(['local-providers', 'mcp']);
+
+/*
+ * Developer-facing tabs (connection/deploy integrations non-developers won't use, plus raw
+ * debug tooling) — hidden from the coralred target audience behind SHOW_DEV_TOOLS. Reversible
+ * by flipping that one flag; nothing here is deleted.
+ */
+const DEV_ONLY_TAB_IDS = new Set<TabType>([
+  'github',
+  'gitlab',
+  'netlify',
+  'vercel',
+  'mcp',
+  'event-logs',
+  'local-providers',
+  'cloud-providers',
+]);
 
 const BetaLabel = () => (
   <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-purple-500/10 dark:bg-purple-500/20">
@@ -83,6 +100,14 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
         }
 
         if (tab.id === 'notifications' && notificationsDisabled) {
+          return false;
+        }
+
+        /*
+         * Developer-facing connection/debug tabs — hidden from the non-developer target
+         * audience, but the flag alone re-reveals them (no data lost, nothing deleted).
+         */
+        if (!SHOW_DEV_TOOLS && DEV_ONLY_TAB_IDS.has(tab.id)) {
           return false;
         }
 
@@ -177,19 +202,19 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
   const getStatusMessage = (tabId: TabType): string => {
     switch (tabId) {
       case 'features':
-        return `${unviewedFeatures.length} new feature${unviewedFeatures.length === 1 ? '' : 's'} to explore`;
+        return `새 기능 ${unviewedFeatures.length}개`;
       case 'notifications':
-        return `${unreadNotifications.length} unread notification${unreadNotifications.length === 1 ? '' : 's'}`;
+        return `읽지 않은 알림 ${unreadNotifications.length}개`;
       case 'github':
       case 'gitlab':
       case 'supabase':
       case 'vercel':
       case 'netlify':
         return currentIssue === 'disconnected'
-          ? 'Connection lost'
+          ? '연결이 끊겼어요'
           : currentIssue === 'high-latency'
-            ? 'High latency detected'
-            : 'Connection issues detected';
+            ? '응답이 느려요'
+            : '연결에 문제가 있어요';
       default:
         return '';
     }
@@ -261,7 +286,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                       </button>
                     )}
                     <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-                      {showTabManagement ? 'Tab Management' : activeTab ? TAB_LABELS[activeTab] : 'Control Panel'}
+                      {showTabManagement ? '탭 관리' : activeTab ? TAB_LABELS[activeTab] : '설정'}
                     </DialogTitle>
                   </div>
 
