@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { classNames } from '~/utils/classNames';
 import {
   QUESTION_BANK,
   selectQuestions,
@@ -33,12 +35,7 @@ interface RecordedAnswer {
   label: string;
 }
 
-const BRAND = {
-  background: '#FAF7F0',
-  accent: '#FF5330',
-  text: '#1A1A1A',
-  border: '#EAE0D5',
-};
+const ACCENT = '#FF5330';
 
 const EMPTY_DIRECTIVES: GenerationDirectives = { promptAdditions: [] };
 
@@ -94,6 +91,18 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [finalPrompt, setFinalPrompt] = useState(initialPrompt);
   const [directives, setDirectives] = useState<GenerationDirectives>(EMPTY_DIRECTIVES);
+  const [pendingOptionId, setPendingOptionId] = useState<string | null>(null);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mq.matches);
+
+    const handler = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
+    mq.addEventListener('change', handler);
+
+    return () => mq.removeEventListener('change', handler);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -182,6 +191,24 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
     }
   };
 
+  /** Brief "confirmed" beat (coral border + check) before advancing, skipped under reduced-motion. */
+  const selectOption = (option: ClarifyOption) => {
+    if (pendingOptionId) {
+      return;
+    }
+
+    if (reducedMotion) {
+      recordAnswer(option);
+      return;
+    }
+
+    setPendingOptionId(option.id);
+    setTimeout(() => {
+      recordAnswer(option);
+      setPendingOptionId(null);
+    }, 220);
+  };
+
   const handleCustomAnswer = () => {
     const trimmed = customInput.trim();
 
@@ -192,29 +219,30 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
     recordAnswer({ id: 'custom', label: trimmed, value: trimmed });
   };
 
-  const stepLabel =
-    status === 'summary'
-      ? '마지막 확인'
-      : status === 'waitingForDynamic'
-        ? '질문 확인 중'
-        : `질문 ${currentStep + 1}/${questions.length}`;
-
   const currentQuestion = questions[currentStep];
   const normalOptions = currentQuestion?.options.filter((option) => !option.isUnsure) ?? [];
   const unsureOption = currentQuestion?.options.find((option) => option.isUnsure);
 
+  const progressPct = status === 'summary' ? 100 : Math.min(100, (currentStep / Math.max(questions.length, 1)) * 100);
+
   return (
-    <div className="mt-[10vh] max-w-xl mx-auto px-4 lg:px-0 w-full animate-fade-in">
-      <div className="rounded-3xl p-6 lg:p-8" style={{ backgroundColor: BRAND.background }}>
-        <div className="flex items-center justify-between mb-6">
-          <span className="text-sm font-medium" style={{ color: BRAND.text, opacity: 0.6 }}>
-            {stepLabel}
-          </span>
+    <div className="mt-[10vh] max-w-[560px] mx-auto px-4 lg:px-0 w-full">
+      <div
+        className="relative rounded-[20px] p-6 lg:p-8 overflow-hidden border border-bolt-elements-borderColor"
+        style={{ background: 'var(--surface)' }}
+      >
+        <div className="absolute top-0 left-0 right-0 h-1 bg-bolt-elements-borderColor overflow-hidden">
+          <div
+            className="h-full transition-[width] duration-300 ease-out"
+            style={{ width: `${progressPct}%`, background: ACCENT }}
+          />
+        </div>
+
+        <div className="flex items-center justify-end mb-6 mt-2">
           <button
             type="button"
             onClick={handleSkip}
-            className="text-sm font-semibold underline underline-offset-4 decoration-2 py-2 px-1"
-            style={{ color: BRAND.accent }}
+            className="text-sm font-medium px-3 py-1.5 rounded-full text-bolt-elements-textSecondary hover:bg-bolt-elements-item-backgroundActive hover:text-bolt-elements-textPrimary transition-colors duration-150"
           >
             바로 만들기
           </button>
@@ -222,106 +250,127 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
 
         {status === 'waitingForDynamic' && (
           <div className="flex flex-col items-center gap-4 py-10 text-center">
-            <div className="i-svg-spinners:90-ring-with-bg text-4xl" style={{ color: BRAND.accent }} />
-            <p className="text-base" style={{ color: BRAND.text }}>
-              이 앱에 맞는 질문을 확인하고 있어요
-            </p>
+            <div className="i-svg-spinners:90-ring-with-bg text-4xl" style={{ color: ACCENT }} />
+            <p className="text-base text-bolt-elements-textPrimary">이 앱에 맞는 질문을 확인하고 있어요</p>
           </div>
         )}
 
-        {status === 'questions' && currentQuestion && (
-          <div className="flex flex-col gap-4">
-            <h2 className="text-xl lg:text-2xl font-bold leading-snug" style={{ color: BRAND.text }}>
-              {currentQuestion.question}
-            </h2>
-            <div className="flex flex-col gap-3">
-              {normalOptions.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => recordAnswer(option)}
-                  className="w-full min-h-14 text-left rounded-2xl border-2 px-5 py-4 text-base font-medium transition-colors hover:brightness-95 active:scale-[0.99]"
-                  style={{ borderColor: BRAND.border, color: BRAND.text, backgroundColor: '#FFFFFF' }}
-                >
-                  {option.label}
-                </button>
-              ))}
+        <AnimatePresence mode="wait">
+          {status === 'questions' && currentQuestion && (
+            <motion.div
+              key={currentQuestion.id}
+              initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reducedMotion ? undefined : { opacity: 0, transition: { duration: 0.12 } }}
+              transition={{ duration: 0.16 }}
+              className="flex flex-col gap-4"
+            >
+              <h2 className="text-xl lg:text-2xl font-bold leading-snug text-bolt-elements-textPrimary">
+                {currentQuestion.question}
+              </h2>
+              <div className="flex flex-col gap-3">
+                {normalOptions.map((option) => {
+                  const isPending = pendingOptionId === option.id;
 
-              {/* "잘 모르겠어요" is visually de-emphasized (dashed border, muted text, no fill) so
-                  picking it feels like a low-stakes pass rather than a real fifth choice. */}
-              {unsureOption && (
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => selectOption(option)}
+                      disabled={pendingOptionId !== null}
+                      className={classNames(
+                        'w-full min-h-[52px] text-left rounded-xl px-5 py-3.5 text-base font-medium flex items-center justify-between gap-3 transition-colors duration-150 active:scale-[0.98]',
+                        !isPending && 'hover:border-[var(--accent)] hover:bg-[var(--accent-soft)]',
+                      )}
+                      style={{
+                        border: isPending ? `2px solid ${ACCENT}` : '1px solid var(--border)',
+                        color: 'var(--text)',
+                        background: isPending ? 'var(--accent-soft)' : 'var(--surface)',
+                      }}
+                    >
+                      <span>{option.label}</span>
+                      {isPending && (
+                        <motion.span
+                          initial={{ opacity: 0, scale: 0.6 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ duration: 0.15 }}
+                          className="i-ph:check-circle-fill text-xl shrink-0"
+                          style={{ color: ACCENT }}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+
+                {/* "잘 모르겠어요" is visually de-emphasized (dashed border, muted text, no fill) so
+                    picking it feels like a low-stakes pass rather than a real fifth choice. */}
+                {unsureOption && (
+                  <button
+                    type="button"
+                    onClick={() => selectOption(unsureOption)}
+                    disabled={pendingOptionId !== null}
+                    className="w-full min-h-11 text-left rounded-xl border border-dashed px-5 py-3 text-sm font-medium transition-colors duration-150 active:scale-[0.98] hover:border-[var(--accent)]"
+                    style={{ borderColor: 'var(--border)', color: 'var(--muted)', background: 'transparent' }}
+                  >
+                    {unsureOption.label}
+                  </button>
+                )}
+              </div>
+
+              {showCustomInput ? (
+                <div className="flex flex-col gap-2 mt-1">
+                  <input
+                    autoFocus
+                    type="text"
+                    value={customInput}
+                    onChange={(e) => setCustomInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleCustomAnswer();
+                      }
+                    }}
+                    placeholder="직접 입력해주세요"
+                    className="w-full min-h-[52px] rounded-xl border px-5 py-3.5 text-base outline-none bg-transparent"
+                    style={{ borderColor: ACCENT, color: 'var(--text)' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCustomAnswer}
+                    disabled={!customInput.trim()}
+                    className="self-end min-h-11 rounded-full px-5 text-sm font-semibold text-white disabled:opacity-40 transition-opacity duration-150"
+                    style={{ backgroundColor: ACCENT }}
+                  >
+                    확인
+                  </button>
+                </div>
+              ) : (
                 <button
                   type="button"
-                  onClick={() => recordAnswer(unsureOption)}
-                  className="w-full min-h-11 text-left rounded-2xl border-2 border-dashed px-5 py-3 text-sm font-medium transition-colors hover:brightness-95 active:scale-[0.99]"
-                  style={{
-                    borderColor: BRAND.border,
-                    color: BRAND.text,
-                    opacity: 0.55,
-                    backgroundColor: 'transparent',
-                  }}
+                  onClick={() => setShowCustomInput(true)}
+                  className="text-sm font-medium text-left py-2 underline underline-offset-4 text-bolt-elements-textSecondary"
                 >
-                  {unsureOption.label}
+                  직접 입력할게요
                 </button>
               )}
-            </div>
-
-            {showCustomInput ? (
-              <div className="flex flex-col gap-2 mt-1">
-                <input
-                  autoFocus
-                  type="text"
-                  value={customInput}
-                  onChange={(e) => setCustomInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleCustomAnswer();
-                    }
-                  }}
-                  placeholder="직접 입력해주세요"
-                  className="w-full min-h-14 rounded-2xl border-2 px-5 py-4 text-base outline-none"
-                  style={{ borderColor: BRAND.accent, color: BRAND.text, backgroundColor: '#FFFFFF' }}
-                />
-                <button
-                  type="button"
-                  onClick={handleCustomAnswer}
-                  disabled={!customInput.trim()}
-                  className="self-end min-h-11 rounded-full px-5 text-sm font-semibold text-white disabled:opacity-40"
-                  style={{ backgroundColor: BRAND.accent }}
-                >
-                  확인
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setShowCustomInput(true)}
-                className="text-sm font-medium text-left py-2 underline underline-offset-4"
-                style={{ color: BRAND.text, opacity: 0.6 }}
-              >
-                직접 입력할게요
-              </button>
-            )}
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {status === 'summary' && (
           <div className="flex flex-col gap-4">
-            <h2 className="text-xl lg:text-2xl font-bold" style={{ color: BRAND.text }}>
-              이렇게 만들게요
-            </h2>
+            <h2 className="text-xl lg:text-2xl font-bold text-bolt-elements-textPrimary">이렇게 만들게요</h2>
             <textarea
               value={finalPrompt}
               onChange={(e) => setFinalPrompt(e.target.value)}
               rows={6}
-              className="w-full rounded-2xl border-2 px-5 py-4 text-sm leading-relaxed outline-none resize-none"
-              style={{ borderColor: BRAND.border, color: BRAND.text, backgroundColor: '#FFFFFF' }}
+              className="w-full rounded-xl border px-5 py-4 text-sm leading-relaxed outline-none resize-none bg-transparent"
+              style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
             />
             <button
               type="button"
               onClick={() => onComplete(finalPrompt.trim() || initialPrompt, directives)}
-              className="w-full min-h-14 rounded-2xl px-5 py-4 text-base font-bold text-white"
-              style={{ backgroundColor: BRAND.accent }}
+              className="w-full min-h-14 rounded-xl px-5 py-4 text-base font-bold text-white transition-opacity duration-150 hover:opacity-90 active:opacity-80"
+              style={{ backgroundColor: ACCENT }}
             >
               만들기
             </button>
