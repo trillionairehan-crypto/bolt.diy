@@ -1,6 +1,6 @@
 import { useStore } from '@nanostores/react';
 import type { LinksFunction } from '@remix-run/cloudflare';
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useRouteError } from '@remix-run/react';
 import tailwindReset from '@unocss/reset/tailwind-compat.css?url';
 import { themeStore } from './lib/stores/theme';
 import { stripIndents } from './utils/stripIndent';
@@ -10,12 +10,16 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ClientOnly } from 'remix-utils/client-only';
 import { cssTransition, ToastContainer } from 'react-toastify';
+import { createScopedLogger } from './utils/logger';
+import { initGlobalErrorRecovery } from './utils/globalErrorRecovery';
 
 import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';
 import globalStyles from './styles/index.scss?url';
 import xtermStyles from '@xterm/xterm/css/xterm.css?url';
 
 import 'virtual:uno.css';
+
+const logger = createScopedLogger('root');
 
 const toastAnimation = cssTransition({
   enter: 'animated fadeInRight',
@@ -120,6 +124,10 @@ export default function App() {
   const theme = useStore(themeStore);
 
   useEffect(() => {
+    initGlobalErrorRecovery();
+  }, []);
+
+  useEffect(() => {
     logStore.logSystem('Application initialized', {
       theme,
       platform: navigator.platform,
@@ -150,5 +158,52 @@ export default function App() {
     <Layout>
       <Outlet />
     </Layout>
+  );
+}
+
+/**
+ * Framework-level fallback for errors that escape all the way to the route (loader/action
+ * failures, or a render error with no boundary beneath it) — without this export Remix falls
+ * back to its own generic error page instead of coralred's recovery UI. Rendered inside
+ * `Layout` automatically by Remix, so no need to repeat the document shell here.
+ */
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  useEffect(() => {
+    logger.error('Root route error boundary caught', error);
+  }, [error]);
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100dvh',
+        width: '100%',
+        gap: '1.25rem',
+        textAlign: 'center',
+        padding: '2rem',
+      }}
+    >
+      <p style={{ fontSize: '0.9rem', color: '#57534e', margin: 0 }}>화면에 문제가 생겼어요</p>
+      <button
+        onClick={() => window.location.reload()}
+        style={{
+          background: '#FF5330',
+          color: '#FAF7F0',
+          border: 'none',
+          borderRadius: '8px',
+          padding: '10px 20px',
+          fontSize: '0.875rem',
+          fontWeight: 500,
+          cursor: 'pointer',
+        }}
+      >
+        다시 불러오기
+      </button>
+    </div>
   );
 }

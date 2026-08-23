@@ -515,21 +515,22 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           )}
                         </div>
                         {progressAnnotations && <ProgressCompilation data={progressAnnotations} />}
-                        {!chatStarted && (
-                          <p className="text-xs px-1" style={{ color: '#FAF7F0', opacity: 0.75 }}>
-                            {freeGenerationsRemaining > 0 ? (
-                              <>무료 체험 {freeGenerationsRemaining}회 남았어요</>
-                            ) : (
-                              <>
-                                무료 체험을 다 썼어요. 계속하려면{' '}
-                                <a href="/pricing" style={{ color: '#FAF7F0', textDecoration: 'underline' }}>
-                                  요금제
-                                </a>
-                                를 확인해주세요
-                              </>
-                            )}
-                          </p>
-                        )}
+                        <p
+                          className="text-xs px-1"
+                          style={{ color: '#FAF7F0', opacity: 0.75, display: chatStarted ? 'none' : undefined }}
+                        >
+                          {freeGenerationsRemaining > 0 ? (
+                            <span key="remaining">무료 체험 {freeGenerationsRemaining}회 남았어요</span>
+                          ) : (
+                            <span key="exhausted">
+                              무료 체험을 다 썼어요. 계속하려면{' '}
+                              <a href="/pricing" style={{ color: '#FAF7F0', textDecoration: 'underline' }}>
+                                요금제
+                              </a>
+                              를 확인해주세요
+                            </span>
+                          )}
+                        </p>
                         <ChatBox
                           isModelSettingsCollapsed={isModelSettingsCollapsed}
                           setIsModelSettingsCollapsed={setIsModelSettingsCollapsed}
