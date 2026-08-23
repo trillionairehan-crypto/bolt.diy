@@ -105,13 +105,14 @@ export function WebSearch({ onSearchResult, disabled = false }: WebSearchProps) 
         title="참고할 사이트 주소 넣기"
         disabled={disabled || isSearching}
         onClick={() => setIsOpen(!isOpen)}
-        className="transition-all"
+        className="flex items-center h-8 gap-1.5 px-2 !text-bolt-elements-textSecondary"
       >
         {isSearching ? (
-          <div className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress text-xl animate-spin" />
+          <div className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress text-base animate-spin" />
         ) : (
-          <div className="i-ph:link text-xl" />
+          <div className="i-ph:link text-base" />
         )}
+        <span className="text-[13px]">사이트</span>
       </IconButton>
       {isOpen && (
         <div

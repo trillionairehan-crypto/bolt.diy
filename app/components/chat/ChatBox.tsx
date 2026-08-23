@@ -246,29 +246,15 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           placeholder={props.chatMode === 'build' ? '어떤 걸 만들고 싶으세요?' : '무엇이든 물어보세요'}
           translate="no"
         />
-        <ClientOnly>
-          {() => (
-            <SendButton
-              show={props.input.length > 0 || props.isStreaming || props.uploadedFiles.length > 0}
-              isStreaming={props.isStreaming}
-              disabled={!props.providerList || props.providerList.length === 0}
-              onClick={(event) => {
-                if (props.isStreaming) {
-                  props.handleStop?.();
-                  return;
-                }
-
-                if (props.input.length > 0 || props.uploadedFiles.length > 0) {
-                  props.handleSendMessage?.(event);
-                }
-              }}
-            />
-          )}
-        </ClientOnly>
-        <div className="flex justify-between items-center text-sm p-4 pt-2">
-          <div className="flex gap-1 items-center">
-            <IconButton title="이미지 첨부" className="transition-all" onClick={() => props.handleFileUpload()}>
-              <div className="i-ph:paperclip text-xl"></div>
+        <div className="flex justify-between items-center text-sm p-4 pt-3">
+          <div className="flex gap-3 items-center">
+            <IconButton
+              title="이미지 첨부"
+              className="flex items-center h-8 gap-1.5 px-2 !text-bolt-elements-textSecondary"
+              onClick={() => props.handleFileUpload()}
+            >
+              <div className="i-ph:paperclip text-base"></div>
+              <span className="text-[13px]">이미지</span>
             </IconButton>
             <WebSearch onSearchResult={(result) => props.onWebSearchResult?.(result)} disabled={props.isStreaming} />
             {SHOW_ENHANCE_BUTTON && (
@@ -329,13 +315,37 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               </IconButton>
             )}
           </div>
-          {props.input.length > 3 ? (
-            <div className="text-xs text-bolt-elements-textTertiary">
-              Use <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Shift</kbd> +{' '}
-              <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Return</kbd> a new line
-            </div>
-          ) : null}
-          <SupabaseConnection />
+          <div className="flex gap-2 items-center">
+            {props.input.length > 3 ? (
+              <div className="text-xs text-bolt-elements-textTertiary">
+                Use <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Shift</kbd> +{' '}
+                <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Return</kbd> a new line
+              </div>
+            ) : null}
+            <SupabaseConnection />
+            <ClientOnly>
+              {() => (
+                <SendButton
+                  isStreaming={props.isStreaming}
+                  disabled={
+                    !props.providerList ||
+                    props.providerList.length === 0 ||
+                    (!props.isStreaming && props.input.length === 0 && props.uploadedFiles.length === 0)
+                  }
+                  onClick={(event) => {
+                    if (props.isStreaming) {
+                      props.handleStop?.();
+                      return;
+                    }
+
+                    if (props.input.length > 0 || props.uploadedFiles.length > 0) {
+                      props.handleSendMessage?.(event);
+                    }
+                  }}
+                />
+              )}
+            </ClientOnly>
+          </div>
           <ExpoQrModal open={props.qrModalOpen} onClose={() => props.setQrModalOpen(false)} />
         </div>
       </div>
