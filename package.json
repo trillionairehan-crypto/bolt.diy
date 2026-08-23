@@ -202,6 +202,7 @@
     "pnpm": "^9.14.4",
     "prettier": "^3.5.3",
     "rimraf": "^4.4.1",
+    "rollup-plugin-visualizer": "^7.1.1",
     "sass-embedded": "^1.81.0",
     "sharp": "^0.35.3",
     "stream-browserify": "^3.0.0",

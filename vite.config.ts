@@ -4,6 +4,7 @@ import { defineConfig, type ViteDevServer } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { optimizeCssModules } from 'vite-plugin-optimize-css-modules';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import { visualizer } from 'rollup-plugin-visualizer';
 import * as dotenv from 'dotenv';
 
 // Load environment variables from multiple files
@@ -56,6 +57,14 @@ export default defineConfig((config) => {
       tsconfigPaths(),
       chrome129IssuePlugin(),
       config.mode === 'production' && optimizeCssModules({ apply: 'build' }),
+      // Opt-in only (ANALYZE=true pnpm run build) — writes bundle-analysis.html, never runs on a normal build.
+      process.env.ANALYZE === 'true' &&
+        visualizer({
+          filename: 'bundle-analysis.html',
+          gzipSize: true,
+          brotliSize: true,
+          template: 'treemap',
+        }),
     ],
     envPrefix: [
       'VITE_',
