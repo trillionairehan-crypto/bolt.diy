@@ -120,7 +120,22 @@
 
 ## 작업 5: 포트원 서버 검증 준비
 
-- [상태: 진행 예정]
+- [상태: 완료] (pricing.tsx는 전혀 안 건드림 — 읽기만 함)
+- [한 일]
+  - `pricing.tsx`를 읽어서 이미 남겨져 있던 TODO 주석(결제 버튼 핸들러 바로 위)에서 정확한 스펙을 그대로 가져옴: `PORTONE_API_SECRET`로 `GET /payments/{paymentId}` 단건조회 → status/금액/통화 재검증. env var 이름도 `worker-configuration.d.ts`에 이미 선언돼 있던 걸 그대로 씀(새로 발명 안 함)
+  - `app/routes/api.payment.verify.ts` 신설: `POST`로 `{paymentId, expectedAmount, expectedCurrency}` 받아서 PortOne V2 API(`https://api.portone.io/payments/{id}`, `Authorization: PortOne {secret}`)로 단건조회 → `status === 'PAID'` && 금액 일치 && 통화 일치일 때만 `verified: true` 반환. 기존 `api.supabase.query.ts`의 라우트 구조(action, 에러 응답 형식) 그대로 재사용
+  - `app/routes/api.payment.webhook.ts` 신설: PortOne V2가 Svix 방식(`webhook-id`/`webhook-timestamp`/`webhook-signature` 헤더)으로 웹훅에 서명한다는 것까지만 반영한 뼈대. 서명 검증 로직 자체는 TODO로 남김(지시서에 "실연동은 아침 이후"라고 명시돼 있어서 그대로 따름) — 현재는 시크릿이 없으면 로그만 남기고 200 반환, 있어도 검증 없이 로그만
+  - `worker-configuration.d.ts`에 `PORTONE_WEBHOOK_SECRET: string;` 타입 선언 추가(값은 안 건드림, 타입 파일이라 보호 대상 아님)
+  - curl로 자체 테스트: `GET`은 405가 아니라 400이 나오는데, 이건 버그가 아니라 Remix 리소스 라우트가 `loader`를 안 만들면 GET 자체를 프레임워크 레벨에서 400으로 막아버려서(`action`까지 아예 안 옴) — 기존 `api.supabase.query.ts`도 동일 패턴이라 이 코드베이스의 기존 관례와 일치. 빈 body → `missing_payment_id`(400) 정상. **`paymentId: "test-123"`로 실제 조회를 날려봤더니 `PORTONE_API_SECRET`이 이미 이 dev 환경에 설정돼 있어서 실제 PortOne API까지 갔고, 존재하지 않는 결제라 404가 그대로 반환됨 — 라우트가 진짜로 동작하는 것까지 확인** (시크릿 값 자체는 출력한 적 없음, 응답 상태코드만 관찰)
+- [판단과 근거]
+  - 서버 SDK(`@portone/server-sdk`)가 설치돼 있지 않아서, 새 패키지를 몰래 추가하는 대신 이미 이 코드베이스에 있는 관례(`api.supabase.query.ts`처럼 raw `fetch`)를 그대로 따름 — "스펙에 없는 결정은 보수적으로" 원칙
+  - 웹훅 서명 검증을 실제로 구현하지 않은 것도 지시서 문구를 그대로 따른 것("실연동은 아침 이후") — 실제 시크릿 없이 검증 로직만 만들면 테스트도 못 하고 틀렸을 가능성이 높아서 정직하게 TODO로 남김
+- [아침 확인 체크리스트]
+  - [ ] pricing.tsx의 TODO 자리(157번째 줄 근처, `if (response && !response.code)`)에서 `/api/payment/verify`를 호출해 `response.paymentId`와 `plan.priceMonthly`를 넘기고, `verified === true`일 때만 플랜을 활성화하도록 3줄 정도만 추가하면 연결 끝
+  - [ ] PortOne 콘솔에서 웹훅 URL을 `https://coralred.kr/api/payment/webhook`으로 등록하고, 콘솔에 뜨는 웹훅 시크릿을 Cloudflare Pages 환경변수에 `PORTONE_WEBHOOK_SECRET`으로 추가
+  - [ ] 그 다음 `api.payment.webhook.ts`의 TODO 자리에 Svix 방식 서명 검증(HMAC-SHA256, `webhook-id.webhook-timestamp.rawBody`를 서명) 구현 — PortOne V2 공식 문서의 정확한 서명 페이로드 포맷을 실제로 대조해서 구현해야 함(코드만 보고 추측한 부분이라 문서 대조 필수)
+  - [ ] `/api/payment/verify`가 실제 결제 성공 건에 대해 `verified: true`를 정확히 반환하는지 실제 테스트 결제로 확인
+- [커밋 해시] 8265301
 
 ---
 
