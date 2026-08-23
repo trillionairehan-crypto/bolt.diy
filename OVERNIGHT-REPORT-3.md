@@ -134,3 +134,20 @@
 - **아침 확인 필요**: 폰트 굵기를 줄이려면 jsdelivr에서 실제로 서빙되는 개별 굵기 파일 경로(또는 variable font 파일)를 브라우저로 직접 확인한 뒤 교체 — 잘못된 URL로 바꾸면 사이트 전체 폰트가 깨지는 눈에 띄는 리스크라 반드시 사람이 확인 후 진행.
 
 ---
+
+### B3: 코드 위생
+
+- [상태: 완료] 커밋 `931b778`, `7e3f5b1`
+- **죽은 파일 인벤토리**: `madge --orphans`로 424개 파일 스캔 → 결과 대부분이 오탐(라우트 파일은 Remix가 파일명으로 자동 발견해서 madge 기준 "아무도 import 안 함"으로 뜨고, 타입 전용 파일/ambient 타입/`.spec.ts`도 마찬가지) — 이 목록 자체를 죽은 코드 리스트로 쓸 수 없다고 판단, 리스트만 참고용으로 남기고 신뢰도 낮음을 명시.
+  - 대신 **round2에서 이미 확인됐던 `CloseButton.tsx`**(사용처 0, 하드코딩 보라색 포커스 링, 영어 aria-label)를 재확인 — 이번에도 실사용처가 정말 하나도 없음을 직접 grep으로 재검증(barrel export만 있었고 그마저 아무도 소비 안 함) → 삭제.
+  - **이번 라운드에 새로 발견한 죽은 코드는 삭제하지 않고 "보류" 처리** (지시받은 "이번 라운드에 de-rendered된 것들은 held" 원칙을 적용): A3 조사 중 발견한 `app/components/workbench/Inspector.tsx`의 `Inspector` 컴포넌트 export(실제 클릭-선택 기능은 Preview.tsx에 완전히 별도로 인라인 구현돼 있어서 이 컴포넌트는 렌더되는 곳이 없음 — 단, `ElementInfo` 타입은 여러 파일에서 여전히 씀, 파일 전체 삭제는 불가)와 `InspectorPanel.tsx`(어디서도 렌더 안 됨) — 리스트에만 남김, 아침에 확인 후 삭제 판단 필요.
+- **console.* → logger 통일**: 전체 499건 중, 이미 스코프 `logger`를 갖고 있는데도 `console.*`을 남겨둔 12개 파일·39건만 이번에 정리(신규 `createScopedLogger` 도입이 필요한 나머지 460여 건은 파일마다 스코프 이름을 새로 정해야 하는 훨씬 큰 검토 범위라 이번엔 손 안 댐, 아래 아침 확인 항목에 카운트만 기록). `console.error`→`logger.error` 그대로 대응, `catch(error){ console.log(error) }` 식으로 에러를 log 레벨로 찍고 있던 곳들은 `logger.error`로 승격(원래도 에러 로그였는데 레벨이 잘못돼 있던 부수 발견), 나머지 정보성 로그는 `logger.debug`. `Workbench.client.tsx`는 `renderLogger`(trace 전용)만 있어서 `createScopedLogger('Workbench')` 신규 추가.
+- **순환 참조 (리스트만, 구조 변경 없음 — 지시대로)**: `madge --circular` 결과 4건 —
+  1. `components/editor/codemirror/CodeMirrorEditor.tsx` ↔ `components/editor/codemirror/cm-theme.ts`
+  2. `utils/debugLogger.ts` ↔ `utils/logger.ts`
+  3. `lib/modules/llm/base-provider.ts` ↔ `lib/modules/llm/manager.ts`
+  4. `lib/persistence/db.ts` ↔ `lib/persistence/useChatHistory.ts`
+- **검증**: typecheck/lint/build 클린, `pnpm test` 150/150 통과(로거 치환이 런타임 동작에 영향 없음을 재확인).
+- **아침 확인 필요**: 나머지 약 460건의 `console.*` 사용처(대부분 아직 로거가 없는 파일들) — 파일별로 적절한 스코프 이름을 정하면서 정리해야 해서 별도 세션으로 넘김. `Inspector.tsx`/`InspectorPanel.tsx`의 미사용 컴포넌트 삭제 여부 결정.
+
+---
