@@ -50,4 +50,6 @@ docs/instructions/Roadmap.md
 *.md
 # design-handoff docs are canonical references (brand spec, voice guide, etc.) — must be tracked
 !design-handoff/*.md
+# overnight autonomous-loop status report — must be tracked so the morning review can read it
+!/OVERNIGHT-REPORT.md
 .qodo
