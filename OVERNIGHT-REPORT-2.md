@@ -154,3 +154,30 @@
 - [커밋 해시] d2b9fbe
 
 ---
+
+## 작업 6: 접근성·모션 최종 감사
+
+- [상태: 부분완료] (핵심 공유 컴포넌트 2곳 + 명시된 4개 영역은 확인/보강 완료, 나머지 39개 파일은 시간상 플래그만)
+- [한 일]
+  - **`IconButton.tsx`**: `focus:outline-none`만 있고 대체 스타일이 없던 걸(포커스 링이 통째로 사라짐 — 키보드 사용자에게 심각한 문제) `focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-ring)]`로 교체. 이 컴포넌트가 앱 전체에서 가장 많이 재사용되는 아이콘 버튼 프리미티브라 이 한 곳 수정으로 대부분의 아이콘 버튼에 자동 전파됨. `active:scale-95`(press 피드백)도 같이 추가
+  - **`Button.tsx`**: 이미 `focus-visible:ring-1 ring-bolt-elements-borderColor`가 있었지만 약한 색이라, 지시서 스펙(2px `--accent-ring` 오프셋 2px)에 맞춰 `IconButton`과 동일한 규격으로 통일 + `active:scale-95` 추가
+  - **aria-label/title 누락 스윕(지시서가 명시한 4개 영역)**:
+    - 헤더 토글: 이미 `aria-label="사이드바 열기/닫기"` 있었음(확인만)
+    - 타일(히어로): 어젯밤 작업 1에서 이미 6개 전부에 `aria-label` 추가함(확인만)
+    - 입력창 아이콘(이미지/사이트/음성): 이미 `title` 있었음(확인만 — `title`도 스크린리더 접근성 이름으로 인식됨)
+    - **워크벤치 툴바**: 실제로 빠진 곳 발견 — `Preview.tsx`의 새로고침/영역 선택 버튼에 `title` 자체가 없었음(추가). `Workbench.client.tsx`의 채팅 숨기기/보이기 토글도 `title`/`aria-label` 둘 다 없었음(추가). 김에 `Preview.tsx` 툴바에 남아있던 영어 title 6개(`Switch to Responsive/Device Mode`, `Switch to Portrait/Landscape`, `Hide/Show Device Frame`, `Exit Full Screen`, `Enable/Disable Element Inspector`)도 한국어로 전환
+  - **이미지 alt**: `SupabaseAlert.tsx`(Supabase 아이콘, alt 아예 없었음)와 `SupabaseConnection.tsx`(같은 아이콘 3곳)에 `alt=""` 추가(장식용 아이콘이라 빈 alt가 맞는 패턴 — 옆 텍스트가 이미 의미를 전달)
+  - **모달 role/aria-modal/Escape**: 이 앱의 모든 모달이 Radix Dialog(`@radix-ui/react-dialog`)의 `Content`를 공유 `Dialog.tsx`를 통해 쓰고 있어서, `role="dialog"`/`aria-modal="true"`/Escape 닫힘이 라이브러리 차원에서 이미 자동 제공됨 — `onEscapeKeyDown` 오버라이드가 있는 2곳도 닫기를 막는 게 아니라 정상적으로 닫기에 연결하는 용도인 것까지 확인. 코드 변경 없이 확인만
+  - **reduced-motion 전수 확인(지시서가 명시한 5개)**: 히어로 타일/플레이스홀더 회전/스켈레톤/질문 전환/스크롤 힌트 — 전부 이미 어젯밤~오늘 밤 각 작업 때 만들면서 reduced-motion 가드를 넣어놔서, grep으로 5곳 전부 실제로 존재하는지 재확인만 함(새로 만든 거 없음)
+- [판단과 근거]
+  - `focus:outline-none`을 쓰는 파일이 grep으로 총 42개 나왔는데, 그중 39개(대부분 `@settings/tabs/*`의 GitHub/GitLab/Vercel/Netlify 연결 폼들)는 **어젯밤 작업 4에서 이미 `SHOW_DEV_TOOLS` 뒤로 숨긴 탭들**이라 일반 사용자가 도달할 수 없는 화면임 — 임팩트 대비 시간 효율을 고려해서 공유 프리미티브 2곳(`IconButton`/`Button`, 이게 실질적으로 화면에 보이는 대부분의 버튼을 커버)과 지시서가 명시적으로 지목한 4개 영역만 하고, 나머지는 정직하게 플래그만 남김
+  - `CloseButton.tsx`도 같은 문제(포커스 링 없음 + 영어 `aria-label="Close"` + 보라색 하드코딩 링)가 있었지만, grep으로 확인해보니 **이 컴포넌트를 쓰는 곳이 앱에 단 한 곳도 없는 죽은 코드**라 시간 안 씀 — 화면에 안 보이는 컴포넌트를 고치는 것보다 실제로 보이는 것들에 시간을 쓰는 게 낫다고 판단
+- [아침 확인 체크리스트]
+  - [ ] 키보드로 Tab을 눌러가며 버튼들에 포커스를 옮겨보고, 코랄 계열 링이 또렷하게 보이는지(마우스 클릭 시에는 안 보여야 정상 — `focus-visible`이라 키보드 전용)
+  - [ ] 워크벤치 미리보기 툴바 아이콘들에 마우스를 올렸을 때 한국어 툴팁이 뜨는지
+  - [ ] 스크린리더(VoiceOver/내레이터)로 새로고침/영역 선택/채팅 숨기기 버튼이 뭐라고 읽히는지
+  - [ ] 모달에서 Escape 키가 실제로 닫는지, 스크린리더가 "대화 상자"로 인식하는지
+  - [ ] **남은 39개 파일**(대부분 숨겨진 설정 탭)은 이번에 손 안 댐 — `grep -rl "focus:outline-none" app/components/@settings`로 위치 확인 가능
+- [커밋 해시] 87a97d6
+
+---
