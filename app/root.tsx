@@ -61,6 +61,13 @@ export const Head = createHead(() => (
   <>
     <meta charSet="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {/*
+      Browser auto-translate (esp. Chrome) has mangled brand/plan names — e.g. "Light" → "빛",
+      "Pro" → "장점" — since this site has no real multi-language use case (the product itself
+      requires Korean prompt input, so a non-Korean-reading visitor can't use it translated or
+      not), page-wide notranslate is the right call over chasing every element with translate="no".
+    */}
+    <meta name="google" content="notranslate" />
     {/* Site-wide OG defaults — individual routes still control <title>/description via their own
         meta() export; these just make sure link previews (e.g. KakaoTalk) always have an image. */}
     <meta property="og:site_name" content="코랄레드" />

@@ -30,7 +30,9 @@ export function Logo({ height = 24, className, variant = 'default', textColor }:
         <rect x="289" y="84" width="84" height="84" rx="26" fill="#FFB5A3" />
         <rect x="289" y="344" width="84" height="84" rx="26" fill="#FFB5A3" />
       </svg>
-      <span style={{ color: resolvedTextColor, fontWeight: 700, fontSize: 18 }}>코랄레드</span>
+      <span translate="no" style={{ color: resolvedTextColor, fontWeight: 700, fontSize: 18 }}>
+        코랄레드
+      </span>
     </span>
   );
 }
