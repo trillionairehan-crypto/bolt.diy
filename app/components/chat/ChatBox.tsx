@@ -283,7 +283,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
             />
             {props.chatStarted && (
               <IconButton
-                title="Discuss"
+                title="대화 모드"
                 className={classNames(
                   'transition-all flex items-center gap-1 px-1.5',
                   props.chatMode === 'discuss'
@@ -295,12 +295,12 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
                 }}
               >
                 <div className={`i-ph:chats text-xl`} />
-                {props.chatMode === 'discuss' ? <span>Discuss</span> : <span />}
+                {props.chatMode === 'discuss' ? <span>대화</span> : <span />}
               </IconButton>
             )}
             {SHOW_DEV_TOOLS && (
               <IconButton
-                title="Model Settings"
+                title="모델 설정"
                 className={classNames('transition-all flex items-center gap-1', {
                   'bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent':
                     props.isModelSettingsCollapsed,
@@ -318,8 +318,8 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           <div className="flex gap-2 items-center">
             {props.input.length > 3 ? (
               <div className="text-xs text-bolt-elements-textTertiary">
-                Use <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Shift</kbd> +{' '}
-                <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Return</kbd> a new line
+                <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Shift</kbd> +{' '}
+                <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Return</kbd>으로 줄바꿈
               </div>
             ) : null}
             <SupabaseConnection />

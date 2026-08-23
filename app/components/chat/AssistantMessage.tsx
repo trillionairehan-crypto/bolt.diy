@@ -2,7 +2,7 @@ import { memo, Fragment } from 'react';
 import { Markdown } from './Markdown';
 import Popover from '~/components/ui/Popover';
 import { workbenchStore } from '~/lib/stores/workbench';
-import { WORK_DIR } from '~/utils/constants';
+import { SHOW_DEV_TOOLS, WORK_DIR } from '~/utils/constants';
 import WithTooltip from '~/components/ui/Tooltip';
 import type { ProviderInfo } from '~/types/model';
 import type {
@@ -158,7 +158,9 @@ export const AssistantMessage = memo(
               </Popover>
             )}
             <div className="flex w-full items-center justify-between">
-              {usage && (
+              {/* Token counts are meaningless to non-developers and the pricing model is
+                  message-based, not token-based — dev-only visibility. */}
+              {usage && SHOW_DEV_TOOLS && (
                 <div>
                   Tokens: {usage.totalTokens} (prompt: {usage.promptTokens}, completion: {usage.completionTokens})
                 </div>

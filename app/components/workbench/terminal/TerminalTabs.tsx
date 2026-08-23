@@ -189,7 +189,7 @@ export const TerminalTabs = memo(() => {
             {terminalCount < MAX_TERMINALS && <IconButton icon="i-ph:plus" size="md" onClick={addTerminal} />}
             <IconButton
               icon="i-ph:arrow-clockwise"
-              title="Reset Terminal"
+              title="터미널 초기화"
               size="md"
               onClick={() => {
                 const ref = terminalRefs.current.get(activeTerminal);
@@ -210,7 +210,7 @@ export const TerminalTabs = memo(() => {
             <IconButton
               className="ml-auto"
               icon="i-ph:caret-down"
-              title="Close"
+              title="닫기"
               size="md"
               onClick={() => workbenchStore.toggleTerminal(false)}
             />

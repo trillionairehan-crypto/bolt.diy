@@ -335,9 +335,9 @@ function FileContextMenu({
             const success = await workbenchStore.createFile(filePath, binaryContent);
 
             if (success) {
-              toast.success(`File ${file.name} uploaded successfully`);
+              toast.success(`${file.name} 파일을 올렸어요`);
             } else {
-              toast.error(`Failed to upload file ${file.name}`);
+              toast.error(`${file.name} 파일을 올리지 못했어요`);
             }
           } catch (error) {
             toast.error(`Error uploading ${file.name}`);
@@ -356,9 +356,9 @@ function FileContextMenu({
     const success = await workbenchStore.createFile(newFilePath, '');
 
     if (success) {
-      toast.success('File created successfully');
+      toast.success('파일을 만들었어요');
     } else {
-      toast.error('Failed to create file');
+      toast.error('파일을 만들지 못했어요');
     }
 
     setIsCreatingFile(false);
@@ -369,9 +369,9 @@ function FileContextMenu({
     const success = await workbenchStore.createFolder(newFolderPath);
 
     if (success) {
-      toast.success('Folder created successfully');
+      toast.success('폴더를 만들었어요');
     } else {
-      toast.error('Failed to create folder');
+      toast.error('폴더를 만들지 못했어요');
     }
 
     setIsCreatingFolder(false);
@@ -379,7 +379,7 @@ function FileContextMenu({
 
   const handleDelete = async () => {
     try {
-      if (!confirm(`Are you sure you want to delete ${isFolder ? 'folder' : 'file'}: ${fileName}?`)) {
+      if (!confirm(`${isFolder ? '폴더' : '파일'} "${fileName}"을(를) 삭제할까요?`)) {
         return;
       }
 
@@ -392,9 +392,9 @@ function FileContextMenu({
       }
 
       if (success) {
-        toast.success(`${isFolder ? 'Folder' : 'File'} deleted successfully`);
+        toast.success(isFolder ? '폴더를 삭제했어요' : '파일을 삭제했어요');
       } else {
-        toast.error(`Failed to delete ${isFolder ? 'folder' : 'file'}`);
+        toast.error(isFolder ? '폴더를 삭제하지 못했어요' : '파일을 삭제하지 못했어요');
       }
     } catch (error) {
       toast.error(`Error deleting ${isFolder ? 'folder' : 'file'}`);
@@ -412,9 +412,9 @@ function FileContextMenu({
       const success = workbenchStore.lockFile(fullPath);
 
       if (success) {
-        toast.success(`File locked successfully`);
+        toast.success(`파일을 잠갔어요`);
       } else {
-        toast.error(`Failed to lock file`);
+        toast.error(`파일을 잠그지 못했어요`);
       }
     } catch (error) {
       toast.error(`Error locking file`);
@@ -432,9 +432,9 @@ function FileContextMenu({
       const success = workbenchStore.unlockFile(fullPath);
 
       if (success) {
-        toast.success(`File unlocked successfully`);
+        toast.success(`파일 잠금을 해제했어요`);
       } else {
-        toast.error(`Failed to unlock file`);
+        toast.error(`파일 잠금을 해제하지 못했어요`);
       }
     } catch (error) {
       toast.error(`Error unlocking file`);
@@ -452,9 +452,9 @@ function FileContextMenu({
       const success = workbenchStore.lockFolder(fullPath);
 
       if (success) {
-        toast.success(`Folder locked successfully`);
+        toast.success(`폴더를 잠갔어요`);
       } else {
-        toast.error(`Failed to lock folder`);
+        toast.error(`폴더를 잠그지 못했어요`);
       }
     } catch (error) {
       toast.error(`Error locking folder`);
@@ -472,9 +472,9 @@ function FileContextMenu({
       const success = workbenchStore.unlockFolder(fullPath);
 
       if (success) {
-        toast.success(`Folder unlocked successfully`);
+        toast.success(`폴더 잠금을 해제했어요`);
       } else {
-        toast.error(`Failed to unlock folder`);
+        toast.error(`폴더 잠금을 해제하지 못했어요`);
       }
     } catch (error) {
       toast.error(`Error unlocking folder`);
@@ -560,7 +560,7 @@ function FileContextMenu({
               <ContextMenuItem onSelect={handleDelete}>
                 <div className="flex items-center gap-2 text-red-500">
                   <div className="i-ph:trash" />
-                  Delete {isFolder ? 'Folder' : 'File'}
+                  {isFolder ? '폴더' : '파일'} 삭제
                 </div>
               </ContextMenuItem>
             </ContextMenu.Group>
@@ -570,7 +570,7 @@ function FileContextMenu({
       {isCreatingFile && (
         <InlineInput
           depth={depth}
-          placeholder="Enter file name..."
+          placeholder="파일 이름 입력..."
           onSubmit={handleCreateFile}
           onCancel={() => setIsCreatingFile(false)}
         />
@@ -578,7 +578,7 @@ function FileContextMenu({
       {isCreatingFolder && (
         <InlineInput
           depth={depth}
-          placeholder="Enter folder name..."
+          placeholder="폴더 이름 입력..."
           onSubmit={handleCreateFolder}
           onCancel={() => setIsCreatingFolder(false)}
         />
@@ -611,7 +611,7 @@ function Folder({ folder, collapsed, selected = false, onCopyPath, onCopyRelativ
           {isLocked && (
             <span
               className={classNames('shrink-0', 'i-ph:lock-simple scale-80 text-red-500')}
-              title={'Folder is locked'}
+              title={'잠긴 폴더예요'}
             />
           )}
         </div>
@@ -713,7 +713,7 @@ function File({
             {locked && (
               <span
                 className={classNames('shrink-0', 'i-ph:lock-simple scale-80 text-red-500')}
-                title={'File is locked'}
+                title={'잠긴 파일이에요'}
               />
             )}
             {unsavedChanges && <span className="i-ph:circle-fill scale-68 shrink-0 text-orange-500" />}

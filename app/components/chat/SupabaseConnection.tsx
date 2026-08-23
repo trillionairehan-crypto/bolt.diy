@@ -83,7 +83,7 @@ export function SupabaseConnection() {
           disabled={connecting}
           onClick={() => setIsDialogOpen(!isDialogOpen)}
           className="hover:bg-bolt-elements-item-backgroundActive !text-white flex items-center gap-2"
-          title={isConnected ? '데이터베이스가 연결됐어요' : '앱에 로그인과 데이터 저장 기능을 쓰려면 연결이 필요해요'}
+          title={isConnected ? '저장 기능이 켜졌어요' : '앱에 로그인과 저장 기능을 쓰려면 연결이 필요해요'}
         >
           <img
             className="w-4 h-4"
@@ -92,7 +92,7 @@ export function SupabaseConnection() {
             crossOrigin="anonymous"
             src="https://cdn.simpleicons.org/supabase"
           />
-          <span className="ml-1 text-xs">{isConnected ? '연결됨' : '데이터베이스 연결'}</span>
+          <span className="ml-1 text-xs">{isConnected ? '연결됨' : '저장 기능 켜기'}</span>
         </Button>
       </div>
 
@@ -109,17 +109,17 @@ export function SupabaseConnection() {
                     crossOrigin="anonymous"
                     src="https://cdn.simpleicons.org/supabase"
                   />
-                  Connect to Supabase
+                  Supabase 연결하기
                 </DialogTitle>
 
                 <div>
-                  <label className="block text-sm text-bolt-elements-textSecondary mb-2">Access Token</label>
+                  <label className="block text-sm text-bolt-elements-textSecondary mb-2">액세스 토큰</label>
                   <input
                     type="password"
                     value={supabaseConn.token}
                     onChange={(e) => updateToken(e.target.value)}
                     disabled={connecting}
-                    placeholder="Enter your Supabase access token"
+                    placeholder="Supabase 액세스 토큰을 입력하세요"
                     className={classNames(
                       'w-full px-3 py-2 rounded-lg text-sm',
                       'bg-[#F8F8F8] dark:bg-[#1A1A1A]',
@@ -136,7 +136,7 @@ export function SupabaseConnection() {
                       rel="noopener noreferrer"
                       className="text-[#3ECF8E] hover:underline inline-flex items-center gap-1"
                     >
-                      Get your token
+                      토큰 발급받기
                       <div className="i-ph:arrow-square-out w-4 h-4" />
                     </a>
                   </div>
@@ -144,7 +144,7 @@ export function SupabaseConnection() {
 
                 <div className="flex justify-end gap-2 mt-6">
                   <DialogClose asChild>
-                    <DialogButton type="secondary">Cancel</DialogButton>
+                    <DialogButton type="secondary">취소</DialogButton>
                   </DialogClose>
                   <button
                     onClick={handleConnect}
@@ -159,12 +159,12 @@ export function SupabaseConnection() {
                     {connecting ? (
                       <>
                         <div className="i-ph:spinner-gap animate-spin" />
-                        Connecting...
+                        연결하는 중...
                       </>
                     ) : (
                       <>
                         <div className="i-ph:plug-charging w-4 h-4" />
-                        Connect
+                        연결
                       </>
                     )}
                   </button>
@@ -181,21 +181,21 @@ export function SupabaseConnection() {
                       crossOrigin="anonymous"
                       src="https://cdn.simpleicons.org/supabase"
                     />
-                    Supabase Connection
+                    Supabase 연결
                   </DialogTitle>
                 </div>
 
                 <div className="flex items-center gap-4 p-3 bg-[#F8F8F8] dark:bg-[#1A1A1A] rounded-lg">
                   <div>
                     <h4 className="text-sm font-medium text-bolt-elements-textPrimary">{supabaseConn.user?.email}</h4>
-                    <p className="text-xs text-bolt-elements-textSecondary">Role: {supabaseConn.user?.role}</p>
+                    <p className="text-xs text-bolt-elements-textSecondary">권한: {supabaseConn.user?.role}</p>
                   </div>
                 </div>
 
                 {fetchingStats ? (
                   <div className="flex items-center gap-2 text-sm text-bolt-elements-textSecondary">
                     <div className="i-ph:spinner-gap w-4 h-4 animate-spin" />
-                    Fetching projects...
+                    프로젝트를 불러오는 중...
                   </div>
                 ) : (
                   <div>
@@ -204,8 +204,7 @@ export function SupabaseConnection() {
                         onClick={() => setIsProjectsExpanded(!isProjectsExpanded)}
                         className="bg-transparent text-left text-sm font-medium text-bolt-elements-textPrimary flex items-center gap-2"
                       >
-                        <div className="i-ph:database w-4 h-4" />
-                        Your Projects ({supabaseConn.stats?.totalProjects || 0})
+                        <div className="i-ph:database w-4 h-4" />내 프로젝트 ({supabaseConn.stats?.totalProjects || 0})
                         <div
                           className={classNames(
                             'i-ph:caret-down w-4 h-4 transition-transform',
@@ -217,17 +216,16 @@ export function SupabaseConnection() {
                         <button
                           onClick={() => fetchSupabaseStats(supabaseConn.token)}
                           className="px-2 py-1 rounded-md text-xs bg-[#F0F0F0] dark:bg-[#252525] text-bolt-elements-textSecondary hover:bg-[#E5E5E5] dark:hover:bg-[#333333] flex items-center gap-1"
-                          title="Refresh projects list"
+                          title="프로젝트 목록 새로고침"
                         >
                           <div className="i-ph:arrows-clockwise w-3 h-3" />
-                          Refresh
+                          새로고침
                         </button>
                         <button
                           onClick={() => handleCreateProject()}
                           className="px-2 py-1 rounded-md text-xs bg-[#3ECF8E] text-white hover:bg-[#3BBF84] flex items-center gap-1"
                         >
-                          <div className="i-ph:plus w-3 h-3" />
-                          New Project
+                          <div className="i-ph:plus w-3 h-3" />새 프로젝트
                         </button>
                       </div>
                     </div>
@@ -236,7 +234,7 @@ export function SupabaseConnection() {
                       <>
                         {!supabaseConn.selectedProjectId && (
                           <div className="mb-2 p-3 bg-[#F8F8F8] dark:bg-[#1A1A1A] rounded-lg text-sm text-bolt-elements-textSecondary">
-                            Select a project or create a new one for this chat
+                            이 대화에서 사용할 프로젝트를 선택하거나 새로 만드세요
                           </div>
                         )}
 
@@ -269,10 +267,10 @@ export function SupabaseConnection() {
                                     {supabaseConn.selectedProjectId === project.id ? (
                                       <span className="flex items-center gap-1">
                                         <div className="i-ph:check w-3 h-3" />
-                                        Selected
+                                        선택됨
                                       </span>
                                     ) : (
-                                      'Select'
+                                      '선택'
                                     )}
                                   </button>
                                 </div>
@@ -282,7 +280,7 @@ export function SupabaseConnection() {
                         ) : (
                           <div className="text-sm text-bolt-elements-textSecondary flex items-center gap-2">
                             <div className="i-ph:info w-4 h-4" />
-                            No projects found
+                            프로젝트가 없어요
                           </div>
                         )}
                       </>
@@ -292,11 +290,11 @@ export function SupabaseConnection() {
 
                 <div className="flex justify-end gap-2 mt-6">
                   <DialogClose asChild>
-                    <DialogButton type="secondary">Close</DialogButton>
+                    <DialogButton type="secondary">닫기</DialogButton>
                   </DialogClose>
                   <DialogButton type="danger" onClick={handleDisconnect}>
                     <div className="i-ph:plugs w-4 h-4" />
-                    Disconnect
+                    연결 끊기
                   </DialogButton>
                 </div>
               </div>

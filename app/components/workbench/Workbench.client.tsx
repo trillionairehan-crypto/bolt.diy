@@ -46,15 +46,15 @@ const viewTransition = { ease: cubicEasingFn };
 const sliderOptions: SliderOptions<WorkbenchViewType> = {
   left: {
     value: 'code',
-    text: 'Code',
+    text: '코드',
   },
   middle: {
     value: 'diff',
-    text: 'Diff',
+    text: '차이점',
   },
   right: {
     value: 'preview',
-    text: 'Preview',
+    text: '미리보기',
   },
 };
 
@@ -97,7 +97,7 @@ const FileModifiedDropdown = memo(
           {({ open }: { open: boolean }) => (
             <>
               <Popover.Button className="flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg bg-bolt-elements-background-depth-2 hover:bg-bolt-elements-background-depth-3 transition-colors text-bolt-elements-item-contentDefault">
-                <span>File Changes</span>
+                <span>바뀐 파일</span>
                 {hasChanges && (
                   <span className="w-5 h-5 rounded-full bg-accent-500/20 text-accent-500 text-xs flex items-center justify-center border border-accent-500/30">
                     {modifiedFiles.length}
@@ -118,7 +118,7 @@ const FileModifiedDropdown = memo(
                     <div className="relative mx-2 mb-2">
                       <input
                         type="text"
-                        placeholder="Search files..."
+                        placeholder="파일 검색..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg bg-bolt-elements-background-depth-1 border border-bolt-elements-borderColor focus:outline-none focus:ring-2 focus:ring-blue-500/50"
@@ -246,10 +246,10 @@ const FileModifiedDropdown = memo(
                             <div className="i-ph:file-dashed" />
                           </div>
                           <p className="text-sm font-medium text-bolt-elements-textPrimary">
-                            {searchQuery ? 'No matching files' : 'No modified files'}
+                            {searchQuery ? '찾는 파일이 없어요' : '바뀐 파일이 없어요'}
                           </p>
                           <p className="text-xs text-bolt-elements-textTertiary mt-1">
-                            {searchQuery ? 'Try another search' : 'Changes will appear here as you edit'}
+                            {searchQuery ? '다른 검색어로 찾아보세요' : '수정하면 여기에 나타나요'}
                           </p>
                         </div>
                       )}
@@ -261,13 +261,13 @@ const FileModifiedDropdown = memo(
                       <button
                         onClick={() => {
                           navigator.clipboard.writeText(filteredFiles.map(([filePath]) => filePath).join('\n'));
-                          toast('File list copied to clipboard', {
+                          toast('파일 목록을 복사했어요', {
                             icon: <div className="i-ph:check-circle text-accent-500" />,
                           });
                         }}
                         className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-sm rounded-lg bg-bolt-elements-background-depth-1 hover:bg-bolt-elements-background-depth-3 transition-colors text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary"
                       >
-                        Copy File List
+                        파일 목록 복사
                       </button>
                     </div>
                   )}
@@ -345,7 +345,7 @@ export const Workbench = memo(
           previewStore.refreshAllPreviews();
         })
         .catch(() => {
-          toast.error('Failed to update file content');
+          toast.error('파일을 저장하지 못했어요');
         });
     }, []);
 
@@ -364,10 +364,10 @@ export const Workbench = memo(
       try {
         const directoryHandle = await window.showDirectoryPicker();
         await workbenchStore.syncFiles(directoryHandle);
-        toast.success('Files synced successfully');
+        toast.success('파일을 저장했어요');
       } catch (error) {
         console.error('Error syncing files:', error);
-        toast.error('Failed to sync files');
+        toast.error('파일을 저장하지 못했어요');
       } finally {
         setIsSyncing(false);
       }
@@ -418,7 +418,7 @@ export const Workbench = memo(
                             disabled={isSyncing || streaming}
                             className="rounded-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-accent-500 text-white hover:text-bolt-elements-item-contentAccent [&:not(:disabled,.disabled)]:hover:bg-bolt-elements-button-primary-backgroundHover outline-accent-500 flex gap-1.7"
                           >
-                            {isSyncing ? 'Syncing...' : 'Sync'}
+                            {isSyncing ? '저장 중...' : '저장'}
                             <span className={classNames('i-ph:caret-down transition-transform')} />
                           </DropdownMenu.Trigger>
                           <DropdownMenu.Content
@@ -446,7 +446,7 @@ export const Workbench = memo(
                                 ) : (
                                   <div className="i-ph:cloud-arrow-down" />
                                 )}
-                                <span>{isSyncing ? 'Syncing...' : 'Sync Files'}</span>
+                                <span>{isSyncing ? '저장 중...' : '파일 저장'}</span>
                               </div>
                             </DropdownMenu.Item>
                           </DropdownMenu.Content>
@@ -462,7 +462,7 @@ export const Workbench = memo(
                           className="rounded-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-accent-500 text-white hover:text-bolt-elements-item-contentAccent [&:not(:disabled,.disabled)]:hover:bg-bolt-elements-button-primary-backgroundHover outline-accent-500 flex gap-1.7"
                         >
                           <div className="i-ph:terminal" />
-                          Toggle Terminal
+                          터미널
                         </button>
                       </div>
                     </div>

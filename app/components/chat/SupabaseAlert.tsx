@@ -21,10 +21,10 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
   const isConnected = !!(connection.token && connection.selectedProjectId);
 
   // Set title and description based on connection state
-  const title = isConnected ? 'Supabase 쿼리' : 'Supabase 연결 필요';
-  const description = isConnected ? '데이터베이스 쿼리 실행' : 'Supabase 연결이 필요해요';
+  const title = isConnected ? 'Supabase 변경 사항' : 'Supabase 연결 필요';
+  const description = isConnected ? '저장 기능 변경 내용' : 'Supabase 연결이 필요해요';
   const message = isConnected
-    ? '제안된 변경사항을 확인하고 데이터베이스에 적용해주세요.'
+    ? '제안된 변경 사항을 확인하고 저장 기능에 적용해주세요.'
     : '계속하려면 먼저 Supabase에 연결해주세요.';
 
   const handleConnectClick = () => {
@@ -58,7 +58,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
 
       if (!response.ok) {
         const errorData = (await response.json()) as any;
-        throw new Error(`Supabase 쿼리 실행에 실패했어요: ${errorData.error?.message || response.statusText}`);
+        throw new Error(`Supabase 저장 기능 적용에 실패했어요: ${errorData.error?.message || response.statusText}`);
       }
 
       const result = await response.json();
@@ -67,7 +67,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
     } catch (error) {
       console.error('Failed to execute Supabase action:', error);
       postMessage(
-        `*Supabase 쿼리 실행 중 오류가 발생했어요. 고쳐서 쿼리를 다시 알려줘*\n\`\`\`\n${error instanceof Error ? error.message : String(error)}\n\`\`\`\n`,
+        `*Supabase 저장 기능을 적용하다가 문제가 생겼어요. 고쳐서 다시 알려줘*\n\`\`\`\n${error instanceof Error ? error.message : String(error)}\n\`\`\`\n`,
       );
     } finally {
       setIsExecuting(false);

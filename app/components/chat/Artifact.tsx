@@ -75,11 +75,11 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
     artifact?.type === 'bundled'
       ? allActionFinished
         ? artifact.id === 'restored-project-setup'
-          ? 'Project Restored' // Title when restore is complete
-          : 'Project Created' // Title when initial creation is complete
+          ? '복원했어요' // Title when restore is complete
+          : '다 만들었어요' // Title when initial creation is complete
         : artifact.id === 'restored-project-setup'
-          ? 'Restoring Project...' // Title during restore
-          : 'Creating Project...' // Title during initial creation
+          ? '복원하는 중이에요' // Title during restore
+          : '만드는 중이에요' // Title during initial creation
       : artifact?.title; // Fallback to original title for non-bundled or if artifact is missing
 
   return (
@@ -99,7 +99,7 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
                 {dynamicTitle}
               </div>
               <div className="w-full w-full text-bolt-elements-textSecondary text-xs mt-0.5">
-                Click to open Workbench
+                누르면 작업 화면이 열려요
               </div>
             </div>
           </button>
@@ -134,9 +134,9 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
               {/* This status text remains the same */}
               {allActionFinished
                 ? artifact.id === 'restored-project-setup'
-                  ? 'Restore files from snapshot'
-                  : 'Initial files created'
-                : 'Creating initial files'}
+                  ? '저장된 파일을 불러왔어요'
+                  : '기본 파일을 만들었어요'
+                : '기본 파일을 만드는 중이에요'}
             </div>
           </div>
         )}
@@ -237,17 +237,17 @@ const ActionList = memo(({ actions }: ActionListProps) => {
                 </div>
                 {type === 'file' ? (
                   <div>
-                    Create{' '}
                     <code
                       className="bg-bolt-elements-artifacts-inlineCode-background text-bolt-elements-artifacts-inlineCode-text px-1.5 py-1 rounded-md text-bolt-elements-item-contentAccent hover:underline cursor-pointer"
                       onClick={() => openArtifactInWorkbench(action.filePath)}
                     >
                       {action.filePath}
-                    </code>
+                    </code>{' '}
+                    만들기
                   </div>
                 ) : type === 'shell' ? (
                   <div className="flex items-center w-full min-h-[28px]">
-                    <span className="flex-1">Run command</span>
+                    <span className="flex-1">명령 실행</span>
                   </div>
                 ) : type === 'start' ? (
                   <a
@@ -257,7 +257,7 @@ const ActionList = memo(({ actions }: ActionListProps) => {
                     }}
                     className="flex items-center w-full min-h-[28px]"
                   >
-                    <span className="flex-1">Start Application</span>
+                    <span className="flex-1">앱 실행</span>
                   </a>
                 ) : null}
               </div>

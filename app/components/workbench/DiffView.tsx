@@ -40,7 +40,7 @@ const FullscreenButton = memo(({ onClick, isFullscreen }: FullscreenButtonProps)
   <button
     onClick={onClick}
     className="ml-4 p-1 rounded hover:bg-bolt-elements-background-depth-3 text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary transition-colors"
-    title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+    title={isFullscreen ? '전체 화면 나가기' : '전체 화면으로 보기'}
   >
     <div className={isFullscreen ? 'i-ph:corners-in' : 'i-ph:corners-out'} />
   </button>
@@ -335,10 +335,10 @@ const renderContentWarning = (type: 'binary' | 'error') => (
     <div className="text-center text-bolt-elements-textTertiary">
       <div className={`i-ph:${type === 'binary' ? 'file-x' : 'warning-circle'} text-4xl text-red-400 mb-2 mx-auto`} />
       <p className="font-medium text-bolt-elements-textPrimary">
-        {type === 'binary' ? 'Binary file detected' : 'Error processing file'}
+        {type === 'binary' ? '바이너리 파일이에요' : '파일을 처리하지 못했어요'}
       </p>
       <p className="text-sm mt-1">
-        {type === 'binary' ? 'Diff view is not available for binary files' : 'Could not generate diff preview'}
+        {type === 'binary' ? '바이너리 파일은 차이점을 볼 수 없어요' : '변경 내용을 미리 볼 수 없어요'}
       </p>
     </div>
   </div>

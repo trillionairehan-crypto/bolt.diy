@@ -251,7 +251,7 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
         onMouseOut={(e) =>
           (e.currentTarget.style.background = 'var(--bolt-elements-background-depth-3, rgba(0,0,0,.15))')
         }
-        title="Drag to resize width"
+        title="드래그해서 너비 조절"
       >
         <GripIcon />
       </div>
@@ -778,7 +778,7 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
             previews={previews}
           />
           <input
-            title="URL Path"
+            title="주소 경로"
             ref={inputRef}
             className="w-full bg-transparent outline-none"
             type="text"
@@ -814,7 +814,9 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
             title={isDeviceModeOn ? 'Switch to Responsive Mode' : 'Switch to Device Mode'}
           />
 
-          {expoUrl && <IconButton icon="i-ph:qr-code" onClick={() => setIsExpoQrModalOpen(true)} title="Show QR" />}
+          {expoUrl && (
+            <IconButton icon="i-ph:qr-code" onClick={() => setIsExpoQrModalOpen(true)} title="QR 코드 보기" />
+          )}
 
           <ExpoQrModal open={isExpoQrModalOpen} onClose={() => setIsExpoQrModalOpen(false)} />
 
@@ -850,7 +852,7 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
             <IconButton
               icon="i-ph:list"
               onClick={() => setIsWindowSizeDropdownOpen(!isWindowSizeDropdownOpen)}
-              title="New Window Options"
+              title="새 창 옵션"
             />
 
             {isWindowSizeDropdownOpen && (

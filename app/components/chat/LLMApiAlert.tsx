@@ -32,7 +32,7 @@ export default function LlmErrorAlert({ alert, clearAlert }: Props) {
       case 'quota':
         return `${provider}의 사용량을 초과했어요. 계정 한도를 확인해주세요.`;
       default:
-        return '요청을 처리하는 중 오류가 발생했어요.';
+        return '잠시 문제가 있었어요. 다시 시도해주세요.';
     }
   };
 

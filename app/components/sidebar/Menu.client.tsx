@@ -133,7 +133,7 @@ export const Menu = () => {
 
       deleteChat(item.id)
         .then(() => {
-          toast.success('Chat deleted successfully', {
+          toast.success('대화를 삭제했어요', {
             position: 'bottom-right',
             autoClose: 3000,
           });
@@ -149,7 +149,7 @@ export const Menu = () => {
         })
         .catch((error) => {
           console.error('Failed to delete chat:', error);
-          toast.error('Failed to delete conversation', {
+          toast.error('대화를 삭제하지 못했어요', {
             position: 'bottom-right',
             autoClose: 3000,
           });
@@ -192,11 +192,14 @@ export const Menu = () => {
 
       // Show appropriate toast message
       if (errors.length === 0) {
-        toast.success(`${deletedCount} chat${deletedCount === 1 ? '' : 's'} deleted successfully`);
+        toast.success(`대화 ${deletedCount}개를 삭제했어요`);
       } else {
-        toast.warning(`Deleted ${deletedCount} of ${itemsToDeleteIds.length} chats. ${errors.length} failed.`, {
-          autoClose: 5000,
-        });
+        toast.warning(
+          `대화 ${itemsToDeleteIds.length}개 중 ${deletedCount}개를 삭제했어요. ${errors.length}개는 실패했어요.`,
+          {
+            autoClose: 5000,
+          },
+        );
       }
 
       // Reload the list after all deletions
@@ -239,14 +242,14 @@ export const Menu = () => {
 
   const handleBulkDeleteClick = useCallback(() => {
     if (selectedItems.length === 0) {
-      toast.info('Select at least one chat to delete');
+      toast.info('삭제할 대화를 하나 이상 선택해주세요');
       return;
     }
 
     const selectedChats = list.filter((item) => selectedItems.includes(item.id));
 
     if (selectedChats.length === 0) {
-      toast.error('Could not find selected chats');
+      toast.error('선택한 대화를 찾을 수 없어요');
       return;
     }
 
@@ -393,7 +396,7 @@ export const Menu = () => {
                     ? 'bg-[#FF5330] dark:bg-[#FF5330] text-white border border-[#E44A28] dark:border-[#E44A28]'
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700',
                 )}
-                aria-label={selectionMode ? 'Exit selection mode' : 'Enter selection mode'}
+                aria-label={selectionMode ? '선택 모드 나가기' : '선택 모드 켜기'}
               >
                 <span className={selectionMode ? 'i-ph:x h-4 w-4' : 'i-ph:check-square h-4 w-4'} />
               </button>
@@ -416,7 +419,7 @@ export const Menu = () => {
             {selectionMode && (
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" onClick={selectAll}>
-                  {selectedItems.length === filteredList.length ? 'Deselect all' : 'Select all'}
+                  {selectedItems.length === filteredList.length ? '전체 선택 해제' : '전체 선택'}
                 </Button>
                 <Button
                   variant="destructive"
@@ -424,7 +427,7 @@ export const Menu = () => {
                   onClick={handleBulkDeleteClick}
                   disabled={selectedItems.length === 0}
                 >
-                  Delete selected
+                  선택 삭제
                 </Button>
               </div>
             )}
@@ -432,7 +435,7 @@ export const Menu = () => {
           <div className="flex-1 overflow-auto px-3 pb-3">
             {filteredList.length === 0 && (
               <div className="px-4 text-gray-500 dark:text-gray-400 text-sm">
-                {list.length === 0 ? 'No previous conversations' : 'No matches found'}
+                {list.length === 0 ? '아직 대화가 없어요' : '찾는 대화가 없어요'}
               </div>
             )}
             <DialogRoot open={dialogContent !== null}>
@@ -466,20 +469,20 @@ export const Menu = () => {
                 {dialogContent?.type === 'delete' && (
                   <>
                     <div className="p-6 bg-white dark:bg-gray-950">
-                      <DialogTitle className="text-gray-900 dark:text-white">Delete Chat?</DialogTitle>
+                      <DialogTitle className="text-gray-900 dark:text-white">대화를 삭제할까요?</DialogTitle>
                       <DialogDescription className="mt-2 text-gray-600 dark:text-gray-400">
                         <p>
-                          You are about to delete{' '}
                           <span className="font-medium text-gray-900 dark:text-white">
                             {dialogContent.item.description}
-                          </span>
+                          </span>{' '}
+                          대화를 삭제해요.
                         </p>
-                        <p className="mt-2">Are you sure you want to delete this chat?</p>
+                        <p className="mt-2">삭제하면 되돌릴 수 없어요.</p>
                       </DialogDescription>
                     </div>
                     <div className="flex justify-end gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
                       <DialogButton type="secondary" onClick={closeDialog}>
-                        Cancel
+                        취소
                       </DialogButton>
                       <DialogButton
                         type="danger"
@@ -489,7 +492,7 @@ export const Menu = () => {
                           closeDialog();
                         }}
                       >
-                        Delete
+                        삭제
                       </DialogButton>
                     </div>
                   </>
@@ -497,12 +500,9 @@ export const Menu = () => {
                 {dialogContent?.type === 'bulkDelete' && (
                   <>
                     <div className="p-6 bg-white dark:bg-gray-950">
-                      <DialogTitle className="text-gray-900 dark:text-white">Delete Selected Chats?</DialogTitle>
+                      <DialogTitle className="text-gray-900 dark:text-white">선택한 대화를 삭제할까요?</DialogTitle>
                       <DialogDescription className="mt-2 text-gray-600 dark:text-gray-400">
-                        <p>
-                          You are about to delete {dialogContent.items.length}{' '}
-                          {dialogContent.items.length === 1 ? 'chat' : 'chats'}:
-                        </p>
+                        <p>대화 {dialogContent.items.length}개를 삭제해요:</p>
                         <div className="mt-2 max-h-32 overflow-auto border border-gray-100 dark:border-gray-800 rounded-md bg-gray-50 dark:bg-gray-900 p-2">
                           <ul className="list-disc pl-5 space-y-1">
                             {dialogContent.items.map((item) => (
@@ -512,12 +512,12 @@ export const Menu = () => {
                             ))}
                           </ul>
                         </div>
-                        <p className="mt-3">Are you sure you want to delete these chats?</p>
+                        <p className="mt-3">삭제하면 되돌릴 수 없어요.</p>
                       </DialogDescription>
                     </div>
                     <div className="flex justify-end gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800">
                       <DialogButton type="secondary" onClick={closeDialog}>
-                        Cancel
+                        취소
                       </DialogButton>
                       <DialogButton
                         type="danger"
@@ -532,7 +532,7 @@ export const Menu = () => {
                           closeDialog();
                         }}
                       >
-                        Delete
+                        삭제
                       </DialogButton>
                     </div>
                   </>
