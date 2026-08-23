@@ -47,3 +47,21 @@
     transform: translateY(6px);
   }
 }
+
+// Indeterminate top-of-card progress bar (bundled artifact, mid-generation).
+@keyframes artifact-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[artifact-progress_1\.2s_ease-in-out_infinite\] {
+    animation: none;
+    width: 100% !important;
+    opacity: 0.5;
+  }
+}

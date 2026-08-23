@@ -84,7 +84,12 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
 
   return (
     <>
-      <div className="artifact border border-bolt-elements-borderColor flex flex-col overflow-hidden rounded-lg w-full transition-border duration-150">
+      <div className="artifact relative border border-bolt-elements-borderColor flex flex-col overflow-hidden rounded-[14px] w-full transition-border duration-150">
+        {artifact.type === 'bundled' && !allActionFinished && (
+          <div className="absolute top-0 left-0 right-0 h-[1.5px] overflow-hidden bg-bolt-elements-borderColor z-10">
+            <div className="h-full w-1/3 bg-[#FF5330] animate-[artifact-progress_1.2s_ease-in-out_infinite]" />
+          </div>
+        )}
         <div className="flex">
           <button
             className="flex items-stretch bg-bolt-elements-artifacts-background hover:bg-bolt-elements-artifacts-backgroundHover w-full overflow-hidden"
@@ -125,7 +130,12 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
           <div className="flex items-center gap-1.5 p-5 bg-bolt-elements-actions-background border-t border-bolt-elements-artifacts-borderColor">
             <div className={classNames('text-lg', getIconColor(allActionFinished ? 'complete' : 'running'))}>
               {allActionFinished ? (
-                <div className="i-ph:check"></div>
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.2, ease: cubicEasingFn }}
+                  className="i-ph:check"
+                ></motion.div>
               ) : (
                 <div className="i-svg-spinners:90-ring-with-bg"></div>
               )}

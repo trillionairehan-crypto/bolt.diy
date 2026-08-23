@@ -600,10 +600,8 @@ function Folder({ folder, collapsed, selected = false, onCopyPath, onCopyRelativ
           'bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent': selected,
         })}
         depth={folder.depth}
-        iconClasses={classNames({
-          'i-ph:caret-right scale-98': collapsed,
-          'i-ph:caret-down scale-98': !collapsed,
-        })}
+        selected={selected}
+        iconClasses={classNames('i-ph:caret-right scale-98', { 'rotate-90': !collapsed })}
         onClick={onClick}
       >
         <div className="flex items-center w-full">
@@ -692,6 +690,7 @@ function File({
           'bg-bolt-elements-item-backgroundAccent text-bolt-elements-item-contentAccent': selected,
         })}
         depth={depth}
+        selected={selected}
         iconClasses={classNames('i-ph:file-duotone scale-98', {
           'group-hover:text-bolt-elements-item-contentActive': !selected,
         })}
@@ -730,19 +729,21 @@ interface ButtonProps {
   children: ReactNode;
   className?: string;
   onClick?: () => void;
+  selected?: boolean;
 }
 
-function NodeButton({ depth, iconClasses, onClick, className, children }: ButtonProps) {
+function NodeButton({ depth, iconClasses, onClick, className, children, selected = false }: ButtonProps) {
   return (
     <button
       className={classNames(
-        'flex items-center gap-1.5 w-full pr-2 border-2 border-transparent text-faded py-0.5',
+        'flex items-center gap-1.5 w-full h-7 pr-2 border-l-2 text-faded transition-colors duration-150',
+        selected ? 'border-l-[#FF5330]' : 'border-l-transparent',
         className,
       )}
       style={{ paddingLeft: `${6 + depth * NODE_PADDING_LEFT}px` }}
       onClick={() => onClick?.()}
     >
-      <div className={classNames('scale-120 shrink-0', iconClasses)}></div>
+      <div className={classNames('scale-120 shrink-0 transition-transform duration-150', iconClasses)}></div>
       <div className="truncate w-full text-left">{children}</div>
     </button>
   );

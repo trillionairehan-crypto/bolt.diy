@@ -5,17 +5,32 @@
 }
 
 .Toastify__toast {
-  --at-apply: shadow-md;
-
-  background-color: var(--bolt-elements-bg-depth-2);
+  background-color: var(--surface-2);
   color: var(--bolt-elements-textPrimary);
   border: 1px solid var(--bolt-elements-borderColor);
+  border-left: 4px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px rgba(23, 16, 14, 0.08),
+    0 8px 24px rgba(23, 16, 14, 0.14);
+}
+
+.Toastify__toast--success {
+  border-left-color: var(--ok);
+}
+
+.Toastify__toast--warning {
+  border-left-color: var(--warn);
+}
+
+.Toastify__toast--error {
+  border-left-color: var(--err);
 }
 
 .Toastify__close-button {
   color: var(--bolt-elements-item-contentDefault);
   opacity: 1;
-  transition: none;
+  transition: color 150ms ease;
 
   &:hover {
     color: var(--bolt-elements-item-contentActive);
