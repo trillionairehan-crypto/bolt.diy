@@ -14,7 +14,6 @@ import Cookies from 'js-cookie';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import styles from './BaseChat.module.scss';
 import { ImportButtons } from '~/components/chat/chatExportAndImport/ImportButtons';
-import { ExamplePrompts } from '~/components/chat/ExamplePrompts';
 import GitCloneButton from './GitCloneButton';
 import type { ProviderInfo } from '~/types/model';
 import StarterTemplates from './StarterTemplates';
@@ -577,21 +576,16 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                         </div>
                       )}
                       <div className="flex flex-col gap-5">
-                        {!chatStarted &&
-                          ExamplePrompts((event, messageInput) => {
-                            if (isStreaming) {
-                              handleStop?.();
-                              return;
-                            }
-
-                            handleSendMessage?.(event, messageInput);
-                          })}
+                        {/*
+                          ExamplePrompts (suggestion chips) intentionally not rendered on the
+                          landing hero — component kept intact for possible reuse elsewhere later.
+                        */}
                         {!chatStarted && SHOW_DEV_TOOLS && <StarterTemplates />}
                       </div>
                     </div>
                   </div>
                   {!chatStarted && (
-                    <div className="mt-10 lg:mt-0">
+                    <div className="mt-12 lg:mt-0">
                       <ClientOnly>
                         {() => <CoralredHero onFocusPrompt={() => textareaRef?.current?.focus()} />}
                       </ClientOnly>
