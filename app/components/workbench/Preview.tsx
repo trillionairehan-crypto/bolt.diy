@@ -761,11 +761,12 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
       <div className="bg-bolt-elements-background-depth-2 p-2 flex items-center gap-2">
         <div className="flex items-center gap-2">
           {/* 로컬 프리뷰 서버 토글 버튼 숨김: 별도 서버 실행 필요 + localStorage에 상태가 남아 비개발자 사용자가 원인을 알 수 없는 "연결 거부" 상태에 빠짐 */}
-          <IconButton icon="i-ph:arrow-clockwise" onClick={reloadPreview} />
+          <IconButton icon="i-ph:arrow-clockwise" onClick={reloadPreview} title="새로고침" />
           <IconButton
             icon="i-ph:selection"
             onClick={() => setIsSelectionMode(!isSelectionMode)}
             className={isSelectionMode ? 'bg-bolt-elements-background-depth-3' : ''}
+            title="영역 선택"
           />
         </div>
 
@@ -812,7 +813,7 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
           <IconButton
             icon="i-ph:devices"
             onClick={toggleDeviceMode}
-            title={isDeviceModeOn ? 'Switch to Responsive Mode' : 'Switch to Device Mode'}
+            title={isDeviceModeOn ? '반응형 모드로 전환' : '기기 모드로 전환'}
           />
 
           {expoUrl && (
@@ -826,12 +827,12 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
               <IconButton
                 icon="i-ph:device-rotate"
                 onClick={() => setIsLandscape(!isLandscape)}
-                title={isLandscape ? 'Switch to Portrait' : 'Switch to Landscape'}
+                title={isLandscape ? '세로로 전환' : '가로로 전환'}
               />
               <IconButton
                 icon={showDeviceFrameInPreview ? 'i-ph:device-mobile' : 'i-ph:device-mobile-slash'}
                 onClick={() => setShowDeviceFrameInPreview(!showDeviceFrameInPreview)}
-                title={showDeviceFrameInPreview ? 'Hide Device Frame' : 'Show Device Frame'}
+                title={showDeviceFrameInPreview ? '기기 프레임 숨기기' : '기기 프레임 보이기'}
               />
             </>
           )}
@@ -841,12 +842,12 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
             className={
               isInspectorMode ? 'bg-bolt-elements-background-depth-3 !text-bolt-elements-item-contentAccent' : ''
             }
-            title={isInspectorMode ? 'Disable Element Inspector' : 'Enable Element Inspector'}
+            title={isInspectorMode ? '요소 검사 끄기' : '요소 검사 켜기'}
           />
           <IconButton
             icon={isFullscreen ? 'i-ph:arrows-in' : 'i-ph:arrows-out'}
             onClick={toggleFullscreen}
-            title={isFullscreen ? 'Exit Full Screen' : 'Full Screen'}
+            title={isFullscreen ? '전체 화면 나가기' : '전체 화면으로 보기'}
           />
 
           <div className="flex items-center relative">

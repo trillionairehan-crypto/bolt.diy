@@ -403,6 +403,8 @@ export const Workbench = memo(
                 >
                   <button
                     className={`${showChat ? 'i-ph:sidebar-simple-fill' : 'i-ph:sidebar-simple'} text-lg text-bolt-elements-textSecondary mr-1`}
+                    title={showChat ? '채팅 숨기기' : '채팅 보이기'}
+                    aria-label={showChat ? '채팅 숨기기' : '채팅 보이기'}
                     disabled={!canHideChat || isSmallViewport}
                     onClick={() => {
                       if (canHideChat) {

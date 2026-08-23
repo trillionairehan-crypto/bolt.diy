@@ -91,6 +91,7 @@ export function SupabaseConnection() {
             width="20"
             crossOrigin="anonymous"
             src="https://cdn.simpleicons.org/supabase"
+            alt=""
           />
           <span className="ml-1 text-xs">{isConnected ? '연결됨' : '저장 기능 켜기'}</span>
         </Button>
@@ -108,6 +109,7 @@ export function SupabaseConnection() {
                     width="24"
                     crossOrigin="anonymous"
                     src="https://cdn.simpleicons.org/supabase"
+                    alt=""
                   />
                   Supabase 연결하기
                 </DialogTitle>
@@ -180,6 +182,7 @@ export function SupabaseConnection() {
                       width="24"
                       crossOrigin="anonymous"
                       src="https://cdn.simpleicons.org/supabase"
+                      alt=""
                     />
                     Supabase 연결
                   </DialogTitle>
