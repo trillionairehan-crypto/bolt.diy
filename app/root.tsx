@@ -62,7 +62,9 @@ export const Head = createHead(() => (
     <meta property="og:type" content="website" />
     <meta property="og:title" content="코랄레드" />
     <meta property="og:description" content="코딩 몰라도 한국어 한마디로 웹사이트와 앱을 만들어요" />
-    <meta property="og:image" content="https://coralred.kr/coralred-icon-2048.png" />
+    <meta property="og:image" content="https://coralred.kr/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:url" content="https://coralred.kr" />
     <meta name="twitter:card" content="summary_large_image" />
     <Meta />

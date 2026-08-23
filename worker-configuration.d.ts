@@ -19,4 +19,7 @@ interface Env {
   XAI_API_KEY: string;
   PERPLEXITY_API_KEY: string;
   AWS_BEDROCK_CONFIG: string;
+  PORTONE_STORE_ID: string;
+  PORTONE_CHANNEL_KEY: string;
+  PORTONE_API_SECRET: string;
 }
