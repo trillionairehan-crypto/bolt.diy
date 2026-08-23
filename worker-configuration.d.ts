@@ -22,4 +22,5 @@ interface Env {
   PORTONE_STORE_ID: string;
   PORTONE_CHANNEL_KEY: string;
   PORTONE_API_SECRET: string;
+  PORTONE_WEBHOOK_SECRET: string;
 }
