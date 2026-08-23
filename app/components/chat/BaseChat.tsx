@@ -53,6 +53,12 @@ const Workbench = lazy(() =>
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
+const LANDING_STEPS = [
+  { number: '01', title: '말하면', description: '만들고 싶은 걸 한국어로 설명하세요' },
+  { number: '02', title: '만들어져요', description: 'AI가 화면과 기능을 전부 만들어요' },
+  { number: '03', title: '바로 써요', description: '주소가 생기고, 링크로 공유할 수 있어요' },
+];
+
 interface BaseChatProps {
   textareaRef?: React.RefObject<HTMLTextAreaElement> | undefined;
   messageRef?: RefCallback<HTMLDivElement> | undefined;
@@ -593,7 +599,57 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                   )}
                 </div>
                 {!chatStarted && (
-                  <footer className="mt-16 px-4 lg:px-10 py-6 border-t border-bolt-elements-borderColor text-xs text-bolt-elements-textTertiary flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+                  <section style={{ background: 'var(--bg)', padding: '96px 0' }}>
+                    <div className="max-w-[1120px] mx-auto px-8">
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-8">
+                        {LANDING_STEPS.map((step) => (
+                          <div key={step.title} className="flex flex-col gap-2">
+                            <span
+                              style={{
+                                color: 'var(--accent)',
+                                fontSize: 32,
+                                fontWeight: 700,
+                                letterSpacing: '-0.02em',
+                              }}
+                            >
+                              {step.number}
+                            </span>
+                            <h3 style={{ color: 'var(--text)', fontSize: 20, fontWeight: 600 }}>{step.title}</h3>
+                            <p style={{ color: 'var(--muted)', fontSize: 15 }}>{step.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </section>
+                )}
+
+                {/* 쇼케이스 섹션(만든 앱 스크린샷) 자리 — 스크린샷 준비되면 3단계 섹션과 요금제 티저 사이에 추가 */}
+
+                {!chatStarted && (
+                  <section style={{ background: 'var(--accent-soft)', padding: '96px 0' }}>
+                    <div className="max-w-[1120px] mx-auto px-8 text-center">
+                      <p style={{ color: 'var(--text)', fontSize: 20, fontWeight: 600, marginBottom: 24 }}>
+                        무료로 시작해서, 필요할 때 올리세요
+                      </p>
+                      <a
+                        href="/pricing"
+                        className="inline-flex items-center justify-center rounded-md px-4"
+                        style={{
+                          height: 36,
+                          background: 'var(--accent)',
+                          color: 'var(--on-accent)',
+                          fontSize: 14,
+                          fontWeight: 500,
+                        }}
+                      >
+                        요금제 보기
+                      </a>
+                    </div>
+                  </section>
+                )}
+
+                {!chatStarted && (
+                  <footer className="px-4 lg:px-10 py-6 border-t border-bolt-elements-borderColor text-xs text-bolt-elements-textTertiary flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
                     <span>코랄레드</span>
                     <span>·</span>
                     <span>대표 한성민</span>
@@ -602,15 +658,24 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                     <span>·</span>
                     <span>coralred@coralred.kr</span>
                     <span>·</span>
-                    <a href="/pricing" className="hover:text-bolt-elements-textSecondary hover:underline">
+                    <a
+                      href="/pricing"
+                      className="text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary hover:underline"
+                    >
                       요금제
                     </a>
                     <span>·</span>
-                    <a href="/terms" className="hover:text-bolt-elements-textSecondary hover:underline">
+                    <a
+                      href="/terms"
+                      className="text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary hover:underline"
+                    >
                       이용약관
                     </a>
                     <span>·</span>
-                    <a href="/privacy" className="hover:text-bolt-elements-textSecondary hover:underline">
+                    <a
+                      href="/privacy"
+                      className="text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary hover:underline"
+                    >
                       개인정보처리방침
                     </a>
                   </footer>
