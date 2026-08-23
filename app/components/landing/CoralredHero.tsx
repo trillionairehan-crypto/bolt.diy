@@ -72,18 +72,6 @@ export function CoralredHero({ onFocusPrompt }: CoralredHeroProps) {
     }
   };
 
-  const scrollToTemplates = () => {
-    const el = document.getElementById('examples');
-
-    if (!el) {
-      return;
-    }
-
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    el.classList.add(styles.examplesHighlight);
-    setTimeout(() => el.classList.remove(styles.examplesHighlight), 700);
-  };
-
   return (
     <div className={styles.container} role="group" aria-label="코랄레드 바로가기">
       <div className={`${styles.tileFloat} ${styles.tileRight}`} style={floatStyle(TILE_POSITIONS[0])}>
@@ -113,16 +101,10 @@ export function CoralredHero({ onFocusPrompt }: CoralredHeroProps) {
       </div>
 
       <div className={`${styles.tileFloat} ${styles.tileRight}`} style={floatStyle(TILE_POSITIONS[2])}>
-        <button
-          type="button"
-          aria-label="템플릿"
-          className={styles.tile}
-          style={tileStyle(TILE_POSITIONS[2], 2)}
-          onClick={scrollToTemplates}
-        >
+        <a href="/templates" aria-label="템플릿" className={styles.tile} style={tileStyle(TILE_POSITIONS[2], 2)}>
           <span className={styles.dot} />
           <span className={styles.label}>템플릿</span>
-        </button>
+        </a>
       </div>
 
       <div className={`${styles.tileFloat} ${styles.tileRight}`} style={floatStyle(TILE_POSITIONS[3])}>

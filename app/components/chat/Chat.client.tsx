@@ -228,19 +228,28 @@ export const ChatImpl = memo(
       setInput(event.target.value);
     };
 
+    /*
+     * Entry point for /templates' "이 템플릿으로 시작" cards (and any other future ?prompt= link) —
+     * previously called sendChatMessage directly, which skipped the onboarding clarification step
+     * entirely (bypassed the same !chatStarted gate that ExamplePrompts/the input bar go through
+     * via sendMessage below). Fixed to route through the identical checkGenerationsAllowed +
+     * setClarifyingPrompt path so a template click behaves exactly like typing the same prompt in.
+     */
     useEffect(() => {
       const prompt = searchParams.get('prompt');
 
-      // console.log(prompt, searchParams, model, provider);
-
       if (prompt) {
         setSearchParams({});
-        runAnimation();
-        sendChatMessage({
-          text: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${prompt}`,
-        });
+
+        (async () => {
+          if (!(await checkGenerationsAllowed())) {
+            return;
+          }
+
+          setClarifyingPrompt(prompt);
+        })();
       }
-    }, [model, provider, searchParams]);
+    }, [searchParams]);
 
     const { enhancingPrompt, promptEnhanced, enhancePrompt, resetEnhancer } = usePromptEnhancer();
     const { parsedMessages, parseMessages } = useMessageParser();
