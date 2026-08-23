@@ -8,6 +8,14 @@ export const MODEL_REGEX = /^\[Model: (.*?)\]\n\n/;
 export const PROVIDER_REGEX = /\[Provider: (.*?)\]\n\n/;
 
 /*
+ * PromptClarification.tsx appends the onboarding survey's synthesized instructions after this
+ * exact marker when building the message text sent to the model. UserMessage.tsx splits on it to
+ * show only the user's original prompt in the chat bubble — the model still receives the full
+ * text (marker and all) since only display is affected, not what gets sent.
+ */
+export const ONBOARDING_ADDITIONS_MARKER = '\n\n추가로 알려주신 내용:\n';
+
+/*
  * Switched to 'claude-sonnet-5' 2026-08-21: the forced `temperature: 0` injection that used to
  * make Sonnet 5 (and Opus 5) reject non-reasoning calls was tied to the old ai SDK (v4.3.16).
  * Confirmed resolved after the v7 SDK migration (ai@7.0.70) via live generateText/streamText

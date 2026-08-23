@@ -12,6 +12,7 @@ import {
   type GenerationDirectives,
 } from '~/lib/onboarding/answer-directives';
 import { generateAppQuestions } from '~/utils/generateAppQuestions';
+import { ONBOARDING_ADDITIONS_MARKER } from '~/utils/constants';
 
 interface PromptClarificationProps {
   initialPrompt: string;
@@ -71,7 +72,7 @@ function buildFinalPromptAndDirectives(
 
   const finalPrompt =
     directives.promptAdditions.length > 0
-      ? `${initialPrompt}\n\n추가로 알려주신 내용:\n${directives.promptAdditions.map((line) => `- ${line}`).join('\n')}`
+      ? `${initialPrompt}${ONBOARDING_ADDITIONS_MARKER}${directives.promptAdditions.map((line) => `- ${line}`).join('\n')}`
       : initialPrompt;
 
   return { finalPrompt, directives };

@@ -399,7 +399,7 @@ const ToolCallsList = memo(({ toolInvocations, toolCallAnnotations, addToolOutpu
                       className={classNames(
                         'h-10 inline-flex items-center gap-2 px-3 py-1.5 text-xs font-normal rounded-lg transition-colors',
                         'bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor',
-                        'text-accent-500 hover:text-bolt-elements-textPrimary',
+                        'text-[var(--accent-text)] hover:text-bolt-elements-textPrimary',
                         'disabled:opacity-50 disabled:cursor-not-allowed',
                       )}
                       onClick={() =>
