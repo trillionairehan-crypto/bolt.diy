@@ -61,7 +61,7 @@ export function Header() {
             />
           )}
           <a href="/" className="flex items-center gap-2">
-            <Logo height={24} textColor={isLanding ? LANDING_TEXT_COLOR : undefined} />
+            <Logo height={24} variant={isLanding ? 'onCoral' : 'default'} />
           </a>
         </div>
 
@@ -74,15 +74,15 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
-                className="flex items-center gap-2 text-sm font-medium hover:opacity-80"
-                style={{ color: LANDING_TEXT_COLOR }}
+                className="flex items-center gap-2 text-sm font-semibold rounded-full pl-4 pr-1.5 py-1.5 hover:opacity-90 transition-opacity"
+                style={{ background: '#FAF7F0', color: '#FF5330' }}
               >
                 내 프로젝트
-                <span className="flex items-center justify-center w-7 h-7 rounded-full overflow-hidden bg-white/20 shrink-0">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full overflow-hidden bg-[#FF5330]/15 shrink-0">
                   {profile?.avatar ? (
                     <img src={profile.avatar} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="i-ph:user-fill text-sm" style={{ color: LANDING_TEXT_COLOR }} />
+                    <span className="i-ph:user-fill text-xs" style={{ color: '#FF5330' }} />
                   )}
                 </span>
               </button>
@@ -90,8 +90,8 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setIsLoginModalOpen(true)}
-                className="text-sm font-medium hover:opacity-80"
-                style={{ color: LANDING_TEXT_COLOR }}
+                className="text-sm font-semibold rounded-full px-4 py-1.5 hover:opacity-90 transition-opacity"
+                style={{ background: '#FAF7F0', color: '#FF5330' }}
               >
                 로그인
               </button>

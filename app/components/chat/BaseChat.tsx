@@ -433,18 +433,6 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                         >
                           코딩 없이, 한국어로 설명하면 앱이 완성돼요.
                         </p>
-                        <p
-                          className="text-sm lg:text-base mb-2 animate-fade-in animation-delay-200"
-                          style={{ color: '#FAF7F0' }}
-                        >
-                          {freeGenerationsRemaining > 0 ? (
-                            <>
-                              무료 체험 <span style={{ fontWeight: 800 }}>{freeGenerationsRemaining}회</span> 남았어요
-                            </>
-                          ) : (
-                            <span style={{ fontWeight: 800 }}>무료 체험을 모두 사용했어요</span>
-                          )}
-                        </p>
                       </div>
                     )}
                     <StickToBottom
@@ -516,6 +504,20 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           )}
                         </div>
                         {progressAnnotations && <ProgressCompilation data={progressAnnotations} />}
+                        {!chatStarted && (
+                          <p className="text-xs px-1" style={{ color: '#FAF7F0', opacity: 0.75 }}>
+                            {freeGenerationsRemaining > 0 ? (
+                              <>무료 체험 {freeGenerationsRemaining}회 남았어요</>
+                            ) : (
+                              <>
+                                무료 체험을 모두 사용했어요.{' '}
+                                <a href="/pricing" style={{ color: '#FAF7F0', textDecoration: 'underline' }}>
+                                  요금제 확인하기
+                                </a>
+                              </>
+                            )}
+                          </p>
+                        )}
                         <ChatBox
                           isModelSettingsCollapsed={isModelSettingsCollapsed}
                           setIsModelSettingsCollapsed={setIsModelSettingsCollapsed}
