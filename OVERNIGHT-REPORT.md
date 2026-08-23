@@ -40,7 +40,26 @@
 
 ## 작업 2: 다크모드 완성
 
-- [상태: 진행 예정]
+- [상태: 완료]
+- [한 일]
+  - 조사해보니 대부분 이미 돼 있었음: `prefers-color-scheme` 감지 + localStorage 우선 + FOUC 방지 인라인 스크립트는 `root.tsx`에 이미 존재(`setTutorialKitTheme()`), `themeStore.ts`의 `initStore()`가 그 결과(`data-theme` 속성)를 그대로 초기값으로 읽어옴 — 코드 추가 없이 스펙 충족 확인
+  - CodeMirror(`EditorPanel.tsx` → `theme` prop → `CodeMirrorEditor.tsx`의 `reconfigureTheme`)와 xterm(`Terminal.tsx`의 `getTerminalTheme()`가 `--bolt-elements-terminal-*` CSS 변수를 라이브로 읽음) 둘 다 이미 테마 전환에 연동돼 있음 — 확인만, 수정 없음
+  - 실제로 빠져 있던 것: 테마 토글 **버튼**이 사이드바 푸터에만 있고 헤더엔 전혀 없었음 → `Header.tsx`에 `ThemeSwitch` 추가: 랜딩(요금제 링크 옆, 코랄 배경용 `!text-[#FAF7F0]` 오버라이드) + 작업공간(`HeaderActionButtons` 옆)
+  - `ThemeSwitch.tsx`의 `title="Toggle Theme"`(영어, voice.md 위반) → "밝은/어두운 화면으로" 해요체로 수정
+  - `variables.scss`의 `:root[data-theme='light']`/`[data-theme='dark']` 블록에 `color-scheme` 선언 추가(네이티브 스크롤바/폼 컨트롤 다크 대응) — 빌드 결과물 CSS에 반영된 것까지 확인
+  - `/pricing`은 이미 `design-handoff/coralred-ui.css`를 정식 스타일시트로 로드 중이고, 그 파일 자체가 `[data-theme="dark"]`에 `color-scheme: dark`까지 포함해 이미 다크 대응 완비 — `pricing.tsx`가 인라인 색상 없이 킷 클래스만 쓰는 것도 확인(`var(--` 4회, 하드코딩 hex 0회). 테마는 `<html>` 전역 속성이라 다른 페이지에서 토글해도 `/pricing` 이동 시 유지됨 — 코드 추가 불필요, 확인만
+  - 히어로 코랄 고정: `BaseChat.tsx`의 히어로 배경이 `style={{ background: '#FF5330' }}` 리터럴이라 테마와 무관 — 확인만
+  - `Preview.tsx`의 "New Window Options" 드롭다운은 `bolt-elements-*` 토큰 대신 `dark:` 접두사+하드코딩 hex 조합을 쓰고 있었는데, `uno.config.ts`가 `dark:`를 `[data-theme="dark"]`에 매핑해뒀는지 확인한 결과 실제로는 정상 작동함 — 토큰 일관성은 떨어지지만 기능은 이상 없어서 스코프 밖으로 두고 손 안 댐(과잉 리팩터링 방지)
+- [판단과 근거]
+  - 이미 동작하는 CodeMirror/xterm/프리뷰 드롭다운 다크 로직을 굳이 토큰 스타일로 재작성하지 않은 건 "필요 이상으로 건드리지 않는다" 원칙 — 기능이 이미 맞으면 스타일 일관성은 후순위
+- [아침 확인 체크리스트]
+  - [ ] 랜딩 헤더/작업공간 헤더 양쪽에서 해/달 아이콘 토글 클릭 → 실제 라이트/다크 전환되는지, 아이콘이 코랄 배경 위에서도 잘 보이는지
+  - [ ] 다크 상태에서 새로고침 시 FOUC(잠깐 흰 화면 깜빡임) 없는지
+  - [ ] 시크릿/프라이빗 창(로컬스토리지 없음)에서 처음 열었을 때 OS 다크모드 설정을 따라가는지
+  - [ ] 코드 에디터/터미널이 다크 전환 시 실제로 색이 바뀌는지 (작업공간 진입해서 확인)
+  - [ ] `/pricing` 페이지를 다크 상태로 이동해서 킷 스타일이 깨지지 않는지
+  - [ ] 네이티브 스크롤바/입력창 다크 렌더링 확인(브라우저별로 다를 수 있음)
+- [커밋 해시] 8a282a0
 
 ---
 
