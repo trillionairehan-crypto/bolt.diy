@@ -298,17 +298,21 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           placeholder={isLanding ? '' : props.chatMode === 'build' ? '어떤 걸 만들고 싶으세요?' : '무엇이든 물어보세요'}
           translate="no"
         />
-        <div className="flex justify-between items-center text-sm p-4 pt-3">
-          <div className="flex gap-3 items-center">
+        <div className="flex flex-nowrap justify-between items-center text-sm p-4 pt-3 w-full">
+          <div className="flex flex-nowrap gap-3 items-center min-w-0">
             <IconButton
               title="이미지 첨부"
-              className="flex items-center h-8 gap-1.5 px-2 !text-bolt-elements-textSecondary"
+              className="flex items-center h-8 gap-1.5 px-2 shrink-0 whitespace-nowrap !text-bolt-elements-textSecondary"
               onClick={() => props.handleFileUpload()}
             >
               <div className="i-ph:paperclip text-base"></div>
-              <span className="hidden sm:inline text-[13px]">이미지</span>
+              <span className={classNames('text-[13px]', isLanding ? 'hidden sm:inline' : 'hidden')}>이미지</span>
             </IconButton>
-            <WebSearch onSearchResult={(result) => props.onWebSearchResult?.(result)} disabled={props.isStreaming} />
+            <WebSearch
+              onSearchResult={(result) => props.onWebSearchResult?.(result)}
+              disabled={props.isStreaming}
+              showLabel={isLanding}
+            />
             {SHOW_ENHANCE_BUTTON && (
               <IconButton
                 title="Enhance prompt"
@@ -332,12 +336,13 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               onStart={props.startListening}
               onStop={props.stopListening}
               disabled={props.isStreaming}
+              showLabel={isLanding}
             />
             {props.chatStarted && (
               <IconButton
                 title="대화 모드"
                 className={classNames(
-                  'transition-all flex items-center gap-1 px-1.5',
+                  'transition-all flex items-center gap-1 px-1.5 shrink-0 whitespace-nowrap',
                   props.chatMode === 'discuss'
                     ? '!bg-bolt-elements-item-backgroundAccent !text-bolt-elements-item-contentAccent'
                     : 'bg-bolt-elements-item-backgroundDefault text-bolt-elements-item-contentDefault',
@@ -347,7 +352,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
                 }}
               >
                 <div className={`i-ph:chats text-xl`} />
-                {props.chatMode === 'discuss' ? <span className="hidden sm:inline">대화</span> : <span />}
+                {props.chatMode === 'discuss' ? <span className="hidden">대화</span> : <span />}
               </IconButton>
             )}
             {SHOW_DEV_TOOLS && (
@@ -367,34 +372,38 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               </IconButton>
             )}
           </div>
-          <div className="flex gap-2 items-center">
-            {props.input.length > 3 ? (
-              <div className="hidden sm:block text-xs text-bolt-elements-textTertiary">
+          <div className="flex flex-nowrap gap-2 items-center shrink-0">
+            {isLanding && props.input.length > 3 ? (
+              <div className="hidden sm:block text-xs text-bolt-elements-textTertiary whitespace-nowrap shrink-0">
                 <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Shift</kbd> +{' '}
                 <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Return</kbd>으로 줄바꿈
               </div>
             ) : null}
-            <SupabaseConnection />
+            <div className="shrink-0">
+              <SupabaseConnection />
+            </div>
             <ClientOnly>
               {() => (
-                <SendButton
-                  isStreaming={props.isStreaming}
-                  disabled={
-                    !props.providerList ||
-                    props.providerList.length === 0 ||
-                    (!props.isStreaming && props.input.length === 0 && props.uploadedFiles.length === 0)
-                  }
-                  onClick={(event) => {
-                    if (props.isStreaming) {
-                      props.handleStop?.();
-                      return;
+                <div className="shrink-0">
+                  <SendButton
+                    isStreaming={props.isStreaming}
+                    disabled={
+                      !props.providerList ||
+                      props.providerList.length === 0 ||
+                      (!props.isStreaming && props.input.length === 0 && props.uploadedFiles.length === 0)
                     }
+                    onClick={(event) => {
+                      if (props.isStreaming) {
+                        props.handleStop?.();
+                        return;
+                      }
 
-                    if (props.input.length > 0 || props.uploadedFiles.length > 0) {
-                      props.handleSendMessage?.(event);
-                    }
-                  }}
-                />
+                      if (props.input.length > 0 || props.uploadedFiles.length > 0) {
+                        props.handleSendMessage?.(event);
+                      }
+                    }}
+                  />
+                </div>
               )}
             </ClientOnly>
           </div>

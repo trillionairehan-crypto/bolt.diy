@@ -6,6 +6,7 @@ import { classNames } from '~/utils/classNames';
 interface WebSearchProps {
   onSearchResult: (result: string) => void;
   disabled?: boolean;
+  showLabel?: boolean;
 }
 
 interface WebSearchData {
@@ -37,7 +38,7 @@ function formatSearchResult(data: WebSearchData): string {
   return parts.join('\n');
 }
 
-export function WebSearch({ onSearchResult, disabled = false }: WebSearchProps) {
+export function WebSearch({ onSearchResult, disabled = false, showLabel = true }: WebSearchProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [url, setUrl] = useState('');
@@ -105,14 +106,14 @@ export function WebSearch({ onSearchResult, disabled = false }: WebSearchProps) 
         title="참고할 사이트 주소 넣기"
         disabled={disabled || isSearching}
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center h-8 gap-1.5 px-2 !text-bolt-elements-textSecondary"
+        className="flex items-center h-8 gap-1.5 px-2 shrink-0 whitespace-nowrap !text-bolt-elements-textSecondary"
       >
         {isSearching ? (
           <div className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress text-base animate-spin" />
         ) : (
           <div className="i-ph:link text-base" />
         )}
-        <span className="hidden sm:inline text-[13px]">사이트</span>
+        <span className={classNames('text-[13px]', showLabel ? 'hidden sm:inline' : 'hidden')}>사이트</span>
       </IconButton>
       {isOpen && (
         <div
