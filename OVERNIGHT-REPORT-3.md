@@ -67,3 +67,23 @@
 - **아침 확인 필요 (중요도 높음)**: 실제 대화에서 메시지 3~4개를 주고받은 뒤, 중간 시점(가장 최근이 아닌 시점)으로 "되돌리기"를 실행했을 때 코드/파일이 **실제로 그 시점 상태로 복원되는지** 반드시 확인 필요 — 위에서 설명한 대로 이 부분은 코드 추적만 했고 실브라우저 검증을 못 했음. 만약 안 된다면 이건 오늘 밤 새로 만든 버그가 아니라 기존에 이미 있던 버그이니 별도 이슈로 다뤄야 함.
 
 ---
+
+### A5: 메시지 카운트 일관성
+
+- [상태: 완료 — 플래그 게이트, 기본 꺼짐] 커밋 `aa03919`
+- **⚠️ 조사 결과 — 실제로 이미 배포되어 있던 과금 우회 버그를 발견함**: `increment_generation_count`가 호출되는 곳을 코드 전체에서 추적한 결과 **딱 한 군데**뿐이었음 — `generateNewApp`(채팅의 "첫 메시지"가 온보딩 설문을 마친 뒤 실제로 생성이 시작되는 지점). `chatStarted` 이후 후속 메시지를 보내는 `sendMessage`의 다른 분기는 `checkGenerationsAllowed`도 `increment`도 전혀 호출하지 않음. 즉 **채팅의 첫 메시지 딱 1개만 카운트되고, 그 뒤로 몇 개를 더 보내든 전부 무료** — 오늘 밤 새로 생긴 버그가 아니라 이미 프로덕션에 나가 있는 상태로 추정됨(이 세션에서 아무것도 안 건드렸는데 발견된 것이므로).
+- **목표 정의**(지시받은 대로): 1 사용자 발화 = 1메시지. auto-fix(미리보기 에러 자동수정, `actionAlert` 기원) 트리거는 제외. 무료 티어 = 월 10개 + 일 1개.
+- **구현, 전부 `CORALRED_NEW_METERING` 플래그 뒤(`app/utils/featureFlags.ts`, 기본 `false`)**:
+  - `Chat.client.tsx`: `sendMessage`에 4번째 파라미터 `isAutoFix`(기본 `false`) 추가, auto-fix 이펙트만 `true`로 호출. `checkGenerationsAllowed`/새 `recordGenerationUsed` 헬퍼가 플래그에 따라 기존 v1 함수 또는 새 v2 함수로 분기. 후속 메시지 분기에 `if (CORALRED_NEW_METERING && !isAutoFix)` 블록으로 체크+카운트를 새로 추가 — **플래그가 꺼져 있으면 이 블록 자체가 아예 실행 안 되므로 기존 버그(?) 동작이 그대로 보존됨**.
+  - `app/lib/freeTrial.ts`: v2 함수 세트 추가 (게스트=localStorage 월/일 카운터, 로그인=새 Supabase RPC). 기존 v1 함수는 한 글자도 안 건드림.
+  - `supabase/migrations/20260825000000_message_metering_v2.sql` (작성만 함, 미적용): `generation_usage_v2` 테이블(월/일 카운트 + 이월용 예약 컬럼) + `get_generation_status_v2`/`increment_generation_count_v2` RPC. 기존 `generation_usage` 테이블이나 RPC는 전혀 안 건드리는 완전 추가형 스키마.
+  - **의도적으로 미구현**: 유료 플랜 이월(다음 달로 최대 월 할당량의 2배까지 누적)은 플랜별 월 할당량을 알아야 하는데, 그 정보가 있는 `pricing.tsx`가 이번 시리즈 내내 불가침이라 코드로 확인 못함. `carryover_count` 컬럼만 마련해두고 로직은 안 붙임 — 아침에 실제 플랜별 할당량을 확인한 뒤 이어서 구현해야 함.
+- **재검증**: typecheck/lint/build 클린. 플래그가 꺼진 상태에서의 코드 경로를 다시 추적: `checkGenerationsAllowed`/`recordGenerationUsed`는 flag=false일 때 기존 v1 함수를 그대로 호출하고, 새로 추가된 후속-메시지 카운트 블록은 flag 조건 자체가 false라 통째로 스킵됨 — 즉 오늘 밤 이전과 동작이 100% 동일함을 코드 추적으로 확인.
+- **아침 적용 절차** (사용자가 결정할 사항):
+  1. `supabase/migrations/20260825000000_message_metering_v2.sql`을 실제 Supabase 프로젝트에 적용 (Supabase 대시보드 SQL 에디터 또는 `supabase db push`).
+  2. `pricing.tsx`의 실제 플랜별 월 할당량을 확인하고, 유료 플랜 이월 로직을 RPC에 추가할지 결정.
+  3. `app/utils/featureFlags.ts`의 `CORALRED_NEW_METERING`을 `true`로 변경 + 커밋.
+  4. 실브라우저에서 후속 메시지를 여러 번 보내면서 카운트가 실제로 올라가는지, 한도 도달 시 올바르게 막히는지 확인.
+  5. (선택) 기존 v1 `generation_usage` 테이블의 과거 데이터를 v2로 마이그레이션할지 결정 — 새 스키마는 완전히 별도라 기존 사용자의 "이미 쓴 횟수" 이력이 자동으로 넘어가지 않음.
+
+---
