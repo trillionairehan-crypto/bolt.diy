@@ -1,0 +1,114 @@
+.container {
+  width: min(480px, 88vw);
+  aspect-ratio: 1 / 1;
+  position: relative;
+  container-type: inline-size;
+  margin: 0 auto;
+}
+
+.tileFloat {
+  position: absolute;
+  animation-name: cr-float;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+}
+
+@keyframes cr-float {
+  from {
+    transform: translateY(-6px);
+  }
+  to {
+    transform: translateY(6px);
+  }
+}
+
+.tile {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  opacity: 0;
+  animation-name: cr-enter;
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation-fill-mode: both;
+  transition:
+    transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes cr-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.6) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.tile:hover {
+  transform: scale(1.08) translateY(-4px);
+  box-shadow: 0 20px 40px rgba(23, 16, 14, 0.25);
+}
+
+.tile:focus-visible {
+  outline: 3px solid rgba(250, 247, 240, 0.9);
+  outline-offset: 3px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.label {
+  font-size: clamp(11px, 3cqw, 15px);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+  padding: 0 6px;
+}
+
+.examplesHighlight {
+  animation: cr-examples-pulse 700ms ease-out;
+}
+
+@keyframes cr-examples-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 83, 48, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(255, 83, 48, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tileFloat {
+    animation: none;
+  }
+
+  .tile {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    transition: filter 150ms ease;
+  }
+
+  .tile:hover {
+    transform: none;
+    box-shadow: none;
+    filter: brightness(0.92);
+  }
+}

@@ -36,6 +36,7 @@ import { getGenerationsRemaining } from '~/lib/freeTrial';
 import { authUserStore } from '~/lib/stores/auth';
 import PromptClarification from './PromptClarification';
 import type { GenerationDirectives } from '~/lib/onboarding/answer-directives';
+import { CoralredHero } from '~/components/landing/CoralredHero';
 
 /*
  * Lazy-loaded: Workbench.client.tsx pulls in the workbenchStore singleton (ActionRunner,
@@ -402,163 +403,192 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
               />
             ) : (
               <>
-                {!chatStarted && (
-                  <div id="intro" className="mt-[16vh] max-w-2xl mx-auto text-center px-4 lg:px-0">
-                    <h1 className="text-3xl lg:text-6xl font-bold text-bolt-elements-textPrimary mb-4 animate-fade-in">
-                      만들고 싶은 걸 말해보세요
-                    </h1>
-                    <p className="text-md lg:text-xl mb-8 text-bolt-elements-textSecondary animate-fade-in animation-delay-200">
-                      코딩 몰라도 괜찮아요. 한국어로 설명하면 앱이 만들어져요.
-                    </p>
-                    <p
-                      className="text-sm lg:text-base mb-8 animate-fade-in animation-delay-200"
-                      style={{ color: '#1A1A1A' }}
-                    >
-                      {freeGenerationsRemaining > 0 ? (
-                        <>
-                          무료 체험{' '}
-                          <span style={{ color: '#FF5330', fontWeight: 600 }}>{freeGenerationsRemaining}회</span>{' '}
-                          남았어요
-                        </>
-                      ) : (
-                        <span style={{ color: '#FF5330', fontWeight: 600 }}>무료 체험을 모두 사용했어요</span>
-                      )}
-                    </p>
-                  </div>
-                )}
-                <StickToBottom
-                  className={classNames('pt-6 px-2 sm:px-6 relative', {
-                    'h-full flex flex-col modern-scrollbar': chatStarted,
+                <div
+                  className={classNames({
+                    'lg:grid lg:grid-cols-2 lg:items-center lg:gap-12 px-4 lg:px-10 py-10 lg:py-14 -mx-2 sm:-mx-6':
+                      !chatStarted,
                   })}
-                  resize="smooth"
-                  initial="smooth"
+                  style={!chatStarted ? { background: '#FF5330' } : undefined}
                 >
-                  <StickToBottom.Content className="flex flex-col gap-4 relative ">
-                    <ClientOnly>
-                      {() => {
-                        return chatStarted ? (
-                          <Messages
-                            className="flex flex-col w-full flex-1 max-w-chat pb-4 mx-auto z-1"
-                            messages={messages}
-                            parsedMessages={parsedMessages}
-                            isStreaming={isStreaming}
-                            append={append}
-                            chatMode={chatMode}
-                            setChatMode={setChatMode}
-                            provider={provider}
-                            model={model}
-                            addToolOutput={addToolOutput}
-                          />
-                        ) : null;
-                      }}
-                    </ClientOnly>
-                    <ScrollToBottom />
-                  </StickToBottom.Content>
-                  <div
-                    className={classNames('my-auto flex flex-col gap-2 w-full max-w-chat mx-auto z-prompt mb-6', {
-                      'sticky bottom-2': chatStarted,
-                    })}
-                  >
-                    <div className="flex flex-col gap-2">
-                      {deployAlert && (
-                        <DeployChatAlert
-                          alert={deployAlert}
-                          clearAlert={() => clearDeployAlert?.()}
-                          postMessage={(message: string | undefined) => {
-                            sendMessage?.({} as any, message);
-                            clearSupabaseAlert?.();
+                  <div className="flex flex-col min-w-0">
+                    {!chatStarted && (
+                      <div id="intro" className="max-w-xl">
+                        <h1
+                          className="mb-4 animate-fade-in"
+                          style={{
+                            color: '#FAF7F0',
+                            fontWeight: 700,
+                            letterSpacing: '-0.03em',
+                            fontSize: 'clamp(34px, 5vw, 56px)',
+                            lineHeight: 1.15,
                           }}
-                        />
-                      )}
-                      {supabaseAlert && (
-                        <SupabaseChatAlert
-                          alert={supabaseAlert}
-                          clearAlert={() => clearSupabaseAlert?.()}
-                          postMessage={(message) => {
-                            sendMessage?.({} as any, message);
-                            clearSupabaseAlert?.();
+                        >
+                          말하면,
+                          <br />
+                          앱이 됩니다
+                        </h1>
+                        <p
+                          className="text-md lg:text-xl mb-6 animate-fade-in animation-delay-200"
+                          style={{ color: '#FAF7F0' }}
+                        >
+                          코딩 없이, 한국어로 설명하면 앱이 완성돼요.
+                        </p>
+                        <p
+                          className="text-sm lg:text-base mb-2 animate-fade-in animation-delay-200"
+                          style={{ color: '#FAF7F0' }}
+                        >
+                          {freeGenerationsRemaining > 0 ? (
+                            <>
+                              무료 체험 <span style={{ fontWeight: 800 }}>{freeGenerationsRemaining}회</span> 남았어요
+                            </>
+                          ) : (
+                            <span style={{ fontWeight: 800 }}>무료 체험을 모두 사용했어요</span>
+                          )}
+                        </p>
+                      </div>
+                    )}
+                    <StickToBottom
+                      className={classNames('pt-6 px-2 sm:px-6 relative', {
+                        'h-full flex flex-col modern-scrollbar': chatStarted,
+                      })}
+                      resize="smooth"
+                      initial="smooth"
+                    >
+                      <StickToBottom.Content className="flex flex-col gap-4 relative ">
+                        <ClientOnly>
+                          {() => {
+                            return chatStarted ? (
+                              <Messages
+                                className="flex flex-col w-full flex-1 max-w-chat pb-4 mx-auto z-1"
+                                messages={messages}
+                                parsedMessages={parsedMessages}
+                                isStreaming={isStreaming}
+                                append={append}
+                                chatMode={chatMode}
+                                setChatMode={setChatMode}
+                                provider={provider}
+                                model={model}
+                                addToolOutput={addToolOutput}
+                              />
+                            ) : null;
                           }}
+                        </ClientOnly>
+                        <ScrollToBottom />
+                      </StickToBottom.Content>
+                      <div
+                        className={classNames('my-auto flex flex-col gap-2 w-full max-w-chat mx-auto z-prompt mb-6', {
+                          'sticky bottom-2': chatStarted,
+                        })}
+                      >
+                        <div className="flex flex-col gap-2">
+                          {deployAlert && (
+                            <DeployChatAlert
+                              alert={deployAlert}
+                              clearAlert={() => clearDeployAlert?.()}
+                              postMessage={(message: string | undefined) => {
+                                sendMessage?.({} as any, message);
+                                clearSupabaseAlert?.();
+                              }}
+                            />
+                          )}
+                          {supabaseAlert && (
+                            <SupabaseChatAlert
+                              alert={supabaseAlert}
+                              clearAlert={() => clearSupabaseAlert?.()}
+                              postMessage={(message) => {
+                                sendMessage?.({} as any, message);
+                                clearSupabaseAlert?.();
+                              }}
+                            />
+                          )}
+                          {actionAlert && (
+                            <ChatAlert
+                              alert={actionAlert}
+                              clearAlert={() => clearAlert?.()}
+                              postMessage={(message) => {
+                                sendMessage?.({} as any, message);
+                                clearAlert?.();
+                              }}
+                            />
+                          )}
+                          {llmErrorAlert && (
+                            <LlmErrorAlert alert={llmErrorAlert} clearAlert={() => clearLlmErrorAlert?.()} />
+                          )}
+                        </div>
+                        {progressAnnotations && <ProgressCompilation data={progressAnnotations} />}
+                        <ChatBox
+                          isModelSettingsCollapsed={isModelSettingsCollapsed}
+                          setIsModelSettingsCollapsed={setIsModelSettingsCollapsed}
+                          provider={provider}
+                          setProvider={setProvider}
+                          providerList={providerList || (PROVIDER_LIST as ProviderInfo[])}
+                          model={model}
+                          setModel={setModel}
+                          modelList={modelList}
+                          apiKeys={apiKeys}
+                          isModelLoading={isModelLoading}
+                          onApiKeysChange={onApiKeysChange}
+                          uploadedFiles={uploadedFiles}
+                          setUploadedFiles={setUploadedFiles}
+                          imageDataList={imageDataList}
+                          setImageDataList={setImageDataList}
+                          textareaRef={textareaRef}
+                          input={input}
+                          handleInputChange={handleInputChange}
+                          handlePaste={handlePaste}
+                          TEXTAREA_MIN_HEIGHT={TEXTAREA_MIN_HEIGHT}
+                          TEXTAREA_MAX_HEIGHT={TEXTAREA_MAX_HEIGHT}
+                          isStreaming={isStreaming}
+                          handleStop={handleStop}
+                          handleSendMessage={handleSendMessage}
+                          enhancingPrompt={enhancingPrompt}
+                          enhancePrompt={enhancePrompt}
+                          isListening={isListening}
+                          startListening={startListening}
+                          stopListening={stopListening}
+                          chatStarted={chatStarted}
+                          exportChat={exportChat}
+                          qrModalOpen={qrModalOpen}
+                          setQrModalOpen={setQrModalOpen}
+                          handleFileUpload={handleFileUpload}
+                          chatMode={chatMode}
+                          setChatMode={setChatMode}
+                          designScheme={designScheme}
+                          setDesignScheme={setDesignScheme}
+                          selectedElement={selectedElement}
+                          setSelectedElement={setSelectedElement}
+                          onWebSearchResult={onWebSearchResult}
                         />
+                      </div>
+                    </StickToBottom>
+                    <div className="flex flex-col justify-center">
+                      {!chatStarted && SHOW_DEV_TOOLS && (
+                        <div className="flex justify-center gap-2">
+                          {ImportButtons(importChat)}
+                          <GitCloneButton importChat={importChat} />
+                        </div>
                       )}
-                      {actionAlert && (
-                        <ChatAlert
-                          alert={actionAlert}
-                          clearAlert={() => clearAlert?.()}
-                          postMessage={(message) => {
-                            sendMessage?.({} as any, message);
-                            clearAlert?.();
-                          }}
-                        />
-                      )}
-                      {llmErrorAlert && (
-                        <LlmErrorAlert alert={llmErrorAlert} clearAlert={() => clearLlmErrorAlert?.()} />
-                      )}
+                      <div className="flex flex-col gap-5">
+                        {!chatStarted &&
+                          ExamplePrompts((event, messageInput) => {
+                            if (isStreaming) {
+                              handleStop?.();
+                              return;
+                            }
+
+                            handleSendMessage?.(event, messageInput);
+                          })}
+                        {!chatStarted && SHOW_DEV_TOOLS && <StarterTemplates />}
+                      </div>
                     </div>
-                    {progressAnnotations && <ProgressCompilation data={progressAnnotations} />}
-                    <ChatBox
-                      isModelSettingsCollapsed={isModelSettingsCollapsed}
-                      setIsModelSettingsCollapsed={setIsModelSettingsCollapsed}
-                      provider={provider}
-                      setProvider={setProvider}
-                      providerList={providerList || (PROVIDER_LIST as ProviderInfo[])}
-                      model={model}
-                      setModel={setModel}
-                      modelList={modelList}
-                      apiKeys={apiKeys}
-                      isModelLoading={isModelLoading}
-                      onApiKeysChange={onApiKeysChange}
-                      uploadedFiles={uploadedFiles}
-                      setUploadedFiles={setUploadedFiles}
-                      imageDataList={imageDataList}
-                      setImageDataList={setImageDataList}
-                      textareaRef={textareaRef}
-                      input={input}
-                      handleInputChange={handleInputChange}
-                      handlePaste={handlePaste}
-                      TEXTAREA_MIN_HEIGHT={TEXTAREA_MIN_HEIGHT}
-                      TEXTAREA_MAX_HEIGHT={TEXTAREA_MAX_HEIGHT}
-                      isStreaming={isStreaming}
-                      handleStop={handleStop}
-                      handleSendMessage={handleSendMessage}
-                      enhancingPrompt={enhancingPrompt}
-                      enhancePrompt={enhancePrompt}
-                      isListening={isListening}
-                      startListening={startListening}
-                      stopListening={stopListening}
-                      chatStarted={chatStarted}
-                      exportChat={exportChat}
-                      qrModalOpen={qrModalOpen}
-                      setQrModalOpen={setQrModalOpen}
-                      handleFileUpload={handleFileUpload}
-                      chatMode={chatMode}
-                      setChatMode={setChatMode}
-                      designScheme={designScheme}
-                      setDesignScheme={setDesignScheme}
-                      selectedElement={selectedElement}
-                      setSelectedElement={setSelectedElement}
-                      onWebSearchResult={onWebSearchResult}
-                    />
                   </div>
-                </StickToBottom>
-                <div className="flex flex-col justify-center">
-                  {!chatStarted && SHOW_DEV_TOOLS && (
-                    <div className="flex justify-center gap-2">
-                      {ImportButtons(importChat)}
-                      <GitCloneButton importChat={importChat} />
+                  {!chatStarted && (
+                    <div className="mt-10 lg:mt-0">
+                      <ClientOnly>
+                        {() => <CoralredHero onFocusPrompt={() => textareaRef?.current?.focus()} />}
+                      </ClientOnly>
                     </div>
                   )}
-                  <div className="flex flex-col gap-5">
-                    {!chatStarted &&
-                      ExamplePrompts((event, messageInput) => {
-                        if (isStreaming) {
-                          handleStop?.();
-                          return;
-                        }
-
-                        handleSendMessage?.(event, messageInput);
-                      })}
-                    {!chatStarted && SHOW_DEV_TOOLS && <StarterTemplates />}
-                  </div>
                 </div>
               </>
             )}
