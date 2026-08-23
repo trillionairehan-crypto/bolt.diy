@@ -27,7 +27,7 @@ export const SpeechRecognitionButton = ({
       ) : (
         <div className="i-ph:microphone text-base" />
       )}
-      <span className="text-[13px]">음성</span>
+      <span className="hidden sm:inline text-[13px]">음성</span>
     </IconButton>
   );
 };

@@ -254,7 +254,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               onClick={() => props.handleFileUpload()}
             >
               <div className="i-ph:paperclip text-base"></div>
-              <span className="text-[13px]">이미지</span>
+              <span className="hidden sm:inline text-[13px]">이미지</span>
             </IconButton>
             <WebSearch onSearchResult={(result) => props.onWebSearchResult?.(result)} disabled={props.isStreaming} />
             {SHOW_ENHANCE_BUTTON && (
@@ -295,7 +295,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
                 }}
               >
                 <div className={`i-ph:chats text-xl`} />
-                {props.chatMode === 'discuss' ? <span>대화</span> : <span />}
+                {props.chatMode === 'discuss' ? <span className="hidden sm:inline">대화</span> : <span />}
               </IconButton>
             )}
             {SHOW_DEV_TOOLS && (
@@ -317,7 +317,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           </div>
           <div className="flex gap-2 items-center">
             {props.input.length > 3 ? (
-              <div className="text-xs text-bolt-elements-textTertiary">
+              <div className="hidden sm:block text-xs text-bolt-elements-textTertiary">
                 <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Shift</kbd> +{' '}
                 <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Return</kbd>으로 줄바꿈
               </div>

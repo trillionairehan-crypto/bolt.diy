@@ -112,7 +112,7 @@ export function WebSearch({ onSearchResult, disabled = false }: WebSearchProps) 
         ) : (
           <div className="i-ph:link text-base" />
         )}
-        <span className="text-[13px]">사이트</span>
+        <span className="hidden sm:inline text-[13px]">사이트</span>
       </IconButton>
       {isOpen && (
         <div
