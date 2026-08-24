@@ -78,7 +78,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
   const fetchRecentRepos = async (token: string, gitlabUrl = 'https://gitlab.com') => {
     if (!token) {
       logStore.logError('No GitLab token available');
-      toast.error('GitLab authentication required');
+      toast.error('GitLab 인증이 필요해요');
 
       return;
     }
@@ -92,7 +92,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
     } catch (error) {
       console.error('Failed to fetch GitLab repositories:', error);
       logStore.logError('Failed to fetch GitLab repositories', { error });
-      toast.error('Failed to fetch recent repositories');
+      toast.error('최근 저장소를 가져오지 못했어요');
     } finally {
       setIsFetchingRepos(false);
     }
@@ -105,12 +105,12 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
     const connection = getLocalStorage('gitlab_connection');
 
     if (!connection?.token || !connection?.user) {
-      toast.error('Please connect your GitLab account in Settings > Connections first');
+      toast.error('먼저 설정 > 연결에서 GitLab 계정을 연결해주세요');
       return;
     }
 
     if (!repoName.trim()) {
-      toast.error('Repository name is required');
+      toast.error('저장소 이름을 입력해주세요');
       return;
     }
 
@@ -129,7 +129,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
 
       // Warn user if repository name was changed
       if (sanitizedRepoName !== repoName && sanitizedRepoName !== repoName.toLowerCase()) {
-        toast.info(`Repository name sanitized to "${sanitizedRepoName}" to meet GitLab requirements`);
+        toast.info(`GitLab 요구사항에 맞춰 저장소 이름이 "${sanitizedRepoName}"(으)로 변경됐어요`);
       }
 
       // Check if project exists using the sanitized name
@@ -142,11 +142,11 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
         // Confirm overwrite
         const visibilityChange =
           existingProject.visibility !== (isPrivate ? 'private' : 'public')
-            ? `\n\nThis will also change the repository from ${existingProject.visibility} to ${isPrivate ? 'private' : 'public'}.`
+            ? `\n\n이 작업으로 저장소가 ${existingProject.visibility === 'private' ? '비공개' : '공개'}에서 ${isPrivate ? '비공개' : '공개'}(으)로 전환돼요.`
             : '';
 
         const confirmOverwrite = window.confirm(
-          `Repository "${sanitizedRepoName}" already exists. Do you want to update it? This will add or modify files in the repository.${visibilityChange}`,
+          `저장소 "${sanitizedRepoName}"이(가) 이미 있어요. 업데이트할까요? 저장소의 파일이 추가되거나 변경돼요.${visibilityChange}`,
         );
 
         if (!confirmOverwrite) {
@@ -156,24 +156,24 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
 
         // Update visibility if needed
         if (existingProject.visibility !== (isPrivate ? 'private' : 'public')) {
-          toast.info('Updating repository visibility...');
+          toast.info('저장소 공개 범위를 변경하는 중...');
           await apiService.updateProjectVisibility(existingProject.id, isPrivate ? 'private' : 'public');
         }
 
         // Update project with files
-        toast.info('Uploading files to existing repository...');
+        toast.info('기존 저장소에 파일을 업로드하는 중...');
         await apiService.updateProjectWithFiles(existingProject.id, files);
         repoUrl = existingProject.http_url_to_repo;
         setCreatedRepoUrl(repoUrl);
-        toast.success('Repository updated successfully!');
+        toast.success('저장소를 업데이트했어요!');
       } else {
         // Create new project with files
-        toast.info('Creating new repository...');
+        toast.info('새 저장소를 만드는 중...');
 
         const newProject = await apiService.createProjectWithFiles(sanitizedRepoName, isPrivate, files);
         repoUrl = newProject.http_url_to_repo;
         setCreatedRepoUrl(repoUrl);
-        toast.success('Repository created successfully!');
+        toast.success('저장소를 만들었어요!');
       }
 
       // Set pushed files for display
@@ -213,27 +213,25 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
       });
 
       // Provide specific error messages based on error type
-      let errorMessage = 'Failed to push to GitLab';
+      let errorMessage = 'GitLab에 푸시하지 못했어요';
 
       if (error instanceof Error) {
         const errorMsg = error.message.toLowerCase();
 
         if (errorMsg.includes('404') || errorMsg.includes('not found')) {
-          errorMessage =
-            'Repository or GitLab instance not found. Please check your GitLab URL and repository permissions.';
+          errorMessage = '저장소 또는 GitLab 인스턴스를 찾을 수 없어요. GitLab URL과 저장소 권한을 확인해주세요.';
         } else if (errorMsg.includes('401') || errorMsg.includes('unauthorized')) {
-          errorMessage = 'GitLab authentication failed. Please check your access token and permissions.';
+          errorMessage = 'GitLab 인증에 실패했어요. 액세스 토큰과 권한을 확인해주세요.';
         } else if (errorMsg.includes('403') || errorMsg.includes('forbidden')) {
-          errorMessage =
-            'Access denied. Your GitLab token may not have sufficient permissions to create/modify repositories.';
+          errorMessage = '접근이 거부됐어요. GitLab 토큰에 저장소 생성/수정 권한이 부족할 수 있어요.';
         } else if (errorMsg.includes('network') || errorMsg.includes('fetch')) {
-          errorMessage = 'Network error. Please check your internet connection and try again.';
+          errorMessage = '네트워크 오류예요. 인터넷 연결을 확인하고 다시 시도해주세요.';
         } else if (errorMsg.includes('timeout')) {
-          errorMessage = 'Request timed out. Please try again or check your connection.';
+          errorMessage = '요청이 시간 초과됐어요. 다시 시도하거나 연결을 확인해주세요.';
         } else if (errorMsg.includes('rate limit')) {
-          errorMessage = 'GitLab API rate limit exceeded. Please wait a moment and try again.';
+          errorMessage = 'GitLab API 요청 한도를 초과했어요. 잠시 후 다시 시도해주세요.';
         } else {
-          errorMessage = `GitLab error: ${error.message}`;
+          errorMessage = `GitLab 오류: ${error.message}`;
         }
       }
 
@@ -281,7 +279,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                 className="bg-white dark:bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor shadow-xl"
                 aria-describedby="success-dialog-description"
               >
-                <Dialog.Title className="sr-only">Successfully pushed to GitLab</Dialog.Title>
+                <Dialog.Title className="sr-only">GitLab에 성공적으로 푸시했어요</Dialog.Title>
                 <div className="p-6 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -290,10 +288,10 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       </div>
                       <div>
                         <h3 className="text-lg font-medium text-bolt-elements-textPrimary">
-                          Successfully pushed to GitLab
+                          GitLab에 성공적으로 푸시했어요
                         </h3>
                         <p id="success-dialog-description" className="text-sm text-bolt-elements-textSecondary">
-                          Your code is now available on GitLab
+                          이제 GitLab에서 코드를 확인할 수 있어요
                         </p>
                       </div>
                     </div>
@@ -303,7 +301,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                         className="p-2 rounded-lg transition-all duration-200 ease-in-out bg-transparent text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-background-depth-2 dark:hover:bg-bolt-elements-background-depth-3 focus:outline-none focus:ring-2 focus:ring-bolt-elements-borderColor"
                       >
                         <span className="i-ph:x block w-5 h-5" aria-hidden="true" />
-                        <span className="sr-only">Close dialog</span>
+                        <span className="sr-only">닫기</span>
                       </button>
                     </Dialog.Close>
                   </div>
@@ -311,7 +309,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                   <div className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 rounded-lg p-4 text-left border border-bolt-elements-borderColor">
                     <p className="text-sm font-medium text-bolt-elements-textPrimary mb-2 flex items-center gap-2">
                       <span className="i-ph:gitlab-logo w-4 h-4 text-orange-500" />
-                      Repository URL
+                      저장소 URL
                     </p>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 text-sm bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-4 px-3 py-2 rounded border border-bolt-elements-borderColor text-bolt-elements-textPrimary font-mono">
@@ -320,7 +318,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       <motion.button
                         onClick={() => {
                           navigator.clipboard.writeText(createdRepoUrl);
-                          toast.success('URL copied to clipboard');
+                          toast.success('URL을 복사했어요');
                         }}
                         className="p-2 text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-4 rounded-lg border border-bolt-elements-borderColor"
                         whileHover={{ scale: 1.05 }}
@@ -334,7 +332,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                   <div className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 rounded-lg p-4 border border-bolt-elements-borderColor">
                     <p className="text-sm font-medium text-bolt-elements-textPrimary mb-2 flex items-center gap-2">
                       <span className="i-ph:files w-4 h-4 text-[var(--accent)]" />
-                      Pushed Files ({pushedFiles.length})
+                      푸시된 파일 ({pushedFiles.length}개)
                     </p>
                     <div className="max-h-[200px] overflow-y-auto custom-scrollbar pr-2">
                       {pushedFiles.slice(0, 100).map((file) => (
@@ -350,7 +348,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       ))}
                       {pushedFiles.length > 100 && (
                         <div className="py-2 text-center text-xs text-bolt-elements-textSecondary">
-                          +{pushedFiles.length - 100} more files
+                          파일 {pushedFiles.length - 100}개 더 있음
                         </div>
                       )}
                     </div>
@@ -366,19 +364,19 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="i-ph:gitlab-logo w-4 h-4" />
-                      View Repository
+                      저장소 보기
                     </motion.a>
                     <motion.button
                       onClick={() => {
                         navigator.clipboard.writeText(createdRepoUrl);
-                        toast.success('URL copied to clipboard');
+                        toast.success('URL을 복사했어요');
                       }}
                       className="px-4 py-2 rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 text-bolt-elements-textSecondary hover:bg-bolt-elements-background-depth-3 dark:hover:bg-bolt-elements-background-depth-4 text-sm inline-flex items-center gap-2 border border-bolt-elements-borderColor"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="i-ph:copy w-4 h-4" />
-                      Copy URL
+                      URL 복사
                     </motion.button>
                     <motion.button
                       onClick={handleClose}
@@ -386,7 +384,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      Close
+                      닫기
                     </motion.button>
                   </div>
                 </div>
@@ -415,7 +413,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                 className="bg-white dark:bg-bolt-elements-background-depth-1 rounded-lg p-6 border border-bolt-elements-borderColor shadow-xl"
                 aria-describedby="connection-required-description"
               >
-                <Dialog.Title className="sr-only">GitLab Connection Required</Dialog.Title>
+                <Dialog.Title className="sr-only">GitLab 연결이 필요해요</Dialog.Title>
                 <div className="relative text-center space-y-4">
                   <Dialog.Close asChild>
                     <button
@@ -434,12 +432,12 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                   >
                     <div className="i-ph:gitlab-logo w-8 h-8" />
                   </motion.div>
-                  <h3 className="text-lg font-medium text-bolt-elements-textPrimary">GitLab Connection Required</h3>
+                  <h3 className="text-lg font-medium text-bolt-elements-textPrimary">GitLab 연결이 필요해요</h3>
                   <p
                     id="connection-required-description"
                     className="text-sm text-bolt-elements-textSecondary max-w-md mx-auto"
                   >
-                    To deploy your code to GitLab, you need to connect your GitLab account first.
+                    GitLab에 코드를 배포하려면 먼저 GitLab 계정을 연결해야 해요.
                   </p>
                   <div className="pt-2 flex justify-center gap-3">
                     <motion.button
@@ -448,7 +446,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       whileTap={{ scale: 0.98 }}
                       onClick={handleClose}
                     >
-                      Close
+                      닫기
                     </motion.button>
                     <motion.button
                       onClick={() => setShowAuthDialog(true)}
@@ -457,7 +455,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="i-ph:gitlab-logo w-4 h-4" />
-                      Connect GitLab Account
+                      GitLab 계정 연결
                     </motion.button>
                   </div>
                 </div>
@@ -500,10 +498,10 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                   </motion.div>
                   <div>
                     <Dialog.Title className="text-lg font-medium text-bolt-elements-textPrimary">
-                      Deploy to GitLab
+                      GitLab에 배포
                     </Dialog.Title>
                     <p id="push-dialog-description" className="text-sm text-bolt-elements-textSecondary">
-                      Deploy your code to a new or existing GitLab repository
+                      새 저장소 또는 기존 GitLab 저장소에 코드를 배포해요
                     </p>
                   </div>
                   <Dialog.Close asChild>
@@ -578,7 +576,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <label htmlFor="repoName" className="text-sm text-bolt-elements-textSecondary">
-                      Repository Name
+                      저장소 이름
                     </label>
                     <div className="relative">
                       <div className="absolute left-3 top-1/2 -translate-y-1/2 text-bolt-elements-textTertiary">
@@ -598,15 +596,15 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm text-bolt-elements-textSecondary">Recent Repositories</label>
+                      <label className="text-sm text-bolt-elements-textSecondary">최근 저장소</label>
                       <span className="text-xs text-bolt-elements-textTertiary">
-                        {filteredRepos.length} of {recentRepos.length}
+                        {filteredRepos.length}개 / {recentRepos.length}개
                       </span>
                     </div>
 
                     <div className="mb-2">
                       <SearchInput
-                        placeholder="Search repositories..."
+                        placeholder="저장소 검색..."
                         value={repoSearchQuery}
                         onChange={(e) => setRepoSearchQuery(e.target.value)}
                         onClear={() => setRepoSearchQuery('')}
@@ -617,8 +615,8 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                     {recentRepos.length === 0 && !isFetchingRepos ? (
                       <EmptyState
                         icon="i-ph:gitlab-logo"
-                        title="No repositories found"
-                        description="We couldn't find any repositories in your GitLab account."
+                        title="저장소를 찾을 수 없어요"
+                        description="GitLab 계정에서 저장소를 찾지 못했어요."
                         variant="compact"
                       />
                     ) : (
@@ -626,8 +624,8 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                         {filteredRepos.length === 0 && repoSearchQuery.trim() !== '' ? (
                           <EmptyState
                             icon="i-ph:magnifying-glass"
-                            title="No matching repositories"
-                            description="Try a different search term"
+                            title="일치하는 저장소가 없어요"
+                            description="다른 검색어를 입력해보세요"
                             variant="compact"
                           />
                         ) : (
@@ -649,7 +647,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                                 </div>
                                 {repo.visibility === 'private' && (
                                   <Badge variant="primary" size="sm" icon="i-ph:lock w-3 h-3">
-                                    Private
+                                    비공개
                                   </Badge>
                                 )}
                               </div>
@@ -678,7 +676,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
 
                   {isFetchingRepos && (
                     <div className="flex items-center justify-center py-4">
-                      <StatusIndicator status="loading" pulse={true} label="Loading repositories..." />
+                      <StatusIndicator status="loading" pulse={true} label="저장소 불러오는 중..." />
                     </div>
                   )}
 
@@ -692,11 +690,11 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                         className="rounded border-bolt-elements-borderColor text-orange-500 focus:ring-orange-500 dark:bg-bolt-elements-background-depth-3"
                       />
                       <label htmlFor="private" className="text-sm text-bolt-elements-textPrimary">
-                        Make repository private
+                        저장소를 비공개로 만들기
                       </label>
                     </div>
                     <p className="text-xs text-bolt-elements-textTertiary mt-2 ml-6">
-                      Private repositories are only visible to you and people you share them with
+                      비공개 저장소는 나와 공유한 사람만 볼 수 있어요
                     </p>
                   </div>
 
@@ -708,7 +706,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      Cancel
+                      취소
                     </motion.button>
                     <motion.button
                       type="submit"
@@ -723,12 +721,12 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       {isLoading ? (
                         <>
                           <div className="i-ph:spinner-gap animate-spin w-4 h-4" />
-                          Deploying...
+                          배포 중...
                         </>
                       ) : (
                         <>
                           <div className="i-ph:gitlab-logo w-4 h-4" />
-                          Deploy to GitLab
+                          GitLab에 배포
                         </>
                       )}
                     </motion.button>

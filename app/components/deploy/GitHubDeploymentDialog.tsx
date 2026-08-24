@@ -99,7 +99,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
   const fetchRecentRepos = async (token: string) => {
     if (!token) {
       logStore.logError('No GitHub token available');
-      toast.error('GitHub authentication required');
+      toast.error('GitHub 인증이 필요해요');
 
       return;
     }
@@ -131,7 +131,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
           }
 
           if (response.status === 401) {
-            toast.error('GitHub token expired. Please reconnect your account.');
+            toast.error('GitHub 토큰이 만료됐어요. 계정을 다시 연결해주세요.');
 
             // Clear invalid token
             const connection = getLocalStorage('github_connection');
@@ -143,15 +143,15 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
           } else if (response.status === 403 && response.headers.get('x-ratelimit-remaining') === '0') {
             // Rate limit exceeded
             const resetTime = response.headers.get('x-ratelimit-reset');
-            const resetDate = resetTime ? new Date(parseInt(resetTime) * 1000).toLocaleTimeString() : 'soon';
-            toast.error(`GitHub API rate limit exceeded. Limit resets at ${resetDate}`);
+            const resetDate = resetTime ? new Date(parseInt(resetTime) * 1000).toLocaleTimeString() : '곧';
+            toast.error(`GitHub API 요청 한도를 초과했어요. ${resetDate}에 다시 시도할 수 있어요.`);
           } else {
             logStore.logError('Failed to fetch GitHub repositories', {
               status: response.status,
               statusText: response.statusText,
               error: errorData,
             });
-            toast.error(`Failed to fetch repositories: ${errorData.message || response.statusText}`);
+            toast.error(`저장소 목록을 가져오지 못했어요: ${errorData.message || response.statusText}`);
           }
 
           return;
@@ -168,7 +168,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
           }
         } catch (parseError) {
           logStore.logError('Failed to parse GitHub repositories response', { parseError });
-          toast.error('Failed to parse repository data');
+          toast.error('저장소 데이터를 처리하지 못했어요');
           setRecentRepos([]);
 
           return;
@@ -178,7 +178,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
       setRecentRepos(allRepos);
     } catch (error) {
       logStore.logError('Failed to fetch GitHub repositories', { error });
-      toast.error('Failed to fetch recent repositories');
+      toast.error('최근 저장소를 가져오지 못했어요');
     } finally {
       setIsFetchingRepos(false);
     }
@@ -191,12 +191,12 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
     const connection = getLocalStorage('github_connection');
 
     if (!connection?.token || !connection?.user) {
-      toast.error('Please connect your GitHub account in Settings > Connections first');
+      toast.error('먼저 설정 > 연결에서 GitHub 계정을 연결해주세요');
       return;
     }
 
     if (!repoName.trim()) {
-      toast.error('Repository name is required');
+      toast.error('저장소 이름을 입력해주세요');
       return;
     }
 
@@ -204,19 +204,19 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
     const sanitizedName = sanitizeRepoName(repoName);
 
     if (!sanitizedName || sanitizedName.length < 1) {
-      toast.error('Repository name must contain at least one alphanumeric character');
+      toast.error('저장소 이름에는 영문자나 숫자가 하나 이상 포함돼야 해요');
       return;
     }
 
     if (sanitizedName.length > 100) {
-      toast.error('Repository name is too long (maximum 100 characters)');
+      toast.error('저장소 이름이 너무 길어요 (최대 100자)');
       return;
     }
 
     // Update the repo name field with the sanitized version if it was changed
     if (sanitizedName !== repoName) {
       setRepoName(sanitizedName);
-      toast.info(`Repository name sanitized to: ${sanitizedName}`);
+      toast.info(`저장소 이름이 "${sanitizedName}"(으)로 변경됐어요`);
     }
 
     setIsLoading(true);
@@ -237,13 +237,13 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
         repoExists = true;
 
         // If we get here, the repo exists - confirm overwrite
-        let confirmMessage = `Repository "${repoName}" already exists. Do you want to update it? This will add or modify files in the repository.`;
+        let confirmMessage = `저장소 "${repoName}"이(가) 이미 있어요. 업데이트할까요? 저장소의 파일이 추가되거나 변경돼요.`;
 
         // Add visibility change warning if needed
         if (existingRepo.private !== isPrivate) {
           const visibilityChange = isPrivate
-            ? 'This will also change the repository from public to private.'
-            : 'This will also change the repository from private to public.';
+            ? '이 작업으로 저장소가 공개에서 비공개로 전환돼요.'
+            : '이 작업으로 저장소가 비공개에서 공개로 전환돼요.';
 
           confirmMessage += `\n\n${visibilityChange}`;
         }
@@ -473,42 +473,40 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
       console.error('Error pushing to GitHub:', error);
 
       // Attempt to extract more specific error information
-      let errorMessage = 'Failed to push to GitHub';
+      let errorMessage = 'GitHub에 푸시하지 못했어요';
       let isRetryable = false;
 
       if (error instanceof Error) {
         const errorMsg = error.message.toLowerCase();
 
         if (errorMsg.includes('network') || errorMsg.includes('fetch failed') || errorMsg.includes('connection')) {
-          errorMessage = 'Network error. Please check your internet connection and try again.';
+          errorMessage = '네트워크 오류예요. 인터넷 연결을 확인하고 다시 시도해주세요.';
           isRetryable = true;
         } else if (errorMsg.includes('401') || errorMsg.includes('unauthorized')) {
-          errorMessage = 'GitHub authentication failed. Please check your access token in Settings > Connections.';
+          errorMessage = 'GitHub 인증에 실패했어요. 설정 > 연결에서 액세스 토큰을 확인해주세요.';
         } else if (errorMsg.includes('403') || errorMsg.includes('forbidden')) {
-          errorMessage =
-            'Access denied. Your GitHub token may not have sufficient permissions to create/modify repositories.';
+          errorMessage = '접근이 거부됐어요. GitHub 토큰에 저장소 생성/수정 권한이 부족할 수 있어요.';
         } else if (errorMsg.includes('404') || errorMsg.includes('not found')) {
-          errorMessage = 'Repository or resource not found. Please check the repository name and your permissions.';
+          errorMessage = '저장소 또는 리소스를 찾을 수 없어요. 저장소 이름과 권한을 확인해주세요.';
         } else if (errorMsg.includes('422') || errorMsg.includes('validation failed')) {
           if (errorMsg.includes('name already exists')) {
-            errorMessage =
-              'A repository with this name already exists in your account. Please choose a different name.';
+            errorMessage = '같은 이름의 저장소가 이미 계정에 있어요. 다른 이름을 선택해주세요.';
           } else {
-            errorMessage = 'Repository validation failed. Please check the repository name and settings.';
+            errorMessage = '저장소 검증에 실패했어요. 저장소 이름과 설정을 확인해주세요.';
           }
         } else if (errorMsg.includes('rate limit') || errorMsg.includes('429')) {
-          errorMessage = 'GitHub API rate limit exceeded. Please wait a moment and try again.';
+          errorMessage = 'GitHub API 요청 한도를 초과했어요. 잠시 후 다시 시도해주세요.';
           isRetryable = true;
         } else if (errorMsg.includes('timeout')) {
-          errorMessage = 'Request timed out. Please check your connection and try again.';
+          errorMessage = '요청이 시간 초과됐어요. 연결을 확인하고 다시 시도해주세요.';
           isRetryable = true;
         } else {
-          errorMessage = `GitHub error: ${error.message}`;
+          errorMessage = `GitHub 오류: ${error.message}`;
         }
       } else if (typeof error === 'object' && error !== null) {
         // Octokit errors
         if ('message' in error) {
-          errorMessage = `GitHub API error: ${error.message as string}`;
+          errorMessage = `GitHub API 오류: ${error.message as string}`;
         }
 
         // GitHub API errors
@@ -518,7 +516,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
       }
 
       // Show error with retry suggestion if applicable
-      const finalMessage = isRetryable ? `${errorMessage} Click to retry.` : errorMessage;
+      const finalMessage = isRetryable ? `${errorMessage} 다시 시도해주세요.` : errorMessage;
       toast.error(finalMessage);
 
       // Log detailed error for debugging
@@ -571,7 +569,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                 className="bg-white dark:bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor shadow-xl"
                 aria-describedby="success-dialog-description"
               >
-                <Dialog.Title className="sr-only">Successfully pushed to GitHub</Dialog.Title>
+                <Dialog.Title className="sr-only">GitHub에 성공적으로 푸시했어요</Dialog.Title>
                 <div className="p-6 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -580,10 +578,10 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       </div>
                       <div>
                         <h3 className="text-lg font-medium text-bolt-elements-textPrimary">
-                          Successfully pushed to GitHub
+                          GitHub에 성공적으로 푸시했어요
                         </h3>
                         <p id="success-dialog-description" className="text-sm text-bolt-elements-textSecondary">
-                          Your code is now available on GitHub
+                          이제 GitHub에서 코드를 확인할 수 있어요
                         </p>
                       </div>
                     </div>
@@ -593,7 +591,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                         className="p-2 rounded-lg transition-all duration-200 ease-in-out bg-transparent text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-background-depth-2 dark:hover:bg-bolt-elements-background-depth-3 focus:outline-none focus:ring-2 focus:ring-bolt-elements-borderColor"
                       >
                         <span className="i-ph:x block w-5 h-5" aria-hidden="true" />
-                        <span className="sr-only">Close dialog</span>
+                        <span className="sr-only">닫기</span>
                       </button>
                     </Dialog.Close>
                   </div>
@@ -601,7 +599,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                   <div className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 rounded-lg p-4 text-left border border-bolt-elements-borderColor">
                     <p className="text-sm font-medium text-bolt-elements-textPrimary mb-2 flex items-center gap-2">
                       <span className="i-ph:github-logo w-4 h-4 text-[var(--accent)]" />
-                      Repository URL
+                      저장소 URL
                     </p>
                     <div className="flex items-center gap-2">
                       <code className="flex-1 text-sm bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-4 px-3 py-2 rounded border border-bolt-elements-borderColor text-bolt-elements-textPrimary font-mono">
@@ -610,7 +608,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       <motion.button
                         onClick={() => {
                           navigator.clipboard.writeText(createdRepoUrl);
-                          toast.success('URL copied to clipboard');
+                          toast.success('URL을 복사했어요');
                         }}
                         className="p-2 text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-4 rounded-lg border border-bolt-elements-borderColor"
                         whileHover={{ scale: 1.05 }}
@@ -624,7 +622,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                   <div className="bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 rounded-lg p-4 border border-bolt-elements-borderColor">
                     <p className="text-sm font-medium text-bolt-elements-textPrimary mb-2 flex items-center gap-2">
                       <span className="i-ph:files w-4 h-4 text-[var(--accent)]" />
-                      Pushed Files ({pushedFiles.length})
+                      푸시된 파일 ({pushedFiles.length}개)
                     </p>
                     <div className="max-h-[200px] overflow-y-auto custom-scrollbar pr-2">
                       {pushedFiles.slice(0, 100).map((file) => (
@@ -640,7 +638,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       ))}
                       {pushedFiles.length > 100 && (
                         <div className="py-2 text-center text-xs text-bolt-elements-textSecondary">
-                          +{pushedFiles.length - 100} more files
+                          파일 {pushedFiles.length - 100}개 더 있음
                         </div>
                       )}
                     </div>
@@ -656,19 +654,19 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="i-ph:github-logo w-4 h-4" />
-                      View Repository
+                      저장소 보기
                     </motion.a>
                     <motion.button
                       onClick={() => {
                         navigator.clipboard.writeText(createdRepoUrl);
-                        toast.success('URL copied to clipboard');
+                        toast.success('URL을 복사했어요');
                       }}
                       className="px-4 py-2 rounded-lg bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3 text-bolt-elements-textSecondary hover:bg-bolt-elements-background-depth-3 dark:hover:bg-bolt-elements-background-depth-4 text-sm inline-flex items-center gap-2 border border-bolt-elements-borderColor"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="i-ph:copy w-4 h-4" />
-                      Copy URL
+                      URL 복사
                     </motion.button>
                     <motion.button
                       onClick={handleClose}
@@ -676,7 +674,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      Close
+                      닫기
                     </motion.button>
                   </div>
                 </div>
@@ -705,7 +703,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                 className="bg-white dark:bg-bolt-elements-background-depth-1 rounded-lg p-6 border border-bolt-elements-borderColor shadow-xl"
                 aria-describedby="connection-required-description"
               >
-                <Dialog.Title className="sr-only">GitHub Connection Required</Dialog.Title>
+                <Dialog.Title className="sr-only">GitHub 연결이 필요해요</Dialog.Title>
                 <div className="relative text-center space-y-4">
                   <Dialog.Close asChild>
                     <button
@@ -713,7 +711,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       className="absolute right-0 top-0 p-2 rounded-lg transition-all duration-200 ease-in-out bg-transparent text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-background-depth-2 dark:hover:bg-bolt-elements-background-depth-3 focus:outline-none focus:ring-2 focus:ring-bolt-elements-borderColor"
                     >
                       <span className="i-ph:x block w-5 h-5" aria-hidden="true" />
-                      <span className="sr-only">Close dialog</span>
+                      <span className="sr-only">닫기</span>
                     </button>
                   </Dialog.Close>
                   <motion.div
@@ -724,12 +722,12 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                   >
                     <div className="i-ph:github-logo w-8 h-8" />
                   </motion.div>
-                  <h3 className="text-lg font-medium text-bolt-elements-textPrimary">GitHub Connection Required</h3>
+                  <h3 className="text-lg font-medium text-bolt-elements-textPrimary">GitHub 연결이 필요해요</h3>
                   <p
                     id="connection-required-description"
                     className="text-sm text-bolt-elements-textSecondary max-w-md mx-auto"
                   >
-                    To deploy your code to GitHub, you need to connect your GitHub account first.
+                    GitHub에 코드를 배포하려면 먼저 GitHub 계정을 연결해야 해요.
                   </p>
                   <div className="pt-2 flex justify-center gap-3">
                     <motion.button
@@ -738,7 +736,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       whileTap={{ scale: 0.98 }}
                       onClick={handleClose}
                     >
-                      Close
+                      닫기
                     </motion.button>
                     <motion.button
                       onClick={() => setShowAuthDialog(true)}
@@ -747,7 +745,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       whileTap={{ scale: 0.98 }}
                     >
                       <div className="i-ph:github-logo w-4 h-4" />
-                      Connect GitHub Account
+                      GitHub 계정 연결
                     </motion.button>
                   </div>
                 </div>
@@ -790,10 +788,10 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                   </motion.div>
                   <div>
                     <Dialog.Title className="text-lg font-medium text-bolt-elements-textPrimary">
-                      Deploy to GitHub
+                      GitHub에 배포
                     </Dialog.Title>
                     <p id="push-dialog-description" className="text-sm text-bolt-elements-textSecondary">
-                      Deploy your code to a new or existing GitHub repository
+                      새 저장소 또는 기존 GitHub 저장소에 코드를 배포해요
                     </p>
                   </div>
                   <Dialog.Close asChild>
@@ -802,7 +800,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       className="ml-auto p-2 rounded-lg transition-all duration-200 ease-in-out bg-transparent text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-background-depth-2 dark:hover:bg-bolt-elements-background-depth-3 focus:outline-none focus:ring-2 focus:ring-bolt-elements-borderColor"
                     >
                       <span className="i-ph:x block w-5 h-5" aria-hidden="true" />
-                      <span className="sr-only">Close dialog</span>
+                      <span className="sr-only">닫기</span>
                     </button>
                   </Dialog.Close>
                 </div>
@@ -823,7 +821,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="space-y-2">
                     <label htmlFor="repoName" className="text-sm text-bolt-elements-textSecondary">
-                      Repository Name
+                      저장소 이름
                     </label>
                     <div className="relative">
                       <div className="absolute left-3 top-1/2 -translate-y-1/2 text-bolt-elements-textTertiary">
@@ -852,12 +850,12 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                         required
                         maxLength={100}
                         pattern="[a-zA-Z0-9\-_\s]+"
-                        title="Repository name can contain letters, numbers, hyphens, underscores, and spaces"
+                        title="저장소 이름에는 영문자, 숫자, 하이픈, 밑줄, 공백을 사용할 수 있어요"
                       />
                     </div>
                     {repoName && sanitizeRepoName(repoName) !== repoName && (
                       <p className="text-xs text-bolt-elements-textSecondary mt-1">
-                        Will be created as:{' '}
+                        다음 이름으로 생성돼요:{' '}
                         <span className="font-mono text-[var(--accent)]">{sanitizeRepoName(repoName)}</span>
                       </p>
                     )}
@@ -865,15 +863,15 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between mb-2">
-                      <label className="text-sm text-bolt-elements-textSecondary">Recent Repositories</label>
+                      <label className="text-sm text-bolt-elements-textSecondary">최근 저장소</label>
                       <span className="text-xs text-bolt-elements-textTertiary">
-                        {filteredRepos.length} of {recentRepos.length}
+                        {filteredRepos.length}개 / {recentRepos.length}개
                       </span>
                     </div>
 
                     <div className="mb-2">
                       <SearchInput
-                        placeholder="Search repositories..."
+                        placeholder="저장소 검색..."
                         value={repoSearchQuery}
                         onChange={(e) => setRepoSearchQuery(e.target.value)}
                         onClear={() => setRepoSearchQuery('')}
@@ -884,8 +882,8 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                     {recentRepos.length === 0 && !isFetchingRepos ? (
                       <EmptyState
                         icon="i-ph:github-logo"
-                        title="No repositories found"
-                        description="We couldn't find any repositories in your GitHub account."
+                        title="저장소를 찾을 수 없어요"
+                        description="GitHub 계정에서 저장소를 찾지 못했어요."
                         variant="compact"
                       />
                     ) : (
@@ -893,8 +891,8 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                         {filteredRepos.length === 0 && repoSearchQuery.trim() !== '' ? (
                           <EmptyState
                             icon="i-ph:magnifying-glass"
-                            title="No matching repositories"
-                            description="Try a different search term"
+                            title="일치하는 저장소가 없어요"
+                            description="다른 검색어를 입력해보세요"
                             variant="compact"
                           />
                         ) : (
@@ -916,7 +914,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                                 </div>
                                 {repo.private && (
                                   <Badge variant="primary" size="sm" icon="i-ph:lock w-3 h-3">
-                                    Private
+                                    비공개
                                   </Badge>
                                 )}
                               </div>
@@ -950,7 +948,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
 
                   {isFetchingRepos && (
                     <div className="flex items-center justify-center py-4">
-                      <StatusIndicator status="loading" pulse={true} label="Loading repositories..." />
+                      <StatusIndicator status="loading" pulse={true} label="저장소 불러오는 중..." />
                     </div>
                   )}
 
@@ -964,11 +962,11 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                         className="rounded border-bolt-elements-borderColor text-[var(--accent)] focus:ring-[var(--accent)] dark:bg-bolt-elements-background-depth-3"
                       />
                       <label htmlFor="private" className="text-sm text-bolt-elements-textPrimary">
-                        Make repository private
+                        저장소를 비공개로 만들기
                       </label>
                     </div>
                     <p className="text-xs text-bolt-elements-textTertiary mt-2 ml-6">
-                      Private repositories are only visible to you and people you share them with
+                      비공개 저장소는 나와 공유한 사람만 볼 수 있어요
                     </p>
                   </div>
 
@@ -980,7 +978,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      Cancel
+                      취소
                     </motion.button>
                     <motion.button
                       type="submit"
@@ -995,12 +993,12 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       {isLoading ? (
                         <>
                           <div className="i-ph:spinner-gap animate-spin w-4 h-4" />
-                          Deploying...
+                          배포 중...
                         </>
                       ) : (
                         <>
                           <div className="i-ph:github-logo w-4 h-4" />
-                          Deploy to GitHub
+                          GitHub에 배포
                         </>
                       )}
                     </motion.button>
