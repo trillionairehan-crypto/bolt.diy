@@ -1,4 +1,4 @@
-다음 감사 영역: 배포
+다음 감사 영역: 요금제/결제
 
 [완료] Preview.tsx 창 크기 드롭다운 하드코딩 색상 — ccafd7d
 [완료] Workbench.client.tsx 저장 동기화 드롭다운 하드코딩 색상 — a89d0ee
@@ -7,6 +7,7 @@
 [완료] Phase2 사이클1(온보딩) PromptClarification.tsx #FF5330 하드코딩 → var(--accent) — 4769e51
 [완료] Phase2 사이클2(생성) Artifact.tsx/Messages.client.tsx #FF5330 하드코딩 → var(--accent) — 5858f4c
 [완료] Phase2 사이클3(미리보기/워크벤치) FileTree.tsx 선택 파일 좌측 보더 #FF5330 하드코딩 → var(--accent) — 0a7fc9d
+[완료] Phase2 사이클4(배포) GitHubDeploymentDialog.tsx/GitLabDeploymentDialog.tsx #FF5330/#E44A28 하드코딩 → var(--accent)/var(--on-accent)/var(--accent-hover) — cf6f6d9
 [손절] CORALRED_NEW_METERING 메터링 버그 — 코드 수정은 이미 준비돼 있으나 DB 마이그레이션(RUN-1-metering.sql) 미적용 확인 전에 플래그를 켜면 로그인 사용자 전체 생성 차단 장애 위험. 사람이 먼저 Supabase에 마이그레이션 적용 후 재시도 필요 (자세한 내용 OVERNIGHT5_BLOCKED.md)
 
 ## 참고 (큐 항목 아님)

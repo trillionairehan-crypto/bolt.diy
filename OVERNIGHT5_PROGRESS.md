@@ -104,3 +104,13 @@
 - **검증**: typecheck 통과(0 에러), lint 통과(무관한 기존 warning 1건만), test(279개, 전부 통과), build(client+server) 전부 성공.
 - **커밋**: `0a7fc9d`
 - **다음 감사 영역**: 배포로 갱신.
+
+### [02:26] Phase 2 — 사이클 4 (감사 대상: 배포)
+- **베이스라인 재확인**: `pnpm vitest run` 279/279 통과, `pnpm run build` 성공(이 사이클 시작 시점 — 이전 사이클이 커밋 안 하고 남긴 변경 없음, `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드만 여전히 미커밋 상태로 남아있고 이전 사이클들의 판단대로 그대로 둠).
+- **발견**: `GitHubDeploymentDialog.tsx`(13곳)/`GitLabDeploymentDialog.tsx`(1곳)에 동일한 `#FF5330`/`#E44A28` 하드코딩 패턴 — 사이클 1~3에서 고친 PromptClarification/Artifact/Messages/FileTree와 완전히 같은 버그 클래스(라이트 모드 `--accent`와 값이 같아 라이트에선 안 보이지만, 다크 모드 `--accent`는 더 밝은 oklch로 갈리고 `--on-accent`도 달라짐). 이 두 파일은 `OVERNIGHT5_IMPROVEMENTS.md` 항목 1에 "판단 필요"로 남아있었는데, 이번 사이클 감사 영역이 정확히 "배포"이고 이 다이얼로그가 랜딩/마케팅이 아니라 워크벤치 내부에서 뜨는 배포 플로우 UI라 테마 반응형이 맞다고 판단(FileTree.tsx와 동일 근거).
+- **변경**: 아이콘 색, 버튼 배경/hover, 포커스 링, 체크박스 accent-color, 텍스트 강조색 전부 `text-[#FF5330]`/`bg-[#FF5330]`/`hover:bg-[#E44A28]`/`text-white`(accent 배경 위) → `var(--accent)`/`var(--accent-hover)`/`var(--on-accent)`로 교체. 파일: `GitHubDeploymentDialog.tsx`, `GitLabDeploymentDialog.tsx`.
+- **테스트**: `deployDialogAccentColor.spec.ts` 신규 3건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: typecheck 0에러, lint 통과(무관한 기존 warning 1건만), test 282개 전부 통과, build(client+server) 성공.
+- **커밋**: `cf6f6d9`
+- **범위 밖으로 남긴 것**: `IMPROVEMENTS.md` 항목 1의 나머지 파일들(랜딩/법률 페이지 등, 개별 판단 필요), `bg-white` 하드코딩(다이얼로그 배경, 이번 버그와 다른 패턴이라 손 안 댐).
+- **다음 감사 영역**: 요금제/결제로 갱신.
