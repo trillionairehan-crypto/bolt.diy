@@ -1,5 +1,17 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 22. 한국어 문구 감사(사이클 24, 2회차) — 프로필 탭은 고침, 나머지 6건은 분량이 많아 다음 사이클로 이월
+Explore 서브에이전트로 `app/components/**`, `app/routes/**`, `app/lib/**`를 재감사(사이클 16에서 이미 고친 항목은 재보고 제외 지시). 보고받은 7건 중 노출 빈도가 가장 높은 `ProfileTab.tsx`(설정 > 프로필 탭 전체가 라벨/placeholder/토스트까지 100% 영어)만 직접 재검증 후 전체 번역·테스트 추가·커밋(`867a4c0`). 나머지 6건은 분량이 많아(특히 아래 3번) 한 사이클 "작고 안전한 수정" 범위를 넘어선다고 판단해 손 안 대고 기록만 함:
+
+1. **`app/lib/persistence/useChatHistory.ts`** — 채팅 로드 실패/저장/메타데이터 업데이트/복제/가져오기 토스트 약 8곳 전부 영어(58, 197, 231, 284, 334, 357/359, 371/374/376번 줄). 사이드바에서 채팅을 복제·가져오기 하거나 로드 오류가 나면 바로 보이는 핵심 경로. **제안**: 다음 한국어 문구 감사 1순위 후보.
+2. **`app/lib/hooks/useDataOperations.ts`** — Settings > Data 탭 내보내기/가져오기/초기화/삭제/실행취소(undo) 토스트 약 35곳 전부 영어(120~1212번 줄 곳곳). 이번에 감사된 것 중 분량이 가장 많아 한 사이클로 끝내기 어려움. **제안**: 별도 사이클을 통째로 할당하거나 여러 사이클로 쪼개서 처리 권장.
+3. **`app/components/@settings/tabs/github/components/GitHubErrorBoundary.tsx`** — 제목/설명/"Show error details"/"Try Again"/"Reload Page" 전체 영어(52-73번 줄). `GitHubTab.tsx`/`GitHubStats.tsx`를 실제로 감싸고 있어 GitHub 연동 중 렌더 오류 시 그대로 노출됨(죽은 코드 아님, wrapping 확인됨).
+4. **`app/lib/hooks/useEditChatDescription.ts`** — 채팅 제목 변경 시 검증 실패/성공 메시지 6곳 영어(100-139번 줄). 사이드바에서 채팅 이름을 바꿀 때마다 노출 가능.
+5. **`app/components/workbench/LockManager.tsx`** — Locks 탭 잠금 해제 토스트 3곳 영어(108, 128, 242번 줄). FileTree.tsx의 예외 토스트(이미 수정됨)와는 다른 별도 파일.
+6. **`app/components/workbench/ScreenshotSelector.tsx`** — 스크린샷 캡처 성공/실패 토스트 4곳 영어(87, 196, 198, 205번 줄).
+
+참고로 `app/components/@settings/tabs/**`의 각종 연동 폼(GitLab/Vercel/Netlify/Supabase) placeholder와 RepositoryCard의 title 속성(`"Stars"`/`"Forks"` 등)도 다수 영어로 남아있으나 동일 유형 반복이라 위 6건에는 개별 포함하지 않음 — 다음다음 한국어 문구 감사 후보로 유지.
+
 ## 21. 모바일 감사(사이클 23, 2회차) — 파일 경로 드롭다운 화면 밖 재배치는 고침, 나머지 4건은 판단 보류
 Explore 서브에이전트로 `app/components/**`, `app/routes/**`, `app/styles/**` 모바일 표면 재감사(사이클 15에서 이미 고친 w-[300px] 류 폭 문제는 재보고 제외 지시). 보고받은 5건 중 `FileBreadcrumb.tsx`의 `avoidCollisions={false}`(사이클 15 커밋 메시지에서 이미 언급됐지만 그때는 폭만 고치고 넘어간 잔여 항목)만 직접 재검증 후 수정·테스트 추가·커밋(`97c184a`). 나머지 4건은 손 안 대고 기록만 함:
 

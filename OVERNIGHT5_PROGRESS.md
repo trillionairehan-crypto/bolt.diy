@@ -340,3 +340,13 @@
 - **커밋**: `97c184a`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 21로 기록)**: (1) `ChatBox.tsx` 채팅 툴바 `flex-nowrap` + 가로 스크롤 폴백 없음(재현 확신도 낮음, 구조적). (2) `ChatBox.tsx` 채팅 액션 버튼 `h-8`(32px) 터치 타겟 미달(여러 파일 공유 클래스, 일괄 조정 필요). (3) `GitHubStats.tsx` `grid-cols-4` 고정(설정 다이얼로그 내부, 반응형 브레이크포인트 누락). (4) `StatsDisplay.tsx`(GitLab) `grid-cols-3` 고정(같은 패턴).
 - **다음 감사 영역**: 한국어 문구로 갱신.
+
+### [06:17] Phase 2 — 사이클 24 (감사 대상: 한국어 문구, 2회차)
+- **베이스라인 재확인**: `corepack pnpm run typecheck` 0에러, `corepack pnpm vitest run` 350/350 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/**`, `app/routes/**`, `app/lib/**`를 재감사(사이클 16에서 이미 고친 ModelSelector/CodeBlock/ExpoQrModal/TerminalTabs/Preview/배포 훅/FileTree 항목은 재보고 제외 지시). 보고받은 7건 중 노출 빈도가 가장 높은 1건만 직접 Read로 재검증 후 수정.
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/@settings/tabs/profile/ProfileTab.tsx` — 설정 > 프로필 탭 전체(프로필 사진/사용자 이름/소개 라벨, placeholder, 업로드 성공·실패 토스트, 필드 업데이트 토스트, 아바타 `alt` 텍스트)가 하나도 빠짐없이 영어로 하드코딩돼 있었음. `ControlPanel.tsx:152`에서 실제 렌더되는, 사용자가 프로필을 수정할 때마다 보는 화면이라 노출 빈도가 높다고 판단 → 전부 한국어로 번역.
+- **테스트**: `app/profileTabKoreanAudit.spec.ts` 신규 2건(소스 grep 방식, 기존 관행과 동일. JSX 주석(`{/* Username Input */}` 등)은 사용자에게 노출되지 않아 검사 대상에서 제외하고 실제 렌더 텍스트만 체크).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 352/352 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `867a4c0`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 22로 기록)**: 나머지 6건은 분량이 많아 한 사이클 범위를 넘어선다고 판단 — (1) `useChatHistory.ts` 채팅 로드/저장/복제/가져오기 토스트 약 8곳. (2) `useDataOperations.ts` Settings > Data 탭 내보내기/가져오기/초기화/실행취소 토스트 약 35곳(분량 최다, 별도 사이클 필요). (3) `GitHubErrorBoundary.tsx` 전체(실제 wrapping 확인됨, 죽은 코드 아님). (4) `useEditChatDescription.ts` 채팅 이름 변경 검증/토스트 6곳. (5) `LockManager.tsx` 잠금 해제 토스트 3곳. (6) `ScreenshotSelector.tsx` 스크린샷 캡처 토스트 4곳.
+- **다음 감사 영역**: 온보딩으로 갱신.
