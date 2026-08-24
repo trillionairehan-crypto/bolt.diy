@@ -15,6 +15,7 @@ export const meta: MetaFunction = () => {
 const PROVIDER_LABEL: Record<string, string> = {
   netlify: 'Netlify',
   vercel: 'Vercel',
+  cloudflare: 'Cloudflare Pages',
 };
 
 function formatDeployedAt(iso: string): string {
@@ -98,9 +99,12 @@ export default function Apps() {
                   {app.url}
                 </a>
                 <p className="cr-caption">{formatDeployedAt(app.deployed_at)}에 배포됨</p>
+                {app.provider === 'cloudflare' && (
+                  <p className="cr-caption">채팅에서 배포하기를 다시 누르면 같은 주소로 업데이트돼요.</p>
+                )}
               </div>
               <a href={`/chat/${app.chat_id}`} className="cr-btn outline" style={{ flexShrink: 0 }}>
-                채팅으로 돌아가기
+                {app.provider === 'cloudflare' ? '다시 배포하기' : '채팅으로 돌아가기'}
               </a>
             </div>
           ))}

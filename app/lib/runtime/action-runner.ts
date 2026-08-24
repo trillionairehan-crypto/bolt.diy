@@ -618,7 +618,7 @@ export class ActionRunner {
     details?: {
       url?: string;
       error?: string;
-      source?: 'netlify' | 'vercel' | 'github' | 'gitlab';
+      source?: 'netlify' | 'vercel' | 'github' | 'gitlab' | 'cloudflare';
     },
   ): void {
     if (!this.onDeployAlert) {
@@ -628,21 +628,16 @@ export class ActionRunner {
 
     const alertType = status === 'failed' ? 'error' : status === 'complete' ? 'success' : 'info';
 
-    const title =
-      stage === 'building'
-        ? 'Building Application'
-        : stage === 'deploying'
-          ? 'Deploying Application'
-          : 'Deployment Complete';
+    const title = stage === 'building' ? '빌드 중이에요' : stage === 'deploying' ? '배포 중이에요' : '배포가 끝났어요';
 
     const description =
       status === 'failed'
-        ? `${stage === 'building' ? 'Build' : 'Deployment'} failed`
+        ? `${stage === 'building' ? '빌드' : '배포'}에 실패했어요`
         : status === 'running'
-          ? `${stage === 'building' ? 'Building' : 'Deploying'} your application...`
+          ? `${stage === 'building' ? '빌드' : '배포'}하고 있어요...`
           : status === 'complete'
-            ? `${stage === 'building' ? 'Build' : 'Deployment'} completed successfully`
-            : `Preparing to ${stage === 'building' ? 'build' : 'deploy'} your application`;
+            ? `${stage === 'building' ? '빌드' : '배포'}가 성공적으로 끝났어요`
+            : `${stage === 'building' ? '빌드' : '배포'}를 준비하고 있어요`;
 
     const buildStatus =
       stage === 'building' ? status : stage === 'deploying' || stage === 'complete' ? 'complete' : 'pending';

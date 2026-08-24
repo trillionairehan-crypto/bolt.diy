@@ -23,4 +23,6 @@ interface Env {
   PORTONE_CHANNEL_KEY: string;
   PORTONE_API_SECRET: string;
   PORTONE_WEBHOOK_SECRET: string;
+  CLOUDFLARE_API_TOKEN: string;
+  CLOUDFLARE_ACCOUNT_ID: string;
 }

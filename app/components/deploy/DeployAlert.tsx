@@ -1,4 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 import { classNames } from '~/utils/classNames';
 import type { DeployAlert } from '~/types/actions';
 
@@ -10,6 +12,21 @@ interface DeployAlertProps {
 
 export default function DeployChatAlert({ alert, clearAlert, postMessage }: DeployAlertProps) {
   const { type, title, description, content, url, stage, buildStatus, deployStatus } = alert;
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyUrl = async () => {
+    if (!url) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('링크를 복사하지 못했어요.');
+    }
+  };
 
   // Determine if we should show the deployment progress
   const showProgress = stage && (buildStatus || deployStatus);
@@ -135,7 +152,7 @@ export default function DeployChatAlert({ alert, clearAlert, postMessage }: Depl
                 </div>
               )}
               {url && type === 'success' && (
-                <div className="mt-2">
+                <div className="mt-2 flex items-center gap-3 flex-wrap">
                   <a
                     href={url}
                     target="_blank"
@@ -145,6 +162,14 @@ export default function DeployChatAlert({ alert, clearAlert, postMessage }: Depl
                     <span className="mr-1">배포된 사이트 보기</span>
                     <div className="i-ph:arrow-square-out"></div>
                   </a>
+                  <button
+                    type="button"
+                    onClick={handleCopyUrl}
+                    className="text-bolt-elements-textSecondary hover:text-bolt-elements-textPrimary flex items-center gap-1 text-sm"
+                  >
+                    <div className={copied ? 'i-ph:check' : 'i-ph:copy'}></div>
+                    {copied ? '복사됐어요' : '링크 복사'}
+                  </button>
                 </div>
               )}
             </motion.div>

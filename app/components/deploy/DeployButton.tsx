@@ -11,6 +11,7 @@ import { NetlifyDeploymentLink } from '~/components/chat/NetlifyDeploymentLink.c
 import { VercelDeploymentLink } from '~/components/chat/VercelDeploymentLink.client';
 import { useVercelDeploy } from '~/components/deploy/VercelDeploy.client';
 import { useNetlifyDeploy } from '~/components/deploy/NetlifyDeploy.client';
+import { useCloudflareDeploy } from '~/components/deploy/CloudflareDeploy.client';
 import { useGitHubDeploy } from '~/components/deploy/GitHubDeploy.client';
 import { useGitLabDeploy } from '~/components/deploy/GitLabDeploy.client';
 import { GitHubDeploymentDialog } from '~/components/deploy/GitHubDeploymentDialog';
@@ -21,6 +22,7 @@ interface DeployButtonProps {
   onNetlifyDeploy?: () => Promise<void>;
   onGitHubDeploy?: () => Promise<void>;
   onGitLabDeploy?: () => Promise<void>;
+  onCloudflareDeploy?: () => Promise<void>;
 }
 
 export const DeployButton = ({
@@ -28,6 +30,7 @@ export const DeployButton = ({
   onNetlifyDeploy,
   onGitHubDeploy,
   onGitLabDeploy,
+  onCloudflareDeploy,
 }: DeployButtonProps) => {
   const netlifyConn = useStore(netlifyConnection);
   const vercelConn = useStore(vercelConnection);
@@ -36,12 +39,15 @@ export const DeployButton = ({
   const previews = useStore(workbenchStore.previews);
   const activePreview = previews[activePreviewIndex];
   const [isDeploying, setIsDeploying] = useState(false);
-  const [deployingTo, setDeployingTo] = useState<'netlify' | 'vercel' | 'github' | 'gitlab' | null>(null);
+  const [deployingTo, setDeployingTo] = useState<'netlify' | 'vercel' | 'github' | 'gitlab' | 'cloudflare' | null>(
+    null,
+  );
   const isStreaming = useStore(streamingState);
   const { handleVercelDeploy } = useVercelDeploy();
   const { handleNetlifyDeploy } = useNetlifyDeploy();
   const { handleGitHubDeploy } = useGitHubDeploy();
   const { handleGitLabDeploy } = useGitLabDeploy();
+  const { handleCloudflareDeploy } = useCloudflareDeploy();
   const [showGitHubDeploymentDialog, setShowGitHubDeploymentDialog] = useState(false);
   const [showGitLabDeploymentDialog, setShowGitLabDeploymentDialog] = useState(false);
   const [githubDeploymentFiles, setGithubDeploymentFiles] = useState<Record<string, string> | null>(null);
@@ -103,6 +109,22 @@ export const DeployButton = ({
     }
   };
 
+  const handleCloudflareDeployClick = async () => {
+    setIsDeploying(true);
+    setDeployingTo('cloudflare');
+
+    try {
+      if (onCloudflareDeploy) {
+        await onCloudflareDeploy();
+      } else {
+        await handleCloudflareDeploy();
+      }
+    } finally {
+      setIsDeploying(false);
+      setDeployingTo(null);
+    }
+  };
+
   const handleGitLabDeployClick = async () => {
     setIsDeploying(true);
     setDeployingTo('gitlab');
@@ -131,9 +153,10 @@ export const DeployButton = ({
         <DropdownMenu.Root>
           <DropdownMenu.Trigger
             disabled={isDeploying || !activePreview || isStreaming}
+            title={isDeploying && deployingTo ? `${deployingTo}에 배포하고 있어요` : undefined}
             className="rounded-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:bg-[var(--accent-hover)] outline-[var(--accent)] flex gap-1.7"
           >
-            {isDeploying ? `Deploying to ${deployingTo}...` : '배포하기'}
+            {isDeploying ? '배포 중...' : '배포하기'}
             <span className={classNames('i-ph:caret-down transition-transform')} />
           </DropdownMenu.Trigger>
           <DropdownMenu.Content
@@ -236,8 +259,14 @@ export const DeployButton = ({
             </DropdownMenu.Item>
 
             <DropdownMenu.Item
-              disabled
-              className="flex items-center w-full rounded-md px-4 py-2 text-sm text-bolt-elements-textTertiary gap-2 opacity-60 cursor-not-allowed"
+              className={classNames(
+                'cursor-pointer flex items-center w-full px-4 py-2 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive gap-2 rounded-md group relative',
+                {
+                  'opacity-60 cursor-not-allowed': isDeploying || !activePreview,
+                },
+              )}
+              disabled={isDeploying || !activePreview}
+              onClick={handleCloudflareDeployClick}
             >
               <img
                 className="w-5 h-5"
@@ -247,7 +276,7 @@ export const DeployButton = ({
                 src="https://cdn.simpleicons.org/cloudflare"
                 alt="cloudflare"
               />
-              <span className="mx-auto">Deploy to Cloudflare (Coming Soon)</span>
+              <span className="mx-auto">Cloudflare에 배포</span>
             </DropdownMenu.Item>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
