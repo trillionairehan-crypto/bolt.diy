@@ -89,3 +89,10 @@
 - **테스트**: `generationIndicators.colors.spec.ts` 신규 2건.
 - **검증**: typecheck/lint/test(277개)/build 전부 통과.
 - **커밋**: `5858f4c`
+
+### [02:17] 큐 파일 유실 발견 — 재구성
+- **발견**: `OVERNIGHT5_QUEUE.md`가 저장소에 존재하지 않았음(커밋 이력에도 없음 — 애초에 git에 올라간 적이 없는 파일). 지시서 규칙상 큐 파일이 없으면 "초기 상태 파악" 절차를 타야 하는데, `OVERNIGHT5_PROGRESS.md`/`BLOCKED.md`/`IMPROVEMENTS.md`를 보면 이미 Phase 1(우선순위 수정 4건, 전부 커밋됨)과 Phase 2 검증 루프(사이클 2회, 전부 커밋됨)가 진행 중이었으므로, 처음부터 다시 조사하는 대신 기존 기록을 근거로 큐 파일을 재구성하는 쪽을 택함(보수적 선택 — 이미 검증된 내용을 다시 파는 건 낭비).
+- **작업 트리 확인**: `app/routes/pricing.tsx`에 커밋 안 된 실제 PortOne 결제 연동 코드(loader + `requestPayment()` 호출, 서버 재검증 TODO 미해결)가 남아있었음. `OVERNIGHT5_IMPROVEMENTS.md`가 이미 이 파일을 "수정 금지 파일"로 기록해둔 시점에도 존재했던 것으로 보여 이 세션(혹은 이번 사이클)이 만든 변경이 아님. 실제 결제 SDK를 호출하는 미완성 기능이라 자동 세션이 임의로 커밋도, 되돌리기도 하지 않고 그대로 둠(보수적 선택).
+- **베이스라인 재확인**: `pnpm vitest run` 277개 전부 통과, `pnpm run build` 클라이언트/서버 빌드 전부 성공(경고만 있음, 에러 없음).
+- **커밋**: `3a7e6e7` — 이전 사이클이 만들었지만 커밋 안 된 완결 상태 산출물(`RUN-1-metering.sql`, `RUN-2-deployed-apps.sql`, `RUN-3-cloud.sql`, `overnight-loop.ps1`)만 정리해서 커밋. 코드 변경 없음.
+- **결과**: `OVERNIGHT5_QUEUE.md` 신규 생성(다음 감사 영역: 미리보기/워크벤치). 이번 사이클은 여기서 종료.
