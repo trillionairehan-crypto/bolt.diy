@@ -117,12 +117,14 @@ async function handleProxyRequest(request: Request, path: string | undefined) {
     // Add body for non-GET/HEAD requests
     if (!['GET', 'HEAD'].includes(request.method)) {
       fetchOptions.body = request.body;
-      fetchOptions.duplex = 'half';
 
       /*
-       * Note: duplex property is removed to ensure TypeScript compatibility
-       * across different environments and versions
+       * duplex is required by the Fetch spec when streaming a request body, but
+       * @cloudflare/workers-types' RequestInit doesn't declare it -- this was previously
+       * typechecking only because Electron's ambient types happened to leak a wider
+       * RequestInit into the global scope (removed when the electron pipeline was deleted).
        */
+      (fetchOptions as RequestInit & { duplex?: 'half' }).duplex = 'half';
     }
 
     // Forward the request to the target URL
