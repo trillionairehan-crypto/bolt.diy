@@ -469,8 +469,8 @@ export class ActionRunner {
     // Trigger build started alert
     this.onDeployAlert?.({
       type: 'info',
-      title: 'Building Application',
-      description: 'Building your application...',
+      title: '빌드 중이에요',
+      description: '앱을 빌드하고 있어요...',
       stage: 'building',
       buildStatus: 'running',
       deployStatus: 'pending',
@@ -510,8 +510,8 @@ export class ActionRunner {
       // Trigger build failed alert
       this.onDeployAlert?.({
         type: 'error',
-        title: 'Build Failed',
-        description: 'Your application build failed',
+        title: '빌드에 실패했어요',
+        description: '앱 빌드에 실패했어요',
         content: output || 'No build output available',
         stage: 'building',
         buildStatus: 'failed',
@@ -525,8 +525,8 @@ export class ActionRunner {
     // Trigger build success alert
     this.onDeployAlert?.({
       type: 'success',
-      title: 'Build Completed',
-      description: 'Your application was built successfully',
+      title: '빌드가 끝났어요',
+      description: '앱이 성공적으로 빌드됐어요',
       stage: 'deploying',
       buildStatus: 'complete',
       deployStatus: 'running',
