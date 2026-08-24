@@ -265,4 +265,26 @@ create trigger deployed_apps_set_user_id
 
 `/apps`에 두 번째 뱃지("저장 기능 연결됨"/"샘플 데이터") 추가 — `deployed_apps` 마이그레이션(아직 미적용, 안전하게 계속 확장 중)에 `supabase_connected` 컬럼 추가하고, `injectSupabaseEnv`가 그 배포에서 실제로 키를 주입했는지 여부를 그대로 기록(현재 연결 상태를 다시 조회하지 않음 — 나중에 연결을 끊어도 "그 배포 당시" 상태를 정확히 반영).
 
+### 작업 6 — 마이그레이션 SQL 출력
+**상태: 완료** — 커밋 `959f01e`. 위 섹션에 두 마이그레이션 전문과 실행 순서 출력함. 적용은 안 함(요청대로).
+
+---
+
+## 작업 7 — 검증 루프 (종료 조건 없음, 계속 진행 중)
+
+### 사이클 1
+**기준선**: `pnpm test`(173개, 이후 175개) / `pnpm typecheck` / `pnpm lint` / `pnpm build` 전부 통과 확인.
+
+**우선 심층 리뷰 1 — Supabase 키 주입 경로: 실제 보안 구멍 발견 및 수정 (커밋 `2a8fcd2`)**
+
+`isServiceRoleKey`(`app/lib/supabase/keyRole.ts`)가 레거시 JWT 형태 키(`header.payload.signature`, payload의 `role` 클레임으로 anon/service_role 구분)만 디코딩하고 있었음. 그런데 Supabase가 2024년부터 새 API 키 형식(`sb_publishable_...`/`sb_secret_...`)을 도입했고, 지금(2026)은 새 프로젝트의 기본 키 형식임 — 이 새 키들은 JWT가 아니라 점(`.`)으로 구분되지 않는 불투명 문자열이라 `jwt.split('.')[1]`이 `undefined`가 되고, `getSupabaseKeyRole`은 `null`을 반환 → `isServiceRoleKey`가 `false`를 반환. 즉 사용자가 새 프로젝트의 "secret" 키(레거시 service_role에 해당)를 anon key 입력란에 붙여넣으면, 마법사 연결 시점과 배포 주입 시점 둘 다에서 걸러지지 않고 그대로 통과했을 것.
+
+**수정**: `sb_secret_` 접두사를 별도로 차단하는 체크 추가(`isServiceRoleKey`가 두 형식 모두 확인). 두 체크포인트(`handleSimpleConnect`, `injectSupabaseEnv`) 모두 이 함수 하나를 통해 검증하므로 한 곳만 고치면 둘 다 방어됨. vitest 2건 추가(`sb_secret_` 차단, `sb_publishable_` 허용). 마법사 안내 문구와 에러 메시지도 "anon/public" 뿐 아니라 "publishable", "service_role/secret"까지 언급하도록 업데이트 — 새 형식 프로젝트에서도 안내가 정확하게 맞도록.
+
+**우선 심층 리뷰 2 — 배포 파이프라인의 바이너리 처리**: `bytesToBase64`/`base64ToBytes` 라운드트립, blake3 해시 계산, `.html` 배지 주입 순서(해시 계산 전에 배지가 먼저 주입되므로 해시가 최종 콘텐츠 기준으로 정확함) 정적 검토 완료 — 로직 자체는 정확함. 다만 `chunkForUpload`의 배치 크기 판단이 원본 바이트 기준(`UPLOAD_BATCH_MAX_BYTES` 20MB)이고 실제 전송은 base64 인코딩(약 1.33배 부풀림)이라, 25MB에 가까운 단일 파일 하나만으로 배치가 실제로는 ~26~27MB짜리 요청이 될 수 있음. Cloudflare의 실제 요청 크기 제한이 정확히 얼마인지 문서화되어 있지 않고, 이 배포 규칙상 실제 배포를 실행해 테스트할 수 없어(배포 금지) 라이브 검증 불가 — 아래 "미수정 이슈"에 기록.
+
+**우선 심층 리뷰 3 — 마법사 상태 전이**: `SupabaseConnection.tsx`/`useSupabaseConnection.ts` 검토. `handleWizardConnect`→`handleSimpleConnect` 흐름, 연결/해제/에러 상태들의 store 반영 확인. `연결하기` 버튼은 `simpleConnecting`으로 disabled 처리되지만, `setSimpleConnecting(true)`가 URL/키 형식 검증 이후에 호출되므로 아주 빠른 연속 클릭 시 두 번째 클릭이 첫 번째 렌더 반영 전에 새 요청을 시작할 이론적 여지가 있음 — 다만 두 요청 모두 멱등적(같은 값으로 같은 store 업데이트)이라 실질적 피해 없음(중복 토스트 정도). 낮은 심각도로 판단, 이번 사이클엔 수정 보류.
+
+**이번 사이클 커밋**: `959f01e`(작업 6 리포트), `2a8fcd2`(service_role 키 형식 보안 수정).
+
 
