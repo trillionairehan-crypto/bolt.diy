@@ -398,3 +398,15 @@
 - **커밋**: `983d671`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 27로 기록)**: (1) `CloudflareDeploy.client.tsx`/`VercelDeploy.client.tsx`/`NetlifyDeploy.client.tsx`의 `appName: description.get() || 'Untitled'` — 채팅 설명이 비어있을 때 영어 "Untitled"가 "내 앱" 대시보드(전부 한국어)에 그대로 노출(확신도 medium). (2) `app/routes/apps.tsx`의 `STORAGE_MODE_LABEL[app.storage_mode]`가 `PROVIDER_LABEL`과 달리 폴백이 없어 스키마 밖 값이면 `undefined` 렌더 위험(확신도 low). 둘 다 한 줄 수준으로 작고 안전하나 이번 사이클은 다이얼로그 번역에 집중.
 - **다음 감사 영역**: 요금제/결제로 갱신.
+
+### [07:20] Phase 2 — 사이클 29 (감사 대상: 요금제/결제, 3회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 364/364 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `api.payment.verify.ts`/`api.payment.webhook.ts`, `CustomDomainConnect.tsx`+`api.cloudflare-domain.ts`, `freeTrial.ts`, 요금제 관련 내비게이션/설정 탭을 대상으로 사이클 5·21이 이미 다룬 항목(인증/소유권 부재, TODO_IS_PRO_USER, 메터링 동결) 제외하고 새 문제 위주로 점검 요청. 보고받은 3건 모두 직접 코드로 재검증.
+- **재검증 중 기각한 것**: `freeTrial.ts:38-40` `getAccountGenerationsRemaining()`이 `platformSupabase`가 없을 때 `0`을 반환(throw 아님)해 `incrementAccountGenerationsUsed()`와 비일관적이라는 후보 — `app/lib/stores/auth.ts`를 직접 확인한 결과 `authUserStore`는 `initAuthListener()`가 `platformSupabase.auth.getSession()`/`onAuthStateChange` 콜백에서만 값을 채우고, 그 함수 자체가 `!platformSupabase`면 즉시 no-op으로 반환돼 로그인 상태가 절대 안 만들어짐 — 즉 "로그인된 상태인데 platformSupabase가 없는" 시나리오가 애초에 도달 불가능한 죽은 분기라 실사용 버그 아님으로 판단(오탐, 수정 안 함).
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/chat/BaseChat.tsx:506-523` — 채팅창 위 무료 생성 잔여 횟수 안내 배지가 로그인 여부와 무관하게 항상 "무료 체험"(게스트 전용 용어 — `freeTrial.ts` 주석 기준 "비로그인 게스트의 무료 생성 한도"는 "체험", "로그인한 계정의 무료 생성 한도"는 "생성")으로 표시되고 있었음. 정확히 같은 상황(무료 생성 소진)을 다루는 `Chat.client.tsx`의 `notifyGenerationLimitReached`(사이클 9 이전부터 존재)는 이미 게스트("무료 체험을 다 쓰셨어요")와 로그인 계정("무료 생성 횟수를 모두 사용했어요")을 구분하는데, 이 배지만 그 구분을 안 따라가고 있어 용어 불일치였음.
+  → `useState`로 이미 로드돼 있던 `authUser`(`useStore(authUserStore)`) 기준으로 "무료 생성"/"무료 체험" 텍스트 분기(잔여/소진 두 문구 다).
+- **테스트**: `app/pricingCopyAudit.spec.ts` 신규 2건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 366/366 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `d72f5f6`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 28로 기록)**: `api.payment.verify.ts`에 요청자 인증/소유권 확인 및 `paymentId` 재사용(replay) 방지가 전혀 없음 — 항목 4(배포/도메인 API 인증 부재)와 같은 클래스의 새 파일. 실제 플랜 활성화 쓰기 로직이 아직 없어(`pricing.tsx` 미완성) 그 설계와 함께 다뤄야 하는 구조적 사안이라 이번엔 기록만.
+- **다음 감사 영역**: 다크모드로 갱신.

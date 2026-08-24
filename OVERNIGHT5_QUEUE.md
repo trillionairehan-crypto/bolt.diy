@@ -1,5 +1,6 @@
-다음 감사 영역: 요금제/결제
+다음 감사 영역: 다크모드
 
+[완료] 요금제/결제 감사(사이클 29, 3회차) — BaseChat.tsx 무료 생성 잔여 횟수 안내 배지가 로그인 계정도 무조건 "무료 체험"(게스트 전용 용어)으로 표시하던 문제 → authUser 여부로 "무료 생성"/"무료 체험" 문구 분기 (Chat.client.tsx의 notifyGenerationLimitReached와 용어 통일) — (사이클 29)
 [완료] 배포 감사(사이클 28, 2회차) — DeployButton.tsx에서 열리는 실제 GitHub/GitLab 배포 다이얼로그(GitHubDeploymentDialog.tsx/GitLabDeploymentDialog.tsx)가 하드코딩 색상만 고쳐졌을 뿐(cf6f6d9) 제목·라벨·placeholder·버튼·토스트/에러 문구 약 40곳이 전부 영어로 남아있던 문제(같은 배포 흐름의 *hook* 파일 GitHubDeploy.client.tsx/GitLabDeploy.client.tsx 토스트는 사이클 12에서 이미 한국어였지만, 실제 화면에 뜨는 다이얼로그 자체는 처음 감사됨) → 전부 한국어로 번역 — (사이클 28)
 [완료] 미리보기/워크벤치 감사(사이클 27) — FileTree.tsx 우클릭 컨텍스트 메뉴 8개 항목(새 파일/새 폴더/경로 복사/상대 경로 복사/파일·폴더 잠금·해제)이 전부 영어로 하드코딩돼있던 문제, onCopyPath/onCopyRelativePath가 비동기 clipboard.writeText 실패를 동기 try/catch로 못 잡고 성공/실패 어느 쪽이든 사용자 피드백이 없던 문제 → 한국어 번역 + .then/.catch + 토스트 추가 — (사이클 27)
 [완료] 온보딩 감사(사이클 25) — BaseChat.tsx ScrollToBottom 버튼("Go to last message"), WebSearch.client.tsx URL 가져오기 팝오버(버튼 라벨/성공·실패 토스트 4곳)가 채팅 툴바 안에서 영어로 하드코딩돼있던 문제 → 전부 한국어로 번역 — (사이클 25)
@@ -45,3 +46,4 @@
 - 사이클 6(감사 대상: 다크모드)에서 서브에이전트로 앱 전체 재검색, 이전 사이클들이 놓친 같은 버그 클래스(하드코딩 accent hex) 9곳(7개 파일)을 찾아 전부 수정·테스트 추가·커밋함(b204747). `app/utils/globalErrorRecovery.ts`의 React 트리 밖 크래시 카드는 판단 보류로 IMPROVEMENTS.md 항목 1에 남김(의도적 설계인지 불명확). `app/components/chat/StarterTemplates.tsx`는 프로덕션에서 도달 불가한 죽은 코드 경로로 확인되어 손 안 댐. `app/root.tsx`의 404 히어로는 의도된 고정 코랄로 재확인, 그대로 둠.
 - 사이클 10(감사 대상: 생성)에서 서브에이전트로 액션 실행/파싱/스트리밍 표면 감사, 실제 크래시 버그(잘못된 `boltAction` 태그 → 어디서도 안 잡히는 throw → 채팅 전체 에러 화면) 발견해 수정·테스트 추가·커밋함(`d158d4b`). 나머지 4건(Supabase 실패 무음, 영어 에러 문구, 빌드 실패 중복 알림, cp/mv 죽은 검증 경고)은 IMPROVEMENTS.md 항목 9에 기록만 하고 손 안 댐.
 - 사이클 26(감사 대상: 생성, 3회차)에서 코드 수정 없이 감사만 진행 — 서브에이전트가 보고한 3건(사용자 메시지 자동 코드실행 위험, Stop 버튼 abortAllActions 완전 no-op, 스트림 절단 시 파일 액션 영구 정지) 전부 직접 재검증 결과 실재하는 문제로 확인됐으나 셋 다 구조적 판단이 필요해 수정 없이 IMPROVEMENTS.md 항목 24로만 기록. 자세한 내용은 PROGRESS.md 사이클 26 기록 참고.
+- 사이클 29(감사 대상: 요금제/결제, 3회차)에서 서브에이전트가 보고한 `freeTrial.ts`의 `getAccountGenerationsRemaining()`이 `platformSupabase`가 없을 때 `0`(고갈)을 반환하고 `incrementAccountGenerationsUsed()`는 같은 조건에서 throw하는 비일관성 후보는, `auth.ts`를 직접 확인한 결과 `authUserStore`가 `platformSupabase`가 있을 때만 값이 채워지는 구조라 "로그인 상태인데 platformSupabase가 없는" 경우 자체가 도달 불가능한 죽은 분기로 확인됨(오탐, 수정 안 함). `api.payment.verify.ts` 인증/재사용 방지 부재는 실재하는 구조적 문제로 확인돼 IMPROVEMENTS.md 항목 28로 기록.
