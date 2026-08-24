@@ -260,12 +260,19 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
     CRITICAL — Supabase unconnected: render mock UI, never a blocking guard screen:
       - A full-screen "Supabase 연결이 필요해요" notice that replaces the entire app is FORBIDDEN. The user just described their app in Korean and wants to immediately see its shape and flow — a wall of setup instructions instead of their app feels broken, not helpful.
       - When isSupabaseConfigured is false, render the SAME UI a connected user would see, seeded with a small hardcoded array of realistic sample data (2-4 items, in the app's own domain — e.g. sample todos, sample products, sample posts). Every interactive element (buttons, forms) still renders and is clickable; actions that would hit Supabase can simply no-op or show a toast while unconfigured.
-      - Communicate the state with ONE small banner near the top of the page — .cr-badge.warn, never a full-page takeover:
+      - Communicate the state with ONE small banner near the top of the page — .cr-badge.warn, never a full-page takeover. The banner MUST be a clickable <button>, not a plain <span> — clicking it is the user's way to actually resolve the sample-data state, and it needs to open Coralred's own Supabase connection wizard (a UI that lives outside this generated app entirely, in the parent page, not something you build). Since this preview runs in a sandboxed iframe, the only way to reach that parent UI is window.parent.postMessage:
 
-          <span className="cr-badge warn">샘플 데이터로 보고 있어요. 실제 저장은 Supabase 연결 후 가능해요</span>
+          <button
+            type="button"
+            onClick={() => window.parent.postMessage({ type: 'coralred:open-supabase-connection' }, '*')}
+            className="cr-badge warn"
+            style={{ cursor: 'pointer' }}
+          >
+            샘플 데이터로 보고 있어요. 실제 저장은 Supabase 연결 후 가능해요
+          </button>
 
       - This applies to every screen that would otherwise depend on Supabase, including auth-gated ones — default to the SIGNED-IN view with mock data (not a login form) when unconfigured, since a login form demonstrates nothing about the app the user asked for. A LoginScreen/onLogin button that the user must click before seeing their app is ALSO forbidden when unconfigured — it is just a softer version of the same blocking pattern. Skip straight to the signed-in view by initializing the user state to the mock user whenever Supabase is unconfigured, e.g. useState(isSupabaseConfigured ? null : MOCK_USER).
-      - The .cr-badge.warn banner is not optional — every generated file that renders the root view when unconfigured MUST include it in its JSX. A version of this feature that only mentions "sample data" in your chat reply, with no matching banner element in the code, does NOT satisfy this rule.
+      - The .cr-badge.warn banner is not optional — every generated file that renders the root view when unconfigured MUST include it in its JSX, as a clickable button with the exact onClick above (the literal message type string 'coralred:open-supabase-connection' — Coralred's host page listens for this exact string). A version of this feature that only mentions "sample data" in your chat reply, or renders a non-clickable <span>, does NOT satisfy this rule.
 
       RIGHT (mock data + small banner, full UI still visible):
 
@@ -280,7 +287,14 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
           return (
             <div className="cr-page">
               {!isSupabaseConfigured && (
-                <span className="cr-badge warn">샘플 데이터로 보고 있어요. 실제 저장은 Supabase 연결 후 가능해요</span>
+                <button
+                  type="button"
+                  onClick={() => window.parent.postMessage({ type: 'coralred:open-supabase-connection' }, '*')}
+                  className="cr-badge warn"
+                  style={{ cursor: 'pointer' }}
+                >
+                  샘플 데이터로 보고 있어요. 실제 저장은 Supabase 연결 후 가능해요
+                </button>
               )}
               <TodoList todos={todos} />
             </div>
@@ -294,7 +308,7 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
             return (
               <div className="cr-page">
                 <h2>Supabase 연결이 필요해요</h2>
-                <p>채팅창 상단에서 Supabase를 먼저 연결해주세요.</p>
+                <p>작업공간 상단의 "Supabase 연결" 버튼을 먼저 눌러주세요.</p>
               </div>
             );
           }
@@ -321,7 +335,14 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
           return (
             <div className="cr-page">
               {!isSupabaseConfigured && (
-                <span className="cr-badge warn">샘플 데이터로 보고 있어요. 실제 저장은 Supabase 연결 후 가능해요</span>
+                <button
+                  type="button"
+                  onClick={() => window.parent.postMessage({ type: 'coralred:open-supabase-connection' }, '*')}
+                  className="cr-badge warn"
+                  style={{ cursor: 'pointer' }}
+                >
+                  샘플 데이터로 보고 있어요. 실제 저장은 Supabase 연결 후 가능해요
+                </button>
               )}
               <TodoList todos={isSupabaseConfigured ? realTodos : mockTodos} />
             </div>
@@ -675,9 +696,9 @@ ${CACHE_BREAKPOINT_MARKER}
   Supabase project setup handled separately by user! ${
     supabase
       ? !supabase.isConnected
-        ? 'You are not connected to Supabase. Remind user to "connect to Supabase in chat box before proceeding".'
+        ? 'You are not connected to Supabase. Remind user to click the "Supabase 연결" button next to the deploy button at the top of the workspace.'
         : !supabase.hasSelectedProject
-          ? 'Connected to Supabase but no project selected. Remind user to select project in chat box.'
+          ? 'Connected to Supabase but no project selected. Remind user to open the "Supabase 연결" button next to the deploy button at the top of the workspace and pick a project there.'
           : ''
       : ''
   }
