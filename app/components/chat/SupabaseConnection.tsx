@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useSupabaseConnection } from '~/lib/hooks/useSupabaseConnection';
 import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
@@ -6,6 +7,9 @@ import { chatId } from '~/lib/persistence/useChatHistory';
 import { fetchSupabaseStats } from '~/lib/stores/supabase';
 import { Dialog, DialogRoot, DialogClose, DialogTitle, DialogButton } from '~/components/ui/Dialog';
 import { isOpenSupabaseConnectionMessage } from '~/lib/supabase/previewBridge';
+import { authUserStore } from '~/lib/stores/auth';
+import { platformSupabase } from '~/lib/supabase/platform-client';
+import { cloudAppState, loadCloudAppForChat, saveCloudAppForChat, clearCloudAppForChat } from '~/lib/stores/cloud';
 
 interface SupabaseConnectionProps {
   showLabel?: boolean;
@@ -41,8 +45,79 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
 
   const [simpleUrl, setSimpleUrl] = useState('');
   const [simpleAnonKey, setSimpleAnonKey] = useState('');
+  const [showAdvancedWizard, setShowAdvancedWizard] = useState(false);
+  const [provisioning, setProvisioning] = useState(false);
 
   const currentChatId = useStore(chatId);
+  const authUser = useStore(authUserStore);
+  const cloudApp = useStore(cloudAppState);
+
+  const isCloudOn = !!cloudApp;
+  const isStorageOn = isConnected || isCloudOn;
+
+  useEffect(() => {
+    cloudAppState.set(currentChatId ? loadCloudAppForChat(currentChatId) : null);
+  }, [currentChatId]);
+
+  const handleTurnOnCloud = async () => {
+    if (!currentChatId) {
+      return;
+    }
+
+    if (!authUser) {
+      window.location.href = '/login';
+      return;
+    }
+
+    if (!platformSupabase) {
+      toast.error('저장 기능을 켜지 못했어요. 잠시 후 다시 시도해주세요.');
+      return;
+    }
+
+    setProvisioning(true);
+
+    try {
+      const {
+        data: { session },
+      } = await platformSupabase.auth.getSession();
+
+      const response = await fetch('/api/cloud-provision', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session?.access_token || ''}`,
+        },
+      });
+
+      const data = (await response.json()) as {
+        appId?: string;
+        token?: string;
+        expiresAt?: string;
+        error?: string;
+      };
+
+      if (!response.ok || !data.appId || !data.token) {
+        toast.error(data.error || '저장 기능을 켜지 못했어요. 잠시 후 다시 시도해주세요.');
+        return;
+      }
+
+      saveCloudAppForChat(currentChatId, { appId: data.appId, token: data.token, expiresAt: data.expiresAt ?? null });
+      toast.success('저장 기능이 켜졌어요');
+    } catch {
+      toast.error('저장 기능을 켜지 못했어요. 잠시 후 다시 시도해주세요.');
+    } finally {
+      setProvisioning(false);
+    }
+  };
+
+  const handleClearCloud = () => {
+    if (!currentChatId) {
+      return;
+    }
+
+    clearCloudAppForChat(currentChatId);
+    toast.success('저장 기능 연결 정보를 지웠어요');
+  };
 
   useEffect(() => {
     const handleOpenConnectionDialog = () => {
@@ -134,17 +209,122 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
               '!px-2': !showLabel,
             },
           )}
-          title={isConnected ? '저장 기능이 켜졌어요' : '앱에 로그인과 저장 기능을 쓰려면 연결이 필요해요'}
+          title={isStorageOn ? '저장 기능이 켜졌어요' : '앱에 로그인과 저장 기능을 쓰려면 연결이 필요해요'}
         >
           <div className="i-ph:database w-4 h-4 shrink-0 text-[var(--accent)]" />
-          {showLabel && <span className="ml-1 text-xs">{isConnected ? '저장 기능 켜짐' : '저장 기능 켜기'}</span>}
+          {showLabel && <span className="ml-1 text-xs">{isStorageOn ? '저장 기능 켜짐' : '저장 기능 켜기'}</span>}
         </Button>
       </div>
 
-      <DialogRoot open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DialogRoot
+        open={isDialogOpen}
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+
+          if (!open) {
+            setShowAdvancedWizard(false);
+          }
+        }}
+      >
         {isDialogOpen && (
           <Dialog className="max-w-[520px] p-6">
-            {!isConnected ? (
+            {!isStorageOn && !showAdvancedWizard ? (
+              <div className="space-y-5">
+                <DialogTitle>
+                  <div className="i-ph:database w-5 h-5 text-[var(--accent)]" />
+                  저장 기능 켜기
+                </DialogTitle>
+                <p className="text-sm text-bolt-elements-textSecondary -mt-3">
+                  회원가입, 목록 저장처럼 데이터가 남아야 하는 기능을 쓰려면 저장 기능을 켜야 해요. 둘 중 하나를
+                  골라주세요.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={handleTurnOnCloud}
+                  disabled={provisioning}
+                  className={classNames(
+                    'w-full text-left p-4 rounded-lg border border-[var(--accent)] flex items-center gap-3',
+                    'bg-[var(--accent-soft)] hover:bg-[var(--accent-ring)] transition-colors',
+                    'disabled:opacity-50 disabled:cursor-not-allowed',
+                  )}
+                >
+                  <div
+                    className={classNames(
+                      'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
+                      'bg-[var(--accent)] text-[var(--on-accent)]',
+                    )}
+                  >
+                    {provisioning ? (
+                      <div className="i-ph:spinner-gap w-4 h-4 animate-spin" />
+                    ) : (
+                      <div className="i-ph:lightning-fill w-4 h-4" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-semibold text-bolt-elements-textPrimary">
+                      코랄레드로 바로 켜기 <span className="text-[var(--accent-text)]">(추천)</span>
+                    </h4>
+                    <p className="text-xs text-bolt-elements-textSecondary">
+                      가입도 키 복사도 없이 한 번에 켜져요. 체험용이라 7일 뒤 데이터가 정리돼요 — 계속 쓰려면 요금제를
+                      확인해주세요.
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setShowAdvancedWizard(true)}
+                  className="w-full text-left p-4 rounded-lg border border-bolt-elements-borderColor hover:bg-bolt-elements-item-backgroundActive transition-colors flex items-center gap-3"
+                >
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-bolt-elements-background-depth-3">
+                    <div className="i-ph:gear-six w-4 h-4 text-bolt-elements-textSecondary" />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-semibold text-bolt-elements-textPrimary">내 Supabase 연결 (고급)</h4>
+                    <p className="text-xs text-bolt-elements-textSecondary">
+                      직접 만든 Supabase 프로젝트를 연결해요. 데이터가 계속 남고, 여러 기기에서 로그인하는 구조도 만들
+                      수 있어요.
+                    </p>
+                  </div>
+                </button>
+
+                <div className="flex justify-end pt-1">
+                  <DialogClose asChild>
+                    <DialogButton type="secondary">취소</DialogButton>
+                  </DialogClose>
+                </div>
+              </div>
+            ) : isCloudOn && !isConnected ? (
+              <div className="space-y-4">
+                <DialogTitle>
+                  <div className="i-ph:database w-5 h-5 text-[var(--accent)]" />
+                  저장 기능
+                </DialogTitle>
+
+                <div className="flex items-center gap-3 p-3 bg-[#F8F8F8] dark:bg-[#1A1A1A] rounded-lg">
+                  <div className="i-ph:check-circle-fill w-5 h-5 text-bolt-elements-icon-success shrink-0" />
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-medium text-bolt-elements-textPrimary">
+                      코랄레드 저장 기능이 켜졌어요
+                    </h4>
+                    <p className="text-xs text-bolt-elements-textSecondary">
+                      체험용이라 7일 뒤 데이터가 정리돼요. 계속 쓰려면 요금제를 확인해주세요.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 mt-6">
+                  <DialogClose asChild>
+                    <DialogButton type="secondary">닫기</DialogButton>
+                  </DialogClose>
+                  <DialogButton type="danger" onClick={handleClearCloud}>
+                    <div className="i-ph:plugs w-4 h-4" />
+                    연결 정보 지우기
+                  </DialogButton>
+                </div>
+              </div>
+            ) : showAdvancedWizard && !isConnected ? (
               <div className="space-y-5">
                 <DialogTitle>
                   <div className="i-ph:database w-5 h-5 text-[var(--accent)]" />
@@ -237,9 +417,9 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                 </div>
 
                 <div className="flex justify-end gap-2 pt-1">
-                  <DialogClose asChild>
-                    <DialogButton type="secondary">취소</DialogButton>
-                  </DialogClose>
+                  <DialogButton type="secondary" onClick={() => setShowAdvancedWizard(false)}>
+                    뒤로
+                  </DialogButton>
                   <button
                     onClick={handleWizardConnect}
                     disabled={simpleConnecting || !simpleUrl.trim() || !simpleAnonKey.trim()}

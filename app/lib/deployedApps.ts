@@ -5,6 +5,8 @@ import { createScopedLogger } from '~/utils/logger';
 
 const logger = createScopedLogger('deployedApps');
 
+export type StorageMode = 'sample' | 'cloud' | 'supabase';
+
 export interface DeployedAppRecord {
   id: string;
   chat_id: string;
@@ -12,7 +14,8 @@ export interface DeployedAppRecord {
   url: string;
   provider: string;
   project_name: string | null;
-  supabase_connected: boolean;
+  storage_mode: StorageMode;
+  storage_expires_at: string | null;
   deployed_at: string;
 }
 
@@ -34,8 +37,11 @@ export async function recordDeployedApp(params: {
   /** Cloudflare Pages project name, when provider is 'cloudflare' — see the migration's own comment. */
   projectName?: string;
 
-  /** Whether this specific build had real Supabase credentials injected (see injectSupabaseEnv). */
-  supabaseConnected?: boolean;
+  /** Which credentials (if any) this specific build shipped with — see injectSupabaseEnv/injectCloudEnv. */
+  storageMode?: StorageMode;
+
+  /** Only meaningful when storageMode is 'cloud' — the app's cloud_apps.expires_at at deploy time. */
+  storageExpiresAt?: string | null;
 }): Promise<void> {
   if (!authUserStore.get() || !platformSupabase) {
     return;
@@ -67,7 +73,8 @@ export async function recordDeployedApp(params: {
       url: params.url,
       provider: params.provider,
       project_name: params.projectName ?? null,
-      supabase_connected: params.supabaseConnected ?? false,
+      storage_mode: params.storageMode ?? 'sample',
+      storage_expires_at: params.storageExpiresAt ?? null,
     });
 
     if (error) {
@@ -85,7 +92,7 @@ export async function getDeployedApps(): Promise<DeployedAppRecord[]> {
 
   const { data, error } = await platformSupabase
     .from('deployed_apps')
-    .select('id, chat_id, app_name, url, provider, project_name, supabase_connected, deployed_at')
+    .select('id, chat_id, app_name, url, provider, project_name, storage_mode, storage_expires_at, deployed_at')
     .order('deployed_at', { ascending: false });
 
   if (error) {

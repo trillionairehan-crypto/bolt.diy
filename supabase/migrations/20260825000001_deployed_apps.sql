@@ -25,10 +25,15 @@ create table if not exists public.deployed_apps (
   -- is NOT always the same string used at deploy time (recordDeployedApp resolves chat_id to the
   -- routable urlId when it can, which can differ from the raw id toProjectName() hashed).
   project_name text,
-  -- overnight5 작업 5: this deploy's build had real Supabase credentials injected (vs. the
-  -- generated app's default sample-data mode) — see CloudflareDeploy.client.tsx's
-  -- injectSupabaseEnv and /apps' badge that reads this column.
-  supabase_connected boolean not null default false,
+  -- overnight6 작업 5: replaces overnight5's supabase_connected boolean (not yet applied, safe to
+  -- change in place) — now 3-way, since a build can ship with coralred Cloud storage, the user's
+  -- own Supabase, or neither (sample-data mode). See CloudflareDeploy.client.tsx's
+  -- injectSupabaseEnv/injectCloudEnv and /apps' badge that reads this column.
+  storage_mode text not null default 'sample' check (storage_mode in ('sample', 'cloud', 'supabase')),
+  -- overnight6 작업 6: denormalized copy of the Cloud app's cloud_apps.expires_at at deploy time —
+  -- cloud_apps lives in a SEPARATE Supabase project the browser has no credentials for, so /apps
+  -- reads this instead of a live cross-project call. Only meaningful when storage_mode = 'cloud'.
+  storage_expires_at timestamptz,
   deployed_at timestamptz not null default now()
 );
 

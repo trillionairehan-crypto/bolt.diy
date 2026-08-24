@@ -9,11 +9,54 @@ import type { ActionCallbackData } from '~/lib/runtime/message-parser';
 import { chatId } from '~/lib/persistence/useChatHistory';
 import { description } from '~/lib/persistence';
 import { formatBuildFailureOutput } from './deployUtils';
-import { recordDeployedApp } from '~/lib/deployedApps';
+import { recordDeployedApp, type StorageMode } from '~/lib/deployedApps';
 import { supabaseConnection } from '~/lib/stores/supabase';
 import { isServiceRoleKey } from '~/lib/supabase/keyRole';
+import { loadCloudAppForChat } from '~/lib/stores/cloud';
 
 const ENV_FILE_PATH = '.env';
+
+/** coralred's own server — where the injected app's fetch calls to /api/cloud/... actually land. */
+const CLOUD_API_ORIGIN = 'https://coralred.kr';
+
+/**
+ * Shared by injectSupabaseEnv/injectCloudEnv — reads the existing .env (if any), replaces any line
+ * whose key is in `desired` in place, appends the rest, and writes it back. Never touches lines for
+ * keys outside `desired` (an unrelated VITE_KAKAO_JS_KEY the AI wrote stays untouched).
+ */
+async function mergeEnvFile(container: WebContainer, desired: Record<string, string>): Promise<void> {
+  let existingContent = '';
+
+  try {
+    existingContent = new TextDecoder().decode(await container.fs.readFile(ENV_FILE_PATH));
+  } catch {
+    // No .env yet — fine, we'll create one with just these lines.
+  }
+
+  const remainingKeys = new Set(Object.keys(desired));
+
+  const lines = existingContent.split('\n').map((line) => {
+    const match = line.match(/^([A-Za-z_][A-Za-z0-9_]*)=/);
+    const key = match?.[1];
+
+    if (key && key in desired) {
+      remainingKeys.delete(key);
+      return `${key}=${desired[key]}`;
+    }
+
+    return line;
+  });
+
+  while (lines.length > 0 && lines[lines.length - 1].trim() === '') {
+    lines.pop();
+  }
+
+  for (const key of remainingKeys) {
+    lines.push(`${key}=${desired[key]}`);
+  }
+
+  await container.fs.writeFile(ENV_FILE_PATH, lines.join('\n') + '\n');
+}
 
 /**
  * Vite inlines VITE_* env vars at build time, so this has to run before `npm run build` — writing
@@ -45,43 +88,39 @@ async function injectSupabaseEnv(container: WebContainer): Promise<boolean> {
     throw new Error('저장 기능 키가 올바르지 않아요. 코랄레드 팀에 문의해주세요.');
   }
 
-  let existingContent = '';
-
-  try {
-    existingContent = new TextDecoder().decode(await container.fs.readFile(ENV_FILE_PATH));
-  } catch {
-    // No .env yet — fine, we'll create one with just these two lines.
-  }
-
-  const desired: Record<string, string> = {
+  await mergeEnvFile(container, {
     VITE_SUPABASE_URL: supabaseUrl,
     VITE_SUPABASE_ANON_KEY: anonKey,
-  };
-  const remainingKeys = new Set(Object.keys(desired));
-
-  const lines = existingContent.split('\n').map((line) => {
-    const match = line.match(/^([A-Za-z_][A-Za-z0-9_]*)=/);
-    const key = match?.[1];
-
-    if (key && key in desired) {
-      remainingKeys.delete(key);
-      return `${key}=${desired[key]}`;
-    }
-
-    return line;
   });
 
-  while (lines.length > 0 && lines[lines.length - 1].trim() === '') {
-    lines.pop();
-  }
-
-  for (const key of remainingKeys) {
-    lines.push(`${key}=${desired[key]}`);
-  }
-
-  await container.fs.writeFile(ENV_FILE_PATH, lines.join('\n') + '\n');
-
   return true;
+}
+
+/**
+ * Cloud SDK counterpart to injectSupabaseEnv — writes the token+API base issued when this chat's
+ * Cloud storage was turned on (app/lib/stores/cloud.ts). No-ops when Cloud was never turned on for
+ * this chat, leaving the generated app's coralred-storage.js to fall back to its in-memory mode
+ * (CLOUD-DESIGN.md section 9) — same "untouched when not applicable" contract as injectSupabaseEnv.
+ *
+ * @returns the app's expiresAt when injected, so recordDeployedApp can denormalize it for /apps'
+ * expiry warning without a live cross-project call to the Cloud Supabase project.
+ */
+async function injectCloudEnv(
+  container: WebContainer,
+  currentChatId: string,
+): Promise<{ appId: string; expiresAt: string | null } | null> {
+  const cloudApp = loadCloudAppForChat(currentChatId);
+
+  if (!cloudApp) {
+    return null;
+  }
+
+  await mergeEnvFile(container, {
+    VITE_CLOUD_API_BASE: `${CLOUD_API_ORIGIN}/api/cloud/${cloudApp.appId}`,
+    VITE_CLOUD_APP_TOKEN: cloudApp.token,
+  });
+
+  return { appId: cloudApp.appId, expiresAt: cloudApp.expiresAt };
 }
 
 /**
@@ -145,6 +184,7 @@ export function useCloudflareDeploy() {
 
       const container = await webcontainer;
       const supabaseInjected = await injectSupabaseEnv(container);
+      const cloudInjected = supabaseInjected ? null : await injectCloudEnv(container, currentChatId);
 
       deployArtifact.runner.handleDeployAction('building', 'running', { source: 'cloudflare' });
 
@@ -247,13 +287,33 @@ export function useCloudflareDeploy() {
         note: data.isFirstDeploy ? '방금 만든 주소예요. 1분 정도 후에 다시 열어보면 더 잘 열려요.' : undefined,
       });
 
+      if (cloudInjected) {
+        const cloudApp = loadCloudAppForChat(currentChatId);
+
+        if (cloudApp) {
+          fetch('/api/cloud-set-origin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${cloudApp.token}` },
+            body: JSON.stringify({ appId: cloudApp.appId, origin: data.url }),
+          }).catch(() => {
+            /*
+             * Best-effort — a failure here just means the storage API stays 403 for this app until
+             * the next successful deploy retries it; the deploy itself already succeeded.
+             */
+          });
+        }
+      }
+
+      const storageMode: StorageMode = supabaseInjected ? 'supabase' : cloudInjected ? 'cloud' : 'sample';
+
       recordDeployedApp({
         chatId: currentChatId,
         appName: description.get() || 'Untitled',
         url: data.url,
         provider: 'cloudflare',
         projectName,
-        supabaseConnected: supabaseInjected,
+        storageMode,
+        storageExpiresAt: cloudInjected?.expiresAt ?? null,
       });
 
       toast.success('배포가 끝났어요!');

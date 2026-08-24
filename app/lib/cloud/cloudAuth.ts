@@ -86,6 +86,58 @@ export async function authenticateCloudRequest(
   };
 }
 
+export type VerifyOwnerTokenResult =
+  | { ok: true; supabase: SupabaseClient; appId: string }
+  | { ok: false; response: Response };
+
+/**
+ * The token+hash half of authenticateCloudRequest, without the origin/expiry/deploy_origin
+ * checks — used by internal deploy-pipeline calls (setting deploy_origin in the first place, so
+ * requiring it up front would be circular) rather than the public storage API.
+ */
+export async function verifyCloudAppOwnerToken(
+  request: Request,
+  env: CloudEnv,
+  appId: string,
+): Promise<VerifyOwnerTokenResult> {
+  const supabase = getCloudSupabaseClient(env);
+
+  if (!supabase || !env.CLOUD_APP_TOKEN_SECRET) {
+    return { ok: false, response: jsonError(503, '지금은 저장 기능을 쓸 수 없어요. 잠시 후 다시 시도해주세요.') };
+  }
+
+  const authHeader = request.headers.get('Authorization') || '';
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice('Bearer '.length).trim() : '';
+
+  if (!token) {
+    return { ok: false, response: jsonError(401, '저장 기능 연결이 확인되지 않았어요.') };
+  }
+
+  const payload = await verifyCloudAppToken(token, env.CLOUD_APP_TOKEN_SECRET);
+
+  if (!payload || payload.appId !== appId) {
+    return { ok: false, response: jsonError(401, '저장 기능 연결이 확인되지 않았어요.') };
+  }
+
+  const { data: app, error } = await supabase
+    .from('cloud_apps')
+    .select('id, app_secret_hash')
+    .eq('id', appId)
+    .maybeSingle();
+
+  if (error || !app) {
+    return { ok: false, response: jsonError(401, '저장 기능 연결이 확인되지 않았어요.') };
+  }
+
+  const tokenHash = await hashCloudAppToken(token);
+
+  if (tokenHash !== app.app_secret_hash) {
+    return { ok: false, response: jsonError(401, '저장 기능 연결이 확인되지 않았어요.') };
+  }
+
+  return { ok: true, supabase, appId };
+}
+
 /**
  * CLOUD-DESIGN.md 7번 섹션 — 앱 전체 120/분, 기기별 60/분. RPC 하나가 두 카운터를 원자적으로
  * 같이 올리고 둘 다 확인(cloud_check_rate_limit, RUN-3-cloud.sql).

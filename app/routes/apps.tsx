@@ -19,6 +19,12 @@ const PROVIDER_LABEL: Record<string, string> = {
   cloudflare: 'Cloudflare Pages',
 };
 
+const STORAGE_MODE_LABEL: Record<DeployedAppRecord['storage_mode'], string> = {
+  sample: '샘플 데이터',
+  cloud: '코랄레드 저장',
+  supabase: '내 Supabase 연결',
+};
+
 function formatDeployedAt(iso: string): string {
   return new Intl.DateTimeFormat('ko-KR', {
     year: 'numeric',
@@ -28,6 +34,22 @@ function formatDeployedAt(iso: string): string {
     minute: '2-digit',
     hour12: true,
   }).format(new Date(iso));
+}
+
+const EXPIRY_WARNING_WINDOW_MS = 3 * 24 * 60 * 60 * 1000;
+
+function expiresSoon(storageExpiresAt: string | null): boolean {
+  if (!storageExpiresAt) {
+    return false;
+  }
+
+  const msRemaining = new Date(storageExpiresAt).getTime() - Date.now();
+
+  return msRemaining > 0 && msRemaining <= EXPIRY_WARNING_WINDOW_MS;
+}
+
+function formatExpiresAt(iso: string): string {
+  return new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric' }).format(new Date(iso));
 }
 
 export default function Apps() {
@@ -92,7 +114,12 @@ export default function Apps() {
                   <div className="cr-row-8">
                     <h2 className="cr-h2">{app.app_name}</h2>
                     <span className="cr-badge">{PROVIDER_LABEL[app.provider] ?? app.provider}</span>
-                    <span className="cr-badge">{app.supabase_connected ? '저장 기능 연결됨' : '샘플 데이터'}</span>
+                    <span className="cr-badge">{STORAGE_MODE_LABEL[app.storage_mode]}</span>
+                    {expiresSoon(app.storage_expires_at) && (
+                      <span className="cr-badge warn">
+                        {formatExpiresAt(app.storage_expires_at as string)}에 데이터가 정리돼요
+                      </span>
+                    )}
                   </div>
                   <a href={app.url} target="_blank" rel="noreferrer" className="cr-mono">
                     {app.url}
