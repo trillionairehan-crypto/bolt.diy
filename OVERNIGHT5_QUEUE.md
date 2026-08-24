@@ -1,5 +1,6 @@
-다음 감사 영역: 배포
+다음 감사 영역: 요금제/결제
 
+[완료] 배포 감사(사이클 36, 5회차) — ActionRunner#runBuildAction()이 쏘는 빌드 시작/실패/완료 onDeployAlert 3곳이 전부 영어("Building Application"/"Build Failed"/"Build Completed")로 하드코딩돼 있어, Cloudflare/GitHub/GitLab/Netlify/Vercel 5개 배포 제공자 전부에서 각 훅이 미리 설정한 한국어 배포 상태("빌드 중이에요" 등)를 빌드 실행 중/직후에 매번 영어로 덮어쓰던 문제(모든 artifact가 같은 workbenchStore.deployAlert atom을 공유해서 발생) → 3곳 전부 한국어로 번역 — (사이클 36)
 [완료] 미리보기/워크벤치 감사(사이클 35, 4회차) — DiffView.tsx "차이점" 탭이 다른 워크벤치 표면과 달리 상태 문구(Modified/No Changes/Streaming…)와 안내 문구(Files are identical/Select a file to view differences 등) 9곳이 전부 영어로 하드코딩돼 있던 문제 → 전부 한국어로 번역 — (사이클 35)
 [완료] 생성 감사(사이클 34, 4회차) — EnhancedStreamingMessageParser.parse()가 코드블록 자동 파일감지 발동 시 super.parse()의 증분(delta) 반환 계약을 깨고 매 틱마다 메시지 전체를 재파싱해 반환, useMessageParser.ts가 이를 계속 덧붙여 스트리밍마다 채팅 텍스트가 중복 누적되던 문제 → parse()가 항상 메시지 전체 텍스트를 반환하도록 계약 변경 + 소비 측을 append→set으로 수정 — (사이클 34)
 [완료] 온보딩 감사(사이클 33, 4회차) — BaseChat.tsx가 SpeechRecognition 미지원 브라우저(예: Firefox)에서는 recognition 인스턴스를 만들지 않아 startListening/stopListening이 no-op이었는데, ChatBox.tsx의 음성 입력 버튼은 props.isStreaming으로만 disabled를 결정해 첫 방문자가 랜딩 화면 마이크 아이콘을 눌러도 아무 피드백 없이 무반응이던 문제 → speechRecognitionSupported prop 추가해 미지원 브라우저에서 버튼 비활성화 — (사이클 33)

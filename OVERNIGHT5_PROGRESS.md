@@ -478,3 +478,14 @@
 - **커밋**: `36530fb`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 31로 기록)**: (1) `Preview.tsx` `openInNewWindow` 프레임 없는 분기가 팝업 차단 시 무음 실패(확신도 high). (2) `Preview.tsx` 창크기 드롭다운 "새 창에서 열기"도 같은 클래스의 무음 실패(확신도 high). (3) `EditorPanel.tsx` 파일 탐색기 탭 라벨(Files/Search/Locks)·Save/Reset 버튼 영어 하드코딩(확신도 medium-high). (4) `Preview.tsx` inspector 클립보드 쓰기 실패 시 `.catch` 없이 선택 결과가 조용히 드롭되는 문제(확신도 medium).
 - **다음 감사 영역**: 배포로 갱신.
+
+### [사이클 36] Phase 2 — 사이클 36 (감사 대상: 배포, 5회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 378/378 통과, `pnpm run build` 성공(client+server). `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음 — 이전 사이클들의 판단대로 이번에도 손 안 댐(사용자 본인 진행 중 작업).
+- **감사 방법**: Explore 서브에이전트로 배포 표면 전체(`DeployButton.tsx`, 5개 제공자 `*.client.tsx`, `GitHubDeploymentDialog.tsx`/`GitLabDeploymentDialog.tsx`, `CustomDomainConnect.tsx`, `api.*deploy*.ts`/`api.*domain*.ts`)를 대상으로 엣지 케이스·에러 처리 누락·영어 잔재·다크모드·모바일 관점 재검색. 보고받은 5건 중 최상위 1건을 직접 코드로 재확인.
+- **발견 및 확인**: `ActionRunner#runBuildAction()`(`app/lib/runtime/action-runner.ts:464-534`)이 빌드 시작/실패/완료 시 쏘는 `onDeployAlert` 3곳이 `title: 'Building Application'`/`'Build Failed'`/`'Build Completed'`로 하드코딩된 영어. `workbenchStore.addArtifact()`(`app/lib/stores/workbench.ts:583-613`)가 **모든** artifact의 `ActionRunner`를 같은 `workbenchStore.deployAlert` atom(`.set()`, 덮어쓰기)에 연결하는데, 5개 배포 훅(Cloudflare/GitHub/GitLab/Netlify/Vercel) 전부가 배포 직전 `deployArtifact.runner.handleDeployAction('building', 'running', ...)`으로 한국어 "빌드 중이에요"를 먼저 알림으로 띄운 뒤, 실제 빌드는 `artifact.runner.runAction({type:'build', ...})`로 **다른** runner에서 실행함 — 이 다른 runner의 `#runBuildAction`이 빌드 시작 시점에 곧바로 위 영어 알림으로 덮어씀. `DeployAlert.tsx:16,73,81`이 `alert.title`/`alert.description`을 그대로 렌더(주변 문구는 전부 한국어)해서 사용자는 배포 버튼을 누를 때마다(제공자 무관) 빌드 진행 중 영어 텍스트가 화면에 뜨는 것을 목격하게 됨 — 엣지 케이스가 아니라 100% 재현되는 상시 버그.
+- **변경**: `app/lib/runtime/action-runner.ts` 3곳 — `'Building Application'`/`'Building your application...'` → `'빌드 중이에요'`/`'앱을 빌드하고 있어요...'`, `'Build Failed'`/`'Your application build failed'` → `'빌드에 실패했어요'`/`'앱 빌드에 실패했어요'`, `'Build Completed'`/`'Your application was built successfully'` → `'빌드가 끝났어요'`/`'앱이 성공적으로 빌드됐어요'`.
+- **테스트**: `app/buildActionDeployAlertKoreanAudit.spec.ts` 신규 4건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm vitest run` 382/382 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: (다음 커밋)
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 32로 기록)**: (1) `api.netlify-deploy.ts`/`api.vercel-deploy.ts`의 영어 에러 문구가 번역 없이 toast로 직행(확신도 high, 파일마다 10곳 이상이라 범위 큼). (2) `useVercelDeploy`/`useNetlifyDeploy`/`useGitHubDeploy`/`useGitLabDeploy` 4곳에 `useCloudflareDeploy`와 달리 더블클릭 재진입 가드 없음(확신도 medium, 설계 판단 필요). (3) `GitLabDeploymentDialog.tsx` sr-only "Close dialog" 2곳 미번역(낮은 우선순위, 다음 사이클에 바로 처리 가능).
+- **다음 감사 영역**: 요금제/결제로 갱신.
