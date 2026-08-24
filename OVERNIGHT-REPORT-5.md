@@ -287,4 +287,11 @@ create trigger deployed_apps_set_user_id
 
 **이번 사이클 커밋**: `959f01e`(작업 6 리포트), `2a8fcd2`(service_role 키 형식 보안 수정).
 
+### 사이클 2
+**테스트 실행 가능 검증**: 배포 파이프라인의 바이너리 처리 관련해서 이전엔 없던 실행 가능 테스트 2건 추가 — (1) 25MB 초과 파일 거부 시 `toUserMessage`가 의존하는 "파일이" 문자열이 실제로 에러 메시지에 포함되는지, (2) 200개 파일 배치 상한을 넘겼을 때 업로드 요청이 실제로 여러 번(200개+1개)으로 쪼개지는지 — 둘 다 모킹된 fetch로 실제 실행해서 확인함(커밋 `c2c16f0`).
+
+**정적 스캔 — unused code**: `useSupabaseConnection.ts`의 `handleConnect`/`updateToken`이 어느 소비자에서도 호출되지 않는 걸 발견. 이 훅은 현재 `SupabaseConnection.tsx`(채팅 마법사) 하나만 쓰는데, 이번 세션 초반 작업 3 리팩터링 이후로 그 컴포넌트는 이 두 export를 구조분해하지 않음. eslint의 no-unused-vars가 못 잡는 이유는 훅의 return 객체 프로퍼티라서 — 실제 소비자가 구조분해하는지까지는 정적 룰이 못 봄. 삭제 전에 PAT 연결 경로 자체가 완전히 죽은 게 아닌지 확인: 설정(Settings) 페이지의 `SupabaseTab.tsx`가 동일한 `supabaseConnection` 스토어를 직접 읽고 쓰는 자기 자신만의 `handleConnect` 구현을 갖고 있어서, PAT 연결 자체는 여전히 그 경로로 가능함(중복 구현이 두 곳에 있었던 것). 안전하게 삭제 가능 확인 후 제거(커밋 `91b4d28`) — `logStore` import도 그 함수에서만 쓰이고 있어서 같이 제거.
+
+**이번 사이클 커밋**: `c2c16f0`(바이너리 처리 테스트 추가), `91b4d28`(죽은 코드 제거).
+
 
