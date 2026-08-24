@@ -1,5 +1,6 @@
-다음 감사 영역: 미리보기/워크벤치
+다음 감사 영역: 배포
 
+[완료] 미리보기/워크벤치 감사(사이클 27) — FileTree.tsx 우클릭 컨텍스트 메뉴 8개 항목(새 파일/새 폴더/경로 복사/상대 경로 복사/파일·폴더 잠금·해제)이 전부 영어로 하드코딩돼있던 문제, onCopyPath/onCopyRelativePath가 비동기 clipboard.writeText 실패를 동기 try/catch로 못 잡고 성공/실패 어느 쪽이든 사용자 피드백이 없던 문제 → 한국어 번역 + .then/.catch + 토스트 추가 — (사이클 27)
 [완료] 온보딩 감사(사이클 25) — BaseChat.tsx ScrollToBottom 버튼("Go to last message"), WebSearch.client.tsx URL 가져오기 팝오버(버튼 라벨/성공·실패 토스트 4곳)가 채팅 툴바 안에서 영어로 하드코딩돼있던 문제 → 전부 한국어로 번역 — (사이클 25)
 [완료] 한국어 문구 감사(사이클 24, 2회차) — 설정 > 프로필 탭(ProfileTab.tsx) 라벨/placeholder/토스트 전체가 영어로 하드코딩돼있던 문제 → 전부 한국어로 번역 — (사이클 24)
 [완료] 모바일 감사(사이클 23, 2회차) — FileBreadcrumb.tsx 파일 경로 드롭다운이 avoidCollisions={false}로 Radix 자동 화면 밖 재배치를 꺼두고 있어, 화면 오른쪽 끝 근처(깊은 경로)에서 뷰포트 밖으로 밀려날 수 있던 문제 → 기본값(true)으로 복원 — (사이클 23)

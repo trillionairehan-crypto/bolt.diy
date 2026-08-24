@@ -374,3 +374,16 @@
 - **수정하지 않은 이유**: 3건 모두 최소 변경으로 안전하게 고칠 수 없는 구조적 판단 필요 사안 — 1번은 의도 확인이 먼저 필요, 2번은 WebContainer 셸 API 조사 및 브라우저 검증 필요, 3번은 스트림 절단 감지용 타임아웃 로직 신규 설계 필요. `OVERNIGHT5_IMPROVEMENTS.md` 항목 24로 상세 기록.
 - **테스트/커밋**: 코드 변경 없어 테스트 추가·커밋 없음(문서만 갱신).
 - **다음 감사 영역**: 미리보기/워크벤치로 갱신.
+
+### [07:00] Phase 2 — 사이클 27 (감사 대상: 미리보기/워크벤치)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 356/356 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/workbench/**`, `app/lib/stores/workbench.ts`를 재감사(FileBreadcrumb avoidCollisions/폭, 미리보기 새로고침 죽은 싱글턴, FileTree 토스트 영어, Preview 창 크기·저장 동기화 드롭다운 하드코딩 색상, 새 창 열기 팝업 차단 안내, FileTree 선택 파일 보더 색상, 설정 모달/Design Palette 오버플로, abortAllActions no-op·스트림 절단(이미 항목 24) 등 기존에 고친/기록된 항목은 재보고 제외 지시). 보고받은 5건 중 확신도 high 2건(같은 파일 안에서 서로 연관된 문제)을 직접 Read로 재검증 후 수정.
+- **발견·수정(1개 파일, 연관된 2건, 전부 검증 완료 후 수정)**: `app/components/workbench/FileTree.tsx` —
+  1. 우클릭 컨텍스트 메뉴 8개 항목(새 파일/새 폴더/경로 복사/상대 경로 복사/파일 잠금/파일 잠금 해제/폴더 잠금/폴더 잠금 해제)이 전부 영어로 하드코딩. 사이클 19에서 이 파일의 토스트 6곳은 이미 한국어로 고쳤지만 컨텍스트 메뉴 자체는 그때 손 안 댔던 부분. 파일 트리에서 가장 자주 쓰는 상호작용(우클릭)이라 노출 빈도 높음.
+  2. `onCopyPath`/`onCopyRelativePath`가 비동기 `navigator.clipboard.writeText()`를 동기 `try/catch`로 감싸고 있어 Promise reject를 못 잡고, 성공/실패 어느 쪽이든 사용자에게 피드백이 전혀 없었음(파일 트리의 다른 모든 액션 — 생성/삭제/잠금 — 은 성공/실패 토스트가 있는데 이 둘만 없음). 클립보드 쓰기 실패(포커스 없음/권한 거부/비보안 컨텍스트) 시 조용히 아무 일도 안 일어나는 것처럼 보이는 문제.
+  → 컨텍스트 메뉴 8개 항목 한국어로 번역, `onCopyPath`/`onCopyRelativePath`를 `.then()/.catch()`로 수정하고 성공("경로를 복사했어요")/실패("경로를 복사하지 못했어요") 토스트 추가.
+- **테스트**: `app/fileTreeContextMenuAudit.spec.ts` 신규 4건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(자동 prettier --fix로 포맷 에러 1건 정리, 무관한 기존 warning 1건만 남음, `auth.ts`), `corepack pnpm vitest run` 360/360 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `d8552b6`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 25·26으로 기록)**: (1) `Preview.tsx` — 새 창 열기(`openInNewWindow` 비-프레임 분기, "새 창에서 열기" 메뉴 버튼) 2곳이 사이클 11에서 고친 팝업 차단 안내 패턴이 빠져있음 + 기기 프레임 팝업 창 자체의 `<title>`/`(Landscape)`/`(Portrait)` 텍스트가 영어 하드코딩. (2) `TerminalTabs.tsx` — 탭을 배열 인덱스로 키/ref 관리해 중간 탭을 닫으면 마지막 탭이 `detachTerminal()` 없이 언마운트돼 WebContainer 셸 프로세스가 리크될 수 있는 경로(확신도 medium, 브라우저 직접 재현 필요).
+- **다음 감사 영역**: 배포로 갱신.
