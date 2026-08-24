@@ -410,3 +410,15 @@
 - **커밋**: `d72f5f6`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 28로 기록)**: `api.payment.verify.ts`에 요청자 인증/소유권 확인 및 `paymentId` 재사용(replay) 방지가 전혀 없음 — 항목 4(배포/도메인 API 인증 부재)와 같은 클래스의 새 파일. 실제 플랜 활성화 쓰기 로직이 아직 없어(`pricing.tsx` 미완성) 그 설계와 함께 다뤄야 하는 구조적 사안이라 이번엔 기록만.
 - **다음 감사 영역**: 다크모드로 갱신.
+
+### [07:35] Phase 2 — 사이클 30 (감사 대상: 다크모드, 4회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 366/366 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/**`, `app/styles/**`, `app/routes/**`(Markdown.tsx/markdown.ts 제외 지시)에서 하드코딩 색상/dark: 변형 누락을 재감사(Markdown.module.scss 테이블/h6, Menu.client.tsx 아이콘, 법률 페이지 링크, Preview/Workbench 드롭다운, bolt-elements-*-dark 죽은 토큰, Phase2 사이클1-6 accent hex 등 기존에 고친 항목은 재보고 제외 지시). 보고받은 2건 모두 직접 Read/Grep으로 재검증 후 수정.
+- **발견·수정(2건, 전부 검증 완료 후 수정)**:
+  1. `app/components/ui/SettingsButton.tsx` — 사이드바 하단(`Menu.client.tsx:565`)에서 "내 앱" 링크 바로 옆에 나란히 렌더되는 SettingsButton/HelpButton 아이콘이 `text-[#666]` 라이트 전용 고정색만 쓰고 `dark:` 변형이 없음. 같은 줄 옆의 "내 앱" 링크(`Menu.client.tsx:569`)는 이미 `dark:text-gray-500`을 갖고 있어, 다크모드에서 한 줄 안에 저대비(흐릿함)/정상 대비 아이콘이 섞여 보이던 문제.
+  2. `app/components/@settings/tabs/github/components/GitHubCacheManager.tsx:351` — GitHub 설정 탭 캐시 관리 "전체 삭제" 버튼이 `text-red-600 hover:text-red-700 border-red-200 hover:border-red-300`로 라이트 전용 고정색만 쓰고 `dark:` 변형이 없음. 같은 파일의 성공 알림 박스(`border-green-200 dark:border-green-700` 등, line 360)는 이미 dark 변형을 갖고 있는 것과 대비.
+  → 둘 다 인접/동일 파일의 기존 dark: 패턴을 그대로 따라 변형 추가.
+- **테스트**: `app/darkModeCycle30Audit.spec.ts` 신규 3건(소스 grep 방식, 기존 관행과 동일). 첫 시도에서 block comment 안에 `red-*/border-red-*` 텍스트를 그대로 써서 `*/`가 조기 종료되며 esbuild 파싱 에러 발생 → 주석 문구 수정으로 해결.
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 369/369 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `e0521f9`
+- **다음 감사 영역**: 모바일로 갱신.
