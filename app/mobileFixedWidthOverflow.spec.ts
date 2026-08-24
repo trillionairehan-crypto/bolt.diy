@@ -25,4 +25,10 @@ describe('고정 300px 폭 요소가 모바일 뷰포트에서 넘치지 않는�
     expect(source).not.toContain('min-w-[300px]');
     expect(source).toContain('w-[min(300px,calc(100vw-2rem))]');
   });
+
+  it('Workbench.client.tsx 바뀐 파일 팝오버가 고정 320px 대신 뷰포트에 맞춰 줄어든다', () => {
+    const source = readFileSync(join(__dirname, 'components/workbench/Workbench.client.tsx'), 'utf-8');
+    expect(source).not.toContain('mt-2 w-80 origin-top-right');
+    expect(source).toContain('w-[min(320px,calc(100vw-2rem))]');
+  });
 });
