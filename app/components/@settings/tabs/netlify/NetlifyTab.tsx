@@ -1281,7 +1281,9 @@ export default function NetlifyTab() {
             </span>
           </div>
           {connectionTest.timestamp && (
-            <p className="text-xs text-gray-500 mt-1">{new Date(connectionTest.timestamp).toLocaleString()}</p>
+            <p className="text-xs text-bolt-elements-textSecondary mt-1">
+              {new Date(connectionTest.timestamp).toLocaleString()}
+            </p>
           )}
         </motion.div>
       )}

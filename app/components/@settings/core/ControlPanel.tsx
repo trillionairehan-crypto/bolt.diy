@@ -275,17 +275,17 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
               </div>
               <div className="relative z-10 flex flex-col h-full">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-bolt-elements-borderColor">
                   <div className="flex items-center space-x-4">
                     {(activeTab || showTabManagement) && (
                       <button
                         onClick={handleBack}
                         className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-colors duration-150"
                       >
-                        <div className="i-ph:arrow-left w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors" />
+                        <div className="i-ph:arrow-left w-4 h-4 text-bolt-elements-textSecondary group-hover:text-purple-500 transition-colors" />
                       </button>
                     )}
-                    <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                    <DialogTitle className="text-xl font-semibold text-bolt-elements-textPrimary">
                       {showTabManagement ? '탭 관리' : activeTab ? TAB_LABELS[activeTab] : '설정'}
                     </DialogTitle>
                   </div>
@@ -301,7 +301,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                       onClick={handleClose}
                       className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-all duration-200"
                     >
-                      <div className="i-ph:x w-4 h-4 text-gray-500 dark:text-gray-400 group-hover:text-purple-500 transition-colors" />
+                      <div className="i-ph:x w-4 h-4 text-bolt-elements-textSecondary group-hover:text-purple-500 transition-colors" />
                     </button>
                   </div>
                 </div>

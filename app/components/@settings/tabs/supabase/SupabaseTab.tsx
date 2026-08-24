@@ -384,7 +384,7 @@ export default function SupabaseTab() {
                                   ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
                                   : project.status === 'INACTIVE'
                                     ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-                                    : 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
+                                    : 'bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary',
                             )}
                           >
                             <div
@@ -685,7 +685,9 @@ export default function SupabaseTab() {
             </span>
           </div>
           {connectionTest.timestamp && (
-            <p className="text-xs text-gray-500 mt-1">{new Date(connectionTest.timestamp).toLocaleString()}</p>
+            <p className="text-xs text-bolt-elements-textSecondary mt-1">
+              {new Date(connectionTest.timestamp).toLocaleString()}
+            </p>
           )}
         </motion.div>
       )}
