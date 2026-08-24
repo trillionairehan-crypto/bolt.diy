@@ -35,7 +35,7 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
               decoding="sync"
             />
           ) : (
-            <div className="w-full h-full rounded-full flex items-center justify-center bg-white dark:bg-gray-800 text-gray-400 dark:text-gray-500">
+            <div className="w-full h-full rounded-full flex items-center justify-center bg-bolt-elements-background-depth-2 text-bolt-elements-textTertiary">
               <div className="i-ph:user w-6 h-6" />
             </div>
           )}
@@ -48,20 +48,15 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             'min-w-[240px] z-[250]',
             'bg-[var(--surface-2)]',
             'rounded-lg shadow-lg',
-            'border border-gray-200/50 dark:border-gray-800/50',
+            'border border-bolt-elements-borderColor',
             'animate-in fade-in-0 zoom-in-95',
             'py-1',
           )}
           sideOffset={5}
           align="end"
         >
-          <div
-            className={classNames(
-              'px-4 py-3 flex items-center gap-3',
-              'border-b border-gray-200/50 dark:border-gray-800/50',
-            )}
-          >
-            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-white dark:bg-gray-800 shadow-sm">
+          <div className={classNames('px-4 py-3 flex items-center gap-3', 'border-b border-bolt-elements-borderColor')}>
+            <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-bolt-elements-background-depth-2 shadow-sm">
               {profile?.avatar ? (
                 <img
                   src={profile.avatar}
@@ -71,23 +66,23 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
                   decoding="sync"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500 font-medium text-lg">
+                <div className="w-full h-full flex items-center justify-center text-bolt-elements-textTertiary font-medium text-lg">
                   <div className="i-ph:user w-6 h-6" />
                 </div>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="font-medium text-sm text-gray-900 dark:text-white truncate">
+              <div className="font-medium text-sm text-bolt-elements-textPrimary truncate">
                 {profile?.username || '게스트'}
               </div>
-              {profile?.bio && <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{profile.bio}</div>}
+              {profile?.bio && <div className="text-xs text-bolt-elements-textSecondary truncate">{profile.bio}</div>}
             </div>
           </div>
 
           <DropdownMenu.Item
             className={classNames(
               'flex items-center gap-2 px-4 py-2.5',
-              'text-sm text-gray-700 dark:text-gray-200',
+              'text-sm text-bolt-elements-textPrimary',
               'hover:bg-purple-50 dark:hover:bg-purple-500/10',
               'hover:text-purple-500 dark:hover:text-purple-400',
               'cursor-pointer transition-all duration-200',
@@ -103,7 +98,7 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
           <DropdownMenu.Item
             className={classNames(
               'flex items-center gap-2 px-4 py-2.5',
-              'text-sm text-gray-700 dark:text-gray-200',
+              'text-sm text-bolt-elements-textPrimary',
               'hover:bg-purple-50 dark:hover:bg-purple-500/10',
               'hover:text-purple-500 dark:hover:text-purple-400',
               'cursor-pointer transition-all duration-200',
@@ -120,7 +115,7 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             <DropdownMenu.Item
               className={classNames(
                 'flex items-center gap-2 px-4 py-2.5',
-                'text-sm text-gray-700 dark:text-gray-200',
+                'text-sm text-bolt-elements-textPrimary',
                 'hover:bg-purple-50 dark:hover:bg-purple-500/10',
                 'hover:text-purple-500 dark:hover:text-purple-400',
                 'cursor-pointer transition-all duration-200',
@@ -138,7 +133,7 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             <DropdownMenu.Item
               className={classNames(
                 'flex items-center gap-2 px-4 py-2.5',
-                'text-sm text-gray-700 dark:text-gray-200',
+                'text-sm text-bolt-elements-textPrimary',
                 'hover:bg-purple-50 dark:hover:bg-purple-500/10',
                 'hover:text-purple-500 dark:hover:text-purple-400',
                 'cursor-pointer transition-all duration-200',
@@ -154,13 +149,13 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             </DropdownMenu.Item>
           )}
 
-          <div className="my-1 border-t border-gray-200/50 dark:border-gray-800/50" />
+          <div className="my-1 border-t border-bolt-elements-borderColor" />
 
           {SHOW_DEBUG_TOOLS && (
             <DropdownMenu.Item
               className={classNames(
                 'flex items-center gap-2 px-4 py-2.5',
-                'text-sm text-gray-700 dark:text-gray-200',
+                'text-sm text-bolt-elements-textPrimary',
                 'hover:bg-purple-50 dark:hover:bg-purple-500/10',
                 'hover:text-purple-500 dark:hover:text-purple-400',
                 'cursor-pointer transition-all duration-200',

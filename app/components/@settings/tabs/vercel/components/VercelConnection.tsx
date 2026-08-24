@@ -171,7 +171,7 @@ export default function VercelConnection() {
                   </p>
                 </div>
                 {/* Debug info - remove this later */}
-                <div className="mt-2 text-xs text-gray-500">
+                <div className="mt-2 text-xs text-bolt-elements-textSecondary">
                   <p>Debug: Token present: {connection.token ? '✅' : '❌'}</p>
                   <p>Debug: User present: {connection.user ? '✅' : '❌'}</p>
                   <p>Debug: Env token: {import.meta.env?.VITE_VERCEL_ACCESS_TOKEN ? '✅' : '❌'}</p>

@@ -63,7 +63,7 @@ export default function SettingsTab() {
     <div className="space-y-4">
       {/* Language & Notifications */}
       <motion.div
-        className="bg-white dark:bg-[#0A0A0A] rounded-lg shadow-sm dark:shadow-none p-4 space-y-4"
+        className="bg-bolt-elements-background-depth-2 rounded-lg shadow-sm dark:shadow-none p-4 space-y-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
@@ -143,7 +143,7 @@ export default function SettingsTab() {
 
       {/* Timezone */}
       <motion.div
-        className="bg-white dark:bg-[#0A0A0A] rounded-lg shadow-sm dark:shadow-none p-4"
+        className="bg-bolt-elements-background-depth-2 rounded-lg shadow-sm dark:shadow-none p-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
@@ -177,7 +177,7 @@ export default function SettingsTab() {
 
       {/* Simplified Keyboard Shortcuts */}
       <motion.div
-        className="bg-white dark:bg-[#0A0A0A] rounded-lg shadow-sm dark:shadow-none p-4"
+        className="bg-bolt-elements-background-depth-2 rounded-lg shadow-sm dark:shadow-none p-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
@@ -194,16 +194,16 @@ export default function SettingsTab() {
               <span className="text-xs text-bolt-elements-textSecondary">Switch between light and dark mode</span>
             </div>
             <div className="flex items-center gap-1">
-              <kbd className="px-2 py-1 text-xs font-semibold text-bolt-elements-textSecondary bg-white dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-[#1A1A1A] rounded shadow-sm">
+              <kbd className="px-2 py-1 text-xs font-semibold text-bolt-elements-textSecondary bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor rounded shadow-sm">
                 {getModifierSymbol('meta')}
               </kbd>
-              <kbd className="px-2 py-1 text-xs font-semibold text-bolt-elements-textSecondary bg-white dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-[#1A1A1A] rounded shadow-sm">
+              <kbd className="px-2 py-1 text-xs font-semibold text-bolt-elements-textSecondary bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor rounded shadow-sm">
                 {getModifierSymbol('alt')}
               </kbd>
-              <kbd className="px-2 py-1 text-xs font-semibold text-bolt-elements-textSecondary bg-white dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-[#1A1A1A] rounded shadow-sm">
+              <kbd className="px-2 py-1 text-xs font-semibold text-bolt-elements-textSecondary bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor rounded shadow-sm">
                 {getModifierSymbol('shift')}
               </kbd>
-              <kbd className="px-2 py-1 text-xs font-semibold text-bolt-elements-textSecondary bg-white dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-[#1A1A1A] rounded shadow-sm">
+              <kbd className="px-2 py-1 text-xs font-semibold text-bolt-elements-textSecondary bg-bolt-elements-background-depth-3 border border-bolt-elements-borderColor rounded shadow-sm">
                 D
               </kbd>
             </div>
