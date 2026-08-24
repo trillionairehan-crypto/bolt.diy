@@ -467,3 +467,14 @@
 - **커밋**: `5d0b275`
 - **범위 밖으로 남긴 것**: 서브에이전트가 보고한 2번째 항목(`workbench.ts`의 `actionStreamSampler`가 `WorkbenchStore`당 공유 인스턴스라 두 액션이 100ms 안에 동시 스트리밍되면 한쪽의 중간 업데이트가 드롭될 수 있는 문제, 확신도 low-medium, 최종 `onActionClose` 쓰기는 정상 동작해 UI 프리뷰 반짝임 정도로 추정)은 재현·확신도가 낮아 기록만 하고 손 안 댐.
 - **다음 감사 영역**: 미리보기/워크벤치로 갱신.
+
+### [08:30] Phase 2 — 사이클 35 (감사 대상: 미리보기/워크벤치, 4회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 376/376 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: general-purpose 서브에이전트로 `Preview.tsx`/`Workbench.client.tsx`/`EditorPanel.tsx`/`FileTree.tsx`/`FileBreadcrumb.tsx`/`DiffView.tsx`/`workbench.ts`/`previews.ts`를 재감사(사이클 11·19·23·27·31 및 커밋 ccafd7d/a89d0ee에서 이미 고친 항목, IMPROVEMENTS.md 항목 25는 재보고 제외 지시). 보고받은 5건 중 확신도 high인 1건(가장 노출 빈도 높은 항목)을 직접 Read로 재검증 후 수정.
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/workbench/DiffView.tsx` — "차이점" 탭이 다른 워크벤치 표면(코드/미리보기 슬라이더, 파일트리 컨텍스트 메뉴, 배포 다이얼로그 등 전부 한국어)과 달리 상태 문구·안내 문구 9곳이 전부 영어로 하드코딩: `Files are identical`/`Both versions match exactly`/`Current Content`(파일 동일 시 안내), `Modified`/`No Changes`/`Streaming…`(상단 상태 배지), `Loading diff...`(로딩), `Select a file to view differences`(파일 미선택), `Failed to render diff view`(렌더 에러).
+  → 전부 한국어로 번역("파일이 동일해요", "두 버전이 완전히 일치해요", "현재 내용", "수정됨", "변경 없음", "스트리밍 중…", "차이점을 불러오는 중...", "차이점을 보려면 파일을 선택하세요", "차이점 화면을 그리지 못했어요").
+- **테스트**: `app/diffViewKoreanAudit.spec.ts` 신규 2건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 378/378 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `36530fb`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 31로 기록)**: (1) `Preview.tsx` `openInNewWindow` 프레임 없는 분기가 팝업 차단 시 무음 실패(확신도 high). (2) `Preview.tsx` 창크기 드롭다운 "새 창에서 열기"도 같은 클래스의 무음 실패(확신도 high). (3) `EditorPanel.tsx` 파일 탐색기 탭 라벨(Files/Search/Locks)·Save/Reset 버튼 영어 하드코딩(확신도 medium-high). (4) `Preview.tsx` inspector 클립보드 쓰기 실패 시 `.catch` 없이 선택 결과가 조용히 드롭되는 문제(확신도 medium).
+- **다음 감사 영역**: 배포로 갱신.
