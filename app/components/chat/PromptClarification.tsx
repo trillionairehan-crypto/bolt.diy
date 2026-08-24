@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { classNames } from '~/utils/classNames';
 import {
@@ -92,6 +92,9 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
   const [pendingOptionId, setPendingOptionId] = useState<string | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
 
+  /** onComplete unmounts this component; guards against a double-tap firing it (and generateNewApp) twice. */
+  const completedRef = useRef(false);
+
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     setReducedMotion(mq.matches);
@@ -158,7 +161,16 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
     return () => clearTimeout(timeoutId);
   }, [status, dynamicStatus, questions.length, currentStep]);
 
-  const handleSkip = () => onComplete(initialPrompt, EMPTY_DIRECTIVES);
+  const completeOnce = (finalPromptValue: string, finalDirectives: GenerationDirectives) => {
+    if (completedRef.current) {
+      return;
+    }
+
+    completedRef.current = true;
+    onComplete(finalPromptValue, finalDirectives);
+  };
+
+  const handleSkip = () => completeOnce(initialPrompt, EMPTY_DIRECTIVES);
 
   const recordAnswer = (option: ClarifyOption) => {
     const question = questions[currentStep];
@@ -240,7 +252,7 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
           <button
             type="button"
             onClick={handleSkip}
-            className="text-sm font-medium px-3 py-1.5 rounded-full text-bolt-elements-textSecondary hover:bg-bolt-elements-item-backgroundActive hover:text-bolt-elements-textPrimary transition-colors duration-150"
+            className="min-h-11 inline-flex items-center text-sm font-medium px-3 rounded-full text-bolt-elements-textSecondary hover:bg-bolt-elements-item-backgroundActive hover:text-bolt-elements-textPrimary transition-colors duration-150"
           >
             바로 만들기
           </button>
@@ -323,7 +335,7 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
                     value={customInput}
                     onChange={(e) => setCustomInput(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
+                      if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
                         handleCustomAnswer();
                       }
                     }}
@@ -345,7 +357,7 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
                 <button
                   type="button"
                   onClick={() => setShowCustomInput(true)}
-                  className="text-sm font-medium text-left py-2 underline underline-offset-4 text-bolt-elements-textSecondary"
+                  className="min-h-11 inline-flex items-center text-sm font-medium text-left underline underline-offset-4 text-bolt-elements-textSecondary"
                 >
                   직접 입력할게요
                 </button>
@@ -366,7 +378,7 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
             />
             <button
               type="button"
-              onClick={() => onComplete(finalPrompt.trim() || initialPrompt, directives)}
+              onClick={() => completeOnce(finalPrompt.trim() || initialPrompt, directives)}
               className="w-full min-h-14 rounded-xl px-5 py-4 text-base font-bold text-[var(--on-accent)] transition-opacity duration-150 hover:opacity-90 active:opacity-80"
               style={{ backgroundColor: 'var(--accent)' }}
             >

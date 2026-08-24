@@ -669,8 +669,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                                 width: 48,
                                 height: 48,
                                 borderRadius: 14,
-                                background: '#FF5330',
-                                color: '#FAF7F0',
+                                background: 'var(--accent)',
+                                color: 'var(--on-accent)',
                                 fontSize: 18,
                                 fontWeight: 700,
                               }}
