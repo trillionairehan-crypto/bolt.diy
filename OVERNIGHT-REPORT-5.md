@@ -349,4 +349,38 @@ create trigger deployed_apps_set_user_id
 | 마법사 "연결하기" 버튼의 초고속 연속 클릭 시 `simpleConnecting` 상태 반영 전에 두 번째 클릭이 통과할 이론적 여지 | 두 요청 모두 멱등적이라 실질적 피해가 토스트 중복 정도로 낮음. 클로드플레어 배포 쪽엔 이미 있는 재진입 가드 패턴을 여기도 넣을 수 있지만, 실제 사용자 피해가 없어 이번 사이클엔 우선순위 낮음으로 보류. |
 | Custom domain API(`addCustomDomain`/`getCustomDomainStatus`)의 응답 필드 구조가 실제 라이브 API로 검증된 적 없음(이전 세션부터 계속) | Cloudflare Pages 커스텀 도메인 API는 Wrangler CLI 자체에 서브커맨드가 없어 실사용 레퍼런스가 없고, DNS/도메인 편집 권한이 있는 토큰으로 라이브 테스트하는 것도 배포 금지 범위 밖 작업이라 판단해 보류. |
 
+---
+
+## 추가 작업 — Supabase 연결 진입점이 사용자에게 노출되지 않는 문제
+**상태: 완료** — 커밋 `af1e0cd`(헤더 진입점 + postMessage 브릿지), `e058ab8`(시스템 프롬프트 문구 수정)
+
+### 조사
+
+**연결 UI가 실제로 어디서 열리는지 전수 확인**: `<SupabaseConnection>`(overnight5 마법사 포함)은 세션 시작 시점엔 `ChatBox.tsx`(채팅 입력창 툴바, 전송 버튼 옆) 딱 한 곳에만 마운트돼 있었음 — `showLabel={isLanding}`이라 랜딩 페이지에선 "저장 기능 켜기" 텍스트가 보이지만, 채팅이 시작된 뒤(`isLanding=false`)엔 Supabase 로고 아이콘만 남고 라벨이 사라짐. 반면 작업공간 헤더(`HeaderActionButtons.client.tsx`)엔 `shouldShowButtons && <DeployButton />`만 있고 Supabase 관련 버튼이 전혀 없었음 — 신고된 증상과 정확히 일치. 이 마법사를 여는 경로는 총 3개였음: (1) 채팅 입력창의 아이콘 버튼(직접 클릭), (2) `DeployAlert.tsx`의 배포 완료 카드(`open-supabase-connection` CustomEvent를 `document`에 dispatch), (3) `SupabaseAlert.tsx`의 SQL 배너 "저장 기능 연결하기" 버튼(같은 이벤트 dispatch) — (2)와 (3)은 헤더나 배포 후에만 뜨는 알림이라 상시 노출이 아니었고, 실질적인 상시 진입점은 (1) 하나뿐이었는데 그게 안 보이는 게 문제였음.
+
+**생성된 앱의 "샘플 데이터" 배너 위치 확인 — 예상과 다른 구조 발견**: 배너 텍스트("샘플 데이터로 보고 있어요...")를 코드베이스에서 찾아보니 coralred 자체 UI가 아니라 `new-prompt.ts`(시스템 프롬프트) 안에 AI가 생성 앱 자신의 JSX에 넣도록 지시하는 예시 코드였음 — 즉 이 배너는 WebContainer 프리뷰 iframe 안, coralred 호스트 페이지와는 별개의 문서(origin)에서 렌더링됨. 클릭 가능하게 만들려면 coralred 쪽 DOM에서 직접 이벤트를 붙일 수 없고, `window.postMessage` 기반 크로스 프레임 통신이 필요함 — 이 코드베이스엔 이미 `Inspector.tsx`(요소 검사 기능)가 같은 패턴(`iframe.contentWindow.postMessage` + 부모의 `window.addEventListener('message', ...)`)을 쓰고 있어서 그 방식을 그대로 따름.
+
+**생성된 앱의 Supabase 사용 여부 감지 가능성 확인**: 시스템 프롬프트상 "CRITICAL: Use Supabase for databases by default, unless specified otherwise" — 데이터가 필요 없는 앱(계산기 등)은 애초에 Supabase를 안 쓸 수 있음. 코드베이스에 파일 트리에서 `@supabase/supabase-js` import 여부 등으로 감지하는 기존 로직은 없었음(직접 확인). 다만 이번 요구사항이 "상시 노출"이라 감지 로직 자체가 불필요 — 배포 버튼처럼 항상 보여주는 쪽으로 구현하고, 감지 로직은 만들지 않음(과잉 구현 방지).
+
+**문구 출처 확인**: "채팅창 상단에서 Supabase를 연결하면..." 문구는 시스템 프롬프트에 하드코딩된 한국어 문장이 아니라, `new-prompt.ts`의 `<request_specific_values>`에 있는 영문 지시문 `'Remind user to "connect to Supabase in chat box before proceeding".'`을 AI가 매 응답마다 자연스러운 한국어로 풀어쓴 결과였음 — 즉 이 지시문 자체를 고쳐야 AI의 모든 응답에서 일관되게 고쳐짐. 같은 문구가 `prompts.ts`("original")와 `optimized.ts`("optimized")에도 있지만 이 둘은 `PromptLibrary`에서 `'default'`(=`new-prompt.ts`)가 아닌 대체 프롬프트라 기본 사용자에게는 노출되지 않음 — 실제 증상과 무관하다고 판단해 손대지 않음(범위 최소화).
+
+### 구현
+
+1. **헤더 상시 노출** (`af1e0cd`): `<SupabaseConnection>`을 `ChatBox.tsx`에서 제거하고 `HeaderActionButtons.client.tsx`로 이동, `<DeployButton />` 왼쪽에 배치. `shouldShowButtons`(activePreview 존재 여부) 조건 없이 항상 렌더링 — Header.tsx가 이미 `chat.started`일 때만 이 컴포넌트를 렌더링하므로 결과적으로 "채팅이 시작된 이후 상시 노출". 인스턴스를 여러 곳에 중복 마운트하면 Dialog가 두 번 열릴 위험이 있어서(각 인스턴스가 독립된 `useState`로 열림 상태를 들고 있음), 새로 추가하지 않고 기존 마운트를 헤더로 옮기는 방식을 택함 — 이제 마운트는 정확히 하나. 버튼 라벨을 "저장 기능 켜기"/"연결됨"에서 "Supabase 연결"/"Supabase 연결됨"으로 변경(작업 지시의 버튼명과 일치).
+2. **미리보기 배너 클릭 가능화** (`af1e0cd`): `app/lib/supabase/previewBridge.ts` 신설 — `OPEN_SUPABASE_CONNECTION_MESSAGE_TYPE` 상수와 `isOpenSupabaseConnectionMessage` 판별 함수. `SupabaseConnection.tsx`의 기존 `open-supabase-connection` CustomEvent 리스너 옆에 `window.addEventListener('message', ...)`를 추가해서 이 메시지를 받으면 같은 방식으로 다이얼로그를 엶. `new-prompt.ts`의 배너 예시 3곳(RIGHT 예제 2개 + 서술 문단 1개) 전부 `<span>`에서 `<button onClick={() => window.parent.postMessage({ type: 'coralred:open-supabase-connection' }, '*')}>`로 교체, "배너는 반드시 클릭 가능해야 하며 이 메시지 타입 문자열을 정확히 써야 한다"를 CRITICAL 규칙에 추가.
+3. **AI 안내 문구 위치 수정** (`e058ab8`): `<request_specific_values>`의 두 리마인더 지시문을 "in chat box" → "Supabase 연결 버튼(배포 버튼 옆, 작업공간 상단)"으로 수정. "WRONG" 예시 안에 있던 동일 문구도 일관성을 위해 같이 수정(그 예시 자체는 여전히 금지된 패턴을 보여주는 용도).
+4. **세 경로 동일 마법사 확인**: 마운트가 정확히 하나이므로(2번 항목) 구조적으로 세 경로(헤더 버튼 직접 클릭 / `open-supabase-connection` CustomEvent — 배포 완료 카드·SQL 배너에서 계속 사용 / 새 `message` 이벤트 — 생성 앱 배너) 전부 같은 컴포넌트 인스턴스의 같은 `isDialogOpen` 상태를 열게 됨. 이전처럼 여러 인스턴스를 두는 방식이 아니라서 "두 다이얼로그가 동시에 뜨는" 류의 버그가 애초에 발생할 수 없는 구조.
+
+### 검증
+
+- typecheck / lint / test(181개 통과, `previewBridge.spec.ts` 4개 신규) / build 전부 클린.
+- `isOpenSupabaseConnectionMessage`에 대해 vitest로 실행 가능 검증: 정확한 메시지 타입만 true, Inspector의 `INSPECTOR_HOVER` 같은 무관한 메시지·null/undefined/문자열/숫자·타입 필드 없는 객체는 전부 false — 4개 케이스.
+- 클릭 → 다이얼로그가 실제로 열리는 화면 동작은 Radix Dialog + nanostores + WebContainer 연동까지 마운트하는 풀 컴포넌트 렌더링 테스트가 이 코드베이스에 기존 사례가 없어(기존 스펙들은 전부 추출된 순수 함수만 테스트) 이번엔 새로 만들지 않고 아래 성민 확인 항목으로 남김.
+
+**성민 브라우저 체크리스트 추가 항목**:
+1. 채팅을 시작한 뒤 헤더에서 "Supabase 연결" 버튼이 "배포하기" 왼쪽에 실제로 보이는지, 라이트/다크 모드 둘 다 확인.
+2. 그 버튼 클릭 → 마법사 다이얼로그가 열리는지, 연결 완료 후 라벨이 "Supabase 연결됨"으로 바뀌는지.
+3. Supabase 미연결 상태로 앱 하나를 생성한 뒤, 미리보기에 뜨는 "샘플 데이터로 보고 있어요" 배너가 버튼처럼 클릭되는지(커서가 포인터로 바뀌는지), 클릭 시 헤더가 아닌 프리뷰 안에서 다이얼로그가 열리는지.
+4. 배포 완료 카드의 "Supabase 연결" 항목과 SQL 변경사항 배너의 "저장 기능 연결하기" 버튼도 여전히 같은 다이얼로그를 여는지(회귀 확인).
+5. AI 생성 완료 메시지에서 Supabase 관련 안내가 나올 때 "작업공간 상단" 같은 정확한 위치로 언급하는지(새로 생성한 앱에서 확인 — 시스템 프롬프트 캐시 때문에 새 대화에서 확인 권장).
 
