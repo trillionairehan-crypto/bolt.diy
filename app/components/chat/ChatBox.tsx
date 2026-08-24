@@ -54,6 +54,7 @@ interface ChatBoxProps {
   isStreaming: boolean;
   handleSendMessage: (event: React.UIEvent, messageInput?: string) => void;
   isListening: boolean;
+  speechRecognitionSupported: boolean;
   startListening: () => void;
   stopListening: () => void;
   chatStarted: boolean;
@@ -338,7 +339,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               isListening={props.isListening}
               onStart={props.startListening}
               onStop={props.stopListening}
-              disabled={props.isStreaming}
+              disabled={props.isStreaming || !props.speechRecognitionSupported}
               showLabel={isLanding}
             />
             {props.chatStarted && (

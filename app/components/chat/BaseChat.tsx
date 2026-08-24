@@ -551,6 +551,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           enhancingPrompt={enhancingPrompt}
                           enhancePrompt={enhancePrompt}
                           isListening={isListening}
+                          speechRecognitionSupported={recognition !== null}
                           startListening={startListening}
                           stopListening={stopListening}
                           chatStarted={chatStarted}
