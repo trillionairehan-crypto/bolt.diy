@@ -86,7 +86,13 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   try {
     const result = await deployToCloudflarePages({ accountId, apiToken, projectName, files: deployFiles });
-    return json({ success: true, url: result.url, deploymentId: result.deploymentId, projectName: result.projectName });
+    return json({
+      success: true,
+      url: result.url,
+      deploymentId: result.deploymentId,
+      projectName: result.projectName,
+      isFirstDeploy: result.isFirstDeploy,
+    });
   } catch (error) {
     console.error('Cloudflare Pages deploy error:', error instanceof Error ? error.message : error);
 

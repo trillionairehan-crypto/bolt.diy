@@ -147,7 +147,12 @@ export function useCloudflareDeploy() {
         body: JSON.stringify({ projectName, files: fileContents }),
       });
 
-      const data = (await response.json()) as { success?: boolean; url?: string; error?: string };
+      const data = (await response.json()) as {
+        success?: boolean;
+        url?: string;
+        error?: string;
+        isFirstDeploy?: boolean;
+      };
 
       if (!response.ok || !data.success || !data.url) {
         const errorMessage = data.error || '배포에 실패했어요. 잠시 후 다시 시도해주세요.';
@@ -155,7 +160,16 @@ export function useCloudflareDeploy() {
         throw new Error(errorMessage);
       }
 
-      deployArtifact.runner.handleDeployAction('complete', 'complete', { url: data.url, source: 'cloudflare' });
+      deployArtifact.runner.handleDeployAction('complete', 'complete', {
+        url: data.url,
+        source: 'cloudflare',
+
+        /*
+         * Only the very first deploy of a brand-new project — the address itself isn't "new"
+         * again on every redeploy after that, so this stays a one-time caveat, not standing noise.
+         */
+        note: data.isFirstDeploy ? '방금 만든 주소예요. 1분 정도 후에 다시 열어보면 더 잘 열려요.' : undefined,
+      });
 
       recordDeployedApp({
         chatId: currentChatId,

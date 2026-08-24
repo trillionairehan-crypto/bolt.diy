@@ -38,6 +38,13 @@ export interface CloudflareDeployResult {
   url: string;
   deploymentId: string;
   projectName: string;
+
+  /**
+   * True only when this call created the Cloudflare Pages project (not on redeploys) — the
+   *  `{project}.pages.dev` route can take a short moment to finish provisioning right after a
+   *  brand-new project's first deploy, so callers use this to decide whether to show that caveat.
+   */
+  isFirstDeploy: boolean;
 }
 
 export class CloudflareDeployError extends Error {
@@ -110,13 +117,21 @@ async function cfFetch<T>(path: string, token: string, init?: RequestInit): Prom
   return data.result;
 }
 
-async function ensureProject(accountId: string, token: string, projectName: string): Promise<void> {
+/**
+ * Cloudflare Pages' fixed production-branch name for this project, set at creation below and
+ *  passed to every deployment so it's unambiguously recognized as the production deploy (not a
+ *  preview) — see createDeployment's own comment for why this matters for the returned URL.
+ */
+const PRODUCTION_BRANCH = 'main';
+
+/** @returns whether this call created the project (false if it already existed). */
+async function ensureProject(accountId: string, token: string, projectName: string): Promise<boolean> {
   const getResponse = await fetch(`${CF_API_BASE}/accounts/${accountId}/pages/projects/${projectName}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 
   if (getResponse.ok) {
-    return;
+    return false;
   }
 
   if (getResponse.status !== 404) {
@@ -130,8 +145,10 @@ async function ensureProject(accountId: string, token: string, projectName: stri
   await cfFetch(`/accounts/${accountId}/pages/projects`, token, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: projectName, production_branch: 'main' }),
+    body: JSON.stringify({ name: projectName, production_branch: PRODUCTION_BRANCH }),
   });
+
+  return true;
 }
 
 async function getUploadJwt(accountId: string, token: string, projectName: string): Promise<string> {
@@ -203,10 +220,18 @@ async function uploadMissingAssets(jwt: string, entries: AssetEntry[], missingHa
 
 interface CloudflareDeploymentResponse {
   id: string;
-  url: string;
-  aliases?: string[] | null;
 }
 
+/**
+ * `branch` here is what Cloudflare uses to decide whether a Direct Upload deployment counts as
+ * the project's production deployment (and therefore gets aliased to the stable
+ * `{project}.pages.dev` URL) or a preview one (hash-prefixed URL only, e.g.
+ * `<hash>.{project}.pages.dev`) — omitting it was the root cause of a real bug where the
+ * returned URL was a preview hash URL that could 526/SSL-error before that specific route
+ * finished provisioning, while the stable project URL was already fine. Must match
+ * production_branch set at project creation (PRODUCTION_BRANCH) or Cloudflare won't recognize
+ * it as production.
+ */
 async function createDeployment(
   accountId: string,
   token: string,
@@ -215,6 +240,7 @@ async function createDeployment(
 ): Promise<CloudflareDeploymentResponse> {
   const formData = new FormData();
   formData.append('manifest', JSON.stringify(manifest));
+  formData.append('branch', PRODUCTION_BRANCH);
 
   return cfFetch<CloudflareDeploymentResponse>(
     `/accounts/${accountId}/pages/projects/${projectName}/deployments`,
@@ -270,7 +296,7 @@ export async function deployToCloudflarePages(params: {
     }
   }
 
-  await ensureProject(accountId, apiToken, projectName);
+  const isFirstDeploy = await ensureProject(accountId, apiToken, projectName);
 
   const entries: AssetEntry[] = files.map((file) => ({
     path: file.path,
@@ -300,12 +326,18 @@ export async function deployToCloudflarePages(params: {
   const manifest = Object.fromEntries(entries.map((entry) => [`/${entry.path}`, entry.hash]));
   const deployment = await createDeployment(accountId, apiToken, projectName, manifest);
 
-  const productionAlias = deployment.aliases?.find((alias) => alias.endsWith('.pages.dev'));
-
+  /*
+   * Built directly from projectName rather than trusting deployment.url (a per-deployment hash
+   * preview URL, e.g. https://<hash>.<project>.pages.dev — real-world tested and confirmed to
+   * SSL-error right after a fresh deploy) or deployment.aliases (unreliable/empty in practice).
+   * This is the same stable URL Cloudflare shows in its own dashboard as the project's production
+   * domain, and it's exactly what projectName was already constrained to produce.
+   */
   return {
-    url: productionAlias ?? deployment.url,
+    url: `https://${projectName}.pages.dev`,
     deploymentId: deployment.id,
     projectName,
+    isFirstDeploy,
   };
 }
 

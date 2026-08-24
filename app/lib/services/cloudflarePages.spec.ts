@@ -95,8 +95,9 @@ describe('deployToCloudflarePages', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('runs the full create → upload-token → check-missing → upload → deploy sequence and returns the pages.dev alias', async () => {
+  it('runs the full create → upload-token → check-missing → upload → deploy sequence and returns the deterministic project URL', async () => {
     const calls: Array<{ url: string; method?: string }> = [];
+    let deploymentBranchField: FormDataEntryValue | null = null;
 
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === 'string' ? input : input.toString();
@@ -124,9 +125,14 @@ describe('deployToCloudflarePages', () => {
       }
 
       if (url.endsWith('/pages/projects/proj/deployments')) {
+        /*
+         * Deliberately returns a hash-preview url/aliases that DON'T include the stable domain —
+         * matches what was seen in production — to prove the real result ignores both.
+         */
+        deploymentBranchField = (init?.body as FormData).get('branch');
         return jsonResponse({
           success: true,
-          result: { id: 'deploy-1', url: 'https://abc123.proj.pages.dev', aliases: ['https://proj.pages.dev'] },
+          result: { id: 'deploy-1', url: 'https://abc123def.proj.pages.dev', aliases: [] },
         });
       }
 
@@ -146,7 +152,9 @@ describe('deployToCloudflarePages', () => {
       url: 'https://proj.pages.dev',
       deploymentId: 'deploy-1',
       projectName: 'proj',
+      isFirstDeploy: false,
     });
+    expect(deploymentBranchField).toBe('main');
 
     // project GET, upload-token, check-missing, upload (one batch), upsert-hashes, deployments
     expect(calls.map((c) => c.url)).toEqual([
@@ -159,7 +167,7 @@ describe('deployToCloudflarePages', () => {
     ]);
   });
 
-  it('creates the project when it does not exist yet (404 on the existence check)', async () => {
+  it('creates the project when it does not exist yet (404 on the existence check) and reports isFirstDeploy', async () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = typeof input === 'string' ? input : input.toString();
 
@@ -184,10 +192,7 @@ describe('deployToCloudflarePages', () => {
       }
 
       if (url.endsWith('/pages/projects/proj/deployments')) {
-        return jsonResponse({
-          success: true,
-          result: { id: 'deploy-2', url: 'https://xyz.proj.pages.dev', aliases: [] },
-        });
+        return jsonResponse({ success: true, result: { id: 'deploy-2' } });
       }
 
       throw new Error(`unexpected fetch: ${url}`);
@@ -197,9 +202,9 @@ describe('deployToCloudflarePages', () => {
 
     const result = await deployToCloudflarePages({ accountId: 'acc', apiToken: 'tok', projectName: 'proj', files });
 
-    // no aliases matched .pages.dev — falls back to the deployment's own url
-    expect(result.url).toBe('https://xyz.proj.pages.dev');
-    expect(fetchMock.mock.calls.some(([input]) => input.toString().endsWith('/pages/projects') && true)).toBe(true);
+    // Always the stable project domain, never a hash-preview or aliases-derived URL.
+    expect(result.url).toBe('https://proj.pages.dev');
+    expect(result.isFirstDeploy).toBe(true);
   });
 
   it('surfaces a 401 as CloudflareDeployError with status 401 (expired/invalid token)', async () => {

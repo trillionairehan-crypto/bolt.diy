@@ -618,6 +618,9 @@ export class ActionRunner {
     details?: {
       url?: string;
       error?: string;
+
+      /** Extra non-error detail shown alongside a successful/in-progress alert (e.g. a first-deploy caveat). */
+      note?: string;
       source?: 'netlify' | 'vercel' | 'github' | 'gitlab' | 'cloudflare';
     },
   ): void {
@@ -648,7 +651,7 @@ export class ActionRunner {
       type: alertType,
       title,
       description,
-      content: details?.error || '',
+      content: details?.error || details?.note || '',
       url: details?.url,
       stage,
       buildStatus: buildStatus as any,
