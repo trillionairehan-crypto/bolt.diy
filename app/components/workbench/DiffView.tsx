@@ -359,12 +359,12 @@ const NoChangesView = memo(
     <div className="h-full flex flex-col items-center justify-center p-4">
       <div className="text-center text-bolt-elements-textTertiary">
         <div className="i-ph:files text-4xl text-green-400 mb-2 mx-auto" />
-        <p className="font-medium text-bolt-elements-textPrimary">Files are identical</p>
-        <p className="text-sm mt-1">Both versions match exactly</p>
+        <p className="font-medium text-bolt-elements-textPrimary">파일이 동일해요</p>
+        <p className="text-sm mt-1">두 버전이 완전히 일치해요</p>
       </div>
       <div className="mt-4 w-full max-w-2xl bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor overflow-hidden">
         <div className="p-2 text-xs font-bold text-bolt-elements-textTertiary border-b border-bolt-elements-borderColor">
-          Current Content
+          현재 내용
         </div>
         <div className="overflow-auto max-h-96">
           {beforeCode.split('\n').map((line, index) => (
@@ -531,13 +531,13 @@ const FileInfo = memo(
                   {deletions > 0 && <span className="text-red-700 dark:text-red-500">-{deletions}</span>}
                 </div>
               )}
-              <span className="text-yellow-600 dark:text-yellow-400">Modified</span>
+              <span className="text-yellow-600 dark:text-yellow-400">수정됨</span>
               <span className="text-bolt-elements-textTertiary text-xs">{new Date().toLocaleTimeString()}</span>
             </>
           ) : (
-            <span className="text-green-700 dark:text-green-400">No Changes</span>
+            <span className="text-green-700 dark:text-green-400">변경 없음</span>
           )}
-          {isStreamingUpdate && <span className="text-bolt-elements-textTertiary text-xs">Streaming…</span>}
+          {isStreamingUpdate && <span className="text-bolt-elements-textTertiary text-xs">스트리밍 중…</span>}
           <FullscreenButton onClick={onToggleFullscreen} isFullscreen={isFullscreen} />
         </span>
       </div>
@@ -664,7 +664,7 @@ const InlineDiffComparison = memo(({ beforeCode, afterCode, filename, language }
   if (!highlighter) {
     return (
       <div className="h-full flex items-center justify-center">
-        <div className="text-bolt-elements-textTertiary">Loading diff...</div>
+        <div className="text-bolt-elements-textTertiary">차이점을 불러오는 중...</div>
       </div>
     );
   }
@@ -807,7 +807,7 @@ export const DiffView = memo(({ fileHistory, setFileHistory }: DiffViewProps) =>
   if (!selectedFile || !currentDocument) {
     return (
       <div className="flex w-full h-full justify-center items-center bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">
-        Select a file to view differences
+        차이점을 보려면 파일을 선택하세요
       </div>
     );
   }
@@ -839,7 +839,7 @@ export const DiffView = memo(({ fileHistory, setFileHistory }: DiffViewProps) =>
       <div className="flex w-full h-full justify-center items-center bg-bolt-elements-background-depth-1 text-red-400">
         <div className="text-center">
           <div className="i-ph:warning-circle text-4xl mb-2" />
-          <p>Failed to render diff view</p>
+          <p>차이점 화면을 그리지 못했어요</p>
         </div>
       </div>
     );
