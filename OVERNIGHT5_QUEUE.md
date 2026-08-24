@@ -1,5 +1,8 @@
-다음 감사 영역: 미리보기/워크벤치
+다음 감사 영역: 배포
 
+[완료] ExpoQrModal.tsx 안내 문구 3곳이 전부 영어(제목/설명/URL 없음 안내) → 한국어로 번역 — (사이클 11)
+[완료] TerminalTabs.tsx 추가 터미널 탭 라벨 "Terminal {n}"이 영어 → "터미널 {n}"으로 번역 — (사이클 11)
+[완료] Preview.tsx "새 창/탭에서 열기" 실패(팝업 차단/잘못된 URL/미리보기 없음) 시 콘솔 로그만 있고 사용자에게 아무 안내 없음 → toast.error 추가 — (사이클 11)
 [완료] ChatBox.tsx 전송 버튼이 공백만 입력해도 활성화(input.length 기준) → trim 기준으로 수정 — aff3c5c
 [완료] PromptClarification.tsx "바로 만들기"/"만들기" 더블탭 시 onComplete(→generateNewApp) 중복 호출 가능 → completedRef 가드 추가 — aff3c5c
 [완료] PromptClarification.tsx "바로 만들기"/"직접 입력할게요" 버튼 터치 타겟이 32~36px로 44px 미만 → min-h-11로 수정 — aff3c5c

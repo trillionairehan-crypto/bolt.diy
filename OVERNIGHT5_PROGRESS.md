@@ -196,3 +196,15 @@
 - **커밋**: `d158d4b`
 - **범위 밖으로 남긴 것(구조적 판단 필요, `OVERNIGHT5_IMPROVEMENTS.md` 항목 9로 기록)**: (1) Supabase 액션 실패가 알림 없이 완전히 무음(콜백 미호출 + `Artifact.tsx`가 목록에서 아예 필터링) — 알림 플러밍 신설이 필요해 보류. (2) 쉘 액션 에러 제목 6개가 영어로 하드코딩돼 한국어 UI에 그대로 노출 — 다른 참조 여부 전수 확인 먼저 필요. (3) 빌드 실패 시 알림이 두 번 뜨고 두 번째가 항상 'Dev Server Failed'로 잘못 표시 — 실제 사용자 영향 브라우저 재현 필요(확신도 중간). (4) `cp`/`mv` 원본 없음 검증 결과가 호출부에서 읽히지 않아 항상 버려지는 죽은 코드 — 낮은 우선순위.
 - **다음 감사 영역**: 미리보기/워크벤치로 갱신.
+
+### [03:50] Phase 2 — 사이클 11 (감사 대상: 미리보기/워크벤치)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 308/308 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `Workbench.client.tsx`/`Preview.tsx`/`FileTree.tsx`/`EditorPanel.tsx`/`terminal/*`를 대상으로 엣지 케이스(빈 상태, 포트 미준비, 파일명 이상), 에러 처리 누락, 한국어 문구, 다크모드/모바일 관점으로 점검 요청. 보고받은 7건을 직접 Read로 재검증.
+- **변경(3건, 전부 검증 완료 후 수정)**:
+  1. `app/components/workbench/ExpoQrModal.tsx` — Expo Go 미리보기 안내 다이얼로그 3곳(제목/설명/URL 없음 안내)이 전부 영어였음(이 모달은 `expoUrl`이 있을 때만 뜨는 별도 아이콘 버튼 경로라 이전 사이클들의 한국어 문구 감사에서 놓친 사각지대). 한국어로 번역. 배경색 `#8a5fff`는 Expo 자체 브랜드 보라색으로 판단해(로고 아이콘 옆 QR 배경) 손 안 댐.
+  2. `app/components/workbench/terminal/TerminalTabs.tsx` — 첫 번째 터미널은 "코랄레드 터미널"(한국어)인데 추가로 여는 터미널만 "Terminal {n}"(영어)이라 같은 탭 바 안에서 용어가 갈렸던 것 → "터미널 {n}"으로 통일.
+  3. `app/components/workbench/Preview.tsx` — "새 창에서 열기"/"새 탭에서 열기" 버튼이 팝업 차단·잘못된 미리보기 URL·미리보기 없음 상황에서 `console.warn`/`console.error`만 찍고 아무 UI 반응이 없어(이 파일에 `toast` import 자체가 없었음) 사용자는 버튼을 눌러도 아무 일도 안 일어나는 것처럼 보였음 → `react-toastify`의 `toast` import 추가, 4개 실패 지점(팝업 차단 1곳, 잘못된 URL 2곳, 활성 미리보기 없음 1곳) 전부에 한국어 토스트 추가.
+- **테스트**: `app/previewWorkbenchAudit.spec.ts` 신규 3건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm vitest run` 311/311 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **범위 밖으로 남긴 것(구조적 판단 필요, `OVERNIGHT5_IMPROVEMENTS.md` 항목 10으로 기록)**: (1) `FileTree.tsx` 우클릭 컨텍스트 메뉴 전체(8개 항목) + 실패 토스트 6곳이 영어 — 다음 사이클 최우선 후보. (2) `EditorPanel.tsx` 사이드바 탭("Files"/"Search"/"Locks")·버튼("Save"/"Reset") 영어. (3) `TerminalTabs.tsx`의 `closeTerminal`이 위치 기반 key라 중간 탭을 닫으면 다른 탭의 세션이 안 정리된 채 남을 수 있는 구조적 의심(런타임 미검증, 확신도 중간). (4) `Preview.tsx` iframe에 `onError` 폴백이 없어 실제 로드 실패 시 15초 뒤 무음으로 빈 화면만 보임 — 감지/재시도 UX 설계 필요.
+- **다음 감사 영역**: 배포로 갱신.
