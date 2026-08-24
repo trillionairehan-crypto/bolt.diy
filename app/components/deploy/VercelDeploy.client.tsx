@@ -18,12 +18,12 @@ export function useVercelDeploy() {
 
   const handleVercelDeploy = async () => {
     if (!vercelConn.user || !vercelConn.token) {
-      toast.error('Please connect to Vercel first in the settings tab!');
+      toast.error('설정 탭에서 먼저 Vercel 계정을 연결해주세요.');
       return false;
     }
 
     if (!currentChatId) {
-      toast.error('No active chat found');
+      toast.error('진행 중인 채팅이 없어요.');
       return false;
     }
 
@@ -33,7 +33,7 @@ export function useVercelDeploy() {
       const artifact = workbenchStore.firstArtifact;
 
       if (!artifact) {
-        throw new Error('No active project found');
+        throw new Error('배포할 프로젝트를 찾지 못했어요.');
       }
 
       // Create a deployment artifact for visual feedback
@@ -75,7 +75,7 @@ export function useVercelDeploy() {
           error: formatBuildFailureOutput(buildOutput?.output),
           source: 'vercel',
         });
-        throw new Error('Build failed');
+        throw new Error('빌드에 실패했어요.');
       }
 
       // Notify that build succeeded and deployment is starting
@@ -109,7 +109,7 @@ export function useVercelDeploy() {
       }
 
       if (!buildPathExists) {
-        throw new Error('Could not find build output directory. Please check your build configuration.');
+        throw new Error('빌드 결과물 폴더를 찾지 못했어요. 빌드 설정을 확인해주세요.');
       }
 
       // Get all files recursively
@@ -202,10 +202,10 @@ export function useVercelDeploy() {
 
         // Notify that deployment failed
         deployArtifact.runner.handleDeployAction('deploying', 'failed', {
-          error: data.error || 'Invalid deployment response',
+          error: data.error || '배포 응답이 올바르지 않아요.',
           source: 'vercel',
         });
-        throw new Error(data.error || 'Invalid deployment response');
+        throw new Error(data.error || '배포 응답이 올바르지 않아요.');
       }
 
       if (data.project) {
@@ -226,12 +226,12 @@ export function useVercelDeploy() {
       });
 
       // Show success toast notification
-      toast.success(`🚀 Vercel deployment completed successfully!`);
+      toast.success(`🚀 Vercel 배포가 끝났어요!`);
 
       return true;
     } catch (err) {
       console.error('Vercel deploy error:', err);
-      toast.error(err instanceof Error ? err.message : 'Vercel deployment failed');
+      toast.error(err instanceof Error ? err.message : 'Vercel 배포에 실패했어요.');
 
       return false;
     } finally {

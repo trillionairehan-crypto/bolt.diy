@@ -17,12 +17,12 @@ export function useGitLabDeploy() {
     const connection = getLocalStorage('gitlab_connection');
 
     if (!connection?.token || !connection?.user) {
-      toast.error('Please connect your GitLab account in Settings > Connections first');
+      toast.error('설정 > 연결에서 먼저 GitLab 계정을 연결해주세요.');
       return false;
     }
 
     if (!currentChatId) {
-      toast.error('No active chat found');
+      toast.error('진행 중인 채팅이 없어요.');
       return false;
     }
 
@@ -32,7 +32,7 @@ export function useGitLabDeploy() {
       const artifact = workbenchStore.firstArtifact;
 
       if (!artifact) {
-        throw new Error('No active project found');
+        throw new Error('배포할 프로젝트를 찾지 못했어요.');
       }
 
       // Create a deployment artifact for visual feedback
@@ -74,7 +74,7 @@ export function useGitLabDeploy() {
           error: formatBuildFailureOutput(buildOutput?.output),
           source: 'gitlab',
         });
-        throw new Error('Build failed');
+        throw new Error('빌드에 실패했어요.');
       }
 
       // Notify that build succeeded and deployment preparation is starting
@@ -149,7 +149,7 @@ export function useGitLabDeploy() {
       });
 
       // Show success toast notification
-      toast.success(`🚀 GitLab deployment preparation completed successfully!`);
+      toast.success(`🚀 GitLab 배포 준비가 완료됐어요!`);
 
       return {
         success: true,
@@ -158,7 +158,7 @@ export function useGitLabDeploy() {
       };
     } catch (err) {
       console.error('GitLab deploy error:', err);
-      toast.error(err instanceof Error ? err.message : 'GitLab deployment preparation failed');
+      toast.error(err instanceof Error ? err.message : 'GitLab 배포 준비에 실패했어요.');
 
       return false;
     } finally {

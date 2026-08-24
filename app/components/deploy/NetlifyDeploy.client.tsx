@@ -18,12 +18,12 @@ export function useNetlifyDeploy() {
 
   const handleNetlifyDeploy = async () => {
     if (!netlifyConn.user || !netlifyConn.token) {
-      toast.error('Please connect to Netlify first in the settings tab!');
+      toast.error('설정 탭에서 먼저 Netlify 계정을 연결해주세요.');
       return false;
     }
 
     if (!currentChatId) {
-      toast.error('No active chat found');
+      toast.error('진행 중인 채팅이 없어요.');
       return false;
     }
 
@@ -33,7 +33,7 @@ export function useNetlifyDeploy() {
       const artifact = workbenchStore.firstArtifact;
 
       if (!artifact) {
-        throw new Error('No active project found');
+        throw new Error('배포할 프로젝트를 찾지 못했어요.');
       }
 
       // Create a deployment artifact for visual feedback
@@ -76,7 +76,7 @@ export function useNetlifyDeploy() {
           error: formatBuildFailureOutput(buildOutput?.output),
           source: 'netlify',
         });
-        throw new Error('Build failed');
+        throw new Error('빌드에 실패했어요.');
       }
 
       // Notify that build succeeded and deployment is starting
@@ -114,7 +114,7 @@ export function useNetlifyDeploy() {
       }
 
       if (!buildPathExists) {
-        throw new Error('Could not find build output directory. Please check your build configuration.');
+        throw new Error('빌드 결과물 폴더를 찾지 못했어요. 빌드 설정을 확인해주세요.');
       }
 
       async function getAllFiles(dirPath: string): Promise<Record<string, string>> {
@@ -164,10 +164,10 @@ export function useNetlifyDeploy() {
 
         // Notify that deployment failed
         deployArtifact.runner.handleDeployAction('deploying', 'failed', {
-          error: data.error || 'Invalid deployment response',
+          error: data.error || '배포 응답이 올바르지 않아요.',
           source: 'netlify',
         });
-        throw new Error(data.error || 'Invalid deployment response');
+        throw new Error(data.error || '배포 응답이 올바르지 않아요.');
       }
 
       const maxAttempts = 20; // 2 minutes timeout
@@ -194,10 +194,10 @@ export function useNetlifyDeploy() {
           if (deploymentStatus.state === 'error') {
             // Notify that deployment failed
             deployArtifact.runner.handleDeployAction('deploying', 'failed', {
-              error: 'Deployment failed: ' + (deploymentStatus.error_message || 'Unknown error'),
+              error: '배포에 실패했어요: ' + (deploymentStatus.error_message || '알 수 없는 오류'),
               source: 'netlify',
             });
-            throw new Error('Deployment failed: ' + (deploymentStatus.error_message || 'Unknown error'));
+            throw new Error('배포에 실패했어요: ' + (deploymentStatus.error_message || '알 수 없는 오류'));
           }
 
           attempts++;
@@ -212,10 +212,10 @@ export function useNetlifyDeploy() {
       if (attempts >= maxAttempts) {
         // Notify that deployment timed out
         deployArtifact.runner.handleDeployAction('deploying', 'failed', {
-          error: 'Deployment timed out',
+          error: '배포 시간이 초과됐어요.',
           source: 'netlify',
         });
-        throw new Error('Deployment timed out');
+        throw new Error('배포 시간이 초과됐어요.');
       }
 
       // Store the site ID if it's a new site
@@ -238,12 +238,12 @@ export function useNetlifyDeploy() {
       });
 
       // Show success toast notification
-      toast.success(`🚀 Netlify deployment completed successfully!`);
+      toast.success(`🚀 Netlify 배포가 끝났어요!`);
 
       return true;
     } catch (error) {
       console.error('Deploy error:', error);
-      toast.error(error instanceof Error ? error.message : 'Deployment failed');
+      toast.error(error instanceof Error ? error.message : '배포에 실패했어요.');
 
       return false;
     } finally {
