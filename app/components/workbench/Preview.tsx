@@ -867,10 +867,10 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
             {isWindowSizeDropdownOpen && (
               <>
                 <div className="fixed inset-0 z-50" onClick={() => setIsWindowSizeDropdownOpen(false)} />
-                <div className="absolute right-0 top-full mt-2 z-50 min-w-[240px] max-h-[400px] overflow-y-auto bg-white dark:bg-black rounded-xl shadow-2xl border border-[#E5E7EB] dark:border-[rgba(255,255,255,0.1)] overflow-hidden">
-                  <div className="p-3 border-b border-[#E5E7EB] dark:border-[rgba(255,255,255,0.1)]">
+                <div className="absolute right-0 top-full mt-2 z-50 min-w-[240px] max-h-[400px] overflow-y-auto bg-bolt-elements-background-depth-2 rounded-xl shadow-2xl border border-bolt-elements-borderColor overflow-hidden">
+                  <div className="p-3 border-b border-bolt-elements-borderColor">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-[#111827] dark:text-gray-300">창 크기</span>
+                      <span className="text-sm font-medium text-bolt-elements-textPrimary">창 크기</span>
                     </div>
                     <div className="flex flex-col gap-2">
                       <button
@@ -879,7 +879,7 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
                           openInNewTab();
                         }}
                       >
-                        <span>Open in new tab</span>
+                        <span>새 탭에서 열기</span>
                         <div className="i-ph:arrow-square-out h-5 w-4" />
                       </button>
                       <button
@@ -910,14 +910,14 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
                           );
                         }}
                       >
-                        <span>Open in new window</span>
+                        <span>새 창에서 열기</span>
                         <div className="i-ph:browser h-5 w-4" />
                       </button>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-bolt-elements-textTertiary">Show Device Frame</span>
+                        <span className="text-xs text-bolt-elements-textTertiary">기기 프레임 보기</span>
                         <button
                           className={`w-10 h-5 rounded-full transition-colors duration-200 ${
-                            showDeviceFrame ? 'bg-[#6D28D9]' : 'bg-gray-300 dark:bg-gray-700'
+                            showDeviceFrame ? 'bg-[var(--accent)]' : 'bg-bolt-elements-background-depth-4'
                           } relative`}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -932,10 +932,10 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
                         </button>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-bolt-elements-textTertiary">Landscape Mode</span>
+                        <span className="text-xs text-bolt-elements-textTertiary">가로 모드</span>
                         <button
                           className={`w-10 h-5 rounded-full transition-colors duration-200 ${
-                            isLandscape ? 'bg-[#6D28D9]' : 'bg-gray-300 dark:bg-gray-700'
+                            isLandscape ? 'bg-[var(--accent)]' : 'bg-bolt-elements-background-depth-4'
                           } relative`}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -954,7 +954,7 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
                   {WINDOW_SIZES.map((size) => (
                     <button
                       key={size.name}
-                      className="w-full px-4 py-3.5 text-left text-[#111827] dark:text-gray-300 text-sm whitespace-nowrap flex items-center gap-3 group hover:bg-[#F5EEFF] dark:hover:bg-gray-900 bg-white dark:bg-black"
+                      className="w-full px-4 py-3.5 text-left text-bolt-elements-textPrimary text-sm whitespace-nowrap flex items-center gap-3 group hover:bg-bolt-elements-item-backgroundActive bg-bolt-elements-background-depth-2"
                       onClick={() => {
                         setSelectedWindowSize(size);
                         setIsWindowSizeDropdownOpen(false);
@@ -962,21 +962,21 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
                       }}
                     >
                       <div
-                        className={`${size.icon} w-5 h-5 text-[#6B7280] dark:text-gray-400 group-hover:text-[#6D28D9] dark:group-hover:text-[#6D28D9] transition-colors duration-200`}
+                        className={`${size.icon} w-5 h-5 text-bolt-elements-textSecondary group-hover:text-[var(--accent-text)] transition-colors duration-200`}
                       />
                       <div className="flex-grow flex flex-col">
-                        <span className="font-medium group-hover:text-[#6D28D9] dark:group-hover:text-[#6D28D9] transition-colors duration-200">
+                        <span className="font-medium group-hover:text-[var(--accent-text)] transition-colors duration-200">
                           {size.name}
                         </span>
-                        <span className="text-xs text-[#6B7280] dark:text-gray-400 group-hover:text-[#6D28D9] dark:group-hover:text-[#6D28D9] transition-colors duration-200">
+                        <span className="text-xs text-bolt-elements-textSecondary group-hover:text-[var(--accent-text)] transition-colors duration-200">
                           {isLandscape && (size.frameType === 'mobile' || size.frameType === 'tablet')
                             ? `${size.height} × ${size.width}`
                             : `${size.width} × ${size.height}`}
-                          {size.hasFrame && showDeviceFrame ? ' (with frame)' : ''}
+                          {size.hasFrame && showDeviceFrame ? ' (프레임 포함)' : ''}
                         </span>
                       </div>
                       {selectedWindowSize.name === size.name && (
-                        <div className="text-[#6D28D9] dark:text-[#6D28D9]">
+                        <div className="text-[var(--accent-text)]">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="16"
