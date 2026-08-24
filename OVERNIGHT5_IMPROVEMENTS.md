@@ -1,5 +1,12 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 14. 모바일 감사(사이클 15, 2회차) — 고정 300px 폭 3건은 고침, 그리드/터치타겟 3건은 판단 보류
+Explore 서브에이전트로 `app/components/**`/`app/routes/**` 전체를 재검색, 이전 모바일 사이클(사이클 7)이 놓친 새 후보를 찾음. 가장 확실한 3건(`WebSearch.client.tsx`/`APIKeyManager.tsx`의 `w-[300px]` 고정 입력창, `FileBreadcrumb.tsx`의 `min-w-[300px]`가 `avoidCollisions={false}`와 겹쳐 화면 밖으로 밀릴 수 있던 드롭다운 — `ColorSchemeDialog.tsx`와 같은 "min-width가 max-width보다 우선"하는 CSS 특성 문제)은 `w-[min(300px,calc(100vw-Nrem))]` 패턴(기존 `Dialog.tsx:119`가 이미 쓰던 관용구)으로 수정·테스트 추가·커밋. 아래 3건은 확인했으나 손 안 댐:
+
+- **`app/components/@settings/tabs/github/components/GitHubStats.tsx:192`의 `grid-cols-4`가 반응형 변형 없음** — 바로 위 형제 블록(163번 줄)은 `grid-cols-2 md:grid-cols-4`로 이미 반응형인데 "Activity Summary" 블록만 항상 4열 고정. 설정 다이얼로그 자체가 이미 `w-[95vw]`(모바일 기준 ~337px)라 4열이면 칸당 70-80px밖에 안 나와 "Contributors" 같은 라벨+숫자가 줄바꿈/잘림 가능. **왜 안 고쳤나**: 이번 사이클은 이미 300px 고정폭 3건을 처리해 범위 초과 판단, 또한 실사용 빈도 낮은 GitHub 연동 세부 통계 화면이라 우선순위 상대적으로 낮음. **제안**: 형제 블록과 동일하게 `grid-cols-2 md:grid-cols-4`로 통일.
+- **`app/components/@settings/tabs/providers/local/StatusDashboard.tsx:62`의 `grid-cols-3`도 반응형 변형 없음** — "Last Check" 칸이 로케일 시간 문자열(`3:45:12 PM`)을 `text-lg font-semibold`로 렌더하는데 설정 패널 안 3열 중 하나라 폭이 90-100px밖에 안 돼 줄바꿈 위험. **왜 안 고쳤나**: 위와 같은 이유(범위 초과, Local 프로바이더 설정은 실사용 빈도 낮음). **제안**: `grid-cols-3` → `grid-cols-1 sm:grid-cols-3` 검토.
+- **`WebSearch.client.tsx`/`APIKeyManager.tsx`의 Fetch/Save/Cancel 버튼이 `px-3 py-1.5`로 36px 미만 터치타겟(확신도 낮음)** — 서브에이전트가 부가로 지적, 명확한 오버플로 버그는 아니고 권장치 미달 수준이라 이번엔 폭 수정만 반영하고 터치타겟은 별도 판단 필요 항목으로 남김.
+
 ## 13. 다크모드 감사(사이클 14) — 죽은 토큰/토큰 불일치 4건, 범위 확장 필요해 보류
 Explore 서브에이전트로 `app/` 전체 재검색, 법률 페이지 링크 하드코딩 건(고침, `6f9b309`)은 별도. 아래 4건은 확인은 했으나 범위가 넓거나 확신도가 낮아 손 안 댐:
 

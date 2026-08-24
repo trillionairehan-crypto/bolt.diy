@@ -241,3 +241,15 @@
 - **커밋**: `6f9b309`
 - **범위 밖으로 남긴 것**: 위 판단 보류 4건 모두 `OVERNIGHT5_IMPROVEMENTS.md` 항목 13으로 신규 기록.
 - **다음 감사 영역**: 모바일로 갱신.
+
+### [04:40] Phase 2 — 사이클 15 (감사 대상: 모바일, 2회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 324/324 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 수정 금지 파일) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/**`/`app/routes/**` 전체를 재검색(사이클 7에서 이미 고친 ControlPanel.tsx/ColorSchemeDialog.tsx, 확신도 낮아 보류된 Menu.client.tsx 아바타/HeaderActionButtons.client.tsx는 재보고 제외 지시)해 고정폭/터치타겟/wrap 부재 새 후보를 확인 요청. 보고받은 5건 전부 직접 Read/Grep으로 재검증.
+- **발견·수정(3건, 전부 검증 완료 후 수정)**:
+  1. `app/components/chat/WebSearch.client.tsx:119-142` — "사이트 참고" 팝오버(채팅 툴바 버튼, 상시 노출)의 URL 입력창이 `w-[300px]` 고정. 팝오버 자체도 `max-w` 제한이 없어 375px 뷰포트에서 입력창+버튼+패딩 합이 뷰포트를 넘음 → 입력창을 `w-[min(300px,calc(100vw-8rem))]`로, 팝오버 컨테이너에 `max-w-[calc(100vw-2rem)]` 추가.
+  2. `app/components/chat/APIKeyManager.tsx:124` — 프로바이더 API 키 편집 입력창도 동일한 `w-[300px]` 고정, 부모가 `flex items-center justify-between`(wrap 없음)이라 좁은 화면에서 라벨과 충돌 위험 → `w-[min(300px,calc(100vw-10rem))]`로 수정.
+  3. `app/components/workbench/FileBreadcrumb.tsx:123` — 폴더 브레드크럼 드롭다운이 `min-w-[300px]`만 있고 `max-w` 없음, `DropdownMenu.Content`에 `avoidCollisions={false}`가 설정돼 있어 화면 밖으로 밀려도 자동 재배치가 안 됨(사이클 7의 `ColorSchemeDialog.tsx`와 같은 "min-width가 max-width보다 CSS 우선순위 높음" 버그 클래스) → `min-w-[300px]`를 `w-[min(300px,calc(100vw-2rem))]`로 교체(기존 `Dialog.tsx:119`가 이미 쓰던 `w-[min(Npx,calc(100vw-Nrem))]` 관용구 재사용).
+- **테스트**: `app/mobileFixedWidthOverflow.spec.ts` 신규 3건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm vitest run` 327/327 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **범위 밖으로 남긴 것(구조적/확신도 낮음, `OVERNIGHT5_IMPROVEMENTS.md` 항목 14로 기록)**: (1) `GitHubStats.tsx`/`StatusDashboard.tsx`의 `grid-cols-4`/`grid-cols-3`이 반응형 변형 없음(형제 블록은 이미 `md:grid-cols-4` 패턴을 쓰는데 일부만 놓침) — 실사용 빈도 낮은 설정 세부 화면이라 우선순위 낮게 기록. (2) WebSearch/APIKeyManager의 Fetch/Save 버튼 `px-3 py-1.5`가 36px 미만 터치타겟(확신도 낮음, 폭 수정만 이번에 반영).
+- **다음 감사 영역**: 한국어 문구로 갱신.
