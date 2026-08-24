@@ -257,8 +257,8 @@ export function ErrorBoundary() {
       <button
         onClick={() => window.location.reload()}
         style={{
-          background: '#FF5330',
-          color: '#FAF7F0',
+          background: 'var(--accent)',
+          color: 'var(--on-accent)',
           border: 'none',
           borderRadius: '8px',
           padding: '10px 20px',

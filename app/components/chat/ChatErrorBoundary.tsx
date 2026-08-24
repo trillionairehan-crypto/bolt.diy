@@ -37,7 +37,7 @@ export class ChatErrorBoundary extends Component<Props, State> {
           <button
             onClick={() => window.location.reload()}
             className="px-4 py-2 rounded-lg text-sm font-medium"
-            style={{ background: '#FF5330', color: '#FAF7F0' }}
+            style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}
           >
             다시 불러오기
           </button>

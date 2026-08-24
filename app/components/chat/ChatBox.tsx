@@ -133,10 +133,10 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
             gradientUnits="userSpaceOnUse"
             gradientTransform="rotate(-45)"
           >
-            <stop offset="0%" stopColor="#FF5330" stopOpacity="0%"></stop>
-            <stop offset="40%" stopColor="#FF5330" stopOpacity="80%"></stop>
-            <stop offset="50%" stopColor="#FF5330" stopOpacity="80%"></stop>
-            <stop offset="100%" stopColor="#FF5330" stopOpacity="0%"></stop>
+            <stop offset="0%" style={{ stopColor: 'var(--accent)' }} stopOpacity="0%"></stop>
+            <stop offset="40%" style={{ stopColor: 'var(--accent)' }} stopOpacity="80%"></stop>
+            <stop offset="50%" style={{ stopColor: 'var(--accent)' }} stopOpacity="80%"></stop>
+            <stop offset="100%" style={{ stopColor: 'var(--accent)' }} stopOpacity="0%"></stop>
           </linearGradient>
           <linearGradient id="shine-gradient">
             <stop offset="0%" stopColor="white" stopOpacity="0%"></stop>

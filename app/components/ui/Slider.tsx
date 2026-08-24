@@ -71,7 +71,7 @@ const SliderButton = memo(({ selected, children, setSelected }: SliderButtonProp
           layoutId="tab-underline"
           transition={{ duration: 0.2, ease: cubicEasingFn }}
           className="absolute left-1 right-1 bottom-0 h-[2px] rounded-full"
-          style={{ background: '#FF5330' }}
+          style={{ background: 'var(--accent)' }}
         ></motion.span>
       )}
     </button>
