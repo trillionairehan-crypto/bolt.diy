@@ -37,6 +37,14 @@ export function useCloudflareDeploy() {
   const currentChatId = useStore(chatId);
 
   const handleCloudflareDeploy = async () => {
+    /*
+     * Guards re-entry at the source, not just via the caller's disabled-button state — a fast
+     * double-click can fire this before React has re-rendered the button as disabled.
+     */
+    if (isDeploying) {
+      return false;
+    }
+
     if (!currentChatId) {
       toast.error('진행 중인 채팅이 없어요.');
       return false;

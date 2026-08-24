@@ -47,7 +47,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return json({ error: '프로젝트를 찾지 못했어요.' }, { status: 400 });
   }
 
-  if (!domain || !DOMAIN_PATTERN.test(domain)) {
+  if (!domain || domain.length > 253 || !DOMAIN_PATTERN.test(domain)) {
     return json({ error: '도메인 주소가 올바르지 않아요. 예: myapp.com' }, { status: 400 });
   }
 

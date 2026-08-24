@@ -79,6 +79,14 @@ export function CustomDomainConnect({ projectName }: CustomDomainConnectProps) {
   };
 
   const handleConnect = async () => {
+    /*
+     * Same re-entry guard as CloudflareDeploy.client.tsx's handleCloudflareDeploy — don't rely
+     * solely on the button's disabled state, which can lag a fast double-click by one render.
+     */
+    if (state === 'connecting' || state === 'pending') {
+      return;
+    }
+
     const trimmed = domain.trim().toLowerCase();
 
     if (!trimmed) {
