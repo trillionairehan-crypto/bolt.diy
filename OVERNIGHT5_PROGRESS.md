@@ -387,3 +387,14 @@
 - **커밋**: `d8552b6`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 25·26으로 기록)**: (1) `Preview.tsx` — 새 창 열기(`openInNewWindow` 비-프레임 분기, "새 창에서 열기" 메뉴 버튼) 2곳이 사이클 11에서 고친 팝업 차단 안내 패턴이 빠져있음 + 기기 프레임 팝업 창 자체의 `<title>`/`(Landscape)`/`(Portrait)` 텍스트가 영어 하드코딩. (2) `TerminalTabs.tsx` — 탭을 배열 인덱스로 키/ref 관리해 중간 탭을 닫으면 마지막 탭이 `detachTerminal()` 없이 언마운트돼 WebContainer 셸 프로세스가 리크될 수 있는 경로(확신도 medium, 브라우저 직접 재현 필요).
 - **다음 감사 영역**: 배포로 갱신.
+
+### [07:10] Phase 2 — 사이클 28 (감사 대상: 배포, 2회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 360/360 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 배포 관련 훅/다이얼로그/API 라우트를 재감사(사이클 12·13·20에서 이미 고친 항목, DeployButton.tsx 더블클릭 레이스, ExpoQrModal 등 기존에 고친/판단 완료된 항목은 재보고 제외 지시). 보고받은 3건 중 확신도 high 1건(가장 영향 큰 것)을 직접 Read로 재검증 후 수정.
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/deploy/GitHubDeploymentDialog.tsx`, `app/components/deploy/GitLabDeploymentDialog.tsx` — `DeployButton.tsx`에서 "GitHub로 내보내기"/"GitLab으로 내보내기" 클릭 시 실제로 열리는 다이얼로그. 사이클 12는 이 배포 흐름의 *hook* 파일(GitHubDeploy.client.tsx/GitLabDeploy.client.tsx)의 토스트만 한국어로 고쳤고, 하드코딩 색상 수정(cf6f6d9)도 이 다이얼로그 파일들을 건드렸지만 문구 자체는 그때도 손 안 댔던 부분 — 다이얼로그 제목("Deploy to GitHub" 등), 폼 라벨("Repository Name", "Recent Repositories"), placeholder("Search repositories..."), 빈 상태 문구, 버튼("Cancel"/"Deploying..."/"View Repository"/"Copy URL" 등), 성공/연결 필요 다이얼로그 문구, 토스트/에러 메시지(약 15개, GitHub API rate limit/404/422 등 세분화된 에러 케이스 포함) 총 약 40곳이 전부 영어로 남아있었음. 두 프로바이더 모두 배포 기능 전체를 처음 쓰는 흐름에서 마주치는 가장 눈에 띄는 표면인데 모달 전체가 영어였음.
+  → 전부 한국어로 번역(에러 메시지의 조건 분기 구조는 그대로 유지, 문구만 교체).
+- **테스트**: `app/deployDialogKoreanAudit.spec.ts` 신규 4건(소스 grep 방식, 기존 관행과 동일 — `deployToastKoreanAudit.spec.ts` 패턴 참고).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 364/364 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `983d671`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 27로 기록)**: (1) `CloudflareDeploy.client.tsx`/`VercelDeploy.client.tsx`/`NetlifyDeploy.client.tsx`의 `appName: description.get() || 'Untitled'` — 채팅 설명이 비어있을 때 영어 "Untitled"가 "내 앱" 대시보드(전부 한국어)에 그대로 노출(확신도 medium). (2) `app/routes/apps.tsx`의 `STORAGE_MODE_LABEL[app.storage_mode]`가 `PROVIDER_LABEL`과 달리 폴백이 없어 스키마 밖 값이면 `undefined` 렌더 위험(확신도 low). 둘 다 한 줄 수준으로 작고 안전하나 이번 사이클은 다이얼로그 번역에 집중.
+- **다음 감사 영역**: 요금제/결제로 갱신.

@@ -1,5 +1,6 @@
-다음 감사 영역: 배포
+다음 감사 영역: 요금제/결제
 
+[완료] 배포 감사(사이클 28, 2회차) — DeployButton.tsx에서 열리는 실제 GitHub/GitLab 배포 다이얼로그(GitHubDeploymentDialog.tsx/GitLabDeploymentDialog.tsx)가 하드코딩 색상만 고쳐졌을 뿐(cf6f6d9) 제목·라벨·placeholder·버튼·토스트/에러 문구 약 40곳이 전부 영어로 남아있던 문제(같은 배포 흐름의 *hook* 파일 GitHubDeploy.client.tsx/GitLabDeploy.client.tsx 토스트는 사이클 12에서 이미 한국어였지만, 실제 화면에 뜨는 다이얼로그 자체는 처음 감사됨) → 전부 한국어로 번역 — (사이클 28)
 [완료] 미리보기/워크벤치 감사(사이클 27) — FileTree.tsx 우클릭 컨텍스트 메뉴 8개 항목(새 파일/새 폴더/경로 복사/상대 경로 복사/파일·폴더 잠금·해제)이 전부 영어로 하드코딩돼있던 문제, onCopyPath/onCopyRelativePath가 비동기 clipboard.writeText 실패를 동기 try/catch로 못 잡고 성공/실패 어느 쪽이든 사용자 피드백이 없던 문제 → 한국어 번역 + .then/.catch + 토스트 추가 — (사이클 27)
 [완료] 온보딩 감사(사이클 25) — BaseChat.tsx ScrollToBottom 버튼("Go to last message"), WebSearch.client.tsx URL 가져오기 팝오버(버튼 라벨/성공·실패 토스트 4곳)가 채팅 툴바 안에서 영어로 하드코딩돼있던 문제 → 전부 한국어로 번역 — (사이클 25)
 [완료] 한국어 문구 감사(사이클 24, 2회차) — 설정 > 프로필 탭(ProfileTab.tsx) 라벨/placeholder/토스트 전체가 영어로 하드코딩돼있던 문제 → 전부 한국어로 번역 — (사이클 24)
