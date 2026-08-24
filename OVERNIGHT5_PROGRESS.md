@@ -171,3 +171,18 @@
 - **커밋**: `e2eb0e0`
 - **범위 밖으로 남긴 것(구조적 판단 필요, IMPROVEMENTS.md에 기록)**: (1) 랜딩/헤더의 "내 프로젝트"와 실제 앱 목록 페이지의 "내 앱"이 다른 이름을 가리키는 내비게이션 명명 불일치(항목 6, 신규) — 여러 진입점을 한 번에 맞춰야 하는 IA 결정이라 보류. (2) GitHubAuthDialog/BranchSelector/ColorSchemeDialog 전체 미번역(항목 2에 추가) — GitHub/GitLabDeploymentDialog와 같은 스코프로 묶어 나중에 한 번에 처리 권장.
 - **다음 감사 영역**: 온보딩으로 갱신(로테이션 처음부터 다시).
+
+### [03:30] Phase 2 — 사이클 9 (감사 대상: 온보딩)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 301/301 통과, `pnpm run build` 성공(client+server). `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음 — 이전 사이클들의 판단대로 이번에도 손 안 댐(사용자 본인의 진행 중 작업, 자동 세션이 만든 변경 아님).
+- **감사 방법**: Explore 서브에이전트로 온보딩 표면(`PromptClarification.tsx`, `BaseChat.tsx`, `Chat.client.tsx`의 온보딩 완료 처리, `generateAppQuestions.ts`, `ChatBox.tsx`)을 대상으로 엣지 케이스(빈/공백 입력, 더블 서브밋, 생성 실패)·에러 처리 누락·다크모드·모바일 관점으로 점검 요청. 보고받은 9건 중 소스를 직접 Read로 재확인.
+- **변경(5건, 전부 검증 완료 후 수정)**:
+  1. `app/components/chat/ChatBox.tsx` — 전송 버튼 disabled 조건이 `input.length === 0`만 봐서 공백만 입력해도(스페이스바 실수 등) 버튼이 활성화되지만 클릭해도 `sendMessage`의 trim 체크에 막혀 조용히 아무 반응 없던 문제 → `input.trim().length === 0` 기준으로 수정.
+  2. `app/components/chat/PromptClarification.tsx` — "바로 만들기"/최종 "만들기" 버튼에 더블탭 가드가 없어(옵션 선택 버튼엔 `pendingOptionId` 가드가 이미 있었음) 빠르게 두 번 누르면 `onComplete`(→`generateNewApp`→`recordGenerationUsed`)가 두 번 호출돼 무료 생성 크레딧이 이중 차감될 위험 → `completedRef` 가드로 첫 호출 이후 무시하도록 수정.
+  3. `app/components/chat/PromptClarification.tsx` — "바로 만들기"(~32px)/"직접 입력할게요"(~36px) 버튼이 권장 터치 타겟(~40-44px) 미만이고, 온보딩 화면 첫 진입 시 가장 먼저 보이는 인터랙션 요소라 영향이 큼 → 둘 다 `min-h-11`(44px)로 수정.
+  4. `app/components/chat/PromptClarification.tsx` — 직접입력 인풋의 Enter 키 처리에 IME 조합 중 가드가 없어(메인 채팅창인 `ChatBox.tsx`는 이미 `isComposing` 체크가 있음) 한글 입력 중 Enter로 조합 중인 글자가 잘려서 제출될 수 있던 불일치 → `!e.nativeEvent.isComposing` 가드 추가.
+  5. `app/components/chat/BaseChat.tsx` — "어떻게 만들어지나요" 3단계 안내 섹션은 주변 전부 `var(--bg)`/`var(--surface)`/`var(--text)` 등 테마 토큰을 쓰는데 단계 번호 배지만 `#FF5330`/`#FAF7F0` 하드코딩 → 다크모드에서 카드는 어두워지는데 배지만 라이트모드 코랄로 남던 문제. 사이클 6의 하드코딩 accent 정리(`darkModeAccentAudit.spec.ts`) 대상 파일 목록에 `BaseChat.tsx`가 없어 놓쳤던 사각지대 → `var(--accent)`/`var(--on-accent)`로 수정.
+- **테스트**: `app/onboardingAudit.spec.ts` 신규 5건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm vitest run` 306/306 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `aff3c5c`
+- **범위 밖으로 남긴 것(구조적 판단 필요, IMPROVEMENTS.md 항목 7·8로 기록)**: (1) 온보딩 완료 직후 `generateNewApp()`이 무료 생성 한도 초과/네트워크 오류로 실패하면, 이미 랜딩/온보딩 UI가 언마운트된 뒤라 사용자가 빈 채팅창만 보게 되는 문제 — 토스트 하나만 스쳐 지나가고 재시도 수단이 없음. 상태 전환 순서를 바꾸거나 실패 시 되돌리는 UX 설계가 필요해 보류. (2) `generateAppQuestions.ts`가 API 실패와 "정상적으로 추가 질문 없음"을 구분 없이 둘 다 `null`/빈 배열로 처리해 완전히 조용함 — 실패를 사용자에게 어떻게 노출할지(또는 안 할지) 판단 근거 부족해 보류. 그 외 낮은 우선순위(모바일 섹션 padding 반응형 부재)는 기록 없이 넘김.
+- **다음 감사 영역**: 생성으로 갱신.

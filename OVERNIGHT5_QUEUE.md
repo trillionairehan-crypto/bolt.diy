@@ -1,5 +1,10 @@
-다음 감사 영역: 온보딩
+다음 감사 영역: 생성
 
+[완료] ChatBox.tsx 전송 버튼이 공백만 입력해도 활성화(input.length 기준) → trim 기준으로 수정 — aff3c5c
+[완료] PromptClarification.tsx "바로 만들기"/"만들기" 더블탭 시 onComplete(→generateNewApp) 중복 호출 가능 → completedRef 가드 추가 — aff3c5c
+[완료] PromptClarification.tsx "바로 만들기"/"직접 입력할게요" 버튼 터치 타겟이 32~36px로 44px 미만 → min-h-11로 수정 — aff3c5c
+[완료] PromptClarification.tsx 직접입력 인풋이 IME 조합 중 Enter로 오submit 가능 → isComposing 가드 추가 — aff3c5c
+[완료] BaseChat.tsx 3단계 안내 배지가 다크모드에서도 라이트모드 고정 #FF5330 사용 → var(--accent)/var(--on-accent)로 수정 — aff3c5c
 [완료] 설정 모달(ControlPanel.tsx) w-[1200px] 고정 → 모바일 뷰포트 오버플로 — 7800fa8
 [완료] Design Palette 다이얼로그(ColorSchemeDialog.tsx) min-w-[480px]가 max-w-[90vw] 무력화 → 모바일 오버플로 — 7800fa8
 [완료] Preview.tsx 창 크기 드롭다운 하드코딩 색상 — ccafd7d
