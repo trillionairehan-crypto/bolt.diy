@@ -118,7 +118,7 @@ export default function Terms() {
         <p>
           회사는 관련 법령이 정하는 바에 따라 회원의 개인정보를 보호하기 위해 노력합니다. 개인정보의 수집, 이용, 제공 및
           처리위탁 등에 관한 자세한 사항은{' '}
-          <a href="/privacy" className="text-[#FF5330] hover:underline">
+          <a href="/privacy" className="hover:underline" style={{ color: 'var(--accent)' }}>
             개인정보처리방침
           </a>
           에서 별도로 정합니다.
@@ -169,7 +169,7 @@ export default function Terms() {
           <p>서비스 도메인: coralred.kr</p>
           <p>
             연락처:{' '}
-            <a href="mailto:coralred@coralred.kr" className="text-[#FF5330] hover:underline">
+            <a href="mailto:coralred@coralred.kr" className="hover:underline" style={{ color: 'var(--accent)' }}>
               coralred@coralred.kr
             </a>
           </p>

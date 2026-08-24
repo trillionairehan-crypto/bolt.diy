@@ -23,7 +23,7 @@ export function LegalPageLayout({ title, effectiveDate, children }: LegalPageLay
         <div className="space-y-8 text-sm sm:text-base leading-relaxed text-bolt-elements-textPrimary">{children}</div>
 
         <div className="mt-16 pt-6 border-t border-bolt-elements-borderColor">
-          <a href="/" className="text-sm font-medium text-[#FF5330] hover:underline">
+          <a href="/" className="text-sm font-medium hover:underline" style={{ color: 'var(--accent)' }}>
             ← 코랄레드 홈으로 돌아가기
           </a>
         </div>
