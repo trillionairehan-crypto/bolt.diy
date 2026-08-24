@@ -96,3 +96,11 @@
 - **베이스라인 재확인**: `pnpm vitest run` 277개 전부 통과, `pnpm run build` 클라이언트/서버 빌드 전부 성공(경고만 있음, 에러 없음).
 - **커밋**: `3a7e6e7` — 이전 사이클이 만들었지만 커밋 안 된 완결 상태 산출물(`RUN-1-metering.sql`, `RUN-2-deployed-apps.sql`, `RUN-3-cloud.sql`, `overnight-loop.ps1`)만 정리해서 커밋. 코드 변경 없음.
 - **결과**: `OVERNIGHT5_QUEUE.md` 신규 생성(다음 감사 영역: 미리보기/워크벤치). 이번 사이클은 여기서 종료.
+
+### [02:24] Phase 2 — 사이클 3 (감사 대상: 미리보기/워크벤치)
+- **발견**: `FileTree.tsx`(워크벤치 파일 탐색기)의 선택된 파일 좌측 보더가 `#FF5330` 하드코딩 — 온보딩/생성 화면에서 이미 고쳤던 동일 패턴. 다크 테마 `--accent`는 `variables.scss`에서 더 밝은 oklch 값이라 다크모드에서 색이 어긋남. Preview.tsx의 디바이스 프레임 노치/홈버튼 `#333`/`#555`/`#111` 하드코딩은 실제 폰 베젤 색을 흉내낸 의도적 고정색(팝업 창의 별도 HTML 문서 + 인앱 프레임 모두 동일 패턴)이라 그대로 둠 — 이미 자체적으로 라이트/다크 두 값을 분기 처리(getFrameColor)하고 있어 버그 아님.
+- **변경**: `border-l-[#FF5330]` → `border-l-[var(--accent)]`. 파일: `app/components/workbench/FileTree.tsx`.
+- **테스트**: `FileTree.colors.spec.ts` 신규 2건.
+- **검증**: typecheck 통과(0 에러), lint 통과(무관한 기존 warning 1건만), test(279개, 전부 통과), build(client+server) 전부 성공.
+- **커밋**: `0a7fc9d`
+- **다음 감사 영역**: 배포로 갱신.
