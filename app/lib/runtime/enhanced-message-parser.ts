@@ -12,6 +12,18 @@ export class EnhancedStreamingMessageParser extends StreamingMessageParser {
   private _processedCodeBlocks = new Map<string, Set<string>>();
   private _artifactCounter = 0;
 
+  /*
+   * super.parse() is incremental (returns only the newly produced slice), but the auto-wrap
+   * path below has to re-parse the whole message from scratch every time it fires (it needs
+   * to see the complete code fence to decide whether to wrap it), which invalidates that
+   * incremental contract. Rather than try to diff two differently-shaped outputs (raw
+   * pass-through vs. post-wrap reparse) back into a delta, this class instead always returns
+   * the full parsed-so-far text for the message, tracked here, and its consumer
+   * (useMessageParser.ts) sets rather than appends. Returning a delta here would otherwise
+   * duplicate visible content on every streamed chunk once auto-wrap activates.
+   */
+  private _fullOutput = new Map<string, string>();
+
   // Optimized command pattern lookup
   private _commandPatternMap = new Map<string, RegExp>([
     ['npm', /^(npm|yarn|pnpm)\s+(install|run|start|build|dev|test|init|create|add|remove)/],
@@ -33,21 +45,30 @@ export class EnhancedStreamingMessageParser extends StreamingMessageParser {
   }
 
   parse(messageId: string, input: string): string {
-    // First try the normal parsing
-    let output = super.parse(messageId, input);
+    // First try the normal (incremental) parsing
+    const delta = super.parse(messageId, input);
+    let fullOutput = (this._fullOutput.get(messageId) ?? '') + delta;
 
     // If no artifacts were detected, check for code blocks that should be files
     if (!this._hasDetectedArtifacts(input)) {
       const enhancedInput = this._detectAndWrapCodeBlocks(messageId, input);
 
       if (enhancedInput !== input) {
-        // Reset and reparse with enhanced input
-        this.reset();
-        output = super.parse(messageId, enhancedInput);
+        // Reset and reparse the whole message with the enhanced input
+        this._resetParserState();
+        fullOutput = super.parse(messageId, enhancedInput);
       }
     }
 
-    return output;
+    this._fullOutput.set(messageId, fullOutput);
+
+    return fullOutput;
+  }
+
+  private _resetParserState() {
+    super.reset();
+    this._processedCodeBlocks.clear();
+    this._artifactCounter = 0;
   }
 
   private _hasDetectedArtifacts(input: string): boolean {
@@ -520,8 +541,7 @@ ${content.trim()}
   }
 
   reset() {
-    super.reset();
-    this._processedCodeBlocks.clear();
-    this._artifactCounter = 0;
+    this._resetParserState();
+    this._fullOutput.clear();
   }
 }
