@@ -87,7 +87,7 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
       <div className="artifact relative border border-bolt-elements-borderColor flex flex-col overflow-hidden rounded-[14px] w-full transition-border duration-150">
         {artifact.type === 'bundled' && !allActionFinished && (
           <div className="absolute top-0 left-0 right-0 h-[1.5px] overflow-hidden bg-bolt-elements-borderColor z-10">
-            <div className="h-full w-1/3 bg-[#FF5330] animate-[artifact-progress_1.2s_ease-in-out_infinite]" />
+            <div className="h-full w-1/3 bg-[var(--accent)] animate-[artifact-progress_1.2s_ease-in-out_infinite]" />
           </div>
         )}
         <div className="flex">

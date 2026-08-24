@@ -125,15 +125,15 @@ export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
               <span className="flex gap-1">
                 <span
                   className="w-1.5 h-1.5 rounded-full animate-[cr-dot-pulse_1.2s_ease-in-out_infinite]"
-                  style={{ background: '#FF5330', animationDelay: '0ms' }}
+                  style={{ background: 'var(--accent)', animationDelay: '0ms' }}
                 />
                 <span
                   className="w-1.5 h-1.5 rounded-full animate-[cr-dot-pulse_1.2s_ease-in-out_infinite]"
-                  style={{ background: '#FF5330', animationDelay: '150ms' }}
+                  style={{ background: 'var(--accent)', animationDelay: '150ms' }}
                 />
                 <span
                   className="w-1.5 h-1.5 rounded-full animate-[cr-dot-pulse_1.2s_ease-in-out_infinite]"
-                  style={{ background: '#FF5330', animationDelay: '300ms' }}
+                  style={{ background: 'var(--accent)', animationDelay: '300ms' }}
                 />
               </span>
               만드는 중이에요
