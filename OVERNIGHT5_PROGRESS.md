@@ -330,3 +330,13 @@
 - **커밋**: `b07ff47`
 - **범위 밖으로 남긴 것**: 없음 — 서브에이전트가 조사한 나머지 후보(랜딩 히어로 고정 코랄, 코드블록 dark-plus 강제, 소셜 로그인 브랜드 색상, Preview.tsx 디바이스 프레임, 데이터 시각화)는 전부 의도된 고정 디자인으로 직접 확인, 실제 버그 아님.
 - **다음 감사 영역**: 모바일로 갱신.
+
+### [06:15] Phase 2 — 사이클 23 (감사 대상: 모바일, 2회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 348/348 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/**`, `app/routes/**`, `app/styles/**`를 재감사(사이클 15에서 이미 고친 w-[300px] 류 고정 폭 항목은 재보고 제외 지시). 보고받은 5건 전부 직접 Read/git log로 재검증.
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/workbench/FileBreadcrumb.tsx` — 파일 경로 드롭다운(`DropdownMenu.Content`)이 `avoidCollisions={false}`로 Radix의 자동 화면 밖 재배치를 꺼두고 있었음. 사이클 15에서 폭은 `w-[min(300px,calc(100vw-2rem))]`로 이미 clamp했지만(그 커밋 메시지 자체가 "avoidCollisions=false와 겹쳐 화면 밖 재배치도 안 됨"이라고 문제를 언급하고도 그때는 폭만 고치고 넘어감), `align="start"` 고정 앵커링은 그대로라 화면 오른쪽 끝 근처(깊은 폴더 경로 탭 시)에서 여전히 뷰포트 밖으로 밀려날 수 있었음 → `avoidCollisions={false}` 제거, 기본값(true)으로 Radix 자동 재배치가 동작하도록 수정.
+- **테스트**: `app/fileBreadcrumbMobileCollisionAudit.spec.ts` 신규 2건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 350/350 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `97c184a`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 21로 기록)**: (1) `ChatBox.tsx` 채팅 툴바 `flex-nowrap` + 가로 스크롤 폴백 없음(재현 확신도 낮음, 구조적). (2) `ChatBox.tsx` 채팅 액션 버튼 `h-8`(32px) 터치 타겟 미달(여러 파일 공유 클래스, 일괄 조정 필요). (3) `GitHubStats.tsx` `grid-cols-4` 고정(설정 다이얼로그 내부, 반응형 브레이크포인트 누락). (4) `StatsDisplay.tsx`(GitLab) `grid-cols-3` 고정(같은 패턴).
+- **다음 감사 영역**: 한국어 문구로 갱신.
