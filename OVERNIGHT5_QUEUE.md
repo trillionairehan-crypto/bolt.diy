@@ -1,5 +1,7 @@
-다음 감사 영역: 모바일
+다음 감사 영역: 한국어 문구
 
+[완료] 설정 모달(ControlPanel.tsx) w-[1200px] 고정 → 모바일 뷰포트 오버플로 — 7800fa8
+[완료] Design Palette 다이얼로그(ColorSchemeDialog.tsx) min-w-[480px]가 max-w-[90vw] 무력화 → 모바일 오버플로 — 7800fa8
 [완료] Preview.tsx 창 크기 드롭다운 하드코딩 색상 — ccafd7d
 [완료] Workbench.client.tsx 저장 동기화 드롭다운 하드코딩 색상 — a89d0ee
 [완료] bolt-elements-*-dark 죽은 토큰 참조 정리 (ui/12개 파일) — f06ca52

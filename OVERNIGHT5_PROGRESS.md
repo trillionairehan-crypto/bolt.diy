@@ -145,3 +145,15 @@
 - **검증**: typecheck 0에러, lint 통과(무관한 기존 warning 1건만, `auth.ts`), test 296개 전부 통과, build(client+server) 성공.
 - **커밋**: `b204747`
 - **다음 감사 영역**: 모바일로 갱신.
+
+### [03:04] Phase 2 — 사이클 7 (감사 대상: 모바일)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 296/296 통과, `pnpm run build` 성공(client+server). `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음 — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/workbench/*`, `deploy/*`, `header/*`, `chat/*`, `settings/*`, `pricing.tsx`, `Dialog.tsx` 계열을 검색해 고정폭/오버플로/터치타겟/데스크톱 전용 표면 위주로 모바일 깨짐 후보 5건을 확인 요청.
+- **발견 1(고침)**: `ControlPanel.tsx:263`(설정 모달) — `w-[1200px] h-[90vh]` 고정, 반응형 변형 전혀 없음. 375px 폰에서 뷰포트를 약 825px 초과해 아바타 메뉴에서 열리는 핵심 진입점(설정)이 사실상 사용 불가.
+- **발견 2(고침)**: `ColorSchemeDialog.tsx:230`(Design Palette 다이얼로그, 워크벤치 툴바 아이콘버튼에서 열림) — `min-w-[480px] max-w-[90vw]`가 함께 있었지만 CSS에서 `min-width`가 `max-width`보다 항상 우선이라 `max-w-[90vw]`가 사실상 죽은 코드였음. 375px 폰에서 90vw=~337px인데 실제로는 480px로 렌더돼 ~140px 오버플로.
+- **변경**: `ControlPanel.tsx` → `w-[95vw] sm:w-[90vw] max-w-[1200px] h-[90vh]`. `ColorSchemeDialog.tsx` → `w-[90vw] sm:min-w-[480px] sm:w-auto max-w-[90vw]`(모바일에선 min-w 미적용, sm 이상에서만 480px 최소폭 복원).
+- **테스트**: `app/mobileDialogOverflow.spec.ts` 신규 2건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm vitest run` 298/298 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `7800fa8`
+- **범위 밖으로 남긴 것**: 서브에이전트가 찾은 나머지 2건(`Menu.client.tsx` 아바타 32px 터치타겟, `HeaderActionButtons.client.tsx` flex-wrap 부재)은 확신도가 낮거나 다른 부작용 확인이 더 필요해 `OVERNIGHT5_IMPROVEMENTS.md` 항목 5로 기록만 하고 코드는 손 안 댐.
+- **다음 감사 영역**: 한국어 문구로 갱신.
