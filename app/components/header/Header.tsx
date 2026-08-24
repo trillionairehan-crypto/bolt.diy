@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense } from 'react';
 import { useStore } from '@nanostores/react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { chatStore } from '~/lib/stores/chat';
@@ -8,7 +8,6 @@ import { profileStore } from '~/lib/stores/profile';
 import { classNames } from '~/utils/classNames';
 import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
 import { Logo } from '~/components/ui/Logo';
-import { LoginModal } from '~/components/auth/LoginModal';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
 
 /*
@@ -33,7 +32,6 @@ export function Header() {
   const sidebarOpen = useStore(sidebarOpenStore);
   const authUser = useStore(authUserStore);
   const profile = useStore(profileStore);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   /*
    * The landing hero is a full-bleed coral section — the header sits directly above it in normal
@@ -89,14 +87,13 @@ export function Header() {
                 </span>
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={() => setIsLoginModalOpen(true)}
+              <a
+                href="/login"
                 className="text-sm font-semibold rounded-full px-4 py-1.5 hover:opacity-90 transition-opacity"
                 style={{ background: '#FAF7F0', color: '#FF5330' }}
               >
                 로그인
-              </button>
+              </a>
             )}
           </div>
         )}
@@ -119,7 +116,6 @@ export function Header() {
           </>
         )}
       </header>
-      <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </>
   );
 }

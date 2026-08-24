@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { Logo } from '~/components/ui/Logo';
 import { authUserStore } from '~/lib/stores/auth';
-import { LoginModal } from '~/components/auth/LoginModal';
 import { getDeployedApps, type DeployedAppRecord } from '~/lib/deployedApps';
 import coralredUiCssUrl from '~design-handoff/coralred-ui.css?url';
 
@@ -31,7 +30,6 @@ function formatDeployedAt(iso: string): string {
 
 export default function Apps() {
   const authUser = useStore(authUserStore);
-  const [showLogin, setShowLogin] = useState(false);
   const [apps, setApps] = useState<DeployedAppRecord[] | null>(null);
 
   useEffect(() => {
@@ -68,9 +66,9 @@ export default function Apps() {
       {!authUser && (
         <section className="cr-card cr-stack-16" style={{ maxWidth: 420 }}>
           <p className="cr-body">로그인하면 배포한 앱을 여기서 확인할 수 있어요.</p>
-          <button type="button" className="cr-btn" style={{ width: 'fit-content' }} onClick={() => setShowLogin(true)}>
+          <a href="/login" className="cr-btn" style={{ width: 'fit-content' }}>
             로그인
-          </button>
+          </a>
         </section>
       )}
 
@@ -108,8 +106,6 @@ export default function Apps() {
           ))}
         </section>
       )}
-
-      <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
     </div>
   );
 }

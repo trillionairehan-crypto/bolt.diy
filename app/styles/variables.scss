@@ -29,6 +29,11 @@
   --err: oklch(0.5 0.15 25);
   --err-bg: oklch(0.95 0.03 25);
 
+  /* Auth pages (/login, /signup) only — brand cream page backdrop in light mode, matching the
+     landing hero's card treatment; falls back to the normal --bg in dark mode rather than a
+     custom dark cream, since there's no equivalent "brand dark cream" defined anywhere else. */
+  --auth-page-bg: #faf7f0;
+
   --bolt-elements-borderColor: var(--border);
   --bolt-elements-borderColorActive: var(--accent);
 
@@ -162,6 +167,8 @@
   --accent-text: oklch(0.72 0.17 var(--hue));
   --on-accent: var(--bg);
   --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.5);
+
+  --auth-page-bg: var(--bg);
   --ok: oklch(0.7 0.14 155);
   --ok-bg: oklch(0.22 0.03 155);
   --warn: oklch(0.75 0.12 85);

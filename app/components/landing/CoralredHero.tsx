@@ -1,8 +1,7 @@
-import { useState, type CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import { useStore } from '@nanostores/react';
 import { authUserStore } from '~/lib/stores/auth';
 import { setSidebarOpen } from '~/lib/stores/sidebar';
-import { LoginModal } from '~/components/auth/LoginModal';
 import styles from './CoralredHero.module.scss';
 
 interface CoralredHeroProps {
@@ -62,13 +61,12 @@ function tileStyle(spec: TileSpec, index: number): CSSProperties {
 
 export function CoralredHero({ onFocusPrompt }: CoralredHeroProps) {
   const authUser = useStore(authUserStore);
-  const [showLogin, setShowLogin] = useState(false);
 
   const openAccount = () => {
     if (authUser) {
       setSidebarOpen(true);
     } else {
-      setShowLogin(true);
+      window.location.href = '/login';
     }
   };
 
@@ -138,8 +136,6 @@ export function CoralredHero({ onFocusPrompt }: CoralredHeroProps) {
           <span className={styles.label}>문의</span>
         </a>
       </div>
-
-      <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
     </div>
   );
 }

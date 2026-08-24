@@ -5,8 +5,6 @@ import { classNames } from '~/utils/classNames';
 import { profileStore } from '~/lib/stores/profile';
 import { authUserStore, signOut } from '~/lib/stores/auth';
 import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
-import { LoginModal } from '~/components/auth/LoginModal';
-import { useState } from 'react';
 import type { TabType, Profile } from './types';
 
 interface AvatarDropdownProps {
@@ -19,7 +17,6 @@ const SHOW_DEBUG_TOOLS = false;
 export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
   const profile = useStore(profileStore) as Profile;
   const authUser = useStore(authUserStore);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   return (
     <DropdownMenu.Root>
@@ -148,7 +145,9 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
                 'outline-none',
                 'group',
               )}
-              onClick={() => setIsLoginModalOpen(true)}
+              onClick={() => {
+                window.location.href = '/login';
+              }}
             >
               <div className="i-ph:sign-in w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
               로그인
@@ -183,8 +182,6 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
           )}
         </DropdownMenu.Content>
       </DropdownMenu.Portal>
-
-      <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </DropdownMenu.Root>
   );
 };

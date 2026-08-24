@@ -23,7 +23,6 @@ import { profileStore } from '~/lib/stores/profile';
 import { sidebarOpenStore, setSidebarOpen } from '~/lib/stores/sidebar';
 import { authUserStore, initAuthListener } from '~/lib/stores/auth';
 import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
-import { LoginModal } from '~/components/auth/LoginModal';
 import { Skeleton } from '~/components/ui/Skeleton';
 import { EmptyStateIllustration } from '~/components/ui/EmptyStateIllustration';
 
@@ -98,7 +97,6 @@ export const Menu = () => {
   const authUser = useStore(authUserStore);
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const { filteredItems: filteredList, handleSearchChange } = useSearchFilter({
     items: list,
@@ -384,13 +382,12 @@ export const Menu = () => {
           </div>
           {!authUser && isPlatformSupabaseConfigured && (
             <div className="px-4 pb-3">
-              <button
-                type="button"
-                onClick={() => setIsLoginModalOpen(true)}
+              <a
+                href="/login"
                 className="w-full flex items-center justify-center gap-2 bg-[#FF5330]/10 dark:bg-[#FF5330]/10 text-[#FF5330] dark:text-[#FF5330] hover:bg-[#FF5330]/20 dark:hover:bg-[#FF5330]/20 rounded-lg px-4 py-2 transition-colors text-sm font-medium"
               >
                 로그인
-              </button>
+              </a>
             </div>
           )}
         </div>
@@ -603,7 +600,6 @@ export const Menu = () => {
       <Suspense fallback={null}>
         <ControlPanel open={isSettingsOpen} onClose={handleSettingsClose} />
       </Suspense>
-      <LoginModal open={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </>
   );
 };
