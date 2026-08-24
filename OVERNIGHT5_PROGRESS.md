@@ -276,3 +276,13 @@
 - **커밋**: `c66f00e`
 - **범위 밖으로 남긴 것(구조적, `OVERNIGHT5_IMPROVEMENTS.md` 항목 16으로 기록)**: (1) 이미지만 업로드하고 텍스트 없이 첫 메시지를 보내면 전송 버튼은 활성화되는데 아무 반응 없는 막다른 골목(`ChatBox.tsx`/`Chat.client.tsx`의 `sendMessage`가 업로드 파일을 안 봄). (2) `selectOption`의 220ms 지연 확인 애니메이션이 "직접 입력" 제출/"바로 만들기" 스킵과 경쟁 상태(레이스 컨디션으로 답변이 조용히 덮어써지거나 언마운트된 컴포넌트에 setState). (3) 온보딩 완료 직후 짧은 순간 이전 입력창 텍스트가 남아 재전송 가능(항목 7과 근본 원인 겹침). 셋 다 여러 핸들러/상태 전환 순서를 함께 바꿔야 하는 구조적 수정이라 이번 사이클 범위를 넘어섬.
 - **다음 감사 영역**: 생성으로 갱신.
+
+### [05:20] Phase 2 — 사이클 18 (감사 대상: 생성, 2회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 332/332 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `message-parser.ts`/`enhanced-message-parser.ts`/`action-runner.ts`/`workbench.ts`/`Artifact.tsx`/`api.chat.ts`를 재감사(사이클 10에서 이미 고친 크래시 버그, 기록된 4건은 재보고 제외 지시). 보고받은 6건 전부 직접 Read로 재검증.
+- **발견·수정(1건, 검증 완료 후 수정, 세션 전체 영향 크래시급)**: `message-parser.ts`의 `file` 타입 액션이 `filePath` 속성 없이도 `logger.debug`만 남기고 `filePath: undefined`로 통과했음. 이 액션이 `WorkbenchStore#_runAction`(`workbench.ts:666`)의 `path.join(wc.workdir, data.action.filePath)`에 도달하면 `path-browserify`가 던지는데, 이 호출은 `addToExecutionQueue`(`workbench.ts:96-98`)가 만드는 `#globalExecutionQueue` 프로미스 체인 안에서 실행되고 이 체인엔 `.catch`가 전혀 없음(grep으로 3곳 전체 참조 확인) — 한 번 reject되면 그 뒤로 체인에 이어붙는 모든 `.then(() => callback())`이 콜백을 아예 안 부르고 reject만 전달하므로, 그 세션에서 앞으로 오는 모든 파일 쓰기·셸 실행이 사용자에게 아무 에러 없이 조용히 no-op이 됨(모듈 전역 싱글턴 스토어라 세션 끝까지 영구 지속). Supabase 액션의 filePath 누락 케이스(사이클 10에서 이미 throw로 처리돼 있음, `message-parser.ts:383-386`)와 동일한 패턴으로 맞춰 throw하도록 수정 — 기존 malformed-tag catch(`message-parser.ts:223-233`, 사이클 10에서 추가됨)가 그대로 스킵 처리함.
+- **테스트**: `app/lib/runtime/message-parser.spec.ts`에 신규 1건 추가(`filePath` 없는 file 액션이 throw 없이 스킵되는지 확인, 기존 Supabase 케이스 테스트와 동일 패턴).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 333/333 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `a967692`
+- **범위 밖으로 남긴 것(구조적/판단 필요, `OVERNIGHT5_IMPROVEMENTS.md` 항목 17로 기록)**: (1) 자동 감지 폴백의 `reset()`이 전체 파서 상태+공유 아티팩트 카운터를 초기화해 중복 액션 재실행 위험(런타임 미재현, 확신도 중). (2) 파일 쓰기 실패가 무음으로 삼켜지고 액션은 그대로 complete 표시. (3) type 속성 누락 액션이 아무 실행 없이 complete 표시(같은 패턴이지만 file 액션 건보다 영향 범위 작음). (4) 스트리밍 진행 상태 라벨(`api.chat.ts`) 6곳 하드코딩 영어. (5) 쉘 액션 코드 블록이 라이트 모드에서도 항상 dark-plus 테마 — 의도된 디자인일 가능성 있어 사람 확인 필요.
+- **다음 감사 영역**: 미리보기/워크벤치로 갱신.
