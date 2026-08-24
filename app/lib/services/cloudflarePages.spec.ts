@@ -234,6 +234,77 @@ describe('deployToCloudflarePages', () => {
       deployToCloudflarePages({ accountId: 'acc', apiToken: 'tok', projectName: 'proj', files }),
     ).rejects.toMatchObject({ status: 403 });
   });
+
+  it('rejects a file over the 25MB size limit before making any request, with a "파일이" message', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    const oversized = [{ path: 'huge.bin', content: new Uint8Array(25 * 1024 * 1024 + 1) }];
+
+    /*
+     * api.cloudflare-deploy.ts's toUserMessage() string-matches on "파일이" to decide whether a
+     * CloudflareDeployError's message is already user-facing Korean copy safe to pass straight
+     * through (vs. a generic fallback) — this assertion guards that coupling, not just the throw.
+     */
+    await expect(
+      deployToCloudflarePages({ accountId: 'acc', apiToken: 'tok', projectName: 'proj', files: oversized }),
+    ).rejects.toMatchObject({ message: expect.stringContaining('파일이') });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('splits uploads into multiple batches once the per-request file count limit (200) is exceeded', async () => {
+    const manyFiles = Array.from({ length: 201 }, (_, i) => ({
+      path: `assets/file-${i}.txt`,
+      content: enc.encode(`content ${i}`),
+    }));
+
+    let uploadCallCount = 0;
+    let lastUploadBatchSize = 0;
+
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input.toString();
+
+      if (url.endsWith('/pages/projects/proj') && !init?.method) {
+        return jsonResponse({}, { ok: true });
+      }
+
+      if (url.endsWith('/upload-token')) {
+        return jsonResponse({ success: true, result: { jwt: 'upload-jwt' } });
+      }
+
+      if (url.endsWith('/pages/assets/check-missing')) {
+        const { hashes } = JSON.parse(init!.body as string) as { hashes: string[] };
+        return jsonResponse({ success: true, result: hashes });
+      }
+
+      if (url.endsWith('/pages/assets/upload')) {
+        uploadCallCount += 1;
+
+        const batch = JSON.parse(init!.body as string) as unknown[];
+        lastUploadBatchSize = batch.length;
+
+        return jsonResponse({ success: true, result: null });
+      }
+
+      if (url.endsWith('/pages/assets/upsert-hashes')) {
+        return jsonResponse({ success: true, result: null });
+      }
+
+      if (url.endsWith('/pages/projects/proj/deployments')) {
+        return jsonResponse({ success: true, result: { id: 'deploy-3' } });
+      }
+
+      throw new Error(`unexpected fetch: ${url}`);
+    });
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    await deployToCloudflarePages({ accountId: 'acc', apiToken: 'tok', projectName: 'proj', files: manyFiles });
+
+    // 201 files at the 200-file-per-batch cap must produce exactly 2 upload requests (200 + 1).
+    expect(uploadCallCount).toBe(2);
+    expect(lastUploadBatchSize).toBe(1);
+  });
 });
 
 describe('custom domains', () => {
