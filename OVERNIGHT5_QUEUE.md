@@ -1,4 +1,4 @@
-다음 감사 영역: 한국어 문구
+다음 감사 영역: 온보딩
 
 [완료] 설정 모달(ControlPanel.tsx) w-[1200px] 고정 → 모바일 뷰포트 오버플로 — 7800fa8
 [완료] Design Palette 다이얼로그(ColorSchemeDialog.tsx) min-w-[480px]가 max-w-[90vw] 무력화 → 모바일 오버플로 — 7800fa8

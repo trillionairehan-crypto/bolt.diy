@@ -157,3 +157,17 @@
 - **커밋**: `7800fa8`
 - **범위 밖으로 남긴 것**: 서브에이전트가 찾은 나머지 2건(`Menu.client.tsx` 아바타 32px 터치타겟, `HeaderActionButtons.client.tsx` flex-wrap 부재)은 확신도가 낮거나 다른 부작용 확인이 더 필요해 `OVERNIGHT5_IMPROVEMENTS.md` 항목 5로 기록만 하고 코드는 손 안 댐.
 - **다음 감사 영역**: 한국어 문구로 갱신.
+
+### [03:20] Phase 2 — 사이클 8 (감사 대상: 한국어 문구)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 298/298 통과, `pnpm run build` 성공(client+server). `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음 — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: 서브에이전트로 앱 전체 UI 문구(버튼/토스트/에러메시지/placeholder/제목)를 대상으로 용어 불일치·부자연스러운 번역투·조사 오류·영어 혼입·존댓말 레벨 불일치를 검색. 보고받은 5건 각각을 직접 grep/Read로 재검증(agent 보고를 그대로 신뢰하지 않고 원본 확인).
+- **검증 중 정정한 것**: agent가 "GitHubAuthDialog/GitLabDeploymentDialog/BranchSelector/ColorSchemeDialog에 영어 'Cancel'이 한국어 UI 속에 섞여있다"고 보고했으나, 각 파일을 `[가-힣]` 패턴으로 grep한 결과 0건 — 실제로는 이 4개 파일이 처음부터 끝까지 통째로 영어(한국어가 전혀 없음)였음. "단어 하나 누락"이 아니라 "화면 전체 미번역"이라 최소 변경 범위를 넘어서 이번엔 손 안 대고 `OVERNIGHT5_IMPROVEMENTS.md` 항목 2에 정정 기록만 남김.
+- **변경(3건, 전부 검증 완료 후 수정)**:
+  1. `app/components/deploy/DeployButton.tsx` — `'GitLab로 내보내기'` → `'GitLab으로 내보내기'` (받침 있는 명사 뒤 조사 오류, 받침 없는 GitHub/Vercel의 "로"는 정상이라 그대로 둠).
+  2. `app/components/sidebar/Menu.client.tsx` — 검색 placeholder/aria-label("채팅 검색...")과 목록 제목("내 채팅")이 같은 파일 안 15곳 이상의 토스트/삭제 다이얼로그("대화")와 용어가 갈려있던 것을 "대화"로 통일(다수결 근거로 "대화" 채택).
+  3. `app/components/chat/BaseChat.tsx` — 랜딩 3단계 안내 제목이 `말하면`(조건절)/`만들어져요`(평서문)/`바로 써요`(평서문)로 문법적으로 안 맞았던 것을 `말해요`(평서문)로 수정해 병렬 구조 통일.
+- **테스트**: `app/koreanCopyAudit.spec.ts` 신규 3건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm vitest run` 301/301 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `e2eb0e0`
+- **범위 밖으로 남긴 것(구조적 판단 필요, IMPROVEMENTS.md에 기록)**: (1) 랜딩/헤더의 "내 프로젝트"와 실제 앱 목록 페이지의 "내 앱"이 다른 이름을 가리키는 내비게이션 명명 불일치(항목 6, 신규) — 여러 진입점을 한 번에 맞춰야 하는 IA 결정이라 보류. (2) GitHubAuthDialog/BranchSelector/ColorSchemeDialog 전체 미번역(항목 2에 추가) — GitHub/GitLabDeploymentDialog와 같은 스코프로 묶어 나중에 한 번에 처리 권장.
+- **다음 감사 영역**: 온보딩으로 갱신(로테이션 처음부터 다시).
