@@ -92,6 +92,7 @@ export default function Apps() {
                   <div className="cr-row-8">
                     <h2 className="cr-h2">{app.app_name}</h2>
                     <span className="cr-badge">{PROVIDER_LABEL[app.provider] ?? app.provider}</span>
+                    <span className="cr-badge">{app.supabase_connected ? '저장 기능 연결됨' : '샘플 데이터'}</span>
                   </div>
                   <a href={app.url} target="_blank" rel="noreferrer" className="cr-mono">
                     {app.url}

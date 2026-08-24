@@ -12,6 +12,7 @@ export interface DeployedAppRecord {
   url: string;
   provider: string;
   project_name: string | null;
+  supabase_connected: boolean;
   deployed_at: string;
 }
 
@@ -32,6 +33,9 @@ export async function recordDeployedApp(params: {
 
   /** Cloudflare Pages project name, when provider is 'cloudflare' — see the migration's own comment. */
   projectName?: string;
+
+  /** Whether this specific build had real Supabase credentials injected (see injectSupabaseEnv). */
+  supabaseConnected?: boolean;
 }): Promise<void> {
   if (!authUserStore.get() || !platformSupabase) {
     return;
@@ -63,6 +67,7 @@ export async function recordDeployedApp(params: {
       url: params.url,
       provider: params.provider,
       project_name: params.projectName ?? null,
+      supabase_connected: params.supabaseConnected ?? false,
     });
 
     if (error) {
@@ -80,7 +85,7 @@ export async function getDeployedApps(): Promise<DeployedAppRecord[]> {
 
   const { data, error } = await platformSupabase
     .from('deployed_apps')
-    .select('id, chat_id, app_name, url, provider, project_name, deployed_at')
+    .select('id, chat_id, app_name, url, provider, project_name, supabase_connected, deployed_at')
     .order('deployed_at', { ascending: false });
 
   if (error) {

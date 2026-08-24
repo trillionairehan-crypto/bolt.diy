@@ -25,6 +25,10 @@ create table if not exists public.deployed_apps (
   -- is NOT always the same string used at deploy time (recordDeployedApp resolves chat_id to the
   -- routable urlId when it can, which can differ from the raw id toProjectName() hashed).
   project_name text,
+  -- overnight5 작업 5: this deploy's build had real Supabase credentials injected (vs. the
+  -- generated app's default sample-data mode) — see CloudflareDeploy.client.tsx's
+  -- injectSupabaseEnv and /apps' badge that reads this column.
+  supabase_connected boolean not null default false,
   deployed_at timestamptz not null default now()
 );
 

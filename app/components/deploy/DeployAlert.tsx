@@ -1,8 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { toast } from 'react-toastify';
+import { useStore } from '@nanostores/react';
 import { classNames } from '~/utils/classNames';
 import type { DeployAlert } from '~/types/actions';
+import { supabaseConnection } from '~/lib/stores/supabase';
 
 interface DeployAlertProps {
   alert: DeployAlert;
@@ -13,6 +15,7 @@ interface DeployAlertProps {
 export default function DeployChatAlert({ alert, clearAlert, postMessage }: DeployAlertProps) {
   const { type, title, description, content, url, stage, buildStatus, deployStatus } = alert;
   const [copied, setCopied] = useState(false);
+  const supabaseConn = useStore(supabaseConnection);
 
   const handleCopyUrl = async () => {
     if (!url) {
@@ -170,6 +173,49 @@ export default function DeployChatAlert({ alert, clearAlert, postMessage }: Depl
                     <div className={copied ? 'i-ph:check' : 'i-ph:copy'}></div>
                     {copied ? '복사됐어요' : '링크 복사'}
                   </button>
+                </div>
+              )}
+
+              {url && type === 'success' && stage === 'complete' && (
+                <div className="mt-4 grid gap-2">
+                  <p className="text-xs font-medium text-bolt-elements-textTertiary">다음 단계</p>
+
+                  {!supabaseConn.isConnected && (
+                    <button
+                      type="button"
+                      onClick={() => document.dispatchEvent(new CustomEvent('open-supabase-connection'))}
+                      className="flex items-center gap-2 p-2.5 rounded-md bg-bolt-elements-background-depth-3 hover:bg-bolt-elements-item-backgroundActive text-left"
+                    >
+                      <div className="i-ph:database text-base text-bolt-elements-textSecondary shrink-0" />
+                      <span className="flex-1 text-xs text-bolt-elements-textPrimary">
+                        저장 기능을 켜면 회원가입, 목록 저장 같은 기능이 실제로 동작해요
+                      </span>
+                      <div className="i-ph:caret-right text-bolt-elements-textTertiary shrink-0" />
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handleCopyUrl}
+                    className="flex items-center gap-2 p-2.5 rounded-md bg-bolt-elements-background-depth-3 hover:bg-bolt-elements-item-backgroundActive text-left"
+                  >
+                    <div
+                      className={classNames(
+                        'text-base text-bolt-elements-textSecondary shrink-0',
+                        copied ? 'i-ph:check' : 'i-ph:share-network',
+                      )}
+                    />
+                    <span className="flex-1 text-xs text-bolt-elements-textPrimary">
+                      {copied ? '링크를 복사했어요' : '링크를 복사해서 다른 사람에게 공유해요'}
+                    </span>
+                  </button>
+
+                  <div className="flex items-center gap-2 p-2.5 rounded-md bg-bolt-elements-background-depth-3">
+                    <div className="i-ph:chat-circle-text text-base text-bolt-elements-textSecondary shrink-0" />
+                    <span className="flex-1 text-xs text-bolt-elements-textPrimary">
+                      수정하고 싶은 부분이 있으면 채팅으로 말해주세요. 다시 배포하기를 누르면 같은 주소로 업데이트돼요
+                    </span>
+                  </div>
                 </div>
               )}
             </motion.div>

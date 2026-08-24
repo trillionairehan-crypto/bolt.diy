@@ -27,14 +27,18 @@ const ENV_FILE_PATH = '.env';
  * Hard-refuses to inject (throws, aborting the whole deploy) if the stored anon key turns out to
  * decode as a service_role key — a second checkpoint independent of the one in
  * useSupabaseConnection's handleSimpleConnect, since that only guards the wizard's own input path.
+ *
+ * @returns whether credentials were actually injected — recordDeployedApp uses this for /apps'
+ * "샘플 데이터" vs "저장 기능 연결됨" badge, so it reflects what THIS build actually got rather
+ * than re-deriving it from possibly-since-changed connection state.
  */
-async function injectSupabaseEnv(container: WebContainer): Promise<void> {
+async function injectSupabaseEnv(container: WebContainer): Promise<boolean> {
   const { credentials } = supabaseConnection.get();
   const supabaseUrl = credentials?.supabaseUrl;
   const anonKey = credentials?.anonKey;
 
   if (!supabaseUrl || !anonKey) {
-    return;
+    return false;
   }
 
   if (isServiceRoleKey(anonKey)) {
@@ -76,6 +80,8 @@ async function injectSupabaseEnv(container: WebContainer): Promise<void> {
   }
 
   await container.fs.writeFile(ENV_FILE_PATH, lines.join('\n') + '\n');
+
+  return true;
 }
 
 /**
@@ -138,7 +144,7 @@ export function useCloudflareDeploy() {
       const deployArtifact = workbenchStore.artifacts.get()[deploymentId];
 
       const container = await webcontainer;
-      await injectSupabaseEnv(container);
+      const supabaseInjected = await injectSupabaseEnv(container);
 
       deployArtifact.runner.handleDeployAction('building', 'running', { source: 'cloudflare' });
 
@@ -247,6 +253,7 @@ export function useCloudflareDeploy() {
         url: data.url,
         provider: 'cloudflare',
         projectName,
+        supabaseConnected: supabaseInjected,
       });
 
       toast.success('배포가 끝났어요!');
