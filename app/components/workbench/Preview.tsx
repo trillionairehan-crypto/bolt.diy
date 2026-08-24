@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '@nanostores/react';
+import { toast } from 'react-toastify';
 import { IconButton } from '~/components/ui/IconButton';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { PortDropdown } from './PortDropdown';
@@ -461,6 +462,8 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
 
           if (!newWindow) {
             console.error('Failed to open new window');
+            toast.error('팝업이 차단되어 새 창을 열 수 없어요. 브라우저의 팝업 차단을 해제해 주세요.');
+
             return;
           }
 
@@ -598,6 +601,7 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
         }
       } else {
         console.warn('[Preview] Invalid WebContainer URL:', activePreview.baseUrl);
+        toast.error('미리보기 주소를 확인할 수 없어요. 잠시 후 다시 시도해 주세요.');
       }
     }
   };
@@ -887,6 +891,8 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
                         onClick={() => {
                           if (!activePreview?.baseUrl) {
                             console.warn('[Preview] No active preview available');
+                            toast.error('열 수 있는 미리보기가 없어요.');
+
                             return;
                           }
 
@@ -896,6 +902,8 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
 
                           if (!match) {
                             console.warn('[Preview] Invalid WebContainer URL:', activePreview.baseUrl);
+                            toast.error('미리보기 주소를 확인할 수 없어요. 잠시 후 다시 시도해 주세요.');
+
                             return;
                           }
 

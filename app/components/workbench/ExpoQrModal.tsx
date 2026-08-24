@@ -22,10 +22,10 @@ export const ExpoQrModal: React.FC<ExpoQrModalProps> = ({ open, onClose }) => {
         <div className="border !border-bolt-elements-borderColor flex flex-col gap-5 justify-center items-center p-6 bg-bolt-elements-background-depth-2 rounded-md">
           <div className="i-bolt:expo-brand h-10 w-full invert dark:invert-none"></div>
           <DialogTitle className="text-bolt-elements-textTertiary text-lg font-semibold leading-6">
-            Preview on your own mobile device
+            내 모바일 기기에서 미리보기
           </DialogTitle>
           <DialogDescription className="bg-bolt-elements-background-depth-3 max-w-sm rounded-md p-1 border border-bolt-elements-borderColor">
-            Scan this QR code with the Expo Go app on your mobile device to open your project.
+            모바일 기기의 Expo Go 앱으로 이 QR 코드를 스캔하면 프로젝트를 열 수 있어요.
           </DialogDescription>
           <div className="my-6 flex flex-col items-center">
             {expoUrl ? (
@@ -45,7 +45,7 @@ export const ExpoQrModal: React.FC<ExpoQrModalProps> = ({ open, onClose }) => {
                 size={200}
               />
             ) : (
-              <div className="text-gray-500 text-center">No Expo URL detected.</div>
+              <div className="text-gray-500 text-center">Expo 주소를 찾을 수 없어요.</div>
             )}
           </div>
         </div>
