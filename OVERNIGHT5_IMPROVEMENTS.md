@@ -8,9 +8,10 @@ Phase 2 사이클 1·2에서 3개 파일(`PromptClarification.tsx`, `Artifact.ts
 - `app/root.tsx` — 브라우저 UI(주소창 등)에 쓰는 `theme-color` meta 태그일 가능성. 고정값이 맞음.
 - `app/utils/paletteToHue.ts`, `app/lib/onboarding/answer-directives.ts` — hue↔hex 룩업 테이블 자체. `#FF5330`이 `--hue: 33`의 "대표 hex"로 쓰이는 상수라 여기 있는 건 정상(값 자체가 이 상수를 정의하는 곳).
 - `app/routes/privacy.tsx`, `app/routes/terms.tsx`, `app/components/legal/LegalPageLayout.tsx` — 미확인, 로고/헤더 부분일 가능성.
-- `app/components/chat/APIKeyManager.tsx`, `ChatBox.tsx`, `ChatErrorBoundary.tsx`, `ModelSelector.tsx`, `StarterTemplates.tsx`, `app/components/deploy/GitHubDeploymentDialog.tsx`, `GitLabDeploymentDialog.tsx`, `app/components/sidebar/HistoryItem.tsx`, `Menu.client.tsx`, `app/components/ui/Slider.tsx`, `app/components/workbench/FileTree.tsx`, `app/utils/globalErrorRecovery.ts` — **미확인, 판단 필요**. 이번 세션에 고친 3개와 같은 "일부만 반응형, 일부만 고정" 패턴일 수도 있고, 의도된 랜딩/브랜드 요소일 수도 있음. 파일마다 문맥을 읽고 "이 UI가 항상 코랄이어야 하는가, 테마를 따라야 하는가"를 개별 판단해야 함 — 일괄 정규식 치환은 위험(랜딩 디자인을 실수로 깨뜨릴 수 있음).
-
-**제안**: 다음 세션에서 파일 하나씩(또는 5개씩 묶어서) "이 요소가 앱 작업 화면 안에 있는가(테마 반응형이어야 함) / 랜딩·마케팅·법률 페이지 안에 있는가(고정 코랄이 맞을 수 있음)"를 먼저 분류한 뒤 착수.
+- `app/components/chat/APIKeyManager.tsx`, `ChatBox.tsx`(SVG 그라디언트만; isLanding 전용 인라인 스타일 블록은 의도된 고정색이라 그대로 둠), `ChatErrorBoundary.tsx`, `ModelSelector.tsx`, `app/components/deploy/GitHubDeploymentDialog.tsx`, `GitLabDeploymentDialog.tsx`, `app/components/sidebar/HistoryItem.tsx`, `Menu.client.tsx`, `app/components/ui/Slider.tsx`, `app/components/workbench/FileTree.tsx` — ✅ **모두 판단 완료·수정됨**(FileTree/GitHub·GitLabDeploymentDialog는 사이클 3·4에서, 나머지 7개는 사이클 6에서). 전부 앱 작업 화면 안 요소로 확인돼 `var(--accent)`/`var(--on-accent)`/`var(--accent-hover)`로 교체, `app/darkModeAccentAudit.spec.ts`로 회귀 방지.
+- `app/root.tsx` 404 히어로(`background: '#FF5330'` 등 여러 곳) — 확인 결과 의도된 고정 코랄 브랜드 화면(로고 `onCoral` variant 사용)이 맞음. 단, 같은 파일의 **일반** `ErrorBoundary`(비-404 렌더 크래시 화면)의 재시작 버튼은 별개로 하드코딩돼 있었고 이건 버그였음 — 사이클 6에서 `var(--accent)`로 수정.
+- `app/components/chat/StarterTemplates.tsx` — 미확인이었으나 `SHOW_DEV_TOOLS && !chatStarted` 뒤에 있는 죽은 코드 경로(프로덕션에서 도달 불가)로 확인됨. 실사용 버그 아님 — 손 안 댐, 낮은 우선순위로 남김.
+- `app/utils/globalErrorRecovery.ts:95-127` — **판단 보류**. React 트리 바깥 `window.addEventListener('error', ...)`에서 `document.createElement`로 직접 그리는 최후 방어 크래시 카드라 Tailwind를 못 쓰지만, `style.background = 'var(--accent)'`처럼 CSS 커스텀 프로퍼티는 여전히 참조 가능함(React 렌더링과 무관). 지금은 항상 라이트(크림색) 카드를 그림 — 의도적으로 "테마와 무관하게 항상 안전한 고정 배색"을 노린 설계일 수도 있어(주석 없음, 판단 근거 부족) 이번엔 손 안 댐. 다음 세션에서 의도 확인 후 필요하면 `var(--accent)`/`var(--bg)`/`var(--text)`로 교체.
 
 ## 2. `GitHubDeploymentDialog.tsx`/`GitLabDeploymentDialog.tsx` 영어 문구 전체 번역
 overnight4부터 계속 "범위가 커서" 보류돼온 항목. 이번 세션은 죽은 다크모드 토큰만 정리(커밋 `6d88330`)하고 영어 문구는 그대로 둠. 각각 1000/760줄 내외, GitHub/GitLab 계정이 있어야 쓰는 세미개발자용 화면이라 우선순위는 낮지만, 언젠가는 정리가 필요한 진짜 스코프.

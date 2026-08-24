@@ -123,3 +123,25 @@
 - **나머지**: `api.payment.verify.ts`/`api.payment.webhook.ts`는 이미 자체 주석으로 "미완성 스켈레톤, pricing.tsx 연동 대기"라고 명시돼 있어 기존 기록과 일치 — 새로운 문제 아님. `CustomDomainConnect.tsx` 자체 로직(폴링, 재시도, 에러 메시지)은 검토 결과 문제 없음. `freeTrial.ts`는 메터링 동결 상태 그대로, 이번 사이클에서 손 안 댐.
 - **코드 변경 없음** — 이번 사이클은 감사만 진행, 커밋은 문서(QUEUE/PROGRESS/REPORT)만.
 - **다음 감사 영역**: 다크모드로 갱신.
+
+### [03:15] Phase 2 — 사이클 6 (감사 대상: 다크모드)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 282/282 통과, `pnpm run build` 성공(client+server). `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음 — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **환경 메모**: 이 세션의 PowerShell/Bash PATH엔 `pnpm`이 직접 없었음(`corepack`은 있음) — `corepack pnpm <cmd>`로 전부 실행. `pnpm --version` 직접 실행은 EPERM으로 실패.
+- **감사 방법**: 서브에이전트로 앱 전체(`app/`)를 재검색 — 기존에 알려진 "라이트 모드 --accent와 값이 같은 #FF5330/#E44A28 하드코딩" 패턴과 "죽은 dark: 토큰" 패턴 둘 다, 이미 고친 파일들(설정 탭 9개, PromptClarification/Artifact/Messages/FileTree/GitHub·GitLabDeploymentDialog/ui 12개) 밖에 더 있는지 확인.
+- **발견 (죽은 다크 토큰)**: 새 인스턴스 없음 — 이 패턴은 이미 전부 정리됨(남은 참조는 회귀 테스트 스펙 파일 안뿐).
+- **발견 (하드코딩 accent hex, 9곳/7개 파일)**:
+  1. `ChatBox.tsx:136-139` — 채팅 입력창 애니메이션 테두리 글로우의 SVG 그라디언트 stop 4개. `isLanding` 조건부 인라인 스타일(같은 파일, 별개 블록)은 의도된 랜딩 전용 고정색이라 안 건드림 — 이 SVG는 `chatStarted` 이후 실제 채팅 입력창에도 항상 렌더링됨.
+  2. `app/components/ui/Slider.tsx:74` — 워크벤치 코드/Diff/미리보기 탭 밑줄 인디케이터. 탭 글자색은 이미 토큰(`text-bolt-elements-item-contentAccent`)을 쓰는데 밑줄만 하드코딩.
+  3. `APIKeyManager.tsx:158` — "API 키 받기" 버튼.
+  4. `ModelSelector.tsx:691,852` — "무료 모델만" 토글, 무료 모델 선물상자 아이콘.
+  5. `Menu.client.tsx:387,400,410,423` — 로그인/새 채팅 버튼, 선택모드 토글, 검색창 포커스 링. 이미 `dark:` 접두사가 붙어있었지만 같은 리터럴 값을 반복해서(`dark:bg-[#FF5330]/10` = `bg-[#FF5330]/10`) 사실상 무의미했음 — "죽은 다크 토큰"과 사촌 패턴.
+  6. `HistoryItem.tsx:92,101,181` — 채팅 이름변경 입력창 포커스 링, 액션 버튼 hover 색 2곳.
+  7. `ChatErrorBoundary.tsx:40` — 채팅 크래시 화면 재시작 버튼. 주변은 이미 `bolt-elements-*` 토큰인데 버튼만 고정.
+  8. `root.tsx:260-261` — **일반**(비-404) `ErrorBoundary`의 재시작 버튼. 같은 파일 404 히어로(라인 202 근처)는 확인 결과 의도된 고정 코랄이라 그대로 둠 — 헷갈리지 않게 두 블록을 구분해서 처리.
+  9. `VercelDeploymentLink.client.tsx:138` — accent 색은 아니지만 같은 클래스의 버그(테마 토큰 기반인데 hover만 순수 검정 `#000000` 하드코딩, 다크모드에서 저대비 위험) → `hover:text-bolt-elements-textPrimary`로 교체.
+- **판단 보류(수정 안 함)**: `app/utils/globalErrorRecovery.ts:95-127`(React 트리 밖 최후 방어 크래시 카드, 항상 라이트 배색 — 의도적 "테마 무관 고정 안전색" 설계일 가능성 있어 보류) / `StarterTemplates.tsx`(죽은 코드 경로, `SHOW_DEV_TOOLS && !chatStarted` 뒤라 프로덕션 도달 불가). 둘 다 `OVERNIGHT5_IMPROVEMENTS.md` 항목 1에 기록.
+- **변경**: 위 9곳 전부 `var(--accent)`/`var(--on-accent)`/`var(--accent-hover)`/`bolt-elements-textPrimary`로 교체. 파일: `ChatBox.tsx`, `Slider.tsx`, `APIKeyManager.tsx`, `ModelSelector.tsx`, `Menu.client.tsx`, `HistoryItem.tsx`, `ChatErrorBoundary.tsx`, `root.tsx`, `VercelDeploymentLink.client.tsx`.
+- **테스트**: `app/darkModeAccentAudit.spec.ts` 신규 14건(소스 grep 방식, 기존 관행과 동일). root.tsx는 일반 ErrorBoundary 블록만 검사하고 404 히어로의 의도된 `#FF5330`은 남아있는지 별도로 확인하는 테스트도 추가(실수로 같이 지워지는 것 방지).
+- **검증**: typecheck 0에러, lint 통과(무관한 기존 warning 1건만, `auth.ts`), test 296개 전부 통과, build(client+server) 성공.
+- **커밋**: `b204747`
+- **다음 감사 영역**: 모바일로 갱신.
