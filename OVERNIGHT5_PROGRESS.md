@@ -445,3 +445,14 @@
 - **커밋**: `0b8faca`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 29로 기록)**: (1) `FeaturesTab.tsx` 전체(제목/설명/툴팁/섹션 헤더/토스트 ~20곳) 100% 영어. (2) `confirm()`/`window.confirm()` 네이티브 대화상자 6곳(VercelTab/NetlifyTab/NetlifyConnection/SupabaseTab/LocalProvidersTab/useGit.ts) 전부 영어. (3) 배포/연결 탭(Netlify/Vercel/Supabase/MCP/EventLogs/Data) 토스트 다수 영어. (4) `NotificationsTab.tsx` 필터 라벨 8개 + 빈 상태 문구 영어.
 - **다음 감사 영역**: 온보딩으로 갱신.
+
+### [08:10] Phase 2 — 사이클 33 (감사 대상: 온보딩, 4회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 372/372 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `BaseChat.tsx`/`PromptClarification.tsx`/`ChatBox.tsx`/`StarterTemplates.tsx` 등 온보딩 표면을 재감사(사이클 17·25 및 aff3c5c/4769e51에서 이미 고친 항목은 재보고 제외 지시). 보고받은 5건 중 확신도 high 1건을 직접 Read/Grep으로 재검증 후 수정.
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/chat/BaseChat.tsx:204,234-269` — `SpeechRecognition`/`webkitSpeechRecognition`을 지원하지 않는 브라우저(Firefox 등)에서는 `recognition` state가 계속 `null`로 남아 `startListening`/`stopListening`(line 324-336)이 완전한 no-op이 되는데, `app/components/chat/ChatBox.tsx:342`의 `SpeechRecognitionButton`은 `disabled={props.isStreaming}`로만 결정돼 있어 미지원 브라우저의 첫 방문자가 랜딩 화면(온보딩 첫 상호작용 중 하나)에서 마이크 아이콘을 눌러도 토스트도, 비활성화 표시도 없이 아무 반응이 없던 문제.
+  → `ChatBoxProps`에 `speechRecognitionSupported: boolean` 추가, `BaseChat.tsx`에서 `speechRecognitionSupported={recognition !== null}`로 전달, `ChatBox.tsx`에서 `disabled={props.isStreaming || !props.speechRecognitionSupported}`로 수정.
+- **테스트**: `app/onboardingSpeechRecognitionSupportAudit.spec.ts` 신규 2건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 374/374 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `7c82be5`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 30으로 기록)**: (1) `PromptClarification.tsx`의 진행률 바가 `'waitingForDynamic'` 상태에서 동적 질문 도착 시 분모가 커지며 순간적으로 뒤로 가는 문제(확신도 medium-high, 진행률 계산 로직 재설계 필요). (2) `ChatBox.tsx` 드래그오버 테두리가 인라인으로 `#1488fc` 하드코딩돼 랜딩 팔레트/다크모드와 무관하게 항상 파란색으로 뜨는 문제(확신도 medium, 시각적 영향만). 나머지 2건(`StarterTemplates.tsx` 영어 문구, `ExamplePrompts.tsx`)은 `SHOW_DEV_TOOLS` 플래그로 현재 도달 불가능한 죽은 코드라 기록만 하고 손 안 댐.
+- **다음 감사 영역**: 생성으로 갱신.

@@ -1,5 +1,6 @@
-다음 감사 영역: 온보딩
+다음 감사 영역: 생성
 
+[완료] 온보딩 감사(사이클 33, 4회차) — BaseChat.tsx가 SpeechRecognition 미지원 브라우저(예: Firefox)에서는 recognition 인스턴스를 만들지 않아 startListening/stopListening이 no-op이었는데, ChatBox.tsx의 음성 입력 버튼은 props.isStreaming으로만 disabled를 결정해 첫 방문자가 랜딩 화면 마이크 아이콘을 눌러도 아무 피드백 없이 무반응이던 문제 → speechRecognitionSupported prop 추가해 미지원 브라우저에서 버튼 비활성화 — (사이클 33)
 [완료] 한국어 문구 감사(사이클 32, 3회차) — APIKeyManager.tsx(채팅창에서 프로바이더별 API 키 입력 시마다 노출) 라벨("{provider} API Key:"), 상태 문구(Set via UI/environment variable/Not Set), placeholder("Enter API Key"), 버튼 title(Save/Cancel/Edit/Get API Key)까지 전체가 영어로 하드코딩돼 있던 문제 → 전부 한국어로 번역 — (사이클 32)
 [완료] 모바일 감사(사이클 31, 3회차) — Workbench.client.tsx "바뀐 파일" Popover.Panel이 고정 w-80(320px)에 반응형 clamp가 없어(Headless UI Popover는 Radix와 달리 충돌 회피 로직 없음, overflow-hidden 조상 안에 포탈 없이 절대 위치) 375px 뷰포트에서 잘릴 위험 → w-[min(320px,calc(100vw-2rem))]로 수정 — (사이클 31)
 [완료] 다크모드 감사(사이클 30, 4회차) — 사이드바 하단 SettingsButton/HelpButton 아이콘이 바로 옆 "내 앱" 링크(dark:text-gray-500)와 달리 라이트 전용 #666 고정색만 써서 다크모드에서 저대비로 흐릿하게 보이던 문제, GitHub 설정 탭 캐시 "전체 삭제" 버튼(text-red-600/border-red-200)이 같은 파일 성공 알림 박스와 달리 dark: 변형이 없던 문제 → 둘 다 dark: 변형 추가 — (사이클 30)

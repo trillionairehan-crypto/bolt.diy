@@ -215,3 +215,9 @@ Phase 2 검증 사이클(감사 대상: 모바일)에서 서브에이전트로 �
 `NotificationsTab.tsx` 필터 라벨 8개(`All Notifications`/`System`/`Updates`/`Errors`/`Warnings`/`Information`/`Providers`/`Network`)와 빈 상태 문구 `"No Notifications"`도 영어.
 - **왜 이번 세션에서 다 안 고쳤는지**: 방침상 한 사이클엔 하나의 정리된 작업만 함. 이번엔 채팅 메인 화면에서 프로바이더 키 입력 시마다 노출돼 노출 빈도가 가장 높은 `APIKeyManager.tsx`를 먼저 처리(커밋 `0b8faca`). 나머지는 각각 파일 하나~탭 하나 단위로 다음 "한국어 문구" 감사 사이클들에서 순서대로 처리 가능한 규모.
 - **제안**: 다음 한국어 문구 감사 사이클에서 우선순위 순으로: (1) `confirm()`/`window.confirm()` 6곳(네이티브 모달이라 가장 눈에 띔, 작은 문자열 치환), (2) `FeaturesTab.tsx`(설정 탭 하나 통째), (3) `NotificationsTab.tsx`, (4) 배포/연결 탭 토스트(파일 수가 많아 여러 사이클에 걸쳐 나눠 처리 권장).
+
+## 30. 온보딩 감사(4회차, 사이클 33)에서 발견된 나머지 2건 — 이번엔 SpeechRecognition 미지원 버그만 처리
+`app/components/chat/PromptClarification.tsx:151-171,245` — `progressPct`가 `currentStep / questions.length`로 계산되는데, `'waitingForDynamic'` 상태에서는 고정 4문항 기준으로 이미 100%에 가깝게 표시되다가, `generateAppQuestions()`가 늦게 resolve되어 동적 질문 1~2개가 `questions` 배열에 추가되면 분모가 커지면서 진행률이 순간적으로 뒤로 가는(예: 100%→67%) 문제. LLM 응답이 사용자가 고정 질문 4개를 다 누르는 것보다 느린 게 일반적이라 흔히 재현될 것으로 보임(확신도 medium-high).
+`app/components/chat/ChatBox.tsx:241-252` — 온보딩 랜딩 채팅창의 드래그오버 테두리가 `e.currentTarget.style.border = '2px solid #1488fc'`로 인라인 하드코딩돼, 랜딩 전용 크림/코랄 팔레트(`LANDING_INK`/`LANDING_BORDER`)나 다크모드와 무관하게 항상 밝은 파란색으로 뜸. 시각적 영향만 있고 기능 손상은 없음(확신도 medium).
+- **왜 이번 세션에서 둘 다 안 고쳤는지**: 방침상 한 사이클엔 하나의 정리된 작업만 함. 이번엔 마이크 버튼이 완전히 무반응이 되는(첫 방문자가 가장 먼저 시도해볼 법한 상호작용) SpeechRecognition 미지원 버그를 우선 처리(커밋 `7c82be5`). 진행률 역행 버그는 `status`별 분모 계산 로직을 다시 설계해야 해 "최소 변경"에서 살짝 벗어나고, 드래그오버 색상은 순수 시각 문제라 우선순위가 낮음.
+- **제안**: 다음 온보딩 감사 사이클에서 (1) `progressPct` 계산을 `'waitingForDynamic'` 동안엔 최종 문항 수를 알 수 없다는 전제로 다시 설계(예: 동적 질문이 실제로 도착하기 전까지는 퍼센트를 고정하거나 별도 "질문 준비 중" 상태 표시)하는 것을 권장, (2) `ChatBox.tsx` 드래그오버 테두리를 `var(--accent)` 계열로 교체(다른 사이클들의 기존 패턴과 동일).
