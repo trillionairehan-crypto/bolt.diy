@@ -1,5 +1,6 @@
-다음 감사 영역: 모바일
+다음 감사 영역: 한국어 문구
 
+[완료] 모바일 감사(사이클 31, 3회차) — Workbench.client.tsx "바뀐 파일" Popover.Panel이 고정 w-80(320px)에 반응형 clamp가 없어(Headless UI Popover는 Radix와 달리 충돌 회피 로직 없음, overflow-hidden 조상 안에 포탈 없이 절대 위치) 375px 뷰포트에서 잘릴 위험 → w-[min(320px,calc(100vw-2rem))]로 수정 — (사이클 31)
 [완료] 다크모드 감사(사이클 30, 4회차) — 사이드바 하단 SettingsButton/HelpButton 아이콘이 바로 옆 "내 앱" 링크(dark:text-gray-500)와 달리 라이트 전용 #666 고정색만 써서 다크모드에서 저대비로 흐릿하게 보이던 문제, GitHub 설정 탭 캐시 "전체 삭제" 버튼(text-red-600/border-red-200)이 같은 파일 성공 알림 박스와 달리 dark: 변형이 없던 문제 → 둘 다 dark: 변형 추가 — (사이클 30)
 [완료] 요금제/결제 감사(사이클 29, 3회차) — BaseChat.tsx 무료 생성 잔여 횟수 안내 배지가 로그인 계정도 무조건 "무료 체험"(게스트 전용 용어)으로 표시하던 문제 → authUser 여부로 "무료 생성"/"무료 체험" 문구 분기 (Chat.client.tsx의 notifyGenerationLimitReached와 용어 통일) — (사이클 29)
 [완료] 배포 감사(사이클 28, 2회차) — DeployButton.tsx에서 열리는 실제 GitHub/GitLab 배포 다이얼로그(GitHubDeploymentDialog.tsx/GitLabDeploymentDialog.tsx)가 하드코딩 색상만 고쳐졌을 뿐(cf6f6d9) 제목·라벨·placeholder·버튼·토스트/에러 문구 약 40곳이 전부 영어로 남아있던 문제(같은 배포 흐름의 *hook* 파일 GitHubDeploy.client.tsx/GitLabDeploy.client.tsx 토스트는 사이클 12에서 이미 한국어였지만, 실제 화면에 뜨는 다이얼로그 자체는 처음 감사됨) → 전부 한국어로 번역 — (사이클 28)

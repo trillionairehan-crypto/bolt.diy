@@ -422,3 +422,14 @@
 - **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 369/369 통과, `corepack pnpm run build`(client+server) 성공.
 - **커밋**: `e0521f9`
 - **다음 감사 영역**: 모바일로 갱신.
+
+### [07:45] Phase 2 — 사이클 31 (감사 대상: 모바일, 3회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 369/369 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/workbench/**`, `deploy/**`, `header/**`를 재감사(사이클 7·15·23에서 이미 고친 항목은 재보고 제외 지시). 보고받은 5건 중 확신도 high 1건을 직접 Read로 재검증 후 수정.
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/workbench/Workbench.client.tsx:128` — Diff 탭 툴바의 "바뀐 파일" `FileModifiedDropdown`이 렌더하는 Headless UI `Popover.Panel`이 `w-80`(320px) 고정폭에 반응형 clamp가 전혀 없었음. 이 컴포넌트는 Radix(충돌 시 자동 flip/collision 회피)가 아니라 Headless UI `Popover`라 그런 로직이 없고, 패널은 포탈 없이 조상(`h-full flex flex-col ... overflow-hidden`, line 474)의 절대 위치 자식으로 렌더돼 좁은 화면에서 잘릴 위험. `useViewport`가 1024px 미만을 "작은 뷰포트"로 보고 워크벤치를 `w-full`로 만들기 때문에 375px 폰에서 이 툴바/패널이 정확히 그 폭.
+  → `WebSearch.client.tsx`/`APIKeyManager.tsx`/`FileBreadcrumb.tsx`에서 이미 검증된 관용구(`w-[min(Npx,calc(100vw-Mrem))]`)와 동일 패턴으로 `w-[min(320px,calc(100vw-2rem))]`로 교체.
+- **테스트**: `app/mobileFixedWidthOverflow.spec.ts`에 신규 1건 추가(기존 관행과 동일 파일에 이어 붙임).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 370/370 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `67b2470`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 25로 기록)**: (1) `Preview.tsx` 미리보기 툴바가 `flex-wrap` 없이 기기 모드에서 8개 이상 아이콘+URL 입력창을 한 줄에 배치(확신도 medium-high, 레이아웃 설계 결정 필요). (2) `Preview.tsx`의 손수 구현한 "새 창 옵션" 드롭다운이 Radix가 아니라 충돌 회피 로직 없음(확신도 low-medium, 실사용 위험은 낮아 보임). (3) 이전 사이클(15/23)이 미해결로 남긴 "Menu.client.tsx 32px 아바타 터치타겟" 항목은 이번에 재검증 결과 그 div엔 클릭 핸들러가 없는 정적 이미지일 뿐이고 실제 클릭 가능한 아바타 버튼(`AvatarDropdown.tsx`)은 이미 40px이라 오탐으로 종결.
+- **다음 감사 영역**: 한국어 문구로 갱신.

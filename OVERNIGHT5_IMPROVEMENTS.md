@@ -1,5 +1,12 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 25. 모바일 감사(사이클 31, 3회차) — 워크벤치 팝오버 고정폭은 고침, 나머지 3건은 판단 보류
+Explore 서브에이전트로 `app/components/workbench/**`, `app/components/deploy/**`, `app/components/header/**` 등을 재감사(이전 모바일 사이클들이 이미 고친 `w-[300px]` 류 폭 문제·`avoidCollisions`·설정/팔레트 다이얼로그 오버플로는 재보고 제외 지시). 보고받은 항목 중 가장 확신도 높은 것(`Workbench.client.tsx`의 "바뀐 파일" Popover가 고정 320px, Headless UI Popover라 Radix와 달리 충돌 회피 로직이 없고 overflow-hidden 조상 안에 포탈 없이 절대 위치라 클리핑 위험)만 기존 `w-[min(Npx,calc(100vw-Mrem))]` 관용구로 수정·테스트 추가·커밋(`67b2470`). 나머지는 확인만 하고 손 안 댐:
+
+- **`Preview.tsx:772-824` 미리보기 툴바가 `flex-wrap` 없이 8개 이상 아이콘 버튼 + URL 입력창을 한 줄에 배치** — 기기 모드(Device Mode)를 켜면 아이콘이 2개 더 늘어나(`device-rotate`, `device-mobile`/`device-mobile-slash`) 정확히 "모바일 미리보기"용 토글이 그 스스로 좁은 화면에서 오버플로를 유발하는 역설적 상황. URL 입력창을 감싼 `flex-grow` div에 `min-w-0`이 없어 인풋이 내용 폭 아래로 안 줄어듦. **왜 안 고쳤나**: 8개 이상 아이콘을 어떻게 줄일지(더보기 메뉴로 묶기/일부 숨기기/줄바꿈 허용)가 레이아웃 설계 결정이라 "고정폭 → 뷰포트 상대폭" 같은 단순 치환으로 안전하게 못 고침. **제안**: 아이콘 그룹에 `flex-wrap` + `min-w-0` on URL 입력 wrapper부터 시도해보고, 그래도 좁으면 저빈도 버튼(전체화면, 리스트 등)을 더보기(`⋯`) 메뉴로 묶는 방향 검토.
+- **`Preview.tsx:874` "새 창 옵션"(창 크기) 드롭다운이 Radix가 아닌 손수 구현(수동 open/close state + 전체화면 클릭 캐처)이라 충돌 회피 로직이 없음** — `FileBreadcrumb.tsx`가 예전에 겪은 것과 같은 위험 패턴이지만 이 인스턴스는 툴바 맨 오른쪽 끝에 붙어 있어 실제로 화면 밖으로 밀릴 가능성은 상대적으로 낮음(확신도 low-medium, 미확인). **제안**: 다른 드롭다운들처럼 공유 `Dropdown`/Radix 패턴으로 교체하는 걸 다음 모바일 또는 미리보기/워크벤치 사이클 후보로 등록.
+- **(기존 항목 5의 정정) `Menu.client.tsx:368`의 32px 아바타는 실제로는 터치 타겟이 아님** — 이 `div`엔 `onClick`이 없는 정적 프로필 이미지 표시일 뿐, 실제 클릭 가능한 아바타 버튼은 `AvatarDropdown.tsx:25`의 `w-10 h-10`(40px) `motion.button`으로 이미 44px 권장치에 근접해 있음. **제안**: 이전 사이클(15/23)에서 미해결로 남겨뒀던 "Menu.client.tsx 아바타 터치타겟" 항목은 오탐으로 종결 처리하고, `HeaderActionButtons.client.tsx`의 `flex-wrap` 부재 항목도 `SHOW_DEBUG_TOOLS=false`로 실제 노출 버튼이 최대 2개뿐이라 현재는 위험 낮음으로 우선순위 하향.
+
 ## 24. 생성 감사(사이클 26) — 3건 전부 판단 보류(구조 변경 필요)
 
 이번 사이클은 코드 수정 없이 감사만 진행. Explore 서브에이전트로 `app/lib/runtime/`(액션 실행기), `app/lib/hooks/useMessageParser.ts`, `app/lib/stores/workbench.ts`를 재감사(사이클 10·18에서 이미 고친 항목, 항목 9/17에 이미 기록된 항목은 재보고 제외 지시). 보고받은 3건을 직접 Read로 재검증, 전부 실제로 존재하는 문제로 확인됐으나 셋 다 "최소 변경"으로 안전하게 못 고칠 만큼 구조적 판단이 필요해 보류.
