@@ -318,3 +318,15 @@
 - **커밋**: `7889fc6`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 20으로 기록)**: 나머지 3건 전부 `pricing.tsx` 안(수정 금지 방침 유지) — (1) 연간 결제 할인 안내 문구가 실제 미구현 기능을 광고. (2) "브랜딩 표시"(제약사항)가 다른 혜택과 같은 초록 체크로 표시돼 혼동 소지. (3) 결제 CTA 버튼(`.cr-btn`, 36px)이 권장 터치 타겟 미만.
 - **다음 감사 영역**: 다크모드로 갱신.
+
+### [06:05] Phase 2 — 사이클 22 (감사 대상: 다크모드, 3회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 343/343 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/**`, `app/routes/**`, `app/styles/**`를 재감사(사이클 6·Phase2 사이클1~6에서 이미 고친 accent hex 하드코딩, 모바일 오버플로, 죽은 다크 토큰 항목은 재보고 제외 지시). 보고받은 2건 전부 직접 Read로 재검증.
+- **발견·수정(2건, 전부 검증 완료 후 수정)**:
+  1. `app/components/chat/Markdown.module.scss` — 테이블 테두리 `#dfe2e5`, 줄무늬 행 배경 `#f6f8fa`, h6 색상 `#6a737d`가 GitHub 라이트 테마 값으로 하드코딩돼 있었음. 이 스타일은 `Markdown.tsx`(수정 금지 파일이지만 `.module.scss`는 별도 파일이라 대상 아님)가 쓰는 클래스로, 사용자 메시지·AI 응답 전부가 거치는 앱에서 가장 빈도 높은 표면. AI 응답에 마크다운 표가 포함되면(비교표, 스펙 목록 등 흔한 형식) 다크모드 채팅 배경 위에 밝은 회색 사각형이 튀어 보이는 문제 → `var(--bolt-elements-borderColor)`/`var(--bolt-elements-bg-depth-2)`/`var(--bolt-elements-textTertiary)`로 교체(전부 라이트/다크 양쪽에 정의된 기존 토큰).
+  2. `app/components/sidebar/Menu.client.tsx:569` — 사이드바 하단 액션바 "내 앱" 링크 아이콘이 다크 변형 없는 고정 `text-[#666]`이었음. 바로 위·아래 형제 요소(`border-gray-200 dark:border-gray-800`, `text-gray-400 dark:text-gray-600`)는 전부 다크 변형이 있는데 이 아이콘만 빠져 있어, 사이드바 배경이 `dark:bg-gray-950`(거의 검정)인 다크모드에서 대비가 낮아 흐릿하게 보이던 문제 → `dark:text-gray-500` 추가.
+- **테스트**: `app/markdownTableDarkModeAudit.spec.ts` 신규 5건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 348/348 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `b07ff47`
+- **범위 밖으로 남긴 것**: 없음 — 서브에이전트가 조사한 나머지 후보(랜딩 히어로 고정 코랄, 코드블록 dark-plus 강제, 소셜 로그인 브랜드 색상, Preview.tsx 디바이스 프레임, 데이터 시각화)는 전부 의도된 고정 디자인으로 직접 확인, 실제 버그 아님.
+- **다음 감사 영역**: 모바일로 갱신.
