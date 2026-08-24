@@ -294,4 +294,59 @@ create trigger deployed_apps_set_user_id
 
 **이번 사이클 커밋**: `c2c16f0`(바이너리 처리 테스트 추가), `91b4d28`(죽은 코드 제거).
 
+*(사이클 3 이후는 계속 진행 중 — 종료 조건 없음. 성민이 돌아올 때까지 같은 구조로 반복하며 이 파일에 계속 append함.)*
+
+---
+
+## 작업별 완료/스킵 요약
+
+| 작업 | 상태 | 커밋 |
+|---|---|---|
+| 1. 배포 URL 프로덕션 도메인 수정 | 완료 | `756ed82` |
+| 2. 배포 드롭다운 정리 | 완료 | `24b37e7` |
+| 3. Supabase 연결 마법사 | 완료 | `a0d63b0` |
+| 4. 배포에 Supabase 키 주입 | 완료 | `a3021cf` |
+| 5. 배포 완료 화면 "다음 단계" 가이드 | 완료 | `ad481c0` |
+| 6. 마이그레이션 SQL 출력 | 완료 | `959f01e` |
+| 7. 검증 루프 | 진행 중 (종료 조건 없음) | `2a8fcd2`, `c2c16f0`, `91b4d28`, `2b5e937`, `488384e` |
+
+이미 완료된 상태라 스킵 처리한 작업은 없음 — 7개 작업 모두 이번 세션에서 처음 손댐.
+
+## 전체 커밋 목록 (이번 세션, 오래된 순)
+
+1. `756ed82` fix: return the stable pages.dev URL instead of a hash-preview URL
+2. `24b37e7` feat: promote Cloudflare to the default one-click deploy action
+3. `a0d63b0` feat: non-developer-friendly Supabase connection wizard
+4. `a3021cf` feat: inject connected Supabase credentials into every Cloudflare deploy
+5. `ad481c0` feat: post-deploy "다음 단계" guide cards + /apps connection badge
+6. `959f01e` docs: add migration SQL + execution order to overnight5 report (task 6)
+7. `2a8fcd2` fix: block Supabase's new sb_secret_ key format in service-role guard
+8. `2b5e937` docs: log task 6 completion and validation-loop cycle 1 in overnight5 report
+9. `c2c16f0` test: cover Cloudflare deploy file-size limit and upload batching
+10. `91b4d28` refactor: remove dead handleConnect/updateToken from useSupabaseConnection
+11. `488384e` docs: log validation-loop cycle 2 in overnight5 report
+
+전부 `pricing.tsx`/`functions/[[path]].ts` 미포함, `.env` 값 미노출, 커밋 전 typecheck+lint+build 통과 확인.
+
+## 성민 브라우저 체크리스트 (내가 직접 확인 못 하는 것들)
+
+이번 세션은 WebContainer/브라우저를 직접 조작해서 눈으로 확인하는 게 불가능한 환경이라, 아래는 전부 정적 검토 + vitest로만 검증했고 실제 브라우저에서 한 번씩 눈으로 봐야 확실함.
+
+1. **배포 URL 실사용 재확인** — 작업 1 수정 후 실제로 새 프로젝트를 배포해서 반환된 `{project}.pages.dev` 주소가 SSL 오류 없이 바로 열리는지. (직전 실사용 테스트에서 발견된 원 버그의 재현 확인.)
+2. **배포 드롭다운 UI** — Cloudflare 버튼 바로 클릭 시 배포되는지, 캐럿 버튼 눌렀을 때 "다른 방법으로 내보내기" 서브메뉴가 Radix Sub 컴포넌트로 정상적으로 열리고 hover/keyboard 네비게이션이 되는지 (Sub 메뉴는 이번 세션에서 이 코드베이스에 처음 쓴 패턴).
+3. **Supabase 마법사 3단계 화면** — 실제로 새 Supabase 계정으로 처음부터 끝까지 따라가봤을 때 안내 문구(어떤 버튼을 누르라는 지시)가 실제 Supabase 화면과 어긋나지 않는지. Supabase가 UI를 자주 바꾸는 편이라 "톱니바퀴 모양 Project Settings" 같은 문구가 최신 화면과 다를 수 있음.
+4. **anon/publishable 키 붙여넣기 → 연결 → 샘플 데이터 배너 전환** — 마법사로 연결 성공 시 생성된 앱 미리보기의 "샘플 데이터" 배너가 실제로 "연결됨" 상태로 바뀌는지 (스토어 상태 전이는 확인했지만, 그 상태를 구독하는 미리보기 iframe/배너 쪽까지는 이번 세션에서 직접 렌더링해서 보지 못함).
+5. **배포 시 Supabase 키 실제 주입 확인** — 연결된 앱을 배포한 뒤, 배포된 사이트가 실제로 그 Supabase 프로젝트에 데이터를 저장/조회하는지 (즉 `.env` 주입이 빌드에 실제로 반영됐는지 최종 결과물에서 확인).
+6. **배포 완료 화면 "다음 단계" 카드** — 3개 카드가 실제 배포 흐름에서 올바른 타이밍에 나타나는지, Supabase 카드 클릭 시 마법사가 정말 열리는지.
+7. **/apps 대시보드 뱃지** — "저장 기능 연결됨"/"샘플 데이터" 뱃지가 실제 배포 기록과 맞게 표시되는지 (마이그레이션이 아직 미적용이라 지금은 이 컬럼 자체가 없어서, 마이그레이션 적용 후에만 확인 가능).
+8. **마이그레이션 실행** — Task 6에 출력한 두 SQL을 Supabase SQL Editor에서 실행하고 에러 없이 끝나는지.
+
+## 미수정 이슈 (사유)
+
+| 이슈 | 사유 |
+|---|---|
+| `chunkForUpload`가 base64 인코딩으로 인한 ~1.33배 부풀림을 배치 크기 계산에 반영 안 함 — 25MB에 가까운 단일 파일이 있으면 실제 전송 요청이 20MB 배치 상한보다 커질 수 있음 | Cloudflare의 실제 요청 크기 한도가 문서화돼 있지 않고, 실제 배포 없이는 라이브 검증이 불가능함(이번 세션은 배포 금지). 코드 로직 자체는 일관되고 현재 앱 빌더 규모(대부분 수백 KB~수 MB) 사이트에선 발생 가능성이 낮음 — 실사용 중 대용량 파일(동영상 등) 배포 시 관찰 필요. |
+| 마법사 "연결하기" 버튼의 초고속 연속 클릭 시 `simpleConnecting` 상태 반영 전에 두 번째 클릭이 통과할 이론적 여지 | 두 요청 모두 멱등적이라 실질적 피해가 토스트 중복 정도로 낮음. 클로드플레어 배포 쪽엔 이미 있는 재진입 가드 패턴을 여기도 넣을 수 있지만, 실제 사용자 피해가 없어 이번 사이클엔 우선순위 낮음으로 보류. |
+| Custom domain API(`addCustomDomain`/`getCustomDomainStatus`)의 응답 필드 구조가 실제 라이브 API로 검증된 적 없음(이전 세션부터 계속) | Cloudflare Pages 커스텀 도메인 API는 Wrangler CLI 자체에 서브커맨드가 없어 실사용 레퍼런스가 없고, DNS/도메인 편집 권한이 있는 토큰으로 라이브 테스트하는 것도 배포 금지 범위 밖 작업이라 판단해 보류. |
+
 
