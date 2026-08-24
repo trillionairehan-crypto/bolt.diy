@@ -74,21 +74,18 @@ export function mapAnswerToDirectives(questionId: string, value: unknown): Parti
           return {
             connectSupabase: true,
             promptAdditions: [
-              '사용자별로 로그인해서 자기 데이터를 저장하고 관리하는 구조로 만들어주세요. Supabase 인증과 RLS를 사용하세요.',
+              '사용자별로 로그인해서 자기 데이터를 관리하는 구조를 원해요. 지금 저장 방식이 코랄레드 Cloud(기본)라면 로그인 계정은 지원되지 않으니 기기 단위 구조로 만들고, 답변에서 로그인이 꼭 필요하면 "저장 기능 켜기"의 내 Supabase 연결(고급)이 필요하다고 짧게 안내하세요. 저장 방식이 내 Supabase(고급)라면 Supabase 인증과 RLS로 실제 로그인 구조를 만드세요.',
             ],
           };
         case 'withoutAuth':
           return {
-            connectSupabase: true,
-            promptAdditions: [
-              '로그인 없이도 데이터가 저장되는 구조로 만들어주세요 (공용 데이터 또는 기기별 로컬 저장과 Supabase 동기화).',
-            ],
+            promptAdditions: ['로그인 없이도 데이터가 저장되는 구조로 만들어주세요 — 기기 단위 저장이면 충분해요.'],
           };
         case 'none':
           return {
             connectSupabase: false,
             promptAdditions: [
-              '이 앱은 데이터를 서버에 저장할 필요가 없어요. Supabase를 연결하지 말고, 필요한 상태는 컴포넌트 state로만 관리하는 클라이언트 전용 앱으로 만들어주세요.',
+              '이 앱은 데이터를 저장할 필요가 없어요. 저장 SDK도 Supabase도 쓰지 말고, 필요한 상태는 컴포넌트 state로만 관리하는 클라이언트 전용 앱으로 만들어주세요.',
             ],
           };
         default:

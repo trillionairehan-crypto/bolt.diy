@@ -37,9 +37,10 @@ describe('mapAnswerToDirectives — persistence', () => {
     expect(result.promptAdditions).toHaveLength(1);
   });
 
-  it('withoutAuth: connectSupabase true (still persisted, just no login)', () => {
+  it('withoutAuth: no connectSupabase opinion (Cloud/기본 already persists without login)', () => {
     const result = mapAnswerToDirectives('persistence', 'withoutAuth');
-    expect(result.connectSupabase).toBe(true);
+    expect(result.connectSupabase).toBeUndefined();
+    expect(result.promptAdditions).toHaveLength(1);
   });
 
   it('none: connectSupabase explicitly false', () => {
