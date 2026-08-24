@@ -308,3 +308,13 @@
 - **커밋**: `7627a81`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 19로 기록)**: (1) `GitHubDeploymentDialog.tsx`/`GitLabDeploymentDialog.tsx` 다이얼로그 본문 전체 영어 — 이미 항목 2(사이클 8)에 기록된 것과 동일 항목, 재확인만 함. (2) Vercel/Netlify 배포 실패 시 서버가 보내는 영어 에러 문자열(`api.vercel-deploy.ts` 등)이 `data.error || '한국어 fallback'` 패턴에서 항상 우선시돼 한국어 fallback이 무의미해지는 문제 — 서버 쪽 에러 생성 지점 전수 조사가 먼저 필요해 이번엔 보류.
 - **다음 감사 영역**: 요금제/결제로 갱신.
+
+### [05:52] Phase 2 — 사이클 21 (감사 대상: 요금제/결제, 2회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 340/340 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: 서브에이전트로 `pricing.tsx`(읽기 전용 확인만), `api.payment.verify.ts`, `api.payment.webhook.ts`, 요금제/결제 관련 UI를 재감사(사이클 5의 구조적 발견은 재보고 제외 지시). 보고받은 4건 전부 직접 Read로 재검증.
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/chat/BaseChat.tsx` — 랜딩 화면의 무료 생성 남은 횟수 표시가 `getGenerationsRemaining().then(...)`에 `.catch()`가 없어, 로그인 계정에서 Supabase RPC가 실패(네트워크 오류 등)하면 `getAccountGenerationsRemaining()`이 던지는 에러가 unhandled rejection으로 사라지고 `freeGenerationsRemaining`의 초기값 `0`이 그대로 남았음. `0`은 "남은 횟수 없음"과 구분이 안 돼 실제로는 남은 횟수를 모르는 상태인데 "무료 체험을 다 썼어요. 계속하려면 요금제를 확인해주세요"라는 문구와 `/pricing` 링크를 보여줘, 아직 무료 생성이 남은 로그인 사용자를 일시적 네트워크 오류만으로 결제 페이지로 유도할 뻔한 문제. `Chat.client.tsx`의 실제 생성 게이트(`checkGenerationsAllowed`)는 이미 같은 종류의 에러를 try/catch로 잡아 "일시적인 오류가 발생했어요" 토스트로 처리하는데, 이 표시 전용 로직만 그 패턴이 빠져 있었음 → 초기값을 `null`(모름)로 바꾸고, `.catch()`로 에러를 로깅하며 `null`을 유지, 렌더링도 `freeGenerationsRemaining !== null`일 때만 하도록 수정(로딩 실패 시엔 안내 자체를 숨김).
+- **테스트**: `app/freeGenerationsCounterAudit.spec.ts` 신규 3건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 343/343 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `7889fc6`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 20으로 기록)**: 나머지 3건 전부 `pricing.tsx` 안(수정 금지 방침 유지) — (1) 연간 결제 할인 안내 문구가 실제 미구현 기능을 광고. (2) "브랜딩 표시"(제약사항)가 다른 혜택과 같은 초록 체크로 표시돼 혼동 소지. (3) 결제 CTA 버튼(`.cr-btn`, 36px)이 권장 터치 타겟 미만.
+- **다음 감사 영역**: 다크모드로 갱신.
