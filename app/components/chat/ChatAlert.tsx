@@ -15,8 +15,8 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
   const isPreview = source === 'preview';
   const title = isPreview ? '미리보기 오류' : '터미널 오류';
   const message = isPreview
-    ? '미리보기를 실행하는 중 오류가 발생했어요. 코랄레드가 분석해서 해결하도록 도와줄까요?'
-    : '터미널 명령을 실행하는 중 오류가 발생했어요. 코랄레드가 분석해서 해결하도록 도와줄까요?';
+    ? '미리보기에서 문제가 생겼어요. 코랄레드가 원인을 찾아서 고쳐줄까요?'
+    : '터미널 명령에서 문제가 생겼어요. 코랄레드가 원인을 찾아서 고쳐줄까요?';
 
   return (
     <AnimatePresence>

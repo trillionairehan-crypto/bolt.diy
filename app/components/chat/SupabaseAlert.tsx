@@ -21,11 +21,11 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
   const isConnected = !!(connection.token && connection.selectedProjectId);
 
   // Set title and description based on connection state
-  const title = isConnected ? 'Supabase 변경 사항' : 'Supabase 연결 필요';
-  const description = isConnected ? '저장 기능 변경 내용' : 'Supabase 연결이 필요해요';
+  const title = isConnected ? '저장 기능 변경 사항' : '저장 기능 연결 필요';
+  const description = isConnected ? '저장 기능 변경 내용' : '저장 기능 연결이 필요해요';
   const message = isConnected
     ? '제안된 변경 사항을 확인하고 저장 기능에 적용해주세요.'
-    : '계속하려면 먼저 Supabase에 연결해주세요.';
+    : '계속하려면 먼저 저장 기능을 연결해주세요.';
 
   const handleConnectClick = () => {
     // Dispatch an event to open the Supabase connection dialog
@@ -114,7 +114,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
           {!isConnected ? (
             <div className="p-3 rounded-md bg-bolt-elements-background-depth-3">
               <span className="text-sm text-bolt-elements-textPrimary">
-                먼저 Supabase에 연결하고 프로젝트를 선택해주세요.
+                먼저 저장 기능을 연결하고 프로젝트를 선택해주세요.
               </span>
             </div>
           ) : (
@@ -158,7 +158,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                   'flex items-center gap-1.5',
                 )}
               >
-                Supabase 연결하기
+                저장 기능 연결하기
               </button>
             ) : (
               <button
@@ -182,10 +182,10 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
               disabled={isExecuting}
               className={classNames(
                 `px-3 py-2 rounded-md text-sm font-medium`,
-                'bg-[#503B26]',
-                'hover:bg-[#774f28]',
+                'bg-bolt-elements-button-secondary-background',
+                'hover:bg-bolt-elements-button-secondary-backgroundHover',
                 'focus:outline-none',
-                'text-[#F79007]',
+                'text-bolt-elements-button-secondary-text',
                 isExecuting ? 'opacity-70 cursor-not-allowed' : '',
               )}
             >

@@ -73,7 +73,7 @@ export function useGitLabConnection(): UseGitLabConnectionReturn {
       setIsLoading(false);
     } catch (error) {
       console.error('Error loading saved connection:', error);
-      setError('Failed to load saved connection');
+      setError('저장된 연결 정보를 불러오지 못했어요');
       setIsLoading(false);
 
       // Clean up corrupted data
@@ -120,7 +120,7 @@ export function useGitLabConnection(): UseGitLabConnectionReturn {
 
   const connect = useCallback(async (token: string, gitlabUrl = 'https://gitlab.com') => {
     if (!token.trim()) {
-      setError('Token is required');
+      setError('연결 키를 입력해주세요');
       return;
     }
 
@@ -134,7 +134,7 @@ export function useGitLabConnection(): UseGitLabConnectionReturn {
       const result = await gitlabConnectionStore.connect(token, gitlabUrl);
 
       if (!result.success) {
-        throw new Error(result.error || 'Connection failed');
+        throw new Error(result.error || '연결에 실패했어요');
       }
 
       console.log('GitLab connection successful, now fetching stats...');
@@ -154,14 +154,14 @@ export function useGitLabConnection(): UseGitLabConnectionReturn {
         // Don't fail the connection if stats fail
       }
 
-      toast.success('Connected to GitLab successfully!');
+      toast.success('깃랩에 연결됐어요');
     } catch (error) {
       console.error('Failed to connect to GitLab:', error);
 
-      const errorMessage = error instanceof Error ? error.message : 'Failed to connect to GitLab';
+      const errorMessage = error instanceof Error ? error.message : '깃랩 연결에 실패했어요';
 
       setError(errorMessage);
-      toast.error(`Failed to connect: ${errorMessage}`);
+      toast.error(errorMessage);
       throw error;
     } finally {
       setIsConnecting(false);
@@ -181,7 +181,7 @@ export function useGitLabConnection(): UseGitLabConnectionReturn {
     gitlabConnectionStore.disconnect();
 
     setError(null);
-    toast.success('Disconnected from GitLab');
+    toast.success('깃랩 연결을 해제했어요');
   }, []);
 
   const refreshConnection = useCallback(async () => {
@@ -196,7 +196,7 @@ export function useGitLabConnection(): UseGitLabConnectionReturn {
       await refreshConnectionData(connection);
     } catch (error) {
       console.error('Error refreshing connection:', error);
-      setError('Failed to refresh connection');
+      setError('연결 정보를 새로고침하지 못했어요');
       throw error;
     } finally {
       setIsLoading(false);

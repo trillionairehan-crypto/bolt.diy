@@ -19,13 +19,13 @@ export function GitLabAuthDialog({ isOpen, onClose }: GitLabAuthDialogProps) {
     event.preventDefault();
 
     if (!token.trim()) {
-      toast.error('Please enter your GitLab access token');
+      toast.error('연결 키를 입력해주세요');
       return;
     }
 
     try {
+      // useGitLabConnection's connect() already shows a success/error toast — don't double it here.
       await connect(token, gitlabUrl);
-      toast.success('Successfully connected to GitLab!');
       setToken('');
       onClose();
     } catch (error) {
@@ -51,7 +51,7 @@ export function GitLabAuthDialog({ isOpen, onClose }: GitLabAuthDialogProps) {
               aria-describedby="gitlab-auth-description"
             >
               <Dialog.Title className="text-lg font-medium text-bolt-elements-textPrimary mb-4">
-                Connect to GitLab
+                GitLab 연결
               </Dialog.Title>
 
               <div className="flex items-center gap-3 mb-6">
@@ -64,16 +64,16 @@ export function GitLabAuthDialog({ isOpen, onClose }: GitLabAuthDialogProps) {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-base font-medium text-bolt-elements-textPrimary">GitLab Connection</h3>
+                  <h3 className="text-base font-medium text-bolt-elements-textPrimary">GitLab 계정 연결</h3>
                   <p id="gitlab-auth-description" className="text-sm text-bolt-elements-textSecondary">
-                    Connect your GitLab account to deploy your projects
+                    깃랩 계정을 연결하면 프로젝트를 올릴 수 있어요
                   </p>
                 </div>
               </div>
 
               <form onSubmit={handleConnect} className="space-y-4">
                 <div>
-                  <label className="block text-sm text-bolt-elements-textSecondary mb-2">GitLab URL</label>
+                  <label className="block text-sm text-bolt-elements-textSecondary mb-2">GitLab 주소</label>
                   <input
                     type="url"
                     value={gitlabUrl}
@@ -93,13 +93,13 @@ export function GitLabAuthDialog({ isOpen, onClose }: GitLabAuthDialogProps) {
                 </div>
 
                 <div>
-                  <label className="block text-sm text-bolt-elements-textSecondary mb-2">Access Token</label>
+                  <label className="block text-sm text-bolt-elements-textSecondary mb-2">연결 키</label>
                   <input
                     type="password"
                     value={token}
                     onChange={(e) => setToken(e.target.value)}
                     disabled={isConnecting}
-                    placeholder="Enter your GitLab access token"
+                    placeholder="연결 키를 입력해주세요"
                     className={classNames(
                       'w-full px-3 py-2 rounded-lg text-sm',
                       'bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-3',
@@ -118,11 +118,11 @@ export function GitLabAuthDialog({ isOpen, onClose }: GitLabAuthDialogProps) {
                       rel="noopener noreferrer"
                       className="text-orange-500 hover:text-orange-600 hover:underline inline-flex items-center gap-1"
                     >
-                      Get your token
+                      연결 키 발급받기
                       <div className="i-ph:arrow-square-out w-3 h-3" />
                     </a>
                     <span className="mx-2">•</span>
-                    <span>Required scopes: api, read_repository</span>
+                    <span>필요한 권한: api, read_repository</span>
                   </div>
                 </div>
 
@@ -141,7 +141,7 @@ export function GitLabAuthDialog({ isOpen, onClose }: GitLabAuthDialogProps) {
                     whileTap={{ scale: 0.98 }}
                     disabled={isConnecting}
                   >
-                    Cancel
+                    취소
                   </motion.button>
                   <motion.button
                     type="submit"
@@ -157,12 +157,12 @@ export function GitLabAuthDialog({ isOpen, onClose }: GitLabAuthDialogProps) {
                     {isConnecting ? (
                       <>
                         <div className="i-ph:spinner-gap animate-spin w-4 h-4" />
-                        Connecting...
+                        연결하는 중...
                       </>
                     ) : (
                       <>
                         <div className="i-ph:plug-charging w-4 h-4" />
-                        Connect to GitLab
+                        연결하기
                       </>
                     )}
                   </motion.button>

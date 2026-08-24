@@ -46,14 +46,15 @@ export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
     const handleFork = async (messageId: string) => {
       try {
         if (!db || !chatId.get()) {
-          toast.error('Chat persistence is not available');
+          toast.error('지금은 새 채팅을 만들 수 없어요.');
           return;
         }
 
         const urlId = await forkChat(db, chatId.get()!, messageId);
         window.location.href = `/chat/${urlId}`;
       } catch (error) {
-        toast.error('Failed to fork chat: ' + (error as Error).message);
+        console.error('Failed to fork chat:', error);
+        toast.error('새 채팅을 만들지 못했어요. 다시 시도해주세요.');
       }
     };
 

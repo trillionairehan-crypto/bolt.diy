@@ -282,13 +282,13 @@ export function RepositoryCard({
                 </span>
               ))}
             {repository.archived && (
-              <span className="px-2 py-0.5 rounded-full bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400">
-                Archived
+              <span className="px-2 py-0.5 rounded-full bg-bolt-elements-background-depth-3 text-bolt-elements-textPrimary">
+                보관됨
               </span>
             )}
             {repository.fork && (
               <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400">
-                Fork
+                포크
               </span>
             )}
           </div>
