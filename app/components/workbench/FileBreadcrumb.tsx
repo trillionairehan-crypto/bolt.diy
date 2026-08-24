@@ -105,13 +105,7 @@ export const FileBreadcrumb = memo<FileBreadcrumbProps>(({ files, pathSegments =
               <AnimatePresence>
                 {isActive && (
                   <DropdownMenu.Portal>
-                    <DropdownMenu.Content
-                      className="z-file-tree-breadcrumb"
-                      asChild
-                      align="start"
-                      side="bottom"
-                      avoidCollisions={false}
-                    >
+                    <DropdownMenu.Content className="z-file-tree-breadcrumb" asChild align="start" side="bottom">
                       <motion.div
                         ref={contextMenuRef}
                         initial="close"
