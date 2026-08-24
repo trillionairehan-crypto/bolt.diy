@@ -1,5 +1,6 @@
-다음 감사 영역: 요금제/결제
+다음 감사 영역: 다크모드
 
+[완료] Cloudflare 배포 API(api.cloudflare-deploy.ts)가 손상된 base64 파일 콘텐츠에 안내 없는 원시 500으로 크래시하던 문제 → try/catch로 감싸 친절한 한국어 400 응답 — (사이클 13)
 [완료] GitHub/GitLab/Vercel/Netlify 배포 훅(useXDeploy)의 토스트/throw Error 문구가 CloudflareDeploy.client.tsx만 빼고 전부 영어 → 4개 파일 전부 한국어로 통일 — (사이클 12)
 [완료] ExpoQrModal.tsx 안내 문구 3곳이 전부 영어(제목/설명/URL 없음 안내) → 한국어로 번역 — (사이클 11)
 [완료] TerminalTabs.tsx 추가 터미널 탭 라벨 "Terminal {n}"이 영어 → "터미널 {n}"으로 번역 — (사이클 11)

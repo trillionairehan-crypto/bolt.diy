@@ -219,3 +219,14 @@
 - **커밋**: `f7c5d57`
 - **범위 밖으로 남긴 것(구조적 판단 필요, `OVERNIGHT5_IMPROVEMENTS.md` 항목 11로 기록)**: `VercelDeploymentLink.client.tsx`의 배포 상태 조회 fetch 실패가 완전히 무음(콘솔 로그만, UI엔 아무것도 안 뜸) — "미배포"와 "조회 실패"를 구분 못 하는 문제, UX 설계 필요해 보류.
 - **다음 감사 영역**: 요금제/결제로 갱신.
+
+### [04:10] Phase 2 — 사이클 13 (감사 대상: 요금제/결제)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 319/319 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 수정 금지 파일) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `pricing.tsx`는 제외하고 요금제/결제 연결 표면(`api.payment.verify.ts`/`api.payment.webhook.ts`, `CustomDomainConnect.tsx`+`api.cloudflare-domain.ts`, `api.cloudflare-deploy.ts`, `freeTrial.ts`, `cloudflarePages.ts`)을 대상으로 엣지 케이스·에러 처리 누락·한국어 문구·다크모드/모바일 관점으로 점검 요청(사이클 5에서 이미 구조적 문제로 기록된 인증 부재/Pro 게이트 항목은 재보고 제외 지시). 보고받은 5건 전부 직접 Read로 재검증.
+- **발견·수정(1건, 크래시 버그)**: `app/routes/api.cloudflare-deploy.ts` — `deployFiles` 매핑 안 `base64ToBytes()` 호출이 기존 `try/catch` 블록 **바깥**에 있어서, 클라이언트가 손상되거나 잘못된 base64 파일 콘텐츠를 보내면 `atob()`이 던지는 예외가 어디서도 안 잡히고 그대로 전파돼 이 라우트의 다른 모든 에러 케이스(`toUserMessage`가 친절한 한국어로 처리하는)와 달리 안내 없는 원시 500 오류로 이어지는 구조였음.
+- **변경**: 디코딩 단계(`Object.entries(files).map(...)`)를 별도 `try/catch`로 감싸 실패 시 `400 파일 데이터가 손상됐어요. 다시 빌드한 뒤 시도해주세요.`를 반환하도록 수정. 파일: `app/routes/api.cloudflare-deploy.ts`.
+- **테스트**: `app/apiCloudflareDeployAudit.spec.ts` 신규 2건 — `action()`을 직접 호출해 실제 동작을 검증(소스 grep이 아니라 실행 기반 테스트, 이 라우트는 순수 함수라 가능했음). **주의**: 처음엔 `app/routes/` 안에 스펙 파일을 뒀다가 `cloudBuildSecurity.spec.ts`(실제 프로덕션 빌드 실행)가 `MISSING_EXPORT` 에러로 실패함 — Remix가 `app/routes/` 안의 모든 파일을 라우트로 자동 인식해서 클라이언트 번들에서 `action`/`loader` export를 스트립하는 처리가 스펙 파일에도 적용되면서 깨진 것으로 확인. `app/` 최상위(`app/apiCloudflareDeployAudit.spec.ts`)로 옮겨서 해결 — **이후 사이클에서 라우트 액션/로더를 직접 호출하는 테스트를 추가할 땐 반드시 `app/routes/` 바깥에 둘 것**.
+- **검증**: `corepack pnpm run typecheck` 0에러(보호 파일 `functions/[[path]].ts`의 기존 무시 대상 에러 1건 제외), `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 321/321 통과(`cloudBuildSecurity.spec.ts`의 실제 프로덕션 빌드 포함), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `54326e0`
+- **범위 밖으로 남긴 것(구조적/판단 필요, `OVERNIGHT5_IMPROVEMENTS.md` 항목 12로 기록)**: (1) `freeTrial.ts`의 로그인 사용자 조회/증가 함수가 "Supabase 클라이언트 없음" 상황을 다르게 처리(조회는 조용히 0, 증가는 throw) — 메터링 관련이라 위험 회피, 손 안 댐. (2) `freeTrial.ts`의 게스트 localStorage 카운터가 원자성 없는 read-modify-write라 동시 요청 시 언더카운트 가능 — 마찬가지로 메터링, 손 안 댐. (3) `api.cloudflare-domain.ts`의 도메인 정규식이 한글 도메인을 거부하면서 퓨니코드 안내가 없음 — 낮은 우선순위 UX 갭. (4) `cloudflarePages.ts`의 무료 배지 문구 "Made with 코랄레드"(영어+한국어 혼용) — 의도적 브랜딩 관용구일 가능성 높아 기록만.
+- **다음 감사 영역**: 다크모드로 갱신.

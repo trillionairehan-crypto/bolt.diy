@@ -1,5 +1,13 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 12. 요금제/결제 감사(사이클 13) — 크래시 버그 1건은 고침, 나머지는 판단 보류
+Explore 서브에이전트로 `pricing.tsx`(수정 금지 파일, 감사 대상에서 제외)를 뺀 요금제/결제 연결 표면(`api.payment.*`, `api.cloudflare-domain.ts`, `api.cloudflare-deploy.ts`, `freeTrial.ts`, `cloudflarePages.ts`)을 감사. 가장 확실한 것(`api.cloudflare-deploy.ts`가 손상된 base64 파일 콘텐츠에 대해 안내 없는 원시 500으로 크래시)은 직접 재검증 후 수정·테스트 추가·커밋(`54326e0`). 아래는 확인은 했으나 손 안 댄 것:
+
+- **`freeTrial.ts`의 무료 생성 조회 함수와 증가 함수가 "Supabase 클라이언트 없음" 상황을 다르게 처리** — `getAccountGenerationsRemaining`(37-51번 줄)/`getV2AccountGenerationStatus`(141-156번 줄)는 `platformSupabase`가 없으면 조용히 `0`(또는 `{0,0}`)을 반환해 "무료 생성 소진"과 구분이 안 되는데, 반대로 `incrementAccountGenerationsUsed`(53-65번 줄)/`incrementV2AccountGenerationsUsed`(158-168번 줄)는 같은 조건에서 한국어 에러를 `throw`함 — 같은 파일 안에서 같은 전제 조건에 대한 처리가 반반으로 갈림. **왜 안 고쳤나**: 메터링 관련 코드는 `CORALRED_NEW_METERING` 플래그 동결 상태와 얽혀 있어(OVERNIGHT5_BLOCKED.md 참고) 무료 생성 카운트 로직에 손대는 건 이번 사이클의 "최소 변경" 범위를 넘는 위험 판단. **제안**: 조회 함수도 증가 함수처럼 명시적으로 throw하거나, 최소한 `null`/구분되는 값을 반환해 호출부(`hasGenerationsRemaining` 등)가 "설정 오류"와 "한도 소진"을 구분할 수 있게 하는 걸 사람이 판단 후 진행 권장.
+- **`freeTrial.ts`의 게스트(비로그인) 무료 생성 카운터가 localStorage read-modify-write로 원자성 없이 구현됨**(15-33번 줄 `incrementFreeGenerationsUsed`, 113-139번 줄 v2 버전) — 더블클릭이나 탭 2개를 동시에 열고 거의 동시에 생성을 트리거하면 둘 다 같은 이전 카운트를 읽고 같은 값으로 덮어써서 한 번의 생성이 카운트에서 누락될 수 있음(사용자에게 유리한 방향의 버그라 악용 우려는 낮지만, 반대로 서버 사이드 검증 없이 클라이언트가 전적으로 신뢰하는 구조라는 뜻이기도 함). **왜 안 고쳤나**: 마찬가지로 메터링 로직이라 위험 회피, 그리고 근본 수정(원자적 락 또는 서버 사이드 카운팅)이 최소 변경을 넘어서는 설계 결정. **제안**: 게스트 카운팅을 서버(쿠키/IP 기반) 또는 최소한 `BroadcastChannel`/`navigator.locks`로 탭 간 동기화하는 걸 검토 권장 — 단, 로그인 사용자 메터링(CORALRED_NEW_METERING) 정리가 먼저.
+- **`api.cloudflare-domain.ts:4`의 `DOMAIN_PATTERN`이 ASCII만 허용, 한글 도메인 입력 시 안내 부족** — 사용자가 한글 도메인(예: `내앱.com`)을 입력하면 일반적인 "도메인 주소가 올바르지 않아요. 예: myapp.com" 메시지만 뜨고 퓨니코드 변환이 필요하다는 안내가 없음. **왜 안 고쳤나**: 크래시가 아닌 낮은 우선순위 UX 갭이고, 한글 도메인 자체가 실사용 빈도가 낮을 것으로 추정돼 이번 사이클 우선순위에서 밀림. **제안**: 에러 메시지에 "한글 도메인은 punycode(xn--)로 변환해서 입력해주세요" 같은 안내 추가 정도로 시작 권장, 우선순위 낮음.
+- **`cloudflarePages.ts:269`의 무료 티어 배지 문구가 `"Made with 코랄레드"`(영어+한국어 혼용)** — 다른 "Made with X" 서비스들의 관용적 표현과 같은 패턴이라 의도적일 가능성이 높아 보임(확신도 낮음). **왜 기록만 하는지**: 버그라기보다 브랜딩 판단이 필요한 문구라 사람이 결정할 사안.
+
 ## 11. 배포 감사(사이클 12) — 영어 토스트 4개 파일은 고침, 나머지 1건은 판단 보류
 Explore 서브에이전트로 배포 표면(`app/components/deploy/*`)을 감사. 보고받은 3건 중 가장 확실한 것(GitHub/GitLab/Vercel/Netlify 배포 훅의 토스트/에러 문구가 CloudflareDeploy.client.tsx만 빼고 전부 영어)은 직접 재검증 후 4개 파일 전부 수정·테스트 추가·커밋(`f7c5d57`). 서브에이전트가 "double-click 레이스 컨디션"으로 보고한 건은 직접 코드 확인 결과 `DeployButton.tsx`가 5개 프로바이더 버튼 전부를 공유 `isDeploying` state로 동시에 disabled 처리하고 있어(Cloudflare 훅 내부의 재진입 가드는 오직 이 컴포넌트에서만 호출되는 defense-in-depth일 뿐, 실질적으로 막고 있는 다른 호출 경로가 없음) 실제 버그로 보기 어렵다고 판단해 수정 안 함. 아래 1건은 확인은 했으나 UX 설계 판단이 필요해 손 안 댐:
 
