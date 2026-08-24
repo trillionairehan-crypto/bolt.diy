@@ -286,3 +286,15 @@
 - **커밋**: `a967692`
 - **범위 밖으로 남긴 것(구조적/판단 필요, `OVERNIGHT5_IMPROVEMENTS.md` 항목 17로 기록)**: (1) 자동 감지 폴백의 `reset()`이 전체 파서 상태+공유 아티팩트 카운터를 초기화해 중복 액션 재실행 위험(런타임 미재현, 확신도 중). (2) 파일 쓰기 실패가 무음으로 삼켜지고 액션은 그대로 complete 표시. (3) type 속성 누락 액션이 아무 실행 없이 complete 표시(같은 패턴이지만 file 액션 건보다 영향 범위 작음). (4) 스트리밍 진행 상태 라벨(`api.chat.ts`) 6곳 하드코딩 영어. (5) 쉘 액션 코드 블록이 라이트 모드에서도 항상 dark-plus 테마 — 의도된 디자인일 가능성 있어 사람 확인 필요.
 - **다음 감사 영역**: 미리보기/워크벤치로 갱신.
+
+### [05:22] Phase 2 — 사이클 19 (감사 대상: 미리보기/워크벤치, 2회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 333/333 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/workbench/**`/`app/lib/stores/workbench.ts`/`app/lib/stores/previews.ts`를 재감사(이전 사이클에서 이미 고친 색상/모바일/터미널 탭 항목은 재보고 제외 지시). 보고받은 5건 전부 직접 Read/Grep으로 재검증.
+- **발견·수정(2건, 전부 검증 완료 후 수정)**:
+  1. `app/lib/stores/previews.ts:321-331`, `app/components/workbench/Workbench.client.tsx:418-429` — 파일 저장 후 "미리보기 새로고침" 기능이 `usePreviewStore()`가 지연 생성하는, `Promise.resolve({} as WebContainer)`로 초기화된 가짜 싱글턴을 호출하고 있었음. `WorkbenchStore`(`workbench.ts:42`)가 이미 실제 webcontainer와 연결된 `PreviewsStore` 인스턴스를 들고 있는데 완전히 다른 인스턴스를 매번 새로 만드는 구조. 이 가짜 스토어의 `#init()`(생성자에서 `.catch` 없이 호출됨, `previews.ts:93`)이 `await Promise.resolve({} as WebContainer)` 후 `{}.on(...)`을 호출해 던지므로 **파일을 저장할 때마다** unhandled promise rejection이 발생했고, `refreshAllPreviews()`는 항상 빈 `previews` 배열을 순회해 실제로는 아무 새로고침도 안 일어났음 → `WorkbenchStore`에 `refreshAllPreviews()` 메서드를 추가해 자신의 `#previewsStore`로 위임하도록 수정, `Workbench.client.tsx`는 `workbenchStore.refreshAllPreviews()`를 호출하도록 변경, 죽은 `usePreviewStore` import 제거.
+  2. `app/components/workbench/FileTree.tsx` — 업로드/삭제/파일·폴더 잠금·해제의 성공/예상된 실패(반환값 `false`) 토스트는 전부 한국어인데, 실제 예외가 발생하는 `catch` 경로 6곳(`Error uploading ${file.name}`, `` Error deleting ${isFolder ? 'folder' : 'file'} ``, `Error locking file`, `Error unlocking file`, `Error locking folder`, `Error unlocking folder`)만 영어로 하드코딩돼 있었음 → 같은 동작의 한국어 문구로 통일.
+- **테스트**: `app/workbenchPreviewRefreshAudit.spec.ts` 신규 3건, `app/fileTreeErrorToastKoreanAudit.spec.ts` 신규 2건(둘 다 소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 338/338 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `654e1e9`, `e234a86`
+- **범위 밖으로 남긴 것(구조적/확신도 낮음, `OVERNIGHT5_IMPROVEMENTS.md` 항목 18로 기록)**: (1) `Preview.tsx:694` 인스펙터 모드 클립보드 복사 promise에 `.catch` 없음(발생 조건 드묾). (2) `EditorPanel.tsx` 사이드바 탭("Files"/"Search"/"Locks")·저장/리셋 버튼("Save"/"Reset") 영어 — 사이클 11부터 알려진 항목, 다음 한국어 문구 감사 후보로 유지. (3) `Preview.tsx` 팝업/디바이스 프레임 미리보기 창 제목("... Preview", "(Landscape)"/"(Portrait)") 영어 — 브라우저 탭 제목 수준이라 영향도 낮게 판단.
+- **다음 감사 영역**: 배포로 갱신.

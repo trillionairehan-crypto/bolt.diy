@@ -1,5 +1,15 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 18. 미리보기/워크벤치 감사(사이클 19) — 미리보기 새로고침 크래시/FileTree 영어 토스트는 고침, 나머지 3건은 판단 보류
+Explore 서브에이전트로 `app/components/workbench/**`/`app/lib/stores/workbench.ts`/`app/lib/stores/previews.ts`를 재감사(이전 사이클에서 이미 고친 색상/모바일/터미널 탭 항목은 재보고 제외 지시). 보고받은 5건 전부 직접 Read/Grep으로 재검증, 가장 심각한 2건을 수정·테스트 추가·커밋:
+1. **파일 저장 후 미리보기 새로고침이 매번 unhandled promise rejection을 던지고 no-op이던 문제** — `usePreviewStore()`(`previews.ts:321-331`)가 지연 생성하는 싱글턴은 `Promise.resolve({} as WebContainer)`로 초기화돼 `WorkbenchStore`가 이미 들고 있는 실제 연결된 `PreviewsStore`(`workbench.ts:42`)와 완전히 무관했음. `Workbench.client.tsx`의 `onFileSave`가 이 가짜 스토어의 `refreshAllPreviews()`를 호출하면 내부 `#init()`이 `{}.on(...)`을 호출해 예외가 나는데, 생성자에서 `#init()`을 `.catch` 없이 호출(`previews.ts:93`)하므로 **매 파일 저장마다** unhandled rejection이 발생하고, "저장 후 미리보기 새로고침" 기능 자체는 항상 빈 배열을 순회해 아무 동작도 안 함 → `WorkbenchStore`에 `refreshAllPreviews()`를 추가해 이미 연결된 `#previewsStore`로 위임하도록 수정, 죽은 `usePreviewStore` import 제거 — `app/workbenchPreviewRefreshAudit.spec.ts` 신규 3건, 커밋 `654e1e9`.
+2. **`FileTree.tsx` 예외(catch) 토스트 6곳만 영어** — 업로드/삭제/파일·폴더 잠금·해제의 성공/예상된 실패 토스트는 한국어인데, 실제 예외가 발생하는 catch 경로만 `Error uploading ...`/`Error deleting ...` 등 영어로 남아있었음 → 같은 동작의 한국어 문구로 통일 — `app/fileTreeErrorToastKoreanAudit.spec.ts` 신규 2건, 커밋 `e234a86`.
+
+나머지 3건은 확인은 했으나 손 안 댐:
+- **`Preview.tsx:694` 인스펙터 모드 클립보드 복사 promise에 `.catch` 없음** — `navigator.clipboard.writeText(element.displayText).then(() => setSelectedElement?.(element))`가 클립보드 쓰기 실패(비보안 컨텍스트/권한 거부/iframe 제약) 시 unhandled rejection을 던지고 `setSelectedElement`가 안 불려 인스펙터 클릭이 조용히 아무 반응 없음. **왜 안 고쳤나**: 이번 사이클에서 이미 2건(미리보기 새로고침 크래시, FileTree 영어 토스트)을 고쳐 검증 게이트를 이미 두 번 통과시켰고, 이 건은 발생 조건(클립보드 API 실패)이 드물어 우선순위가 상대적으로 낮음 — 다음 사이클로 미룸. **제안**: `.catch(() => {})` 추가 또는 실패 시에도 `setSelectedElement?.(element)`는 호출하도록 분리(클립보드 복사는 부가 기능, 선택 자체는 실패해도 되면 안 됨).
+- **`EditorPanel.tsx` 사이드바 탭("Files"/"Search"/"Locks")과 저장/리셋 버튼("Save"/"Reset")이 영어** — 사이클 11부터 알려진 "`EditorPanel.tsx` 사이드바 탭/버튼 미번역" 항목(항목 15)과 동일 파일, 이번에 구체 위치(탭 99·107·115번 줄, 버튼 156·159번 줄) 재확인. **왜 안 고쳤나**: 범위가 이번 사이클에서 고친 것보다 넓어(파일당 최소 변경 원칙 유지 위해 이번엔 워크벤치 새로고침 크래시·FileTree 토스트로 한정) 다음 "한국어 문구" 감사 사이클 후보로 유지.
+- **`Preview.tsx`의 팝업/디바이스 프레임 미리보기 창 제목이 영어** — `501`번 줄 `` <title>${size.name} Preview</title> ``, `577`번 줄 `` `${size.name} ${isLandscape ? '(Landscape)' : '(Portrait)'}` ``. **왜 안 고쳤나**: 팝업창 자체의 제목/부제(브라우저 탭 제목, 사용자가 직접 클릭해서 보는 문구는 아님)라 영향도가 낮게 판단, 이번 사이클 범위 밖으로 남김. **제안**: `${size.name} 미리보기`, `(가로)`/`(세로)`로 교체.
+
 ## 17. 생성 감사(사이클 18, 2회차) — 액션 큐 영구 정지 크래시는 고침, 나머지 5건은 판단 보류
 Explore 서브에이전트로 `message-parser.ts`/`enhanced-message-parser.ts`/`action-runner.ts`/`workbench.ts`/`Artifact.tsx`/`api.chat.ts`를 재감사(사이클 10에서 이미 고친 항목·기록된 4건은 재보고 제외 지시). 보고받은 6건 중 가장 심각한 것(파일 액션에 `filePath`가 없으면 `undefined`인 채로 통과 → `WorkbenchStore#_runAction`의 `path.join(wc.workdir, undefined)`가 던지는 예외가 `#globalExecutionQueue` 프로미스 체인에 `.catch`가 없어 그대로 전파 → 그 뒤로는 `.then(() => callback())`이 콜백을 아예 안 부르고 reject만 전달해서 **세션이 끝날 때까지 모든 파일 쓰기/셸 실행이 조용히 no-op**이 되는 문제)는 Supabase의 filePath 누락 케이스(사이클 10에서 이미 throw로 처리됨)와 동일한 패턴으로 맞춰 직접 수정·테스트 추가·커밋(`a967692`). 나머지 5건은 확인은 했으나 최소 변경 범위를 벗어나 손 안 댐:
 
