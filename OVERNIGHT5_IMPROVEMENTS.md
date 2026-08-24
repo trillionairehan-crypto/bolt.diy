@@ -1,5 +1,14 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 15. 한국어 문구 감사(사이클 16) — 모델 선택기/코드 복사 버튼은 고침, 나머지는 범위 초과로 보류
+Explore 서브에이전트로 `app/components/**`/`app/routes/**`/`app/lib/**` 전체를 재검색, 이미 고쳐진 표면(온보딩/워크벤치/배포 훅/법률 페이지/모바일 폭)은 제외하고 신규 후보를 찾음. 가장 고빈도(모델 전환마다 열리는 `ModelSelector.tsx` 검색창·배지, 코드 블록마다 뜨는 `CodeBlock.tsx` 복사 버튼)만 고치고 테스트 추가·커밋(`5191796`). 아래는 확인은 했으나 범위가 커서(여러 파일·다수 문자열) 이번 사이클 범위를 넘어 손 안 댐:
+
+- **`FileTree.tsx` 우클릭 컨텍스트 메뉴 — 사이클 11에서 발견된 항목이 여전히 미해결**: 메뉴 라벨 8곳("New File"/"New Folder"/"Copy path"/"Copy relative path"/"Lock File"/"Unlock File"/"Lock Folder"/"Unlock Folder", 519·525·530-531·540·546·555·561번 줄)은 그대로 영어. 단 catch 블록 fallback 토스트 6곳(352·409·429·449·469·489번 줄, `Error uploading/deleting/locking/unlocking...`)은 이번에 처음 확인 — 성공 경로 토스트는 이미 한국어인데 실패 fallback만 영어로 남아있어 부분적으로만 고쳐진 상태로 보임. **제안**: 다음 워크벤치/한국어 문구 사이클에서 항목 9(이 개선 문서)와 묶어 14곳을 한 번에 번역 권장, 순수 문자열 치환이라 리스크 낮음.
+- **`EditorPanel.tsx` 사이드바 탭·버튼 — 사이클 11에서 발견된 항목이 여전히 미해결**: 탭 라벨 "Files"/"Search"/"Locks"(99·107·115번 줄), 버튼 "Save"/"Reset"(155·159번 줄) 그대로 영어. 코드 화면 방문 시 거의 항상 보이는 요소라 우선순위 높음.
+- **`GitCloneButton.tsx`/`ImportFolderButton.tsx` — 신규 발견**: 채팅 임포트 메뉴에서 저장소 클론/폴더 임포트 시 뜨는 `title="Clone a repo"`(174번 줄), `title="Import Folder"`(122번 줄)와 토스트 다수(`'Failed to import repository'`, `'No files found in the selected folder'`, `'No text files found in the selected folder'`, `` `Skipping ${n} binary files` ``, `'Folder imported successfully'`, `'Failed to import folder'`)가 전부 영어. **왜 안 고쳤나**: 2개 파일 7곳 이상이라 이번 사이클(이미 2개 파일 8곳 처리) 범위를 넘어섬. **제안**: 다음 한국어 문구 사이클 최우선 후보.
+- **`app/components/chat/DicussMode.tsx`(파일명 자체가 오타, Discuss 아님) — 죽은 코드로 확인**: `title="Discuss"`가 영어지만 이 컴포넌트는 앱 어디서도 import되지 않는 미사용 컴포넌트(grep 결과 정의부만 있고 사용처 없음) — 실사용자에게 도달 불가라 손 안 댐. 다음 정리 사이클에서 삭제 여부는 사람 판단 필요(향후 기능용으로 남겨둔 것인지 확인 안 됨).
+- `cloudflarePages.ts:269`의 `"Made with 코랄레드"` 혼용 배지는 이미 항목 12에 기록돼 있어 중복 기록 생략(여전히 미해결).
+
 ## 14. 모바일 감사(사이클 15, 2회차) — 고정 300px 폭 3건은 고침, 그리드/터치타겟 3건은 판단 보류
 Explore 서브에이전트로 `app/components/**`/`app/routes/**` 전체를 재검색, 이전 모바일 사이클(사이클 7)이 놓친 새 후보를 찾음. 가장 확실한 3건(`WebSearch.client.tsx`/`APIKeyManager.tsx`의 `w-[300px]` 고정 입력창, `FileBreadcrumb.tsx`의 `min-w-[300px]`가 `avoidCollisions={false}`와 겹쳐 화면 밖으로 밀릴 수 있던 드롭다운 — `ColorSchemeDialog.tsx`와 같은 "min-width가 max-width보다 우선"하는 CSS 특성 문제)은 `w-[min(300px,calc(100vw-Nrem))]` 패턴(기존 `Dialog.tsx:119`가 이미 쓰던 관용구)으로 수정·테스트 추가·커밋. 아래 3건은 확인했으나 손 안 댐:
 

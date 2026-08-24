@@ -1,5 +1,6 @@
-다음 감사 영역: 한국어 문구
+다음 감사 영역: 온보딩
 
+[완료] 한국어 문구 감사(사이클 16) — ModelSelector.tsx 프로바이더/모델 검색 placeholder·aria-label·클리어 버튼, 무료/선택됨 배지 title, CodeBlock.tsx 복사 버튼 title이 영어로 하드코딩돼있던 문제 → 한국어로 번역 — (사이클 16)
 [완료] Cloudflare 배포 API(api.cloudflare-deploy.ts)가 손상된 base64 파일 콘텐츠에 안내 없는 원시 500으로 크래시하던 문제 → try/catch로 감싸 친절한 한국어 400 응답 — (사이클 13)
 [완료] GitHub/GitLab/Vercel/Netlify 배포 훅(useXDeploy)의 토스트/throw Error 문구가 CloudflareDeploy.client.tsx만 빼고 전부 영어 → 4개 파일 전부 한국어로 통일 — (사이클 12)
 [완료] ExpoQrModal.tsx 안내 문구 3곳이 전부 영어(제목/설명/URL 없음 안내) → 한국어로 번역 — (사이클 11)

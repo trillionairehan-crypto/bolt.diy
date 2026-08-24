@@ -253,3 +253,16 @@
 - **검증**: `corepack pnpm vitest run` 327/327 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
 - **범위 밖으로 남긴 것(구조적/확신도 낮음, `OVERNIGHT5_IMPROVEMENTS.md` 항목 14로 기록)**: (1) `GitHubStats.tsx`/`StatusDashboard.tsx`의 `grid-cols-4`/`grid-cols-3`이 반응형 변형 없음(형제 블록은 이미 `md:grid-cols-4` 패턴을 쓰는데 일부만 놓침) — 실사용 빈도 낮은 설정 세부 화면이라 우선순위 낮게 기록. (2) WebSearch/APIKeyManager의 Fetch/Save 버튼 `px-3 py-1.5`가 36px 미만 터치타겟(확신도 낮음, 폭 수정만 이번에 반영).
 - **다음 감사 영역**: 한국어 문구로 갱신.
+
+### [04:44] Phase 2 — 사이클 16 (감사 대상: 한국어 문구)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 327/327 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 수정 금지 파일) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/**`/`app/routes/**`/`app/lib/**`를 대상으로 하드코딩 영어 UI 문구(토스트, 버튼 라벨, aria-label, placeholder, title)와 어색한 한국어 문구를 재검색(이미 정리된 표면은 제외 지시). 보고받은 8건 전부 직접 Read/Grep으로 재검증.
+- **변경(2건, 전부 검증 완료 후 수정)**:
+  1. `app/components/chat/ModelSelector.tsx` — 프로바이더/모델 검색 드롭다운(모델 전환마다 열리는 핵심 표면)의 `placeholder="Search providers/models..."`, `aria-label="Search providers/models"`, `aria-label="Clear search"`(2곳), 무료/선택됨 배지 `title="Free model"`/`title="Selected"` 전부 영어였음 → 한국어로 번역.
+  2. `app/components/chat/CodeBlock.tsx:74` — AI가 만드는 거의 모든 코드 블록에 뜨는 복사 버튼 `title="Copy Code"` → `title="코드 복사"`.
+- **재검증 결과 skip한 것**: 서브에이전트가 보고한 `DicussMode.tsx`(파일명 오타)의 `title="Discuss"`는 grep으로 사용처를 확인한 결과 앱 어디서도 import되지 않는 죽은 컴포넌트라 실사용자에게 도달 불가 — 손 안 댐.
+- **테스트**: `app/modelSelectorKoreanAudit.spec.ts` 신규 4건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm vitest run` 331/331 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `5191796`
+- **범위 밖으로 남긴 것(범위 초과, `OVERNIGHT5_IMPROVEMENTS.md` 항목 15로 기록)**: (1) `FileTree.tsx` 우클릭 메뉴 8곳 + catch fallback 토스트 6곳(사이클 11부터 알려진 항목, 여전히 미해결) — 다음 사이클 최우선 후보. (2) `EditorPanel.tsx` 사이드바 탭/버튼(마찬가지로 사이클 11부터 미해결). (3) `GitCloneButton.tsx`/`ImportFolderButton.tsx` 신규 발견 — title 2곳 + 토스트 6곳 영어.
+- **다음 감사 영역**: 온보딩으로 갱신(전체 목록 한 바퀴 완료 후 처음으로 복귀).
