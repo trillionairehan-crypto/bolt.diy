@@ -421,33 +421,42 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                    * Shared between both branches below so the alerts/progress/free-trial-notice/
                    * ChatBox wiring (30+ props) isn't duplicated — only the surrounding chrome
                    * (headline, card centering, StickToBottom's own className) differs by state.
+                   *
+                   * Split into messagesSection/inputSection (rather than one combined chunk) so the
+                   * chatStarted branch below can give messagesSection its own bounded, independently
+                   * scrolling box while inputSection sits outside it as a plain flex sibling — see the
+                   * chatStarted ternary a bit further down for why (input bar reachability fix).
                    */
-                  const chatBoxSection = (
+                  const messagesSection = (
+                    <StickToBottom.Content className="flex flex-col gap-4 relative ">
+                      <ClientOnly>
+                        {() => {
+                          return chatStarted ? (
+                            <Messages
+                              className="flex flex-col w-full flex-1 max-w-chat pb-4 mx-auto z-1"
+                              messages={messages}
+                              parsedMessages={parsedMessages}
+                              isStreaming={isStreaming}
+                              append={append}
+                              chatMode={chatMode}
+                              setChatMode={setChatMode}
+                              provider={provider}
+                              model={model}
+                              addToolOutput={addToolOutput}
+                            />
+                          ) : null;
+                        }}
+                      </ClientOnly>
+                      <ScrollToBottom />
+                    </StickToBottom.Content>
+                  );
+
+                  const inputSection = (
                     <>
-                      <StickToBottom.Content className="flex flex-col gap-4 relative ">
-                        <ClientOnly>
-                          {() => {
-                            return chatStarted ? (
-                              <Messages
-                                className="flex flex-col w-full flex-1 max-w-chat pb-4 mx-auto z-1"
-                                messages={messages}
-                                parsedMessages={parsedMessages}
-                                isStreaming={isStreaming}
-                                append={append}
-                                chatMode={chatMode}
-                                setChatMode={setChatMode}
-                                provider={provider}
-                                model={model}
-                                addToolOutput={addToolOutput}
-                              />
-                            ) : null;
-                          }}
-                        </ClientOnly>
-                        <ScrollToBottom />
-                      </StickToBottom.Content>
                       <div
-                        className={classNames('my-auto flex flex-col gap-2 w-full max-w-chat mx-auto z-prompt mb-6', {
-                          'sticky bottom-2': chatStarted,
+                        className={classNames('flex flex-col gap-2 w-full max-w-chat mx-auto z-prompt mb-6', {
+                          'my-auto': !chatStarted,
+                          'flex-shrink-0 mt-2': chatStarted,
                         })}
                       >
                         <div className="flex flex-col gap-2">
@@ -550,10 +559,19 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                     </>
                   );
 
+                  // Only the !chatStarted (landing) branch needs the two pieces glued back together.
+                  const chatBoxSection = (
+                    <>
+                      {messagesSection}
+                      {inputSection}
+                    </>
+                  );
+
                   return (
                     <div
                       className={classNames('relative overflow-hidden', {
                         'flex flex-col items-center justify-center px-4 py-16': !chatStarted,
+                        'h-full flex flex-col min-h-0': chatStarted,
                       })}
                       style={!chatStarted ? { background: '#FF5330', minHeight: '88vh' } : undefined}
                     >
@@ -562,7 +580,11 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           {() => <CoralredHero onFocusPrompt={() => textareaRef?.current?.focus()} />}
                         </ClientOnly>
                       )}
-                      <div className="flex flex-col min-w-0 relative z-10 w-full">
+                      <div
+                        className={classNames('flex flex-col min-w-0 relative z-10 w-full', {
+                          'h-full min-h-0': chatStarted,
+                        })}
+                      >
                         {!chatStarted ? (
                           <div className="w-full mx-auto flex flex-col items-center" style={{ maxWidth: 760 }}>
                             <div id="intro" className="flex flex-col items-center text-center mb-7 animate-fade-in">
@@ -591,13 +613,25 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                             </p>
                           </div>
                         ) : (
-                          <StickToBottom
-                            className="pt-6 px-2 sm:px-6 relative h-full flex flex-col modern-scrollbar"
-                            resize="smooth"
-                            initial="smooth"
-                          >
-                            {chatBoxSection}
-                          </StickToBottom>
+                          <div className="relative h-full flex flex-col min-h-0">
+                            {/*
+                              messagesSection gets its own bounded (flex-1 min-h-0) box so it — and
+                              only it — scrolls; inputSection sits outside as a flex-shrink-0
+                              sibling, so it's always on screen instead of relying on `position:
+                              sticky` inside an ancestor that (further up) has `overflow-hidden` for
+                              the landing hero's decorative tiles. Sticky's containing block would
+                              resolve to that non-scrolling ancestor and never engage, so the bar
+                              just scrolled away with the messages — this is the fix for that.
+                            */}
+                            <StickToBottom
+                              className="flex-1 min-h-0 flex flex-col pt-6 px-2 sm:px-6 modern-scrollbar"
+                              resize="smooth"
+                              initial="smooth"
+                            >
+                              {messagesSection}
+                            </StickToBottom>
+                            {inputSection}
+                          </div>
                         )}
                         <div className="flex flex-col justify-center">
                           {!chatStarted && SHOW_DEV_TOOLS && (
