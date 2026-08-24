@@ -128,19 +128,23 @@ export const FileTree = memo(
     };
 
     const onCopyPath = (fileOrFolder: FileNode | FolderNode) => {
-      try {
-        navigator.clipboard.writeText(fileOrFolder.fullPath);
-      } catch (error) {
-        logger.error(error);
-      }
+      navigator.clipboard
+        .writeText(fileOrFolder.fullPath)
+        .then(() => toast.success('경로를 복사했어요'))
+        .catch((error) => {
+          logger.error(error);
+          toast.error('경로를 복사하지 못했어요');
+        });
     };
 
     const onCopyRelativePath = (fileOrFolder: FileNode | FolderNode) => {
-      try {
-        navigator.clipboard.writeText(fileOrFolder.fullPath.substring((rootFolder || '').length));
-      } catch (error) {
-        logger.error(error);
-      }
+      navigator.clipboard
+        .writeText(fileOrFolder.fullPath.substring((rootFolder || '').length))
+        .then(() => toast.success('경로를 복사했어요'))
+        .catch((error) => {
+          logger.error(error);
+          toast.error('경로를 복사하지 못했어요');
+        });
     };
 
     if (filteredFileList.length === 0) {
@@ -515,20 +519,18 @@ function FileContextMenu({
             <ContextMenu.Group className="p-1 border-b-px border-solid border-bolt-elements-borderColor">
               <ContextMenuItem onSelect={() => setIsCreatingFile(true)}>
                 <div className="flex items-center gap-2">
-                  <div className="i-ph:file-plus" />
-                  New File
+                  <div className="i-ph:file-plus" />새 파일
                 </div>
               </ContextMenuItem>
               <ContextMenuItem onSelect={() => setIsCreatingFolder(true)}>
                 <div className="flex items-center gap-2">
-                  <div className="i-ph:folder-plus" />
-                  New Folder
+                  <div className="i-ph:folder-plus" />새 폴더
                 </div>
               </ContextMenuItem>
             </ContextMenu.Group>
             <ContextMenu.Group className="p-1">
-              <ContextMenuItem onSelect={onCopyPath}>Copy path</ContextMenuItem>
-              <ContextMenuItem onSelect={onCopyRelativePath}>Copy relative path</ContextMenuItem>
+              <ContextMenuItem onSelect={onCopyPath}>경로 복사</ContextMenuItem>
+              <ContextMenuItem onSelect={onCopyRelativePath}>상대 경로 복사</ContextMenuItem>
             </ContextMenu.Group>
             {/* Add lock/unlock options for files and folders */}
             <ContextMenu.Group className="p-1 border-t-px border-solid border-bolt-elements-borderColor">
@@ -537,13 +539,13 @@ function FileContextMenu({
                   <ContextMenuItem onSelect={handleLockFile}>
                     <div className="flex items-center gap-2">
                       <div className="i-ph:lock-simple" />
-                      Lock File
+                      파일 잠금
                     </div>
                   </ContextMenuItem>
                   <ContextMenuItem onSelect={handleUnlockFile}>
                     <div className="flex items-center gap-2">
                       <div className="i-ph:lock-key-open" />
-                      Unlock File
+                      파일 잠금 해제
                     </div>
                   </ContextMenuItem>
                 </>
@@ -552,13 +554,13 @@ function FileContextMenu({
                   <ContextMenuItem onSelect={handleLockFolder}>
                     <div className="flex items-center gap-2">
                       <div className="i-ph:lock-simple" />
-                      Lock Folder
+                      폴더 잠금
                     </div>
                   </ContextMenuItem>
                   <ContextMenuItem onSelect={handleUnlockFolder}>
                     <div className="flex items-center gap-2">
                       <div className="i-ph:lock-key-open" />
-                      Unlock Folder
+                      폴더 잠금 해제
                     </div>
                   </ContextMenuItem>
                 </>
