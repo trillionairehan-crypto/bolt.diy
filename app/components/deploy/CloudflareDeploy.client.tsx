@@ -1,6 +1,7 @@
 import { toast } from 'react-toastify';
 import { useStore } from '@nanostores/react';
 import { useState } from 'react';
+import type { WebContainer } from '@webcontainer/api';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { webcontainer } from '~/lib/webcontainer';
 import { path } from '~/utils/path';
@@ -9,6 +10,73 @@ import { chatId } from '~/lib/persistence/useChatHistory';
 import { description } from '~/lib/persistence';
 import { formatBuildFailureOutput } from './deployUtils';
 import { recordDeployedApp } from '~/lib/deployedApps';
+import { supabaseConnection } from '~/lib/stores/supabase';
+import { isServiceRoleKey } from '~/lib/supabase/keyRole';
+
+const ENV_FILE_PATH = '.env';
+
+/**
+ * Vite inlines VITE_* env vars at build time, so this has to run before `npm run build` — writing
+ * the connected Supabase credentials directly rather than trusting that the AI already wrote a
+ * matching .env for this chat's current connection (it's instructed to, in new-prompt.ts, but only
+ * when the message that triggered generation had a connection already selected; connecting later
+ * via the wizard doesn't retroactively touch already-written project files). Deploying without a
+ * connection is untouched — an unconnected app must keep working in its sample-data mode, so this
+ * only ever adds/updates the two Supabase keys, never the file's absence or its other lines.
+ *
+ * Hard-refuses to inject (throws, aborting the whole deploy) if the stored anon key turns out to
+ * decode as a service_role key — a second checkpoint independent of the one in
+ * useSupabaseConnection's handleSimpleConnect, since that only guards the wizard's own input path.
+ */
+async function injectSupabaseEnv(container: WebContainer): Promise<void> {
+  const { credentials } = supabaseConnection.get();
+  const supabaseUrl = credentials?.supabaseUrl;
+  const anonKey = credentials?.anonKey;
+
+  if (!supabaseUrl || !anonKey) {
+    return;
+  }
+
+  if (isServiceRoleKey(anonKey)) {
+    throw new Error('저장 기능 키가 올바르지 않아요. 코랄레드 팀에 문의해주세요.');
+  }
+
+  let existingContent = '';
+
+  try {
+    existingContent = new TextDecoder().decode(await container.fs.readFile(ENV_FILE_PATH));
+  } catch {
+    // No .env yet — fine, we'll create one with just these two lines.
+  }
+
+  const desired: Record<string, string> = {
+    VITE_SUPABASE_URL: supabaseUrl,
+    VITE_SUPABASE_ANON_KEY: anonKey,
+  };
+  const remainingKeys = new Set(Object.keys(desired));
+
+  const lines = existingContent.split('\n').map((line) => {
+    const match = line.match(/^([A-Za-z_][A-Za-z0-9_]*)=/);
+    const key = match?.[1];
+
+    if (key && key in desired) {
+      remainingKeys.delete(key);
+      return `${key}=${desired[key]}`;
+    }
+
+    return line;
+  });
+
+  while (lines.length > 0 && lines[lines.length - 1].trim() === '') {
+    lines.pop();
+  }
+
+  for (const key of remainingKeys) {
+    lines.push(`${key}=${desired[key]}`);
+  }
+
+  await container.fs.writeFile(ENV_FILE_PATH, lines.join('\n') + '\n');
+}
 
 /**
  * Cloudflare Pages project names allow only lowercase letters, digits and hyphens (max 58 chars).
@@ -69,6 +137,9 @@ export function useCloudflareDeploy() {
 
       const deployArtifact = workbenchStore.artifacts.get()[deploymentId];
 
+      const container = await webcontainer;
+      await injectSupabaseEnv(container);
+
       deployArtifact.runner.handleDeployAction('building', 'running', { source: 'cloudflare' });
 
       const actionId = 'build-' + Date.now();
@@ -94,7 +165,6 @@ export function useCloudflareDeploy() {
 
       deployArtifact.runner.handleDeployAction('deploying', 'running', { source: 'cloudflare' });
 
-      const container = await webcontainer;
       const buildPath = buildOutput.path.replace('/home/project', '');
 
       let finalBuildPath = buildPath;

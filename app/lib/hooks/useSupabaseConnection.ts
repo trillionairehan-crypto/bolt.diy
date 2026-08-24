@@ -11,6 +11,7 @@ import {
   fetchProjectApiKeys,
   initializeSupabaseConnection,
 } from '~/lib/stores/supabase';
+import { isServiceRoleKey } from '~/lib/supabase/keyRole';
 
 export function useSupabaseConnection() {
   const connection = useStore(supabaseConnection);
@@ -127,6 +128,13 @@ export function useSupabaseConnection() {
 
     if (anonKey.length < 20) {
       setSimpleConnectError('anon key가 올바르지 않아요. 다시 확인해주세요.');
+      return false;
+    }
+
+    if (isServiceRoleKey(anonKey)) {
+      setSimpleConnectError(
+        'service_role 키는 여기 넣으면 안 돼요. Project Settings → API Keys에서 "anon" "public" 키를 다시 복사해주세요.',
+      );
       return false;
     }
 
