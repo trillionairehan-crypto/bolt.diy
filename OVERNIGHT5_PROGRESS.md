@@ -1,0 +1,91 @@
+# overnight5 진행 기록
+
+브랜치: `overnight5` (base: `overnight4` @ `b7805a3`)
+시작: 2026-08-25
+
+## ⚠️ 먼저 읽어야 할 것 — 브랜치/회차 번호 불일치
+
+이 지시문이 말하는 "어젯밤(overnight4) 작업 목록"은 실제로 `overnight4` 브랜치의 **초기** 7개 커밋(`27ad450`~`c2aa617`, 리포트는 `OVERNIGHT-REPORT-4.md`)까지만 가리킴. 그런데 이 브랜치엔 그 뒤로 **같은 세션 안에서 두 회차가 더 진행**돼서 총 22개 커밋이 더 쌓여 있음:
+
+- **"5차"**(`756ed82`~`ceec3a3`, 15개 커밋, `OVERNIGHT-REPORT-5.md`): Cloudflare 배포 URL 안정화(정확히 이 지시문의 "원클릭 배포" 항목의 후속 버그 수정), 배포 드롭다운 정리, Supabase 연결 마법사 신규 구축, 배포 시 Supabase 키 주입, 배포 완료 화면 안내, 마이그레이션 SQL 정리, Supabase 연결 진입점이 헤더에 없던 버그 수정, 브랜드 일관성(초록색→코랄, 아이콘, 용어) 수정.
+- **"6차"**(`221a8d0`~`b7805a3`, 7개 커밋, `OVERNIGHT-REPORT-6.md`, `CLOUD-DESIGN.md`): "코랄레드 Cloud" — Supabase 가입 없이 쓰는 자체 저장 백엔드를 처음부터 설계·구현(DB 스키마, 서버 API, 클라이언트 SDK, 시스템 프롬프트 2트랙화, UI 통합, 적대적 보안 테스트 48건).
+
+즉 이 지시문의 "완료 여부 확인 대상" 체크리스트는 여전히 유효한 항목들이지만(그 부분은 이후 두 회차가 거의 안 건드림), **이 브랜치는 이미 그 체크리스트보다 훨씬 앞서 있음**. 새로 만든 `overnight5` 브랜치는 이 22개 커밋을 전부 포함한 지점에서 시작함 — 아침에 헷갈리지 않도록 여기 명시.
+
+가장 보수적인 선택으로 판단: 브랜치는 지시대로 새로 만들되(git 히스토리상 문제 없음), 체크리스트는 원래 의도대로(overnight4의 원 스코프) 검증하고, 그 이후 발견되는 새 버그는 지시문의 우선순위 규칙대로 큐에 넣어 처리함.
+
+## 베이스라인
+
+- `pnpm test`: **249/249 통과** (16개 파일). `cloudBuildSecurity.spec.ts`가 실제 프로덕션 빌드를 한 번 돌려서 52초 정도 걸림 — 나머지는 1초 내외.
+- `pnpm run build`: **성공**.
+- `pnpm run typecheck`: **에러 0건** (보호 파일 3개 포함, 기존 에러도 없음 — 지시문은 "기존 에러 무시"라고 했지만 실제로 하나도 없어서 무시할 것 자체가 없음).
+
+## Phase 0 — 어젯밤(overnight4) 작업 목록 검증 결과
+
+| 항목 | 상태 | 근거 |
+|---|---|---|
+| 소셜 로그인 아이콘(카카오/구글) | ✅ 완료 확인 | `SocialAuthButtons.tsx`에 `KakaoSymbol`/`GoogleSymbol` 그대로 존재 |
+| 원클릭 Cloudflare 배포 + Made with 배지 | ✅ 완료, 게다가 개선됨 | 어젯밤엔 해시 프리뷰 URL 버그가 있었는데("5차"에서 발견·수정 완료, 커밋 `756ed82`) 지금은 결정론적 `{project}.pages.dev` 반환. 배지는 여전히 무조건 주입(티어 시스템 없음, 아래 계속) |
+| 커스텀 도메인 연결(Pro 게이트) | ⚠️ 부분 — 게이트가 하드코딩 잠금 | `CustomDomainConnect.tsx:9`의 `TODO_IS_PRO_USER = false`가 그대로 — 전원 잠금(안전한 기본값이지만 기능 자체를 아무도 못 씀). 실제 티어 조회 로직이 없어서 못 고침(구조적 블록, 아래 BLOCKED에 기록) |
+| 다크모드 설정 탭 정리 | ✅ 완료(@settings/ 범위 내) / ⚠️ 범위 밖 잔여 | @settings/ 9개 파일은 완료. `bolt-elements-*-dark`(존재하지 않는 CSS 변수라 조용히 무효화되는 죽은 참조) 패턴이 `GitHubDeploymentDialog.tsx`/`GitLabDeploymentDialog.tsx`/`ui/Tooltip.tsx`/`ui/Badge.tsx` 등 14개 파일에 여전히 남음 — 실사용 버그는 아님(앞의 non-dark 토큰이 이미 반응형이라 시각적으로는 정상 동작), 죽은 코드 정리 항목으로 큐에 넣음 |
+| 품질 감사 12개 표면 | ✅ 대부분 완료 / ⚠️ 명시적으로 보류된 5개 항목 그대로 | `Preview.tsx`의 "창 크기" 드롭다운(하드코딩 보라 `#6D28D9`, 회색 `#111827`/`#6B7280`/`#F5EEFF`), `Workbench.client.tsx:555-557`의 "저장" 동기화 드롭다운(`bg-white dark:bg-[#141414]`, `border-gray-200/50`) 둘 다 grep으로 재확인 — 여전히 미수정. 둘 다 실사용자가 보는 화면이라 Phase 1 큐에 추가 |
+| A5 미터링 수정 검증 | ❌ 여전히 미검증/동결 | `CORALRED_NEW_METERING`(`featureFlags.ts:11`) 여전히 `false`. 두 마이그레이션(`message_metering_v2`, `deployed_apps`) 미적용 확정(이 세션이 만든 `RUN-1-metering.sql`/`RUN-2-deployed-apps.sql`이 아직 저장소 루트에 커밋 안 된 채로 남아있음 — 성민이 아직 안 돌린 것으로 추정). 플래그를 켜면 마이그레이션 없이 RPC 실패 → 로그인 사용자 전체 생성 차단 장애. 그대로 동결 유지(재시도 안 함 — 구조적으로 DB 적용이 선행돼야 함) |
+| 이전 "미검증" 수정들(체크포인트 되돌리기 등) | ❌ 여전히 브라우저 필요 | 코드 레벨 재검증만 가능, 실제 클릭 흐름은 이 세션 권한 밖 |
+
+**결론**: 새로 발견된 "실제 버그"는 없음(전부 이미 알려진 미완 항목). Phase 1 큐는 아래.
+
+## Phase 1 큐 (우선순위순)
+
+1. ~~돈 걸린 것~~ — 없음(메터링은 액션 불가, 동결 유지가 맞는 판단)
+2. **[진행] Preview.tsx 창 크기 드롭다운 하드코딩 색상** — 사용자가 미리보기를 열 때마다 보는 표면, 코랄 브랜드와 안 맞는 bolt.diy 잔재 보라색
+3. **[진행] Workbench.client.tsx 저장 동기화 드롭다운 하드코딩 색상** — 마찬가지로 상시 노출 표면
+4. **[대기] `bolt-elements-*-dark` 죽은 토큰 참조 14개 파일** — 실사용 버그 아님(우선순위 낮음), 시간 남으면 진행
+5. **[대기] GitHub/GitLab 배포 다이얼로그 영어 문구** — 세미-개발자용, 파일 크고 범위 넓음
+
+## 진행 기록
+
+### [01:20] 문제 1 — Preview.tsx "창 크기" 드롭다운 하드코딩 색상
+- **원인**: overnight4 품질 감사에서 "범위가 커서" 보류됐던 항목. bolt.diy 잔재 보라(`#6D28D9`)/회색(`#111827`,`#6B7280`,`#F5EEFF`,`#E5E7EB`) 하드코딩 6곳 + 부수로 발견한 영어 문구 4곳("Open in new tab/window", "Show Device Frame", "Landscape Mode").
+- **변경**: `bolt-elements-*`/`--accent` 토큰으로 교체, 영어 문구 한국어로. 파일: `app/components/workbench/Preview.tsx`.
+- **테스트**: `Preview.colors.spec.ts` 신규 6건(소스 내용 검증 — 이 코드베이스에 컴포넌트 렌더 테스트 인프라가 없어서 overnight5/6 세션의 기존 관행대로 소스/빌드 산출물 grep 방식 채택).
+- **검증**: typecheck/lint/test(255개)/build 전부 통과.
+- **커밋**: `ccafd7d`
+
+### [01:23] 문제 2 — Workbench.client.tsx "저장" 동기화 드롭다운 하드코딩 색상
+- **원인**: 같은 파일 안 바로 위(체크포인트 되돌리기 드롭다운)는 이미 토큰을 쓰는데, "저장" 드롭다운만 `bg-white dark:bg-[#141414]`/`border-gray-200/50 dark:border-gray-800/50`로 남아있던 불일치.
+- **변경**: 형제 드롭다운과 동일하게 `bg-[var(--surface-2)]`/`border-bolt-elements-borderColor`로 통일. 파일: `Workbench.client.tsx`.
+- **테스트**: `Workbench.colors.spec.ts` 신규 2건.
+- **검증**: typecheck/lint/test(257개)/build 전부 통과.
+- **커밋**: `a89d0ee`
+
+### [01:32] 문제 3 — `bolt-elements-*-dark` 죽은 토큰 참조 12개 파일
+- **원인**: overnight4가 @settings/ 안 2개 파일에서 찾아 고쳤던 패턴(`--bolt-elements-X-dark`가 `variables.scss`에 없는 CSS 변수라 조용히 무효화됨)이 @settings/ 밖 `app/components/ui/*` 12개 파일에 그대로 남아있던 것 — 실사용 버그는 아님(앞의 non-dark 토큰이 이미 테마 반응형), 죽은 코드 정리.
+- **변경**: `sed -E` 정규식으로 `dark:X-Y-dark`(옵션 `/투명도`, `hover:`/`data-[state=active]:` 복합 선택자 포함) 패턴만 정확히 제거 — 다른 정상적인 `dark:` 변형(예: `dark:bg-bolt-elements-background-depth-4/50`)은 안 건드림. 적용 전 3개 파일로 dry-run 검증 후 12개 파일 일괄 적용.
+- **테스트**: `deadDarkTokens.spec.ts` 신규 12건(파일별 소스 검사).
+- **검증**: typecheck/lint/test(269개)/build 전부 통과. 시각적 변화 없음(죽은 코드 제거라 회귀 리스크 없음).
+- **범위 밖으로 남긴 것**: `GitHubDeploymentDialog.tsx`(42곳)/`GitLabDeploymentDialog.tsx`(41곳) — 같은 패턴이지만 파일이 크고(1000줄 내외) 영어 문구 문제와 같이 다뤄야 해서 별도 작업으로 분리.
+- **커밋**: `f06ca52`
+
+### [01:36] 문제 4 — `GitHubDeploymentDialog.tsx`/`GitLabDeploymentDialog.tsx`의 같은 죽은 토큰 (일부만)
+- **원인**: 문제 3과 동일 패턴, 두 큰 파일(1041줄/764줄)에 각각 42/41곳 — 문제 3에서 검증된 sed 정규식을 dry-run으로 먼저 두 파일 각각 diff 미리보기 확인(예상 개수와 diff 라인 수 일치 확인) 후 적용.
+- **범위**: 죽은 토큰 제거만 진행. 같은 파일들의 영어 문구 전체 번역(오래전부터 "범위가 커서" 보류돼온 별개 항목)은 이번에도 손 안 댐 — 세미개발자용 화면이고 1000줄 가까운 파일을 통째로 번역하는 건 "최소 변경" 원칙을 벗어나는 별도 작업으로 판단.
+- **테스트**: `app/components/deploy/deadDarkTokens.spec.ts` 신규 2건.
+- **검증**: typecheck/lint/test(271개)/build 전부 통과.
+- **커밋**: `6d88330`
+
+**Phase 1 큐 소진.** Phase 2(무한 검증 루프)로 전환.
+
+### [01:42] Phase 2 — 사이클 1 (감사 대상: 온보딩)
+- **발견**: `PromptClarification.tsx`(온보딩 질문 화면)가 `ACCENT = '#FF5330'`을 하드코딩 — 이 값이 정확히 라이트 모드 `--accent`와 같아서 라이트 모드에선 안 보였지만, `variables.scss`의 다크 테마는 `--accent`를 다른(더 밝은) oklch 값으로, `--on-accent`를 `var(--bg)`(어두운 텍스트)로 설정함 — 이 화면은 그 어느 쪽도 안 따르고 있었음. 같은 파일 안 호버 상태 2곳은 이미 `var(--accent)`를 정상적으로 쓰고 있어서 나머지 7곳만 놓친 것으로 보임.
+- **변경**: 7곳 전부 `var(--accent)`로, 버튼 2곳의 `text-white`는 `text-[var(--on-accent)]`로 교체.
+- **테스트**: `PromptClarification.colors.spec.ts` 신규 4건.
+- **검증**: typecheck/lint/test(275개)/build 전부 통과.
+- **커밋**: `4769e51`
+
+### [01:47] Phase 2 — 사이클 2 (감사 대상: 생성)
+- **발견**: 같은 `#FF5330` 하드코딩 패턴이 `Artifact.tsx`(빌드 진행 바)와 `Messages.client.tsx`(생성 중 3점 타이핑 인디케이터 — 감싸는 알약 배경은 이미 `var(--accent-soft)`/`var(--accent-text)`를 정상적으로 쓰는데 점 3개만 하드코딩)에도 있었음.
+- **변경**: 두 파일 전부 `var(--accent)`로 교체.
+- **부가 조사**: `#FF5330`을 앱 전체에서 재검색하니 20개 파일이 더 나옴 — 대부분 랜딩 히어로(`BaseChat.tsx`/`Header.tsx`, 다크모드 무관하게 항상 코랄인 게 기존에도 의도된 설계), 로고, meta theme-color, hue 룩업 테이블(`paletteToHue.ts`/`answer-directives.ts`) 등 **의도적으로 고정 브랜드색**인 것들로 보임 — 전부 훑지 않고 판단 필요한 항목으로 개선 제안에 기록(무차별 일괄 치환은 랜딩 디자인을 깨뜨릴 위험).
+- **테스트**: `generationIndicators.colors.spec.ts` 신규 2건.
+- **검증**: typecheck/lint/test(277개)/build 전부 통과.
+- **커밋**: `5858f4c`
