@@ -1,5 +1,10 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 31. 생성 감사(사이클 34, 4회차) — 스트리밍 중복 버그는 고침, 공유 샘플러 드롭 위험은 판단 보류
+Explore 서브에이전트로 `message-parser.ts`/`action-runner.ts`/`workbench.ts`/`useMessageParser.ts`/`Artifact.tsx`/`api.chat.ts`를 재감사(사이클 10·18·26에서 이미 기록된 8건은 재보고 제외 지시). 확신도 high인 것(`EnhancedStreamingMessageParser.parse()`가 자동 파일감지 발동 시 증분 반환 계약을 깨고 스트리밍마다 채팅 텍스트를 중복 누적시키던 문제)은 직접 Read로 재검증 후 수정·테스트 추가·커밋(`5d0b275`). 아래 1건은 확인만 하고 손 안 댐:
+
+- **`app/lib/stores/workbench.ts`의 `actionStreamSampler`가 `WorkbenchStore` 인스턴스당 공유 단일 샘플러라 액션별로 구분되지 않음** — `createSampler`로 만든 이 샘플러는 100ms 안에 여러 액션의 스트림 업데이트가 들어오면, `lastArgs`에 마지막으로 저장된 액션의 인자만 기준으로 트레일링 콜이 발동해 다른 액션의 중간 업데이트가 조용히 드롭될 수 있음(최종 `onActionClose` 시점의 완전한 쓰기는 액션별로 정상 수행되는 것으로 보여, 데이터 손실보다는 워크벤치 UI/미리보기 중간 표시가 잠깐 튀는 정도로 추정). **왜 안 고쳤나**: 두 액션이 정확히 100ms 창 안에 동시 스트리밍되는 상황을 재현하지 못했고(확신도 low-medium), 고치려면 액션ID별로 샘플러를 분리(Map으로 관리)해야 하는데 이 샘플러의 원래 도입 의도(성능 최적화 트레이드오프)를 함께 검토할 필요가 있어 최소 변경 범위를 벗어난다고 판단. **제안**: 다음 생성 또는 미리보기/워크벤치 감사 사이클에서, 여러 파일을 한 번에 만드는 프롬프트로 재현을 시도한 뒤 실제로 UI 튐이 발생하면 액션ID 키로 샘플러 인스턴스를 Map으로 분리하는 방향 검토 권장.
+
 ## 25. 모바일 감사(사이클 31, 3회차) — 워크벤치 팝오버 고정폭은 고침, 나머지 3건은 판단 보류
 Explore 서브에이전트로 `app/components/workbench/**`, `app/components/deploy/**`, `app/components/header/**` 등을 재감사(이전 모바일 사이클들이 이미 고친 `w-[300px]` 류 폭 문제·`avoidCollisions`·설정/팔레트 다이얼로그 오버플로는 재보고 제외 지시). 보고받은 항목 중 가장 확신도 높은 것(`Workbench.client.tsx`의 "바뀐 파일" Popover가 고정 320px, Headless UI Popover라 Radix와 달리 충돌 회피 로직이 없고 overflow-hidden 조상 안에 포탈 없이 절대 위치라 클리핑 위험)만 기존 `w-[min(Npx,calc(100vw-Mrem))]` 관용구로 수정·테스트 추가·커밋(`67b2470`). 나머지는 확인만 하고 손 안 댐:
 

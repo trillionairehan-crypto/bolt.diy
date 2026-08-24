@@ -456,3 +456,14 @@
 - **커밋**: `7c82be5`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 30으로 기록)**: (1) `PromptClarification.tsx`의 진행률 바가 `'waitingForDynamic'` 상태에서 동적 질문 도착 시 분모가 커지며 순간적으로 뒤로 가는 문제(확신도 medium-high, 진행률 계산 로직 재설계 필요). (2) `ChatBox.tsx` 드래그오버 테두리가 인라인으로 `#1488fc` 하드코딩돼 랜딩 팔레트/다크모드와 무관하게 항상 파란색으로 뜨는 문제(확신도 medium, 시각적 영향만). 나머지 2건(`StarterTemplates.tsx` 영어 문구, `ExamplePrompts.tsx`)은 `SHOW_DEV_TOOLS` 플래그로 현재 도달 불가능한 죽은 코드라 기록만 하고 손 안 댐.
 - **다음 감사 영역**: 생성으로 갱신.
+
+### [08:20] Phase 2 — 사이클 34 (감사 대상: 생성, 4회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 374/374 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `message-parser.ts`/`action-runner.ts`/`workbench.ts`/`useMessageParser.ts`/`Artifact.tsx`/`api.chat.ts`를 재감사(사이클 10·18·26에서 이미 기록된 구조적 항목 8건은 재보고 제외 지시). 보고받은 2건 중 확신도 high인 1건을 직접 Read로 소스 추적해 재검증.
+- **발견**: `app/lib/runtime/enhanced-message-parser.ts`의 `parse()`가 `super.parse()`(증분/delta 반환이 계약인 베이스 클래스)를 호출한 뒤, 코드블록 자동 파일감지(`_detectAndWrapCodeBlocks`, 9번째 사이클 개선 문서에 기록된 "정식 boltArtifact 태그 없이 파일경로+코드블록만 보내는 경우 자동으로 파일로 인식"하는 기능)가 한 번이라도 발동하면 `this.reset()` 후 `enhancedInput` 전체를 처음부터 다시 파싱해 그 결과(메시지 "전체" 텍스트)를 그대로 반환하고 있었음. 소비자인 `useMessageParser.ts:83`(수정 전)은 `(prevParsed[index] || '') + newParsedContent`로 이 반환값이 항상 "새로 나온 부분만"이라고 가정하고 계속 덧붙이고 있어서, 자동 파일감지가 한 번 발동한 뒤로는 스트리밍 틱마다 채팅 텍스트가 지수적으로 중복 누적되는 문제였음. `EnhancedStreamingMessageParser`는 `useMessageParser.ts`에서만 쓰여 계약 변경의 파급 범위가 한정적임을 grep으로 확인.
+- **변경**: `enhanced-message-parser.ts` — 내부적으로 메시지별 "지금까지의 전체 파싱 결과"(`_fullOutput` 맵)를 추적하도록 재설계해 `parse()`가 항상 전체 텍스트를 반환하도록 계약 변경(일반 텍스트만 있는 흔한 경로는 내부적으로 델타를 누적해 전체를 재구성하므로 동작·성능 변화 없음). `reset()`을 파싱 상태 초기화(`_resetParserState`, 내부 재시도 시 사용)와 전체 출력 초기화(외부 명시적 reset 시에만 `_fullOutput` 클리어)로 분리해, 내부 자동 재시도가 실수로 캐시된 전체 출력까지 지우지 않도록 함. `useMessageParser.ts` — 소비 측을 append(`+`)에서 set(`=`)으로 수정.
+- **테스트**: `app/lib/runtime/enhanced-message-parser.spec.ts` 신규 2건 — 문자 단위 스트리밍 시뮬레이션으로 매 틱의 반환 길이가 그 시점까지의 원본 입력 길이를 절대 넘지 않는지 검증(예전 버그라면 이 불변식이 깨짐), `reset()` 후 새 메시지가 이전 출력 없이 깨끗하게 시작하는지 검증.
+- **검증**: `corepack pnpm vitest run` 376/376 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `5d0b275`
+- **범위 밖으로 남긴 것**: 서브에이전트가 보고한 2번째 항목(`workbench.ts`의 `actionStreamSampler`가 `WorkbenchStore`당 공유 인스턴스라 두 액션이 100ms 안에 동시 스트리밍되면 한쪽의 중간 업데이트가 드롭될 수 있는 문제, 확신도 low-medium, 최종 `onActionClose` 쓰기는 정상 동작해 UI 프리뷰 반짝임 정도로 추정)은 재현·확신도가 낮아 기록만 하고 손 안 댐.
+- **다음 감사 영역**: 미리보기/워크벤치로 갱신.
