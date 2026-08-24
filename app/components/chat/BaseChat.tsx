@@ -32,6 +32,7 @@ import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import LlmErrorAlert from './LLMApiAlert';
 import { getGenerationsRemaining } from '~/lib/freeTrial';
+import { createScopedLogger } from '~/utils/logger';
 import { authUserStore } from '~/lib/stores/auth';
 import PromptClarification from './PromptClarification';
 import type { GenerationDirectives } from '~/lib/onboarding/answer-directives';
@@ -53,6 +54,8 @@ const Workbench = lazy(() =>
 );
 
 const TEXTAREA_MIN_HEIGHT = 76;
+
+const logger = createScopedLogger('BaseChat');
 
 const LANDING_STEPS = [
   { number: '01', title: '말해요', description: '만들고 싶은 걸 한국어로 설명해요' },
@@ -173,16 +176,21 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
   ) => {
     const TEXTAREA_MAX_HEIGHT = chatStarted ? 400 : 200;
     const authUser = useStore(authUserStore);
-    const [freeGenerationsRemaining, setFreeGenerationsRemaining] = useState(0);
+    const [freeGenerationsRemaining, setFreeGenerationsRemaining] = useState<number | null>(null);
 
     useEffect(() => {
       let cancelled = false;
 
-      getGenerationsRemaining().then((remaining) => {
-        if (!cancelled) {
-          setFreeGenerationsRemaining(remaining);
-        }
-      });
+      getGenerationsRemaining()
+        .then((remaining) => {
+          if (!cancelled) {
+            setFreeGenerationsRemaining(remaining);
+          }
+        })
+        .catch((error) => {
+          // Leave freeGenerationsRemaining as null (unknown) rather than showing "0 left" on a transient error.
+          logger.error('Failed to load free generation count', error);
+        });
 
       return () => {
         cancelled = true;
@@ -495,22 +503,24 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           )}
                         </div>
                         {progressAnnotations && <ProgressCompilation data={progressAnnotations} />}
-                        <p
-                          className={classNames('text-xs px-1', { 'text-right': !chatStarted })}
-                          style={{ color: '#FAF7F0', opacity: 0.75, display: chatStarted ? 'none' : undefined }}
-                        >
-                          {freeGenerationsRemaining > 0 ? (
-                            <span key="remaining">무료 체험 {freeGenerationsRemaining}회 남았어요</span>
-                          ) : (
-                            <span key="exhausted">
-                              무료 체험을 다 썼어요. 계속하려면{' '}
-                              <a href="/pricing" style={{ color: '#FAF7F0', textDecoration: 'underline' }}>
-                                요금제
-                              </a>
-                              를 확인해주세요
-                            </span>
-                          )}
-                        </p>
+                        {freeGenerationsRemaining !== null && (
+                          <p
+                            className={classNames('text-xs px-1', { 'text-right': !chatStarted })}
+                            style={{ color: '#FAF7F0', opacity: 0.75, display: chatStarted ? 'none' : undefined }}
+                          >
+                            {freeGenerationsRemaining > 0 ? (
+                              <span key="remaining">무료 체험 {freeGenerationsRemaining}회 남았어요</span>
+                            ) : (
+                              <span key="exhausted">
+                                무료 체험을 다 썼어요. 계속하려면{' '}
+                                <a href="/pricing" style={{ color: '#FAF7F0', textDecoration: 'underline' }}>
+                                  요금제
+                                </a>
+                                를 확인해주세요
+                              </span>
+                            )}
+                          </p>
+                        )}
                         <ChatBox
                           isModelSettingsCollapsed={isModelSettingsCollapsed}
                           setIsModelSettingsCollapsed={setIsModelSettingsCollapsed}
