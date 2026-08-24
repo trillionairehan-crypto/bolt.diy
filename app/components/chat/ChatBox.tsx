@@ -384,7 +384,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               </div>
             ) : null}
             <div className="shrink-0">
-              <SupabaseConnection />
+              <SupabaseConnection showLabel={isLanding} />
             </div>
             <ClientOnly>
               {() => (

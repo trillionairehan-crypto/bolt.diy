@@ -6,7 +6,11 @@ import { chatId } from '~/lib/persistence/useChatHistory';
 import { fetchSupabaseStats } from '~/lib/stores/supabase';
 import { Dialog, DialogRoot, DialogClose, DialogTitle, DialogButton } from '~/components/ui/Dialog';
 
-export function SupabaseConnection() {
+interface SupabaseConnectionProps {
+  showLabel?: boolean;
+}
+
+export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps) {
   const {
     connection: supabaseConn,
     connecting,
@@ -82,18 +86,21 @@ export function SupabaseConnection() {
           active
           disabled={connecting}
           onClick={() => setIsDialogOpen(!isDialogOpen)}
-          className="hover:bg-bolt-elements-item-backgroundActive !text-white flex items-center gap-2"
+          className={classNames(
+            'hover:bg-bolt-elements-item-backgroundActive !text-white flex items-center gap-2 whitespace-nowrap',
+            { '!px-2': !showLabel },
+          )}
           title={isConnected ? '저장 기능이 켜졌어요' : '앱에 로그인과 저장 기능을 쓰려면 연결이 필요해요'}
         >
           <img
-            className="w-4 h-4"
+            className="w-4 h-4 shrink-0"
             height="20"
             width="20"
             crossOrigin="anonymous"
             src="https://cdn.simpleicons.org/supabase"
             alt=""
           />
-          <span className="ml-1 text-xs">{isConnected ? '연결됨' : '저장 기능 켜기'}</span>
+          {showLabel && <span className="ml-1 text-xs">{isConnected ? '연결됨' : '저장 기능 켜기'}</span>}
         </Button>
       </div>
 
