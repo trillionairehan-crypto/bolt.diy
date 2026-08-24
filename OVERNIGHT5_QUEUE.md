@@ -1,5 +1,6 @@
-다음 감사 영역: 온보딩
+다음 감사 영역: 생성
 
+[완료] 온보딩 감사(사이클 17, 3회차) — PromptClarification.tsx `buildFinalPromptAndDirectives`가 앱별 동적 질문에서 "잘 모르겠어요"를 선택해도 고정 질문과 달리 무시하지 않고 "질문: 잘 모르겠어요" 문구를 그대로 생성 프롬프트에 추가하던 문제 → optionId==='unsure' 체크 추가 — (사이클 17)
 [완료] 한국어 문구 감사(사이클 16) — ModelSelector.tsx 프로바이더/모델 검색 placeholder·aria-label·클리어 버튼, 무료/선택됨 배지 title, CodeBlock.tsx 복사 버튼 title이 영어로 하드코딩돼있던 문제 → 한국어로 번역 — (사이클 16)
 [완료] Cloudflare 배포 API(api.cloudflare-deploy.ts)가 손상된 base64 파일 콘텐츠에 안내 없는 원시 500으로 크래시하던 문제 → try/catch로 감싸 친절한 한국어 400 응답 — (사이클 13)
 [완료] GitHub/GitLab/Vercel/Netlify 배포 훅(useXDeploy)의 토스트/throw Error 문구가 CloudflareDeploy.client.tsx만 빼고 전부 영어 → 4개 파일 전부 한국어로 통일 — (사이클 12)

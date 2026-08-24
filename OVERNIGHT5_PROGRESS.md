@@ -266,3 +266,13 @@
 - **커밋**: `5191796`
 - **범위 밖으로 남긴 것(범위 초과, `OVERNIGHT5_IMPROVEMENTS.md` 항목 15로 기록)**: (1) `FileTree.tsx` 우클릭 메뉴 8곳 + catch fallback 토스트 6곳(사이클 11부터 알려진 항목, 여전히 미해결) — 다음 사이클 최우선 후보. (2) `EditorPanel.tsx` 사이드바 탭/버튼(마찬가지로 사이클 11부터 미해결). (3) `GitCloneButton.tsx`/`ImportFolderButton.tsx` 신규 발견 — title 2곳 + 토스트 6곳 영어.
 - **다음 감사 영역**: 온보딩으로 갱신(전체 목록 한 바퀴 완료 후 처음으로 복귀).
+
+### [05:00] Phase 2 — 사이클 17 (감사 대상: 온보딩, 3회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 331/331 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 수정 금지 파일) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `PromptClarification.tsx`/`BaseChat.tsx`/`Chat.client.tsx`(온보딩 완료 경로)/`generateAppQuestions.ts`/`ChatBox.tsx`를 재감사, 사이클 1·9에서 이미 고친 항목은 재보고 제외 지시. 보고받은 5건(신규) 전부 직접 Read로 재검증.
+- **발견·수정(1건, 검증 완료 후 수정)**: `PromptClarification.tsx`의 `buildFinalPromptAndDirectives` — 고정 질문은 "잘 모르겠어요"(value===null)를 `mapAnswerToDirectives`의 기본 케이스에서 의도적으로 무시(EMPTY, `answer-directives.ts`에 명시된 설계)하는데, 앱별 동적(isDynamic) 질문은 이 예외가 없어서 "잘 모르겠어요"를 선택해도 `"${question.question} ${answer.label}"`(예: "매매 방식은 어떻게 되나요? 잘 모르겠어요") 형태의 무의미한 줄이 그대로 생성 프롬프트("추가로 알려주신 내용")에 들어가고 있었음. `answer.optionId === 'unsure'` 체크를 custom/isDynamic 분기보다 먼저 추가해 빈 객체를 반환하도록 수정.
+- **테스트**: `app/onboardingUnsureAnswerAudit.spec.ts` 신규 1건(소스 검사 — 'unsure' 체크가 존재하고 dynamic 분기보다 먼저 오는지 확인).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 332/332 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `c66f00e`
+- **범위 밖으로 남긴 것(구조적, `OVERNIGHT5_IMPROVEMENTS.md` 항목 16으로 기록)**: (1) 이미지만 업로드하고 텍스트 없이 첫 메시지를 보내면 전송 버튼은 활성화되는데 아무 반응 없는 막다른 골목(`ChatBox.tsx`/`Chat.client.tsx`의 `sendMessage`가 업로드 파일을 안 봄). (2) `selectOption`의 220ms 지연 확인 애니메이션이 "직접 입력" 제출/"바로 만들기" 스킵과 경쟁 상태(레이스 컨디션으로 답변이 조용히 덮어써지거나 언마운트된 컴포넌트에 setState). (3) 온보딩 완료 직후 짧은 순간 이전 입력창 텍스트가 남아 재전송 가능(항목 7과 근본 원인 겹침). 셋 다 여러 핸들러/상태 전환 순서를 함께 바꿔야 하는 구조적 수정이라 이번 사이클 범위를 넘어섬.
+- **다음 감사 영역**: 생성으로 갱신.
