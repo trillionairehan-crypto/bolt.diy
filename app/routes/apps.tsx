@@ -4,6 +4,7 @@ import { useStore } from '@nanostores/react';
 import { Logo } from '~/components/ui/Logo';
 import { authUserStore } from '~/lib/stores/auth';
 import { getDeployedApps, type DeployedAppRecord } from '~/lib/deployedApps';
+import { CustomDomainConnect } from '~/components/deploy/CustomDomainConnect';
 import coralredUiCssUrl from '~design-handoff/coralred-ui.css?url';
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: coralredUiCssUrl }];
@@ -85,27 +86,29 @@ export default function Apps() {
       {authUser && apps !== null && apps.length > 0 && (
         <section className="cr-stack-16">
           {apps.map((app) => (
-            <div
-              key={app.id}
-              className="cr-card cr-row-16"
-              style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}
-            >
-              <div className="cr-stack-8" style={{ minWidth: 0 }}>
-                <div className="cr-row-8">
-                  <h2 className="cr-h2">{app.app_name}</h2>
-                  <span className="cr-badge">{PROVIDER_LABEL[app.provider] ?? app.provider}</span>
+            <div key={app.id} className="cr-stack-8">
+              <div className="cr-card cr-row-16" style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
+                <div className="cr-stack-8" style={{ minWidth: 0 }}>
+                  <div className="cr-row-8">
+                    <h2 className="cr-h2">{app.app_name}</h2>
+                    <span className="cr-badge">{PROVIDER_LABEL[app.provider] ?? app.provider}</span>
+                  </div>
+                  <a href={app.url} target="_blank" rel="noreferrer" className="cr-mono">
+                    {app.url}
+                  </a>
+                  <p className="cr-caption">{formatDeployedAt(app.deployed_at)}에 배포됨</p>
+                  {app.provider === 'cloudflare' && (
+                    <p className="cr-caption">채팅에서 배포하기를 다시 누르면 같은 주소로 업데이트돼요.</p>
+                  )}
                 </div>
-                <a href={app.url} target="_blank" rel="noreferrer" className="cr-mono">
-                  {app.url}
+                <a href={`/chat/${app.chat_id}`} className="cr-btn outline" style={{ flexShrink: 0 }}>
+                  {app.provider === 'cloudflare' ? '다시 배포하기' : '채팅으로 돌아가기'}
                 </a>
-                <p className="cr-caption">{formatDeployedAt(app.deployed_at)}에 배포됨</p>
-                {app.provider === 'cloudflare' && (
-                  <p className="cr-caption">채팅에서 배포하기를 다시 누르면 같은 주소로 업데이트돼요.</p>
-                )}
               </div>
-              <a href={`/chat/${app.chat_id}`} className="cr-btn outline" style={{ flexShrink: 0 }}>
-                {app.provider === 'cloudflare' ? '다시 배포하기' : '채팅으로 돌아가기'}
-              </a>
+
+              {app.provider === 'cloudflare' && app.project_name && (
+                <CustomDomainConnect projectName={app.project_name} />
+              )}
             </div>
           ))}
         </section>

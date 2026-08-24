@@ -308,3 +308,55 @@ export async function deployToCloudflarePages(params: {
     projectName,
   };
 }
+
+/*
+ * Custom domains — endpoint shapes confirmed from the official `cloudflare` npm SDK bundled inside
+ * wrangler (node_modules/wrangler/wrangler-dist/cli.js, resources/pages/projects/domains.mjs:
+ * POST/GET/DELETE/PATCH `/accounts/{account_id}/pages/projects/{project}/domains[/{domain}]`).
+ * Wrangler's own CLI doesn't have a `pages domain` subcommand, so unlike the Direct Upload flow
+ * above there's no in-repo usage to confirm the exact response field names (status enum,
+ * validation_data/CNAME target shape) against — this was NOT exercised against the live API this
+ * session (no Cloudflare token available with confirmed DNS/domain-edit scope, and live calls were
+ * out of scope). The CNAME guidance shown to the user is deliberately generic and provider-agnostic
+ * rather than parsed from a response field this hasn't verified, so it stays correct regardless.
+ */
+
+export interface CustomDomainStatus {
+  domain: string;
+
+  /** Cloudflare's own enum; only 'active' is treated as "done" — everything else reads as pending. */
+  status: string;
+}
+
+export async function addCustomDomain(
+  accountId: string,
+  apiToken: string,
+  projectName: string,
+  domain: string,
+): Promise<CustomDomainStatus> {
+  const result = await cfFetch<{ name: string; status: string }>(
+    `/accounts/${accountId}/pages/projects/${projectName}/domains`,
+    apiToken,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: domain }),
+    },
+  );
+
+  return { domain: result.name, status: result.status };
+}
+
+export async function getCustomDomainStatus(
+  accountId: string,
+  apiToken: string,
+  projectName: string,
+  domain: string,
+): Promise<CustomDomainStatus> {
+  const result = await cfFetch<{ name: string; status: string }>(
+    `/accounts/${accountId}/pages/projects/${projectName}/domains/${encodeURIComponent(domain)}`,
+    apiToken,
+  );
+
+  return { domain: result.name, status: result.status };
+}

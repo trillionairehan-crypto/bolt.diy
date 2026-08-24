@@ -11,6 +11,7 @@ export interface DeployedAppRecord {
   app_name: string;
   url: string;
   provider: string;
+  project_name: string | null;
   deployed_at: string;
 }
 
@@ -28,6 +29,9 @@ export async function recordDeployedApp(params: {
   appName: string;
   url: string;
   provider: string;
+
+  /** Cloudflare Pages project name, when provider is 'cloudflare' — see the migration's own comment. */
+  projectName?: string;
 }): Promise<void> {
   if (!authUserStore.get() || !platformSupabase) {
     return;
@@ -58,6 +62,7 @@ export async function recordDeployedApp(params: {
       app_name: params.appName,
       url: params.url,
       provider: params.provider,
+      project_name: params.projectName ?? null,
     });
 
     if (error) {
@@ -75,7 +80,7 @@ export async function getDeployedApps(): Promise<DeployedAppRecord[]> {
 
   const { data, error } = await platformSupabase
     .from('deployed_apps')
-    .select('id, chat_id, app_name, url, provider, deployed_at')
+    .select('id, chat_id, app_name, url, provider, project_name, deployed_at')
     .order('deployed_at', { ascending: false });
 
   if (error) {

@@ -19,6 +19,12 @@ create table if not exists public.deployed_apps (
   app_name text not null,
   url text not null,
   provider text not null,
+  -- Cloudflare Pages project name (e.g. "coralred-app-<chatId>"), null for other providers.
+  -- overnight4 A3: needed so /apps' custom-domain UI calls the Pages domains API against the
+  -- exact project the deploy actually created, rather than recomputing a name from chat_id — which
+  -- is NOT always the same string used at deploy time (recordDeployedApp resolves chat_id to the
+  -- routable urlId when it can, which can differ from the raw id toProjectName() hashed).
+  project_name text,
   deployed_at timestamptz not null default now()
 );
 

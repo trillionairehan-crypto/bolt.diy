@@ -154,6 +154,7 @@ export function useCloudflareDeploy() {
         appName: description.get() || 'Untitled',
         url: data.url,
         provider: 'cloudflare',
+        projectName,
       });
 
       toast.success('배포가 끝났어요!');

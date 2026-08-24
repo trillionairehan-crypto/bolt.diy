@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  addCustomDomain,
   CloudflareDeployError,
   deployToCloudflarePages,
+  getCustomDomainStatus,
   hashFileContent,
   injectMadeWithBadge,
 } from './cloudflarePages';
@@ -226,5 +228,48 @@ describe('deployToCloudflarePages', () => {
     await expect(
       deployToCloudflarePages({ accountId: 'acc', apiToken: 'tok', projectName: 'proj', files }),
     ).rejects.toMatchObject({ status: 403 });
+  });
+});
+
+describe('custom domains', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('addCustomDomain posts the domain and returns its initial status', async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      expect(input.toString()).toBe('https://api.cloudflare.com/client/v4/accounts/acc/pages/projects/proj/domains');
+      return jsonResponse({ success: true, result: { name: 'myapp.com', status: 'pending' } });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await addCustomDomain('acc', 'tok', 'proj', 'myapp.com');
+    expect(result).toEqual({ domain: 'myapp.com', status: 'pending' });
+  });
+
+  it('addCustomDomain surfaces a 403 (missing DNS/domain-edit permission) as CloudflareDeployError', async () => {
+    const fetchMock = vi.fn(async () =>
+      jsonResponse(
+        { success: false, errors: [{ code: 10000, message: 'Authentication error' }] },
+        { ok: false, status: 403 },
+      ),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(addCustomDomain('acc', 'tok', 'proj', 'myapp.com')).rejects.toMatchObject({ status: 403 });
+    await expect(addCustomDomain('acc', 'tok', 'proj', 'myapp.com')).rejects.toBeInstanceOf(CloudflareDeployError);
+  });
+
+  it('getCustomDomainStatus reports active once validated', async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      expect(input.toString()).toBe(
+        'https://api.cloudflare.com/client/v4/accounts/acc/pages/projects/proj/domains/myapp.com',
+      );
+      return jsonResponse({ success: true, result: { name: 'myapp.com', status: 'active' } });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await getCustomDomainStatus('acc', 'tok', 'proj', 'myapp.com');
+    expect(result.status).toBe('active');
   });
 });
