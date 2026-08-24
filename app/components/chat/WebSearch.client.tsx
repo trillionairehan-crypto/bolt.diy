@@ -86,15 +86,15 @@ export function WebSearch({ onSearchResult, disabled = false, showLabel = true }
       const result = (await response.json()) as WebSearchResponse;
 
       if (!response.ok || !result.success || !result.data) {
-        throw new Error(result.error || 'Failed to fetch URL content');
+        throw new Error(result.error || '웹페이지 내용을 가져오지 못했어요');
       }
 
       onSearchResult(formatSearchResult(result.data));
-      toast.success('URL content fetched');
+      toast.success('웹페이지 내용을 가져왔어요');
       setUrl('');
       setIsOpen(false);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to fetch URL');
+      toast.error(error instanceof Error ? error.message : '주소를 가져오지 못했어요');
     } finally {
       setIsSearching(false);
     }
@@ -156,7 +156,7 @@ export function WebSearch({ onSearchResult, disabled = false, showLabel = true }
               'disabled:opacity-50 disabled:cursor-not-allowed',
             )}
           >
-            {isSearching ? 'Fetching...' : 'Fetch'}
+            {isSearching ? '가져오는 중...' : '가져오기'}
           </button>
         </div>
       )}
