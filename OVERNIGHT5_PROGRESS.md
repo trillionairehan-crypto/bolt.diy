@@ -114,3 +114,12 @@
 - **커밋**: `cf6f6d9`
 - **범위 밖으로 남긴 것**: `IMPROVEMENTS.md` 항목 1의 나머지 파일들(랜딩/법률 페이지 등, 개별 판단 필요), `bg-white` 하드코딩(다이얼로그 배경, 이번 버그와 다른 패턴이라 손 안 댐).
 - **다음 감사 영역**: 요금제/결제로 갱신.
+
+### [03:05] Phase 2 — 사이클 5 (감사 대상: 요금제/결제)
+- **베이스라인 재확인**: `pnpm vitest run` 282/282 통과, `pnpm run build` 성공(client+server). `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음 — 이전 사이클들의 판단대로 이번에도 손 안 댐(이 파일은 "수정 금지"로 취급).
+- **감사 범위**: `pricing.tsx`(읽기 전용 확인만) 외에 결제/요금제와 실제로 연결된 표면 전부 — `api.payment.verify.ts`, `api.payment.webhook.ts`, `CustomDomainConnect.tsx` + `api.cloudflare-domain.ts`, `cloudflarePages.ts`의 Made-with 배지, `freeTrial.ts`, 헤더/사이드바의 "요금제" 링크, 설정 탭.
+- **발견 1 (오탐)**: Grep 도구 출력에서 `Header.tsx`/`Menu.client.tsx`의 `href="/pricing"`이 `href="\pricing"`(백슬래시)로 보여서 실제 버그인가 의심했으나, `Read` 도구로 원본 바이트를 직접 확인하니 정상적인 `/pricing`이었음 — Grep 콘텐츠 출력 렌더링 특이 현상으로 판단, 실제 코드엔 문제 없음.
+- **발견 2 (구조적, 코드 수정 안 함)**: `api.cloudflare-domain.ts`/`api.cloudflare-deploy.ts` 모두 요청자의 로그인 여부·프로젝트 소유권을 확인하는 코드가 전혀 없음. `CustomDomainConnect.tsx`의 `TODO_IS_PRO_USER` 게이트는 클라이언트 렌더링만 막을 뿐이라, `projectName`을 아는 사람이면 API에 직접 요청해 커스텀 도메인 연결·배포를 트리거할 수 있는 구조(단, 이 환경엔 `CLOUDFLARE_ACCOUNT_ID`/`CLOUDFLARE_API_TOKEN`이 없어 503으로 막혀있음 — 프로덕션 설정 여부는 확인 불가). 앱 전체에 요청 인증 미들웨어 자체가 안 보여서 이 두 파일만 땜질하는 건 "최소 변경" 원칙과 일관성을 둘 다 벗어남 — `OVERNIGHT5_IMPROVEMENTS.md` 항목 4로 기록, 사람 판단 필요(우선순위 높음으로 표시).
+- **나머지**: `api.payment.verify.ts`/`api.payment.webhook.ts`는 이미 자체 주석으로 "미완성 스켈레톤, pricing.tsx 연동 대기"라고 명시돼 있어 기존 기록과 일치 — 새로운 문제 아님. `CustomDomainConnect.tsx` 자체 로직(폴링, 재시도, 에러 메시지)은 검토 결과 문제 없음. `freeTrial.ts`는 메터링 동결 상태 그대로, 이번 사이클에서 손 안 댐.
+- **코드 변경 없음** — 이번 사이클은 감사만 진행, 커밋은 문서(QUEUE/PROGRESS/REPORT)만.
+- **다음 감사 영역**: 다크모드로 갱신.
