@@ -566,7 +566,7 @@ export const Menu = () => {
               <a
                 href="/apps"
                 title="내 앱"
-                className="flex items-center justify-center w-8 h-8 rounded-md text-xl text-[#666] hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive/10 transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-xl text-[#666] dark:text-gray-500 hover:text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive/10 transition-colors"
               >
                 <span className="i-ph:rocket-launch" />
               </a>
