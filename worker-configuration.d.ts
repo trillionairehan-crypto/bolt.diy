@@ -25,4 +25,7 @@ interface Env {
   PORTONE_WEBHOOK_SECRET: string;
   CLOUDFLARE_API_TOKEN: string;
   CLOUDFLARE_ACCOUNT_ID: string;
+  CLOUD_SUPABASE_URL: string;
+  CLOUD_SUPABASE_SERVICE_KEY: string;
+  CLOUD_APP_TOKEN_SECRET: string;
 }
