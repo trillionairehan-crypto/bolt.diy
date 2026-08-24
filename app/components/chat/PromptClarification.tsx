@@ -50,6 +50,15 @@ function buildFinalPromptAndDirectives(
     }
 
     /*
+     * "잘 모르겠어요" means silence for fixed questions too (see mapAnswerToDirectives's default
+     * cases) — without this check, dynamic questions would leak a useless "질문: 잘 모르겠어요"
+     * line into the generation prompt instead of adding nothing like the fixed-question path does.
+     */
+    if (answer.optionId === 'unsure') {
+      return {};
+    }
+
+    /*
      * Free-text fallback ("직접 입력") and every app-specific (isDynamic) question have no fixed
      * id answer-directives.ts knows about — both become a plain "질문: 답변" line instead, same
      * as the old behavior. Only the 4 fixed questions go through mapAnswerToDirectives.
