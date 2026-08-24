@@ -1,5 +1,10 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 23. 온보딩 감사(사이클 25) — ScrollToBottom/WebSearch 영어 문구는 고침, `Chat.client.tsx` 원본 에러 노출은 판단 보류
+Explore 서브에이전트로 `app/components/chat/**` 온보딩 진입 흐름을 재감사(사이클 11·17에서 이미 고친 PromptClarification 항목은 재보고 제외 지시). 보고받은 3건 중 확신도 high 2건(`BaseChat.tsx` ScrollToBottom 버튼, `WebSearch.client.tsx` URL 가져오기 팝오버)은 직접 재검증 후 수정·테스트 추가·커밋(`82dc2ea`). 아래 1건은 확인은 했으나 확신도 medium(재현 조건이 IndexedDB 실패라 낮은 빈도)이라 손 안 댐:
+
+- **`Chat.client.tsx:102` — 메시지 저장 실패 시 원본 JS 예외 메시지를 그대로 토스트에 노출** — `storeMessageHistory(messages).catch((error) => toast.error(error.message))`가 메시지 수가 `initialMessages.length`를 넘자마자(첫 생성 턴 직후, 온보딩 인접 경로) 호출되는데, IndexedDB 저장 실패 시 `error.message`(예: `"Failed to execute ... on 'IDBObjectStore'"` 같은 영어 브라우저 예외 문구)가 그대로 한국어 UI의 토스트에 뜸. 같은 파일의 다른 에러 경로(예: 생성 게이트)는 이미 번역된 고정 문구를 쓰는 것과 대조적. **왜 안 고쳤나**: 재현하려면 실제 IndexedDB 실패(브라우저 저장공간 초과, 프라이빗 모드 제약 등)가 필요해 발생 빈도를 확신하기 어렵고, 고정 한국어 문구로 바꾸면 실제 디버깅에 필요한 원인 정보가 사라지는 트레이드오프도 있어 판단 보류. **제안**: `toast.error('대화 저장에 실패했어요')`처럼 고정 한국어 문구로 바꾸고, `error.message`는 `console.error`로만 남기는 방향 검토(다른 catch 경로들과 동일한 패턴).
+
 ## 22. 한국어 문구 감사(사이클 24, 2회차) — 프로필 탭은 고침, 나머지 6건은 분량이 많아 다음 사이클로 이월
 Explore 서브에이전트로 `app/components/**`, `app/routes/**`, `app/lib/**`를 재감사(사이클 16에서 이미 고친 항목은 재보고 제외 지시). 보고받은 7건 중 노출 빈도가 가장 높은 `ProfileTab.tsx`(설정 > 프로필 탭 전체가 라벨/placeholder/토스트까지 100% 영어)만 직접 재검증 후 전체 번역·테스트 추가·커밋(`867a4c0`). 나머지 6건은 분량이 많아(특히 아래 3번) 한 사이클 "작고 안전한 수정" 범위를 넘어선다고 판단해 손 안 대고 기록만 함:
 

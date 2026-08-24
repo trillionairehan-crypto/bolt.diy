@@ -350,3 +350,16 @@
 - **커밋**: `867a4c0`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 22로 기록)**: 나머지 6건은 분량이 많아 한 사이클 범위를 넘어선다고 판단 — (1) `useChatHistory.ts` 채팅 로드/저장/복제/가져오기 토스트 약 8곳. (2) `useDataOperations.ts` Settings > Data 탭 내보내기/가져오기/초기화/실행취소 토스트 약 35곳(분량 최다, 별도 사이클 필요). (3) `GitHubErrorBoundary.tsx` 전체(실제 wrapping 확인됨, 죽은 코드 아님). (4) `useEditChatDescription.ts` 채팅 이름 변경 검증/토스트 6곳. (5) `LockManager.tsx` 잠금 해제 토스트 3곳. (6) `ScreenshotSelector.tsx` 스크린샷 캡처 토스트 4곳.
 - **다음 감사 영역**: 온보딩으로 갱신.
+
+### [06:36] Phase 2 — 사이클 25 (감사 대상: 온보딩)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 352/352 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/chat/**`(온보딩 진입 흐름: 랜딩 프롬프트 입력, PromptClarification, 첫 생성)를 재감사(사이클 11·17에서 이미 고친 PromptClarification 항목, StarterTemplates 죽은 코드, root.tsx 404 히어로 고정 코랄은 재보고 제외 지시). 보고받은 3건 중 확신도 high 2건을 직접 Read로 재검증 후 수정.
+- **발견·수정(2건, 전부 검증 완료 후 수정)**:
+  1. `app/components/chat/BaseChat.tsx:790` — 채팅이 맨 아래로 스크롤돼있지 않을 때(새 채팅 첫 생성 응답 도중/직후 포함) 뜨는 "맨 아래로 이동" 버튼이 `Go to last message`로 영어 하드코딩. 이 파일의 다른 문구는 전부 한국어.
+  2. `app/components/chat/WebSearch.client.tsx` — 랜딩/채팅 프롬프트 툴바의 "사이트" 버튼(참고 URL 가져오기 팝오버)에서 버튼 자체 title/라벨은 한국어인데 실제 제출 버튼 텍스트(`Fetch`/`Fetching...`)와 성공/실패 토스트 3곳(`URL content fetched`, `Failed to fetch URL content`, `Failed to fetch URL`)이 전부 영어로 남아있어 같은 UI 안에서 한/영이 섞이던 문제.
+  → 둘 다 한국어로 번역.
+- **테스트**: `app/onboardingKoreanAudit.spec.ts` 신규 4건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 356/356 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `82dc2ea`
+- **범위 밖으로 남긴 것**: `app/components/chat/Chat.client.tsx:102` — 첫 생성 턴 이후 `storeMessageHistory` 실패 시 `error.message`(IndexedDB 등 원본 영어 예외 메시지 가능)를 그대로 토스트에 노출하는 문제(확신도 medium, 재현 조건이 IndexedDB 실패라 낮은 빈도) — `OVERNIGHT5_IMPROVEMENTS.md` 항목 23으로 기록.
+- **다음 감사 영역**: 생성으로 갱신.

@@ -1,5 +1,6 @@
-다음 감사 영역: 온보딩
+다음 감사 영역: 생성
 
+[완료] 온보딩 감사(사이클 25) — BaseChat.tsx ScrollToBottom 버튼("Go to last message"), WebSearch.client.tsx URL 가져오기 팝오버(버튼 라벨/성공·실패 토스트 4곳)가 채팅 툴바 안에서 영어로 하드코딩돼있던 문제 → 전부 한국어로 번역 — (사이클 25)
 [완료] 한국어 문구 감사(사이클 24, 2회차) — 설정 > 프로필 탭(ProfileTab.tsx) 라벨/placeholder/토스트 전체가 영어로 하드코딩돼있던 문제 → 전부 한국어로 번역 — (사이클 24)
 [완료] 모바일 감사(사이클 23, 2회차) — FileBreadcrumb.tsx 파일 경로 드롭다운이 avoidCollisions={false}로 Radix 자동 화면 밖 재배치를 꺼두고 있어, 화면 오른쪽 끝 근처(깊은 경로)에서 뷰포트 밖으로 밀려날 수 있던 문제 → 기본값(true)으로 복원 — (사이클 23)
 [완료] 다크모드 감사(사이클 22, 3회차) — Markdown.module.scss 테이블/h6 GitHub 라이트 테마 하드코딩 색상(#dfe2e5/#f6f8fa/#6a737d)이 다크모드 채팅 배경 위에서 밝은 사각형으로 튀던 문제, Menu.client.tsx "내 앱" 사이드바 링크 아이콘 다크 변형 누락으로 저대비 문제 — 테마 토큰으로 교체 — (사이클 22)
