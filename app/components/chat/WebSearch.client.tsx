@@ -118,7 +118,7 @@ export function WebSearch({ onSearchResult, disabled = false, showLabel = true }
       {isOpen && (
         <div
           className={classNames(
-            'absolute bottom-full left-0 mb-2 flex items-center gap-2',
+            'absolute bottom-full left-0 mb-2 flex items-center gap-2 max-w-[calc(100vw-2rem)]',
             'rounded-lg border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 p-2 shadow-lg',
           )}
         >
@@ -139,7 +139,7 @@ export function WebSearch({ onSearchResult, disabled = false, showLabel = true }
             placeholder="https://example.com"
             disabled={isSearching}
             className={classNames(
-              'w-[300px] px-3 py-1.5 text-sm rounded-md',
+              'w-[min(300px,calc(100vw-8rem))] px-3 py-1.5 text-sm rounded-md',
               'border border-bolt-elements-borderColor',
               'bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary',
               'placeholder-bolt-elements-textTertiary',
