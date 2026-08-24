@@ -382,7 +382,7 @@ export function SelectionDialog({
   return (
     <RadixDialog.Root open={isOpen} onOpenChange={onClose}>
       <Dialog showCloseButton={false}>
-        <div className="p-6 bg-white dark:bg-gray-950 relative z-10">
+        <div className="p-6 relative z-10">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription className="mt-2 mb-4">
             Select the items you want to include and click{' '}
@@ -437,7 +437,7 @@ export function SelectionDialog({
             <Button
               onClick={handleConfirm}
               disabled={selectedItems.length === 0}
-              className="bg-accent-500 text-white hover:bg-accent-600 disabled:opacity-50 disabled:pointer-events-none"
+              className="bg-[var(--accent)] text-[var(--on-accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:pointer-events-none"
             >
               {confirmLabel}
             </Button>
