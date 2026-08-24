@@ -1,5 +1,6 @@
-다음 감사 영역: 배포
+다음 감사 영역: 요금제/결제
 
+[완료] 배포 감사(사이클 20) — GitLab 배포 성공 후 localStorage에 저장하는 저장소 URL이 아직 커밋 안 된 state 클로저 값(createdRepoUrl)을 읽어, 재배포 시 이전 저장소 URL 또는 첫 배포 시 빈 문자열이 저장되던 문제 → repoUrl 지역 변수로 수정 — (사이클 20)
 [완료] 미리보기/워크벤치 감사(사이클 19) — 파일 저장 후 미리보기 새로고침이 연결 끊긴 가짜 싱글턴을 호출해 매번 unhandled rejection + no-op이던 문제 수정, FileTree.tsx 예외 처리 토스트 6곳 영어 → 한국어 — (사이클 19)
 [완료] 생성 감사(사이클 18, 2회차) — file 액션 filePath 누락 시 실행 큐 영구 정지 크래시 수정 — (사이클 18)
 [완료] 온보딩 감사(사이클 17, 3회차) — PromptClarification.tsx `buildFinalPromptAndDirectives`가 앱별 동적 질문에서 "잘 모르겠어요"를 선택해도 고정 질문과 달리 무시하지 않고 "질문: 잘 모르겠어요" 문구를 그대로 생성 프롬프트에 추가하던 문제 → optionId==='unsure' 체크 추가 — (사이클 17)

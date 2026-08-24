@@ -298,3 +298,13 @@
 - **커밋**: `654e1e9`, `e234a86`
 - **범위 밖으로 남긴 것(구조적/확신도 낮음, `OVERNIGHT5_IMPROVEMENTS.md` 항목 18로 기록)**: (1) `Preview.tsx:694` 인스펙터 모드 클립보드 복사 promise에 `.catch` 없음(발생 조건 드묾). (2) `EditorPanel.tsx` 사이드바 탭("Files"/"Search"/"Locks")·저장/리셋 버튼("Save"/"Reset") 영어 — 사이클 11부터 알려진 항목, 다음 한국어 문구 감사 후보로 유지. (3) `Preview.tsx` 팝업/디바이스 프레임 미리보기 창 제목("... Preview", "(Landscape)"/"(Portrait)") 영어 — 브라우저 탭 제목 수준이라 영향도 낮게 판단.
 - **다음 감사 영역**: 배포로 갱신.
+
+### [05:40] Phase 2 — 사이클 20 (감사 대상: 배포)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 338/338 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/deploy/**`, 배포 훅(`useXDeploy`), `api.*deploy*.ts` 라우트를 재감사(사이클 12·13에서 이미 고친 훅 토스트 영어/base64 크래시 항목, DeployButton 공유 상태는 재보고 제외 지시). 보고받은 3건 전부 직접 Read/Grep으로 재검증.
+- **발견·수정(1건, 검증 완료 후 수정)**: `GitLabDeploymentDialog.tsx` — GitLab 배포 성공 후 `localStorage.setItem('gitlab-repo-${chatId}', ...)`에 저장하는 저장소 URL이 `createdRepoUrl`(state) 클로저 값을 읽고 있었는데, 이 값은 같은 함수 실행 안에서 방금 호출한 `setCreatedRepoUrl()`이 아직 반영 안 된 이전 값(첫 배포면 빈 문자열, 재배포면 이전 저장소 URL)이었음. 화면에 뜨는 성공 다이얼로그는 다음 렌더에서 올바른 값을 보여줘 눈에 안 띄지만, `localStorage`에 영구 저장되는 값은 계속 틀림. 대조군인 `GitHubDeploymentDialog.tsx`(462-468번 줄)는 URL을 인라인으로 재계산해 이 문제가 없음을 확인. 방금 계산한 URL을 담는 `repoUrl` 지역 변수를 추가해 `setCreatedRepoUrl` 호출과 `localStorage.setItem` 양쪽에서 같은 값을 쓰도록 수정.
+- **테스트**: `app/gitlabDeployStaleUrlAudit.spec.ts` 신규 2건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 340/340 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `7627a81`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 19로 기록)**: (1) `GitHubDeploymentDialog.tsx`/`GitLabDeploymentDialog.tsx` 다이얼로그 본문 전체 영어 — 이미 항목 2(사이클 8)에 기록된 것과 동일 항목, 재확인만 함. (2) Vercel/Netlify 배포 실패 시 서버가 보내는 영어 에러 문자열(`api.vercel-deploy.ts` 등)이 `data.error || '한국어 fallback'` 패턴에서 항상 우선시돼 한국어 fallback이 무의미해지는 문제 — 서버 쪽 에러 생성 지점 전수 조사가 먼저 필요해 이번엔 보류.
+- **다음 감사 영역**: 요금제/결제로 갱신.
