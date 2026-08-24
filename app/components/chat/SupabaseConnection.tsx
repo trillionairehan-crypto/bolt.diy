@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSupabaseConnection } from '~/lib/hooks/useSupabaseConnection';
 import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
@@ -10,6 +10,15 @@ interface SupabaseConnectionProps {
   showLabel?: boolean;
 }
 
+const inputClassName = classNames(
+  'w-full px-3 py-2 rounded-lg text-sm',
+  'bg-[#F8F8F8] dark:bg-[#1A1A1A]',
+  'border border-[#E5E5E5] dark:border-[#333333]',
+  'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
+  'focus:outline-none focus:ring-1 focus:ring-[#3ECF8E]',
+  'disabled:opacity-50',
+);
+
 export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps) {
   const {
     connection: supabaseConn,
@@ -19,14 +28,18 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
     setIsProjectsExpanded,
     isDropdownOpen: isDialogOpen,
     setIsDropdownOpen: setIsDialogOpen,
-    handleConnect,
+    handleSimpleConnect,
+    simpleConnecting,
+    simpleConnectError,
     handleDisconnect,
     selectProject,
     handleCreateProject,
-    updateToken,
     isConnected,
     fetchProjectApiKeys,
   } = useSupabaseConnection();
+
+  const [simpleUrl, setSimpleUrl] = useState('');
+  const [simpleAnonKey, setSimpleAnonKey] = useState('');
 
   const currentChatId = useStore(chatId);
 
@@ -79,6 +92,21 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
     }
   }, [isConnected, supabaseConn.selectedProjectId, supabaseConn.token, supabaseConn.credentials]);
 
+  /*
+   * The richer project-browsing view only makes sense for the old personal-access-token flow —
+   * the simplified wizard never populates `user`, so this tells the two states apart.
+   */
+  const isPatConnection = isConnected && !!supabaseConn.user;
+
+  const handleWizardConnect = async () => {
+    const success = await handleSimpleConnect(simpleUrl, simpleAnonKey);
+
+    if (success) {
+      setSimpleUrl('');
+      setSimpleAnonKey('');
+    }
+  };
+
   return (
     <div className="relative">
       <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden mr-2 text-sm">
@@ -108,6 +136,129 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
         {isDialogOpen && (
           <Dialog className="max-w-[520px] p-6">
             {!isConnected ? (
+              <div className="space-y-5">
+                <DialogTitle>
+                  <img
+                    className="w-5 h-5"
+                    height="24"
+                    width="24"
+                    crossOrigin="anonymous"
+                    src="https://cdn.simpleicons.org/supabase"
+                    alt=""
+                  />
+                  저장 기능 연결하기
+                </DialogTitle>
+                <p className="text-sm text-bolt-elements-textSecondary -mt-3">
+                  회원가입, 목록 저장처럼 데이터가 남아야 하는 기능을 쓰려면 Supabase라는 무료 저장소를 연결해야 해요.
+                  3단계면 끝나요.
+                </p>
+
+                {/* Step 1 */}
+                <div className="flex gap-3">
+                  <StepBadge>1</StepBadge>
+                  <div className="flex-1 space-y-2">
+                    <h4 className="text-sm font-medium text-bolt-elements-textPrimary">Supabase 가입하기</h4>
+                    <p className="text-sm text-bolt-elements-textSecondary">
+                      아직 계정이 없다면 먼저 가입해주세요. 가입 화면에서 "Continue with GitHub" 버튼으로 시작하는 게
+                      가장 빨라요. GitHub 계정이 없다면 이메일로도 가입할 수 있어요.
+                    </p>
+                    <a
+                      href="https://supabase.com/dashboard/sign-up"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sm text-[#3ECF8E] hover:underline"
+                    >
+                      Supabase 가입하러 가기
+                      <div className="i-ph:arrow-square-out w-4 h-4" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="flex gap-3">
+                  <StepBadge>2</StepBadge>
+                  <div className="flex-1 space-y-2">
+                    <h4 className="text-sm font-medium text-bolt-elements-textPrimary">프로젝트 만들기</h4>
+                    <p className="text-sm text-bolt-elements-textSecondary">
+                      로그인하면 나오는 화면에서 "New Project" 버튼을 눌러주세요. 비밀번호는 "Generate a password"
+                      버튼으로 자동 생성하고, 지역(Region)은 가까운 곳으로 고르면 돼요. 만든 뒤엔 1~2분 정도 준비 시간이
+                      필요해요.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="flex gap-3">
+                  <StepBadge>3</StepBadge>
+                  <div className="flex-1 space-y-3">
+                    <h4 className="text-sm font-medium text-bolt-elements-textPrimary">연결 승인</h4>
+                    <p className="text-sm text-bolt-elements-textSecondary">
+                      프로젝트 화면 왼쪽 메뉴에서 톱니바퀴 모양 "Project Settings" → "API Keys"를 눌러주세요. 거기 있는
+                      "Project URL"과 "anon" "public" 라벨이 붙은 키, 이 두 개를 아래에 복사해서 붙여넣으면 돼요.
+                    </p>
+                    <p className="text-xs text-bolt-elements-textTertiary">
+                      "service_role"이라고 써있는 키는 절대 넣지 마세요 — 그건 이 앱과 공유하면 안 되는 키예요.
+                    </p>
+
+                    <div>
+                      <label className="block text-xs text-bolt-elements-textSecondary mb-1">Project URL</label>
+                      <input
+                        type="text"
+                        value={simpleUrl}
+                        onChange={(e) => setSimpleUrl(e.target.value)}
+                        disabled={simpleConnecting}
+                        placeholder="https://xxxxxxxxxxxx.supabase.co"
+                        className={inputClassName}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs text-bolt-elements-textSecondary mb-1">anon public key</label>
+                      <input
+                        type="password"
+                        value={simpleAnonKey}
+                        onChange={(e) => setSimpleAnonKey(e.target.value)}
+                        disabled={simpleConnecting}
+                        placeholder="eyJhbGciOi..."
+                        className={inputClassName}
+                      />
+                    </div>
+
+                    {simpleConnectError && (
+                      <p className="text-sm text-red-500 dark:text-red-400">{simpleConnectError}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-1">
+                  <DialogClose asChild>
+                    <DialogButton type="secondary">취소</DialogButton>
+                  </DialogClose>
+                  <button
+                    onClick={handleWizardConnect}
+                    disabled={simpleConnecting || !simpleUrl.trim() || !simpleAnonKey.trim()}
+                    className={classNames(
+                      'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
+                      'bg-[#3ECF8E] text-white',
+                      'hover:bg-[#3BBF84]',
+                      'disabled:opacity-50 disabled:cursor-not-allowed',
+                    )}
+                  >
+                    {simpleConnecting ? (
+                      <>
+                        <div className="i-ph:spinner-gap animate-spin" />
+                        연결하는 중...
+                      </>
+                    ) : (
+                      <>
+                        <div className="i-ph:plug-charging w-4 h-4" />
+                        연결하기
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ) : !isPatConnection ? (
               <div className="space-y-4">
                 <DialogTitle>
                   <img
@@ -118,65 +269,27 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                     src="https://cdn.simpleicons.org/supabase"
                     alt=""
                   />
-                  Supabase 연결하기
+                  저장 기능
                 </DialogTitle>
 
-                <div>
-                  <label className="block text-sm text-bolt-elements-textSecondary mb-2">액세스 토큰</label>
-                  <input
-                    type="password"
-                    value={supabaseConn.token}
-                    onChange={(e) => updateToken(e.target.value)}
-                    disabled={connecting}
-                    placeholder="Supabase 액세스 토큰을 입력하세요"
-                    className={classNames(
-                      'w-full px-3 py-2 rounded-lg text-sm',
-                      'bg-[#F8F8F8] dark:bg-[#1A1A1A]',
-                      'border border-[#E5E5E5] dark:border-[#333333]',
-                      'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-                      'focus:outline-none focus:ring-1 focus:ring-[#3ECF8E]',
-                      'disabled:opacity-50',
-                    )}
-                  />
-                  <div className="mt-2 text-sm text-bolt-elements-textSecondary">
-                    <a
-                      href="https://app.supabase.com/account/tokens"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-[#3ECF8E] hover:underline inline-flex items-center gap-1"
-                    >
-                      토큰 발급받기
-                      <div className="i-ph:arrow-square-out w-4 h-4" />
-                    </a>
+                <div className="flex items-center gap-3 p-3 bg-[#F8F8F8] dark:bg-[#1A1A1A] rounded-lg">
+                  <div className="i-ph:check-circle-fill w-5 h-5 text-[#3ECF8E] shrink-0" />
+                  <div className="min-w-0">
+                    <h4 className="text-sm font-medium text-bolt-elements-textPrimary">연결됐어요</h4>
+                    <p className="text-xs text-bolt-elements-textSecondary truncate">
+                      {supabaseConn.credentials?.supabaseUrl}
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex justify-end gap-2 mt-6">
                   <DialogClose asChild>
-                    <DialogButton type="secondary">취소</DialogButton>
+                    <DialogButton type="secondary">닫기</DialogButton>
                   </DialogClose>
-                  <button
-                    onClick={handleConnect}
-                    disabled={connecting || !supabaseConn.token}
-                    className={classNames(
-                      'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
-                      'bg-[#3ECF8E] text-white',
-                      'hover:bg-[#3BBF84]',
-                      'disabled:opacity-50 disabled:cursor-not-allowed',
-                    )}
-                  >
-                    {connecting ? (
-                      <>
-                        <div className="i-ph:spinner-gap animate-spin" />
-                        연결하는 중...
-                      </>
-                    ) : (
-                      <>
-                        <div className="i-ph:plug-charging w-4 h-4" />
-                        연결
-                      </>
-                    )}
-                  </button>
+                  <DialogButton type="danger" onClick={handleDisconnect}>
+                    <div className="i-ph:plugs w-4 h-4" />
+                    연결 끊기
+                  </DialogButton>
                 </div>
               </div>
             ) : (
@@ -312,6 +425,14 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
           </Dialog>
         )}
       </DialogRoot>
+    </div>
+  );
+}
+
+function StepBadge({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="w-6 h-6 rounded-full bg-[#3ECF8E] text-white text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">
+      {children}
     </div>
   );
 }

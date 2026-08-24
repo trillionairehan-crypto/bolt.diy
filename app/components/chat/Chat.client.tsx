@@ -135,9 +135,6 @@ export const ChatImpl = memo(
     const actionAlert = useStore(workbenchStore.alert);
     const deployAlert = useStore(workbenchStore.deployAlert);
     const supabaseConn = useStore(supabaseConnection);
-    const selectedProject = supabaseConn.stats?.projects?.find(
-      (project) => project.id === supabaseConn.selectedProjectId,
-    );
     const supabaseAlert = useStore(workbenchStore.supabaseAlert);
     const { activeProviders, promptId, autoSelectTemplate, contextOptimizationEnabled } = useSettings();
     const [llmErrorAlert, setLlmErrorAlert] = useState<LlmErrorAlertType | undefined>(undefined);
@@ -201,7 +198,14 @@ export const ChatImpl = memo(
           designScheme,
           supabase: {
             isConnected: supabaseConn.isConnected,
-            hasSelectedProject: !!selectedProject,
+
+            /*
+             * What actually matters for whether the AI should write real Supabase calls vs
+             * sample-data code is "do we have usable credentials", not the PAT-flow's project-list
+             * selection (selectedProjectId) — the simplified URL+anon-key wizard never populates
+             * that at all, only credentials.
+             */
+            hasSelectedProject: !!(supabaseConn.credentials?.supabaseUrl && supabaseConn.credentials?.anonKey),
             credentials: {
               supabaseUrl: supabaseConn?.credentials?.supabaseUrl,
               anonKey: supabaseConn?.credentials?.anonKey,

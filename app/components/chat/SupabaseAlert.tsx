@@ -4,6 +4,7 @@ import { classNames } from '~/utils/classNames';
 import { supabaseConnection } from '~/lib/stores/supabase';
 import { useStore } from '@nanostores/react';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 interface Props {
   alert: SupabaseAlert;
@@ -17,15 +18,30 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
   const [isExecuting, setIsExecuting] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
 
-  // Determine connection state
-  const isConnected = !!(connection.token && connection.selectedProjectId);
+  // Any connection (either flow) — enough to say "저장 기능 켜짐" and show the SQL at all.
+  const isConnected = !!connection.isConnected;
+
+  /*
+   * Auto-running this SQL against the user's database needs Supabase's Management API, which
+   * only a personal-access-token connection (token + selectedProjectId) can call — the
+   * simplified project URL + anon key flow's anon key has no Management API access at all, by
+   * design (that's a whole-account-scoped credential, not something this app should ever ask a
+   * non-developer to paste in — see the connection wizard in SupabaseConnection.tsx). Connected-
+   * but-can't-auto-apply is a real, reachable state, not just "not connected".
+   */
+  const canAutoApply = !!(connection.token && connection.selectedProjectId);
+
+  const projectRef = connection.credentials?.supabaseUrl?.match(/^https:\/\/([a-z0-9-]+)\.supabase\.co$/i)?.[1];
+  const sqlEditorUrl = projectRef ? `https://supabase.com/dashboard/project/${projectRef}/sql/new` : undefined;
 
   // Set title and description based on connection state
-  const title = isConnected ? '저장 기능 변경 사항' : '저장 기능 연결 필요';
+  const title = !isConnected ? '저장 기능 연결 필요' : canAutoApply ? '저장 기능 변경 사항' : '직접 실행이 필요해요';
   const description = isConnected ? '저장 기능 변경 내용' : '저장 기능 연결이 필요해요';
-  const message = isConnected
-    ? '제안된 변경 사항을 확인하고 저장 기능에 적용해주세요.'
-    : '계속하려면 먼저 저장 기능을 연결해주세요.';
+  const message = !isConnected
+    ? '계속하려면 먼저 저장 기능을 연결해주세요.'
+    : canAutoApply
+      ? '제안된 변경 사항을 확인하고 저장 기능에 적용해주세요.'
+      : 'Supabase SQL 편집기에 아래 내용을 붙여넣고 실행해주세요.';
 
   const handleConnectClick = () => {
     // Dispatch an event to open the Supabase connection dialog
@@ -109,15 +125,15 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
           </div>
         </div>
 
-        {/* SQL Content */}
+        {/* SQL Content — third branch (connected, !canAutoApply) is the simplified anon-key-only
+            flow: no Management API access, so it's shown open (not collapsed) for copying instead
+            of an auto-run toggle. */}
         <div className="px-4">
           {!isConnected ? (
             <div className="p-3 rounded-md bg-bolt-elements-background-depth-3">
-              <span className="text-sm text-bolt-elements-textPrimary">
-                먼저 저장 기능을 연결하고 프로젝트를 선택해주세요.
-              </span>
+              <span className="text-sm text-bolt-elements-textPrimary">먼저 저장 기능을 연결해주세요.</span>
             </div>
-          ) : (
+          ) : canAutoApply ? (
             <>
               <div
                 className="flex items-center p-2 rounded-md bg-bolt-elements-background-depth-3 cursor-pointer"
@@ -138,6 +154,10 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                 </div>
               )}
             </>
+          ) : (
+            <div className="p-3 bg-bolt-elements-background-depth-4 rounded-md overflow-auto max-h-60 font-mono text-xs text-bolt-elements-textSecondary">
+              <pre>{cleanSqlContent(content)}</pre>
+            </div>
           )}
         </div>
 
@@ -160,7 +180,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
               >
                 저장 기능 연결하기
               </button>
-            ) : (
+            ) : canAutoApply ? (
               <button
                 onClick={() => executeSupabaseAction(content)}
                 disabled={isExecuting}
@@ -176,6 +196,47 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
               >
                 {isExecuting ? '적용 중...' : '변경사항 적용'}
               </button>
+            ) : (
+              <>
+                <button
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(cleanSqlContent(content));
+                      toast.success('복사했어요');
+                    } catch {
+                      toast.error('복사하지 못했어요.');
+                    }
+                  }}
+                  className={classNames(
+                    `px-3 py-2 rounded-md text-sm font-medium`,
+                    'bg-[#098F5F]',
+                    'hover:bg-[#0aa06c]',
+                    'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
+                    'text-white',
+                    'flex items-center gap-1.5',
+                  )}
+                >
+                  <div className="i-ph:copy w-4 h-4" />
+                  SQL 복사
+                </button>
+                {sqlEditorUrl && (
+                  <a
+                    href={sqlEditorUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={classNames(
+                      `px-3 py-2 rounded-md text-sm font-medium`,
+                      'bg-bolt-elements-button-secondary-background',
+                      'hover:bg-bolt-elements-button-secondary-backgroundHover',
+                      'text-bolt-elements-button-secondary-text',
+                      'flex items-center gap-1.5',
+                    )}
+                  >
+                    <div className="i-ph:arrow-square-out w-4 h-4" />
+                    SQL 편집기 열기
+                  </a>
+                )}
+              </>
             )}
             <button
               onClick={clearAlert}

@@ -19,6 +19,8 @@ export function useSupabaseConnection() {
   const fetchingApiKeys = useStore(isFetchingApiKeys);
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [simpleConnecting, setSimpleConnecting] = useState(false);
+  const [simpleConnectError, setSimpleConnectError] = useState<string | null>(null);
 
   useEffect(() => {
     const initConnection = async () => {
@@ -80,7 +82,7 @@ export function useSupabaseConnection() {
       const data = (await response.json()) as any;
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to connect');
+        throw new Error(data.error || '연결에 실패했어요');
       }
 
       updateSupabaseConnection({
@@ -89,7 +91,7 @@ export function useSupabaseConnection() {
         stats: data.stats,
       });
 
-      toast.success('Successfully connected to Supabase');
+      toast.success('Supabase에 연결됐어요');
 
       setIsProjectsExpanded(true);
 
@@ -97,7 +99,7 @@ export function useSupabaseConnection() {
     } catch (error) {
       console.error('Connection error:', error);
       logStore.logError('Failed to authenticate with Supabase', { error });
-      toast.error(error instanceof Error ? error.message : 'Failed to connect to Supabase');
+      toast.error(error instanceof Error ? error.message : '연결 키가 올바르지 않아요. 다시 확인해주세요.');
       updateSupabaseConnection({ user: null, token: '' });
 
       return false;
@@ -106,9 +108,75 @@ export function useSupabaseConnection() {
     }
   };
 
+  /**
+   * The simplified connect path (project URL + anon key only — no personal access token, no
+   * project picker) used by the chat entry point's wizard. Validates both format and that the
+   * pair actually works against Supabase's own REST endpoint before marking the app connected,
+   * so a typo'd or mismatched key surfaces immediately instead of failing silently later on.
+   */
+  const handleSimpleConnect = async (rawUrl: string, rawAnonKey: string): Promise<boolean> => {
+    const supabaseUrl = rawUrl.trim().replace(/\/+$/, '');
+    const anonKey = rawAnonKey.trim();
+
+    setSimpleConnectError(null);
+
+    if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(supabaseUrl)) {
+      setSimpleConnectError('URL 형식이 올바르지 않아요. https://로 시작하는 프로젝트 URL을 확인해주세요.');
+      return false;
+    }
+
+    if (anonKey.length < 20) {
+      setSimpleConnectError('anon key가 올바르지 않아요. 다시 확인해주세요.');
+      return false;
+    }
+
+    setSimpleConnecting(true);
+
+    try {
+      let response: Response;
+
+      try {
+        response = await fetch(`${supabaseUrl}/auth/v1/settings`, {
+          headers: { apikey: anonKey },
+        });
+      } catch {
+        setSimpleConnectError('네트워크 문제로 연결하지 못했어요. 잠시 후 다시 시도해주세요.');
+        return false;
+      }
+
+      if (response.status === 401 || response.status === 403) {
+        setSimpleConnectError('anon key가 올바르지 않아요. 다시 확인해주세요.');
+        return false;
+      }
+
+      if (!response.ok) {
+        setSimpleConnectError('URL을 찾을 수 없어요. 프로젝트 주소를 다시 확인해주세요.');
+        return false;
+      }
+
+      updateSupabaseConnection({
+        user: null,
+        token: '',
+        credentials: { supabaseUrl, anonKey },
+      });
+
+      toast.success('저장 기능이 켜졌어요');
+
+      return true;
+    } finally {
+      setSimpleConnecting(false);
+    }
+  };
+
   const handleDisconnect = () => {
-    updateSupabaseConnection({ user: null, token: '' });
-    toast.success('Disconnected from Supabase');
+    updateSupabaseConnection({
+      user: null,
+      token: '',
+      credentials: undefined,
+      selectedProjectId: '',
+      stats: undefined,
+    });
+    toast.success('저장 기능 연결을 껐어요');
     setIsDropdownOpen(false);
   };
 
@@ -128,13 +196,13 @@ export function useSupabaseConnection() {
     if (projectId && currentState.token) {
       try {
         await fetchProjectApiKeys(projectId, currentState.token);
-        toast.success('Project selected successfully');
+        toast.success('프로젝트를 선택했어요');
       } catch (error) {
         console.error('Failed to fetch API keys:', error);
-        toast.error('Selected project but failed to fetch API keys');
+        toast.error('프로젝트는 선택됐지만 키를 가져오지 못했어요');
       }
     } else {
-      toast.success('Project selected successfully');
+      toast.success('프로젝트를 선택했어요');
     }
 
     setIsDropdownOpen(false);
@@ -154,11 +222,19 @@ export function useSupabaseConnection() {
     isDropdownOpen,
     setIsDropdownOpen,
     handleConnect,
+    handleSimpleConnect,
+    simpleConnecting,
+    simpleConnectError,
     handleDisconnect,
     selectProject,
     handleCreateProject,
     updateToken: (token: string) => updateSupabaseConnection({ ...connection, token }),
-    isConnected: !!(connection.user && connection.token),
+
+    /*
+     * Single source of truth (app/lib/stores/supabase.ts computes this for both the token+project
+     * flow and the simplified credentials-only flow) — no longer recomputed narrowly here.
+     */
+    isConnected: !!connection.isConnected,
     fetchProjectApiKeys: (projectId: string) => {
       if (connection.token) {
         return fetchProjectApiKeys(projectId, connection.token);

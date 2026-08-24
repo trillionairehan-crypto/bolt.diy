@@ -93,10 +93,19 @@ if (initialState.token && !initialState.stats) {
 export function updateSupabaseConnection(connection: Partial<SupabaseConnectionState>) {
   const currentState = supabaseConnection.get();
 
-  if (connection.user !== undefined || connection.token !== undefined) {
+  /*
+   * Two ways to be "connected": the original personal-access-token + project-picker flow
+   * (user + token both set), or the simplified project URL + anon key flow this app's chat
+   * entry point (SupabaseConnection.tsx) now uses (credentials set directly, no token/user at
+   * all). Recomputed here — the single source of truth every other isConnected check in the
+   * app (useSupabaseConnection, SupabaseAlert, Chat.client.tsx's prompt payload) should read
+   * from — whenever any of the three relevant fields change.
+   */
+  if (connection.user !== undefined || connection.token !== undefined || connection.credentials !== undefined) {
     const newUser = connection.user !== undefined ? connection.user : currentState.user;
     const newToken = connection.token !== undefined ? connection.token : currentState.token;
-    connection.isConnected = !!(newUser && newToken);
+    const newCredentials = connection.credentials !== undefined ? connection.credentials : currentState.credentials;
+    connection.isConnected = !!(newUser && newToken) || !!(newCredentials?.anonKey && newCredentials?.supabaseUrl);
   }
 
   if (connection.selectedProjectId !== undefined) {

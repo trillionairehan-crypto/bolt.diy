@@ -3,7 +3,7 @@ import type { SupabaseProject } from '~/types/supabase';
 
 export const action: ActionFunction = async ({ request }) => {
   if (request.method !== 'POST') {
-    return json({ error: 'Method not allowed' }, { status: 405 });
+    return json({ error: '지원하지 않는 요청이에요.' }, { status: 405 });
   }
 
   try {
@@ -20,7 +20,7 @@ export const action: ActionFunction = async ({ request }) => {
       const errorText = await projectsResponse.text();
       console.error('Projects fetch failed:', errorText);
 
-      return json({ error: 'Failed to fetch projects' }, { status: 401 });
+      return json({ error: '연결 키가 올바르지 않아요. 다시 확인해주세요.' }, { status: 401 });
     }
 
     const projects = (await projectsResponse.json()) as SupabaseProject[];
@@ -38,7 +38,7 @@ export const action: ActionFunction = async ({ request }) => {
     uniqueProjects.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
     return json({
-      user: { email: 'Connected', role: 'Admin' },
+      user: { email: '연결됨', role: '관리자' },
       stats: {
         projects: uniqueProjects,
         totalProjects: uniqueProjects.length,
@@ -46,11 +46,6 @@ export const action: ActionFunction = async ({ request }) => {
     });
   } catch (error) {
     console.error('Supabase API error:', error);
-    return json(
-      {
-        error: error instanceof Error ? error.message : 'Authentication failed',
-      },
-      { status: 401 },
-    );
+    return json({ error: '연결에 실패했어요. 잠시 후 다시 시도해주세요.' }, { status: 401 });
   }
 };
