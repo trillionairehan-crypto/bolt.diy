@@ -136,6 +136,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
       const projectPath = `${connection.user.username}/${sanitizedRepoName}`;
       const existingProject = await apiService.getProjectByPath(projectPath);
       const projectExists = existingProject !== null;
+      let repoUrl: string;
 
       if (projectExists && existingProject) {
         // Confirm overwrite
@@ -162,14 +163,16 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
         // Update project with files
         toast.info('Uploading files to existing repository...');
         await apiService.updateProjectWithFiles(existingProject.id, files);
-        setCreatedRepoUrl(existingProject.http_url_to_repo);
+        repoUrl = existingProject.http_url_to_repo;
+        setCreatedRepoUrl(repoUrl);
         toast.success('Repository updated successfully!');
       } else {
         // Create new project with files
         toast.info('Creating new repository...');
 
         const newProject = await apiService.createProjectWithFiles(sanitizedRepoName, isPrivate, files);
-        setCreatedRepoUrl(newProject.http_url_to_repo);
+        repoUrl = newProject.http_url_to_repo;
+        setCreatedRepoUrl(repoUrl);
         toast.success('Repository created successfully!');
       }
 
@@ -188,7 +191,7 @@ export function GitLabDeploymentDialog({ isOpen, onClose, projectName, files }: 
         JSON.stringify({
           owner: connection.user.username,
           name: sanitizedRepoName,
-          url: createdRepoUrl,
+          url: repoUrl,
         }),
       );
 
