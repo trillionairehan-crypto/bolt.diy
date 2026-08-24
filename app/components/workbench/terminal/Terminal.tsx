@@ -40,6 +40,7 @@ export const Terminal = memo(
       const terminalRef = useRef<XTerm>();
       const fitAddonRef = useRef<FitAddon>();
       const resizeObserverRef = useRef<ResizeObserver>();
+      const hasOpenedRef = useRef(false);
 
       useEffect(() => {
         const element = terminalElementRef.current!;
@@ -63,53 +64,72 @@ export const Terminal = memo(
         });
 
         terminalRef.current = terminal;
+        hasOpenedRef.current = false;
 
-        // Error handling for addon loading
-        try {
-          terminal.loadAddon(fitAddon);
-          terminal.loadAddon(webLinksAddon);
-          terminal.open(element);
-        } catch (error) {
-          logger.error(`Failed to initialize terminal [${id}]:`, error);
+        /*
+         * loadAddon() doesn't touch the DOM (FitAddon/WebLinksAddon just stash the terminal
+         * reference on activate()), so it's safe to run unconditionally here. open() is the one
+         * that needs a real box to measure — deferred to the ResizeObserver below, which is also
+         * why onTerminalReady still fires synchronously right after this: xterm queues writes
+         * made before open() and flushes them once it does (confirmed against how attachTerminal
+         * in lib/stores/terminal.ts uses it — it calls terminal.write() straight after attaching,
+         * with no open-readiness check of its own), so callers piping shell output in don't need
+         * to wait for the container to actually be visible.
+         */
+        terminal.loadAddon(fitAddon);
+        terminal.loadAddon(webLinksAddon);
 
-          // Attempt recovery
-          setTimeout(() => {
+        /*
+         * Lazy-open: a terminal mounted while its container is zero-size — an inactive tab
+         * (TerminalTabs.tsx mounts those `hidden` rather than not at all, to keep scrollback
+         * alive) or one that mounts mid panel-open-animation — used to call open()/fit()
+         * unconditionally at mount and crash xterm's RenderService ("Cannot read properties of
+         * undefined (reading 'dimensions')"), because the renderer never got real metrics. This
+         * single ResizeObserver now does double duty: its first non-zero callback opens the
+         * terminal (once), and every non-zero callback after that (open or not) re-fits/notifies/
+         * re-themes — exactly what the old "resize catches up a skipped theme change" comment
+         * described, just also covering the very first paint now instead of only later resizes.
+         * A zero-size callback (still hidden, or not visible yet) is always a no-op either way.
+         */
+        const resizeObserver = new ResizeObserver((entries) => {
+          if (entries.length === 0) {
+            return;
+          }
+
+          const { width, height } = entries[0].contentRect;
+
+          if (width === 0 || height === 0) {
+            return;
+          }
+
+          if (!hasOpenedRef.current) {
             try {
               terminal.open(element);
-              fitAddon.fit();
-            } catch (retryError) {
-              logger.error(`Terminal recovery failed [${id}]:`, retryError);
-            }
-          }, 100);
-        }
+              hasOpenedRef.current = true;
+            } catch (error) {
+              logger.error(`Failed to initialize terminal [${id}]:`, error);
 
-        const resizeObserver = new ResizeObserver((entries) => {
-          // Debounce resize events
-          if (entries.length > 0) {
-            const { width, height } = entries[0].contentRect;
+              // Attempt recovery
+              setTimeout(() => {
+                try {
+                  terminal.open(element);
+                  hasOpenedRef.current = true;
+                  fitAddon.fit();
+                } catch (retryError) {
+                  logger.error(`Terminal recovery failed [${id}]:`, retryError);
+                }
+              }, 100);
 
-            /*
-             * A hidden/collapsed terminal container (display:none tab, or a resizable panel
-             * collapsed to 0) reports a zero-size entry here. Calling fit() on it crashes xterm's
-             * RenderService ("Cannot read properties of undefined (reading 'dimensions')") because
-             * the renderer never got real metrics to work from — skip until it's actually visible.
-             */
-            if (width === 0 || height === 0) {
               return;
             }
+          }
 
-            try {
-              fitAddon.fit();
-              onTerminalResize?.(terminal.cols, terminal.rows);
-
-              /*
-               * If a theme change was skipped earlier while this container was hidden (see the
-               * theme-sync effect below), this is the first safe moment to catch it back up.
-               */
-              terminal.options.theme = getTerminalTheme(readonly ? { cursor: '#00000000' } : {});
-            } catch (error) {
-              logger.error(`Resize error [${id}]:`, error);
-            }
+          try {
+            fitAddon.fit();
+            onTerminalResize?.(terminal.cols, terminal.rows);
+            terminal.options.theme = getTerminalTheme(readonly ? { cursor: '#00000000' } : {});
+          } catch (error) {
+            logger.error(`Resize error [${id}]:`, error);
           }
         });
 
