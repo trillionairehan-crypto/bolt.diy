@@ -363,3 +363,14 @@
 - **커밋**: `82dc2ea`
 - **범위 밖으로 남긴 것**: `app/components/chat/Chat.client.tsx:102` — 첫 생성 턴 이후 `storeMessageHistory` 실패 시 `error.message`(IndexedDB 등 원본 영어 예외 메시지 가능)를 그대로 토스트에 노출하는 문제(확신도 medium, 재현 조건이 IndexedDB 실패라 낮은 빈도) — `OVERNIGHT5_IMPROVEMENTS.md` 항목 23으로 기록.
 - **다음 감사 영역**: 생성으로 갱신.
+
+### [06:50] Phase 2 — 사이클 26 (감사 대상: 생성, 3회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 356/356 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/lib/runtime/`(액션 실행기), `app/lib/hooks/useMessageParser.ts`, `app/lib/stores/workbench.ts`를 재감사(사이클 10·18에서 이미 고친 항목, IMPROVEMENTS.md 항목 9·17에 이미 기록된 항목은 재보고 제외 지시). 보고받은 3건 전부 직접 Read/git log로 재검증.
+- **발견(3건, 전부 수정 없이 판단 보류)**:
+  1. `app/lib/hooks/useMessageParser.ts:78-80` — 스트리밍 파서가 AI 응답뿐 아니라 **사용자가 직접 입력한 메시지**도 동일하게 파싱해, 사용자 메시지 안의 코드 블록이 정규식 휴리스틱에 걸리면 실제 파일 쓰기/셸 명령 실행으로 이어질 수 있는 경로 확인. 의도된 파워유저 기능인지 버그인지 이번 세션에서 확정 못 함(업스트림 bolt.diy 코드로 보여 fork 이전 의도 파악 필요) — 사람 판단 필요, 보안 성격이라 우선순위 높음으로 기록.
+  2. `app/lib/stores/workbench.ts:564-566` — 채팅 Stop 버튼이 호출하는 `abortAllActions()`가 `// TODO` 주석만 있는 완전한 no-op. 실행 중인 셸 명령/큐에 남은 파일 쓰기가 Stop을 눌러도 그대로 끝까지 진행됨. 제대로 고치려면 WebContainer 셸 프로세스 강제 종료 경로를 새로 연결해야 하고, 이 저장소 테스트(소스 grep 방식)로는 검증 불가 — 브라우저 직접 확인 필요한 구조 변경.
+  3. `app/lib/stores/workbench.ts:668-701` + `action-runner.ts` — LLM 응답이 파일 액션 중간에 잘리면(토큰 한도 등) 파일이 최초 조각에서 멈추고 Artifact 패널이 영원히 spinner 상태로 남는 경로 확인(라이브 재현은 못 함, 확신도 medium-high).
+- **수정하지 않은 이유**: 3건 모두 최소 변경으로 안전하게 고칠 수 없는 구조적 판단 필요 사안 — 1번은 의도 확인이 먼저 필요, 2번은 WebContainer 셸 API 조사 및 브라우저 검증 필요, 3번은 스트림 절단 감지용 타임아웃 로직 신규 설계 필요. `OVERNIGHT5_IMPROVEMENTS.md` 항목 24로 상세 기록.
+- **테스트/커밋**: 코드 변경 없어 테스트 추가·커밋 없음(문서만 갱신).
+- **다음 감사 영역**: 미리보기/워크벤치로 갱신.

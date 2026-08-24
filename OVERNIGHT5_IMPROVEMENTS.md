@@ -1,5 +1,21 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 24. 생성 감사(사이클 26) — 3건 전부 판단 보류(구조 변경 필요)
+
+이번 사이클은 코드 수정 없이 감사만 진행. Explore 서브에이전트로 `app/lib/runtime/`(액션 실행기), `app/lib/hooks/useMessageParser.ts`, `app/lib/stores/workbench.ts`를 재감사(사이클 10·18에서 이미 고친 항목, 항목 9/17에 이미 기록된 항목은 재보고 제외 지시). 보고받은 3건을 직접 Read로 재검증, 전부 실제로 존재하는 문제로 확인됐으나 셋 다 "최소 변경"으로 안전하게 못 고칠 만큼 구조적 판단이 필요해 보류.
+
+1. **(우선순위 높음, 보안 성격) `app/lib/hooks/useMessageParser.ts:78-80`** — `EnhancedStreamingMessageParser`가 `message.role === 'assistant' || message.role === 'user'` 조건으로 **사용자가 직접 입력한 채팅 메시지**도 AI 응답과 똑같이 파싱함. `enhanced-message-parser.ts`의 `_detectAndWrapCodeBlocks`(정규식 휴리스틱)가 `파일경로.ext:\n\`\`\`lang\n코드\`\`\`` 패턴이나 "명령어처럼 보이는" ```bash 블록을 발견하면 사용자 메시지 안에서도 합성 `<boltArtifact>/<boltAction>`으로 자동 래핑하고, 이게 그대로 `workbenchStore.addAction`/`runAction` → `ActionRunner`로 흘러가 실제 파일 쓰기·셸 명령 실행이 트리거됨. 예: 사용자가 "`utils.js:\n\`\`\`js\n...\`\`\`` 이거 봐줄래?"처럼 AI에게 코드를 보여주며 질문하는 흔한 문장만 쳐도, AI가 답하기도 전에 사용자 자신의 메시지가 실제 파일/명령 실행을 유발할 수 있음(확인 없이, "당신 메시지가 이걸 실행시켰다"는 표시도 없이).
+   - **왜 이번 세션에서 안 고쳤는지**: `role === 'user'` 처리가 의도된 기능(예: 사용자가 파일 경로+코드를 붙여넣어 직접 파일을 작성하게 하는 파워유저 기능)인지, 단순 버그인지 git blame만으로 확정 못 함(원본 bolt.diy 업스트림에서 넘어온 코드로 보임 — 커밋 이력이 fork 이전 시점). 무작정 `role === 'user'` 분기를 지우면 의도된 기능을 깨뜨릴 위험, 반대로 그대로 두면 원치 않는 코드 실행 위험 — 사람 판단 필요.
+   - **제안**: 아침에 사람이 "사용자 메시지에서 코드 블록을 실제 파일/명령으로 자동 실행하는 게 의도된 기능인가"부터 확인. 의도가 아니라면 가장 간단한 수정은 `useMessageParser.ts:79`에서 `message.role === 'user'` 분기를 제거(또는 사용자 메시지는 파싱하되 `_detectAndWrapCodeBlocks` 휴리스틱은 건너뛰고 원문 그대로 보여주기만 하는 모드 추가).
+
+2. **`app/lib/stores/workbench.ts:564-566`** — `abortAllActions()`가 `// TODO: what do we wanna do and how do we wanna recover from this?` 주석만 있는 완전한 no-op. 채팅 Stop 버튼(`Chat.client.tsx:297-300`, `handleStop={abort}`)이 호출하는 유일한 액션 중단 경로인데 아무 일도 안 함. `ActionRunner`는 액션별 `abort()`/`abortSignal`을 갖고 있지만(`action-runner.ts:112-123`), `#runShellAction`/`#runStartAction`(`action-runner.ts:280, 308`)에 넘기는 콜백은 **셸 프로세스가 스스로 종료됐을 때 액션 쪽에 알리는 방향**(shell → action)일 뿐, 반대 방향(액션 쪽에서 실행 중인 셸 프로세스를 강제 종료)은 어디에도 구현돼 있지 않음. 즉 Stop을 눌러도 LLM 토큰 스트림만 멈추고, 이미 실행 중인 `npm install` 같은 셸 명령이나 큐에 남은 파일 쓰기는 그대로 끝까지 진행됨.
+   - **왜 이번 세션에서 안 고쳤는지**: 제대로 고치려면 WebContainer 셸 프로세스를 실제로 kill하는 경로(BoltShell/터미널 프로세스 쪽 API)까지 새로 연결해야 하는데, 이 저장소 테스트는 전부 소스 grep 방식이라 WebContainer 통합 동작(진짜로 프로세스가 죽는지)을 자동 테스트로 검증할 방법이 없음 — 브라우저에서 직접 확인 필요한 구조 변경.
+   - **제안**: 최소한 "실행 중/대기 중인 액션에 `status: 'aborted'`를 표시해 UI에서라도 사용자에게 '중단 요청됨'을 보여주기"부터 시작하고, 실제 프로세스 강제 종료는 별도 사이클에서 WebContainer 셸 API 조사 후 진행 권장.
+
+3. **`app/lib/stores/workbench.ts:668-701`(`_runAction`) + `action-runner.ts`** — LLM 응답이 파일 액션 중간에 잘려서(출력 토큰 한도 등) 닫는 `</boltAction>` 태그를 못 받으면, 스트리밍 중 에디터 버퍼에만 내용이 쓰이고 `onActionClose`가 없어 실제 WebContainer 파일이 최초 조각 그대로 멈추고, 액션 상태도 영원히 `'running'`으로 남아 Artifact 패널이 계속 spinner를 보여줌 — 에러 표시 없음.
+   - **왜 이번 세션에서 안 고쳤는지**: 재현하려면 실제 토큰 한도 절단 타이밍을 맞춰야 해서 이번 세션에서 라이브 재현은 못 했음(코드 상 확실히 가능한 경로이나, 확신도는 위 2건보다 낮음 — medium-high). 고치려면 "스트리밍이 끊긴 채 일정 시간 이상 새 청크가 안 오면 액션을 실패로 표시" 같은 타임아웃 로직을 새로 설계해야 해서 최소 변경 범위를 벗어남.
+   - **제안**: 스트림 종료(전체 응답 완료) 시점에 아직 `'running'`인 액션이 있으면 일괄로 `'failed'`(사유: "응답이 끊겼어요") 처리하는 정리 로직을 `Chat.client.tsx`의 스트림 완료 콜백에 추가하는 정도로 시작 권장.
+
 ## 23. 온보딩 감사(사이클 25) — ScrollToBottom/WebSearch 영어 문구는 고침, `Chat.client.tsx` 원본 에러 노출은 판단 보류
 Explore 서브에이전트로 `app/components/chat/**` 온보딩 진입 흐름을 재감사(사이클 11·17에서 이미 고친 PromptClarification 항목은 재보고 제외 지시). 보고받은 3건 중 확신도 high 2건(`BaseChat.tsx` ScrollToBottom 버튼, `WebSearch.client.tsx` URL 가져오기 팝오버)은 직접 재검증 후 수정·테스트 추가·커밋(`82dc2ea`). 아래 1건은 확인은 했으나 확신도 medium(재현 조건이 IndexedDB 실패라 낮은 빈도)이라 손 안 댐:
 
