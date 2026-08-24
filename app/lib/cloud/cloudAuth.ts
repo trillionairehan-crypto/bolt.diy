@@ -21,15 +21,20 @@ export type CloudAuthResult = { ok: true; context: CloudAuthContext } | { ok: fa
  * Full request pipeline from CLOUD-DESIGN.md section 3 ("검증" steps 1-6) — every storage route
  * calls this first and does nothing else until it returns ok:true. Rate limiting is deliberately
  * NOT here (needs device_key, which lives in different places per method) — see checkCloudRateLimit.
+ *
+ * @param injectedSupabase test-only seam — routes never pass this, so production always builds
+ * the real client from env; cloudAdversarial.spec.ts uses it to exercise the hash-mismatch/expiry/
+ * origin-check branches with a fake query builder instead of a live Cloud Supabase project.
  */
 export async function authenticateCloudRequest(
   request: Request,
   env: CloudEnv,
   urlAppId: string,
+  injectedSupabase?: SupabaseClient,
 ): Promise<CloudAuthResult> {
   const origin = request.headers.get('Origin') || '';
 
-  const supabase = getCloudSupabaseClient(env);
+  const supabase = injectedSupabase ?? getCloudSupabaseClient(env);
 
   if (!supabase || !env.CLOUD_APP_TOKEN_SECRET) {
     return { ok: false, response: jsonError(503, '지금은 저장 기능을 쓸 수 없어요. 잠시 후 다시 시도해주세요.') };
