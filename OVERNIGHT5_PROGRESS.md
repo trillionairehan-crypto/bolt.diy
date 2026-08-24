@@ -433,3 +433,15 @@
 - **커밋**: `67b2470`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 25로 기록)**: (1) `Preview.tsx` 미리보기 툴바가 `flex-wrap` 없이 기기 모드에서 8개 이상 아이콘+URL 입력창을 한 줄에 배치(확신도 medium-high, 레이아웃 설계 결정 필요). (2) `Preview.tsx`의 손수 구현한 "새 창 옵션" 드롭다운이 Radix가 아니라 충돌 회피 로직 없음(확신도 low-medium, 실사용 위험은 낮아 보임). (3) 이전 사이클(15/23)이 미해결로 남긴 "Menu.client.tsx 32px 아바타 터치타겟" 항목은 이번에 재검증 결과 그 div엔 클릭 핸들러가 없는 정적 이미지일 뿐이고 실제 클릭 가능한 아바타 버튼(`AvatarDropdown.tsx`)은 이미 40px이라 오탐으로 종결.
 - **다음 감사 영역**: 한국어 문구로 갱신.
+
+### [08:00] Phase 2 — 사이클 32 (감사 대상: 한국어 문구, 3회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 370/370 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 이미 다룬 영역(BaseChat/WebSearch/ProfileTab/사이드바/FileTree/배포 다이얼로그/ChatBox/PromptClarification/ModelSelector/CodeBlock/ExpoQrModal/pricing.tsx) 제외하고 `@settings/tabs/*`(profile 외), APIKeyManager.tsx, EditorPanel, 라우트, UI 다이얼로그, confirm/alert, 빈 상태·로딩 문구 위주로 재감사 요청.
+- **발견**: 5건 보고, 전부 실재 확인. 규모가 커서(설정 탭 전체, confirm() 6곳, 배포/연결 탭 토스트 다수 등) 이번 사이클은 노출 빈도가 가장 높은 1건만 처리하고 나머지는 `OVERNIGHT5_IMPROVEMENTS.md` 항목 29로 기록.
+- **발견·수정(1건, 직접 Read로 재검증 후 수정)**: `app/components/chat/APIKeyManager.tsx` — 채팅 메인 화면에서 프로바이더별 API 키를 입력/확인할 때마다 노출되는 컴포넌트 전체(라벨 "{provider} API Key:", 상태 문구 "Set via UI"/"Set via environment variable"/"Not Set (Please set via UI or ENV_VAR)", placeholder "Enter API Key", IconButton title 4개: Save/Cancel/Edit/Get API Key)가 영어로 하드코딩돼 있었음.
+  → 전부 한국어로 번역("API 키:", "화면에서 설정됨", "환경 변수로 설정됨", "설정 안 됨 (화면 또는 환경 변수로 설정해 주세요)", "API 키 입력", "API 키 저장", "취소", "API 키 수정", "API 키 발급받기").
+- **테스트**: `app/apiKeyManagerKoreanAudit.spec.ts` 신규 2건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 372/372 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `0b8faca`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 29로 기록)**: (1) `FeaturesTab.tsx` 전체(제목/설명/툴팁/섹션 헤더/토스트 ~20곳) 100% 영어. (2) `confirm()`/`window.confirm()` 네이티브 대화상자 6곳(VercelTab/NetlifyTab/NetlifyConnection/SupabaseTab/LocalProvidersTab/useGit.ts) 전부 영어. (3) 배포/연결 탭(Netlify/Vercel/Supabase/MCP/EventLogs/Data) 토스트 다수 영어. (4) `NotificationsTab.tsx` 필터 라벨 8개 + 빈 상태 문구 영어.
+- **다음 감사 영역**: 온보딩으로 갱신.
