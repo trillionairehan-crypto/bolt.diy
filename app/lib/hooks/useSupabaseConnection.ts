@@ -133,7 +133,8 @@ export function useSupabaseConnection() {
 
     if (isServiceRoleKey(anonKey)) {
       setSimpleConnectError(
-        'service_role 키는 여기 넣으면 안 돼요. Project Settings → API Keys에서 "anon" "public" 키를 다시 복사해주세요.',
+        'service_role/secret 키는 여기 넣으면 안 돼요. Project Settings → API Keys에서 "anon" "public" 또는 ' +
+          '"publishable" 키를 다시 복사해주세요.',
       );
       return false;
     }

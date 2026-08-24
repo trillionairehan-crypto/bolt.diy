@@ -40,4 +40,13 @@ describe('isServiceRoleKey', () => {
     expect(isServiceRoleKey(ANON_JWT)).toBe(false);
     expect(isServiceRoleKey('garbage')).toBe(false);
   });
+
+  it('blocks new-format sb_secret_ keys (not a JWT, so the role-claim check alone would miss them)', () => {
+    expect(isServiceRoleKey('sb_secret_abcdefghijklmnopqrstuvwxyz')).toBe(true);
+    expect(isServiceRoleKey('  sb_secret_abcdefghijklmnopqrstuvwxyz  ')).toBe(true);
+  });
+
+  it('allows new-format sb_publishable_ keys', () => {
+    expect(isServiceRoleKey('sb_publishable_abcdefghijklmnopqrstuvwxyz')).toBe(false);
+  });
 });

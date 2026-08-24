@@ -194,10 +194,12 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                     <h4 className="text-sm font-medium text-bolt-elements-textPrimary">연결 승인</h4>
                     <p className="text-sm text-bolt-elements-textSecondary">
                       프로젝트 화면 왼쪽 메뉴에서 톱니바퀴 모양 "Project Settings" → "API Keys"를 눌러주세요. 거기 있는
-                      "Project URL"과 "anon" "public" 라벨이 붙은 키, 이 두 개를 아래에 복사해서 붙여넣으면 돼요.
+                      "Project URL"과, "anon" "public" 또는 "publishable" 라벨이 붙은 키, 이 두 개를 아래에 복사해서
+                      붙여넣으면 돼요.
                     </p>
                     <p className="text-xs text-bolt-elements-textTertiary">
-                      "service_role"이라고 써있는 키는 절대 넣지 마세요 — 그건 이 앱과 공유하면 안 되는 키예요.
+                      "service_role" 또는 "secret"이라고 써있는 키는 절대 넣지 마세요 — 그건 이 앱과 공유하면 안 되는
+                      키예요.
                     </p>
 
                     <div>
@@ -213,7 +215,9 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                     </div>
 
                     <div>
-                      <label className="block text-xs text-bolt-elements-textSecondary mb-1">anon public key</label>
+                      <label className="block text-xs text-bolt-elements-textSecondary mb-1">
+                        anon / public / publishable key
+                      </label>
                       <input
                         type="password"
                         value={simpleAnonKey}
