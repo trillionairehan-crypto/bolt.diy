@@ -55,7 +55,7 @@ const Workbench = lazy(() =>
 const TEXTAREA_MIN_HEIGHT = 76;
 
 const LANDING_STEPS = [
-  { number: '01', title: '말하면', description: '만들고 싶은 걸 한국어로 설명해요' },
+  { number: '01', title: '말해요', description: '만들고 싶은 걸 한국어로 설명해요' },
   { number: '02', title: '만들어져요', description: 'AI가 화면과 기능을 전부 만들어요' },
   { number: '03', title: '바로 써요', description: '주소가 생기고, 링크로 공유할 수 있어요' },
 ];

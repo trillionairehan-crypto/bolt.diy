@@ -279,7 +279,7 @@ export const DeployButton = ({
                       alt="gitlab"
                     />
                     <span className="mx-auto">
-                      {!gitlabIsConnected ? 'GitLab 계정을 먼저 연결해주세요' : 'GitLab로 내보내기'}
+                      {!gitlabIsConnected ? 'GitLab 계정을 먼저 연결해주세요' : 'GitLab으로 내보내기'}
                     </span>
                   </DropdownMenu.Item>
                 </DropdownMenu.SubContent>
