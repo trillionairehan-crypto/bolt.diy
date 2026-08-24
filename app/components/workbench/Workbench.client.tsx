@@ -552,9 +552,9 @@ export const Workbench = memo(
                             <DropdownMenu.Content
                               className={classNames(
                                 'min-w-[240px] z-[250]',
-                                'bg-white dark:bg-[#141414]',
-                                'rounded-lg shadow-lg',
-                                'border border-gray-200/50 dark:border-gray-800/50',
+                                'bg-[var(--surface-2)] text-bolt-elements-textPrimary',
+                                'rounded-lg shadow-[var(--shadow-overlay,0_20px_50px_rgba(23,16,14,0.18))]',
+                                'border border-bolt-elements-borderColor',
                                 'animate-in fade-in-0 zoom-in-95',
                                 'py-1',
                               )}
