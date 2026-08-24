@@ -73,16 +73,22 @@ export async function action({ request, context }: ActionFunctionArgs) {
   }
 
   // See injectMadeWithBadge's own TODO — unconditional until a real tier lookup exists.
-  const deployFiles: CloudflareDeployFile[] = Object.entries(files).map(([path, base64Content]) => {
-    const normalizedPath = path.replace(/^\/+/, '');
+  let deployFiles: CloudflareDeployFile[];
 
-    if (normalizedPath.toLowerCase().endsWith('.html')) {
-      const html = new TextDecoder().decode(base64ToBytes(base64Content));
-      return { path: normalizedPath, content: new TextEncoder().encode(injectMadeWithBadge(html)) };
-    }
+  try {
+    deployFiles = Object.entries(files).map(([path, base64Content]) => {
+      const normalizedPath = path.replace(/^\/+/, '');
 
-    return { path: normalizedPath, content: base64ToBytes(base64Content) };
-  });
+      if (normalizedPath.toLowerCase().endsWith('.html')) {
+        const html = new TextDecoder().decode(base64ToBytes(base64Content));
+        return { path: normalizedPath, content: new TextEncoder().encode(injectMadeWithBadge(html)) };
+      }
+
+      return { path: normalizedPath, content: base64ToBytes(base64Content) };
+    });
+  } catch {
+    return json({ error: '파일 데이터가 손상됐어요. 다시 빌드한 뒤 시도해주세요.' }, { status: 400 });
+  }
 
   try {
     const result = await deployToCloudflarePages({ accountId, apiToken, projectName, files: deployFiles });
