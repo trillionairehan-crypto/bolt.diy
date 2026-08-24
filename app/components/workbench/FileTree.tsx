@@ -746,7 +746,7 @@ function NodeButton({ depth, iconClasses, onClick, className, children, selected
     <button
       className={classNames(
         'flex items-center gap-1.5 w-full h-7 pr-2 border-l-2 text-faded transition-colors duration-150',
-        selected ? 'border-l-[#FF5330]' : 'border-l-transparent',
+        selected ? 'border-l-[var(--accent)]' : 'border-l-transparent',
         className,
       )}
       style={{ paddingLeft: `${6 + depth * NODE_PADDING_LEFT}px` }}
