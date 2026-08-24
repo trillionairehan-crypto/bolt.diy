@@ -44,6 +44,50 @@ exports[`StreamingMessageParser > malformed action tags > should skip a boltActi
 }
 `;
 
+exports[`StreamingMessageParser > malformed action tags > should skip a boltAction of type file missing filePath instead of passing it through undefined > onActionClose 1`] = `
+{
+  "action": {
+    "content": "npm install",
+    "type": "shell",
+  },
+  "actionId": "0",
+  "artifactId": "message_1-0",
+  "messageId": "message_1",
+}
+`;
+
+exports[`StreamingMessageParser > malformed action tags > should skip a boltAction of type file missing filePath instead of passing it through undefined > onActionOpen 1`] = `
+{
+  "action": {
+    "content": "",
+    "type": "shell",
+  },
+  "actionId": "0",
+  "artifactId": "message_1-0",
+  "messageId": "message_1",
+}
+`;
+
+exports[`StreamingMessageParser > malformed action tags > should skip a boltAction of type file missing filePath instead of passing it through undefined > onArtifactClose 1`] = `
+{
+  "artifactId": "message_1-0",
+  "id": "message_1-0",
+  "messageId": "message_1",
+  "title": "Some title",
+  "type": undefined,
+}
+`;
+
+exports[`StreamingMessageParser > malformed action tags > should skip a boltAction of type file missing filePath instead of passing it through undefined > onArtifactOpen 1`] = `
+{
+  "artifactId": "message_1-0",
+  "id": "message_1-0",
+  "messageId": "message_1",
+  "title": "Some title",
+  "type": undefined,
+}
+`;
+
 exports[`StreamingMessageParser > malformed action tags > should skip a boltAction with an invalid Supabase operation instead of throwing > onActionClose 1`] = `
 {
   "action": {

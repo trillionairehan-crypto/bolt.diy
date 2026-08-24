@@ -182,6 +182,18 @@ describe('StreamingMessageParser', () => {
         runTest(input, { output: 'Before  After', callbacks: { onActionOpen: 1, onActionClose: 1 } }),
       ).not.toThrow();
     });
+
+    it('should skip a boltAction of type file missing filePath instead of passing it through undefined', () => {
+      const input =
+        'Before <boltArtifact title="Some title" id="artifact_1">' +
+        '<boltAction type="file">some content</boltAction>' +
+        '<boltAction type="shell">npm install</boltAction>' +
+        '</boltArtifact> After';
+
+      expect(() =>
+        runTest(input, { output: 'Before  After', callbacks: { onActionOpen: 1, onActionClose: 1 } }),
+      ).not.toThrow();
+    });
   });
 });
 

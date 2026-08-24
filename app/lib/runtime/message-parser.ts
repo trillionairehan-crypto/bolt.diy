@@ -391,7 +391,15 @@ export class StreamingMessageParser {
       const filePath = this.#extractAttribute(actionTag, 'filePath') as string;
 
       if (!filePath) {
-        logger.debug('File path not specified');
+        /*
+         * An undefined filePath reaches path.join(wc.workdir, undefined) in
+         * WorkbenchStore#_runAction, which throws inside the unguarded
+         * #globalExecutionQueue promise chain and permanently breaks execution
+         * of every action for the rest of the session. Skip it here instead,
+         * same as the Supabase missing-filePath case above.
+         */
+        logger.warn('File action missing filePath, skipping');
+        throw new Error('File action requires a filePath');
       }
 
       (actionAttributes as FileAction).filePath = filePath;
