@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { DeployButton } from '~/components/deploy/DeployButton';
+import { SupabaseConnection } from '~/components/chat/SupabaseConnection';
 
 interface HeaderActionButtonsProps {
   chatStarted: boolean;
@@ -19,6 +20,11 @@ export function HeaderActionButtons({ chatStarted: _chatStarted }: HeaderActionB
 
   return (
     <div className="flex items-center gap-1">
+      {/* Supabase Connect — always visible once a chat exists, unlike Deploy which needs a
+          build; this is the entry point users look for right here, next to Deploy, instead of
+          hunting for the icon-only version that used to live in the chat input toolbar. */}
+      <SupabaseConnection />
+
       {/* Deploy Button */}
       {shouldShowButtons && <DeployButton />}
 

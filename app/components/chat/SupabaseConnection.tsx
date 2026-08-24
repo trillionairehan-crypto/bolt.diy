@@ -5,6 +5,7 @@ import { useStore } from '@nanostores/react';
 import { chatId } from '~/lib/persistence/useChatHistory';
 import { fetchSupabaseStats } from '~/lib/stores/supabase';
 import { Dialog, DialogRoot, DialogClose, DialogTitle, DialogButton } from '~/components/ui/Dialog';
+import { isOpenSupabaseConnectionMessage } from '~/lib/supabase/previewBridge';
 
 interface SupabaseConnectionProps {
   showLabel?: boolean;
@@ -48,10 +49,23 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
       setIsDialogOpen(true);
     };
 
+    /*
+     * The generated app's own "샘플 데이터로 보고 있어요" banner runs inside the WebContainer
+     * preview iframe (a separate document) and can only reach this host page via postMessage —
+     * see previewBridge.ts for the shared message contract with new-prompt.ts's banner instructions.
+     */
+    const handlePreviewMessage = (event: MessageEvent) => {
+      if (isOpenSupabaseConnectionMessage(event.data)) {
+        setIsDialogOpen(true);
+      }
+    };
+
     document.addEventListener('open-supabase-connection', handleOpenConnectionDialog);
+    window.addEventListener('message', handlePreviewMessage);
 
     return () => {
       document.removeEventListener('open-supabase-connection', handleOpenConnectionDialog);
+      window.removeEventListener('message', handlePreviewMessage);
     };
   }, [setIsDialogOpen]);
 
@@ -128,7 +142,7 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
             src="https://cdn.simpleicons.org/supabase"
             alt=""
           />
-          {showLabel && <span className="ml-1 text-xs">{isConnected ? '연결됨' : '저장 기능 켜기'}</span>}
+          {showLabel && <span className="ml-1 text-xs">{isConnected ? 'Supabase 연결됨' : 'Supabase 연결'}</span>}
         </Button>
       </div>
 
