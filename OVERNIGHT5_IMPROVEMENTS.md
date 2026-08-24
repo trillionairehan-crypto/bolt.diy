@@ -1,5 +1,10 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 11. 배포 감사(사이클 12) — 영어 토스트 4개 파일은 고침, 나머지 1건은 판단 보류
+Explore 서브에이전트로 배포 표면(`app/components/deploy/*`)을 감사. 보고받은 3건 중 가장 확실한 것(GitHub/GitLab/Vercel/Netlify 배포 훅의 토스트/에러 문구가 CloudflareDeploy.client.tsx만 빼고 전부 영어)은 직접 재검증 후 4개 파일 전부 수정·테스트 추가·커밋(`f7c5d57`). 서브에이전트가 "double-click 레이스 컨디션"으로 보고한 건은 직접 코드 확인 결과 `DeployButton.tsx`가 5개 프로바이더 버튼 전부를 공유 `isDeploying` state로 동시에 disabled 처리하고 있어(Cloudflare 훅 내부의 재진입 가드는 오직 이 컴포넌트에서만 호출되는 defense-in-depth일 뿐, 실질적으로 막고 있는 다른 호출 경로가 없음) 실제 버그로 보기 어렵다고 판단해 수정 안 함. 아래 1건은 확인은 했으나 UX 설계 판단이 필요해 손 안 댐:
+
+- **`VercelDeploymentLink.client.tsx:116-120` — 배포 상태 조회 fetch 실패를 완전히 무음으로 삼킴** — `catch (err) { console.error(...) } finally { setIsLoading(false) }` 뒤 `deploymentUrl`이 `null`로 남고, 컴포넌트는 `if (!deploymentUrl) return null;`로 아무것도 렌더링하지 않음. 사용자 입장에선 "아직 배포 안 함"과 "상태 조회 자체가 실패함"(토큰 만료, 네트워크 오류, rate limit)을 구분할 방법이 없음. **왜 안 고쳤나**: 실패를 어떻게 보여줄지(재시도 버튼? 에러 아이콘? 조용히 다음 폴링을 기다릴지)가 UX 설계 결정이라 최소 변경 범위를 벗어남. **제안**: 최소한 실패 상태를 별도 state로 구분해서 콘솔 로그 외에 재시도 가능한 작은 인디케이터를 노출하는 정도로 시작 권장.
+
 ## 10. 미리보기/워크벤치 감사(사이클 11) — 3건은 고침, 4건은 판단 보류
 Explore 서브에이전트로 워크벤치(파일트리/에디터/터미널/미리보기) 표면을 감사. 보고받은 7건 중 3건(`ExpoQrModal.tsx` 영어 문구, `TerminalTabs.tsx` "Terminal" 영어 라벨, `Preview.tsx` "새 창/탭에서 열기" 실패 시 무음 → 토스트 추가)은 직접 재검증 후 수정·테스트 추가·커밋. 아래 4건은 확인은 했으나 범위가 크거나 확신도가 낮아 손 안 댐:
 

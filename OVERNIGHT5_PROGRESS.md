@@ -208,3 +208,14 @@
 - **검증**: `corepack pnpm vitest run` 311/311 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
 - **범위 밖으로 남긴 것(구조적 판단 필요, `OVERNIGHT5_IMPROVEMENTS.md` 항목 10으로 기록)**: (1) `FileTree.tsx` 우클릭 컨텍스트 메뉴 전체(8개 항목) + 실패 토스트 6곳이 영어 — 다음 사이클 최우선 후보. (2) `EditorPanel.tsx` 사이드바 탭("Files"/"Search"/"Locks")·버튼("Save"/"Reset") 영어. (3) `TerminalTabs.tsx`의 `closeTerminal`이 위치 기반 key라 중간 탭을 닫으면 다른 탭의 세션이 안 정리된 채 남을 수 있는 구조적 의심(런타임 미검증, 확신도 중간). (4) `Preview.tsx` iframe에 `onError` 폴백이 없어 실제 로드 실패 시 15초 뒤 무음으로 빈 화면만 보임 — 감지/재시도 UX 설계 필요.
 - **다음 감사 영역**: 배포로 갱신.
+
+### [04:00] Phase 2 — 사이클 12 (감사 대상: 배포)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 311/311 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/deploy/*`(GitHub/GitLab/Vercel/Netlify/Cloudflare 배포 훅, DeployButton.tsx, CustomDomainConnect.tsx, VercelDeploymentLink.client.tsx)를 대상으로 엣지 케이스, 에러 처리 누락, 한국어 문구, 다크모드/모바일 관점으로 점검 요청(사이클 4에서 이미 색상/다크모드 처리가 끝난 다이얼로그 2개는 제외 지시). 보고받은 3건 전부 직접 Read/Grep으로 재검증.
+- **정정한 것**: 서브에이전트가 "double-click 시 GitHub/GitLab/Vercel/Netlify 배포가 중복 실행될 수 있다"고 보고했으나, `DeployButton.tsx:41-148`을 직접 확인한 결과 5개 프로바이더 버튼이 전부 하나의 공유 `isDeploying` state로 동시에 disabled 처리되고 있어(Cloudflare 훅에만 있는 내부 재진입 가드는 이 컴포넌트가 유일한 호출자라 실질적으로 덧대는 방어일 뿐) 실제 위험은 낮다고 판단, 수정 안 함(`OVERNIGHT5_IMPROVEMENTS.md` 항목 11에 정정 기록).
+- **변경(1건, 전부 검증 완료 후 수정)**: `app/components/deploy/GitHubDeploy.client.tsx`/`GitLabDeploy.client.tsx`/`VercelDeploy.client.tsx`/`NetlifyDeploy.client.tsx` — 계정 미연결/채팅 없음/빌드 실패/배포 응답 오류/타임아웃 시 뜨는 토스트와 throw Error 문구가 `CloudflareDeploy.client.tsx`만 한국어이고 나머지 4개 프로바이더는 전부 영어 그대로였음(예: "Please connect your GitHub account...", "🚀 GitHub deployment preparation completed successfully!"). CloudflareDeploy.client.tsx의 기존 한국어 문구·용어를 그대로 맞춰 4개 파일 전부 번역.
+- **테스트**: `app/deployToastKoreanAudit.spec.ts` 신규 8건(소스 grep 방식, 기존 관행과 동일 — 문자열 리터럴만 정확히 매칭하도록 처음엔 느슨한 substring 패턴으로 오탐(코드 주석까지 걸림)이 나서 리터럴 앞뒤 문맥까지 포함하도록 좁혀 재작성).
+- **검증**: `corepack pnpm vitest run` 319/319 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `f7c5d57`
+- **범위 밖으로 남긴 것(구조적 판단 필요, `OVERNIGHT5_IMPROVEMENTS.md` 항목 11로 기록)**: `VercelDeploymentLink.client.tsx`의 배포 상태 조회 fetch 실패가 완전히 무음(콘솔 로그만, UI엔 아무것도 안 뜸) — "미배포"와 "조회 실패"를 구분 못 하는 문제, UX 설계 필요해 보류.
+- **다음 감사 영역**: 요금제/결제로 갱신.

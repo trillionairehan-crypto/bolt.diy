@@ -1,5 +1,6 @@
-다음 감사 영역: 배포
+다음 감사 영역: 요금제/결제
 
+[완료] GitHub/GitLab/Vercel/Netlify 배포 훅(useXDeploy)의 토스트/throw Error 문구가 CloudflareDeploy.client.tsx만 빼고 전부 영어 → 4개 파일 전부 한국어로 통일 — (사이클 12)
 [완료] ExpoQrModal.tsx 안내 문구 3곳이 전부 영어(제목/설명/URL 없음 안내) → 한국어로 번역 — (사이클 11)
 [완료] TerminalTabs.tsx 추가 터미널 탭 라벨 "Terminal {n}"이 영어 → "터미널 {n}"으로 번역 — (사이클 11)
 [완료] Preview.tsx "새 창/탭에서 열기" 실패(팝업 차단/잘못된 URL/미리보기 없음) 시 콘솔 로그만 있고 사용자에게 아무 안내 없음 → toast.error 추가 — (사이클 11)
@@ -22,6 +23,7 @@
 [손절] CORALRED_NEW_METERING 메터링 버그 — 코드 수정은 이미 준비돼 있으나 DB 마이그레이션(RUN-1-metering.sql) 미적용 확인 전에 플래그를 켜면 로그인 사용자 전체 생성 차단 장애 위험. 사람이 먼저 Supabase에 마이그레이션 적용 후 재시도 필요 (자세한 내용 OVERNIGHT5_BLOCKED.md)
 
 ## 참고 (큐 항목 아님)
+- 사이클 12(감사 대상: 배포)에서 서브에이전트로 배포 표면 재검색, "GitHub/GitLab/Vercel/Netlify 배포 훅 double-click 레이스" 후보는 직접 코드 확인 결과 `DeployButton.tsx`가 5개 프로바이더 전부에 공유 `isDeploying` state로 버튼을 동시에 disabled 처리하고 있어 실질적 위험이 낮다고 판단(오탐에 가까움, 수정 안 함). 영어 토스트/에러 문구 4개 파일 전부는 실제 버그로 확인돼 수정·테스트·커밋함(`f7c5d57`). `VercelDeploymentLink.client.tsx`의 fetch 실패 무음 처리는 구조적 판단(에러 vs 미배포 구분 UX 설계 필요)이라 `OVERNIGHT5_IMPROVEMENTS.md`에 기록만 함.
 - OVERNIGHT5_QUEUE.md 파일 자체가 유실되어 있어 한 사이클에 OVERNIGHT5_PROGRESS.md/BLOCKED.md/IMPROVEMENTS.md 및 git log를 근거로 재구성함. Phase 1(우선순위 수정 4건)은 모두 완료·커밋됨. 현재는 Phase 2(무한 검증 루프) 진행 중.
 - app/routes/pricing.tsx에 커밋 안 된 실제 PortOne 결제 연동 변경(loader + requestPayment 호출)이 작업 트리에 계속 남아있음(사이클 6 기준 여전히 미커밋). 이 세션들이 만든 변경이 아니고, 실제 결제 SDK를 호출하는 미완성 기능(서버 측 재검증 TODO 미해결)이라 자동 세션이 임의로 커밋하거나 되돌리지 않고 그대로 둠. 아침에 사람이 직접 검토 필요.
 - 사이클 5(감사 대상: 요금제/결제)에서 코드 수정 없이 감사만 진행 — 발견 사항은 전부 구조적(인증/티어 시스템 부재)이라 OVERNIGHT5_IMPROVEMENTS.md 항목 4로 기록. 자세한 내용은 PROGRESS.md 사이클 5 기록 참고.
