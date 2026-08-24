@@ -1,5 +1,93 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`StreamingMessageParser > malformed action tags > should skip a boltAction for a Supabase migration missing filePath instead of throwing > onActionClose 1`] = `
+{
+  "action": {
+    "content": "npm install",
+    "type": "shell",
+  },
+  "actionId": "0",
+  "artifactId": "message_1-0",
+  "messageId": "message_1",
+}
+`;
+
+exports[`StreamingMessageParser > malformed action tags > should skip a boltAction for a Supabase migration missing filePath instead of throwing > onActionOpen 1`] = `
+{
+  "action": {
+    "content": "",
+    "type": "shell",
+  },
+  "actionId": "0",
+  "artifactId": "message_1-0",
+  "messageId": "message_1",
+}
+`;
+
+exports[`StreamingMessageParser > malformed action tags > should skip a boltAction for a Supabase migration missing filePath instead of throwing > onArtifactClose 1`] = `
+{
+  "artifactId": "message_1-0",
+  "id": "message_1-0",
+  "messageId": "message_1",
+  "title": "Some title",
+  "type": undefined,
+}
+`;
+
+exports[`StreamingMessageParser > malformed action tags > should skip a boltAction for a Supabase migration missing filePath instead of throwing > onArtifactOpen 1`] = `
+{
+  "artifactId": "message_1-0",
+  "id": "message_1-0",
+  "messageId": "message_1",
+  "title": "Some title",
+  "type": undefined,
+}
+`;
+
+exports[`StreamingMessageParser > malformed action tags > should skip a boltAction with an invalid Supabase operation instead of throwing > onActionClose 1`] = `
+{
+  "action": {
+    "content": "npm install",
+    "type": "shell",
+  },
+  "actionId": "0",
+  "artifactId": "message_1-0",
+  "messageId": "message_1",
+}
+`;
+
+exports[`StreamingMessageParser > malformed action tags > should skip a boltAction with an invalid Supabase operation instead of throwing > onActionOpen 1`] = `
+{
+  "action": {
+    "content": "",
+    "type": "shell",
+  },
+  "actionId": "0",
+  "artifactId": "message_1-0",
+  "messageId": "message_1",
+}
+`;
+
+exports[`StreamingMessageParser > malformed action tags > should skip a boltAction with an invalid Supabase operation instead of throwing > onArtifactClose 1`] = `
+{
+  "artifactId": "message_1-0",
+  "id": "message_1-0",
+  "messageId": "message_1",
+  "title": "Some title",
+  "type": undefined,
+}
+`;
+
+exports[`StreamingMessageParser > malformed action tags > should skip a boltAction with an invalid Supabase operation instead of throwing > onArtifactOpen 1`] = `
+{
+  "artifactId": "message_1-0",
+  "id": "message_1-0",
+  "messageId": "message_1",
+  "title": "Some title",
+  "type": undefined,
+}
+`;
+
 exports[`StreamingMessageParser > valid artifacts with actions > should correctly parse chunks and strip out bolt artifacts (0) > onActionClose 1`] = `
 {
   "action": {

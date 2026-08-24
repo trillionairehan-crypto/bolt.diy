@@ -218,9 +218,22 @@ export class StreamingMessageParser {
             const actionEndIndex = input.indexOf('>', actionOpenIndex);
 
             if (actionEndIndex !== -1) {
-              state.insideAction = true;
+              let parsedAction: BoltActionData;
 
-              state.currentAction = this.#parseActionTag(input, actionOpenIndex, actionEndIndex);
+              try {
+                parsedAction = this.#parseActionTag(input, actionOpenIndex, actionEndIndex);
+              } catch (error) {
+                /*
+                 * Malformed action tag (e.g. invalid Supabase operation) — skip it instead of
+                 * throwing, which would otherwise crash the whole chat via the error boundary.
+                 */
+                logger.warn('Skipping malformed boltAction tag', error);
+                i = actionEndIndex + 1;
+                continue;
+              }
+
+              state.insideAction = true;
+              state.currentAction = parsedAction;
 
               this._options.callbacks?.onActionOpen?.({
                 artifactId: currentArtifact.id,

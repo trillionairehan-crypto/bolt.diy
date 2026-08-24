@@ -157,6 +157,32 @@ describe('StreamingMessageParser', () => {
       runTest(input, expected);
     });
   });
+
+  describe('malformed action tags', () => {
+    it('should skip a boltAction with an invalid Supabase operation instead of throwing', () => {
+      const input =
+        'Before <boltArtifact title="Some title" id="artifact_1">' +
+        '<boltAction type="supabase" operation="not-a-real-operation">select 1;</boltAction>' +
+        '<boltAction type="shell">npm install</boltAction>' +
+        '</boltArtifact> After';
+
+      expect(() =>
+        runTest(input, { output: 'Before  After', callbacks: { onActionOpen: 1, onActionClose: 1 } }),
+      ).not.toThrow();
+    });
+
+    it('should skip a boltAction for a Supabase migration missing filePath instead of throwing', () => {
+      const input =
+        'Before <boltArtifact title="Some title" id="artifact_1">' +
+        '<boltAction type="supabase" operation="migration">create table foo();</boltAction>' +
+        '<boltAction type="shell">npm install</boltAction>' +
+        '</boltArtifact> After';
+
+      expect(() =>
+        runTest(input, { output: 'Before  After', callbacks: { onActionOpen: 1, onActionClose: 1 } }),
+      ).not.toThrow();
+    });
+  });
 });
 
 describe('EnhancedStreamingMessageParser', () => {
