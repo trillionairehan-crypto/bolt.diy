@@ -15,10 +15,17 @@ interface CustomDomainConnectProps {
   projectName: string;
 }
 
-type ConnectState = 'idle' | 'connecting' | 'pending' | 'active' | 'error';
+type ConnectState = 'idle' | 'connecting' | 'pending' | 'active' | 'timeout' | 'error';
 
 export function CustomDomainConnect({ projectName }: CustomDomainConnectProps) {
   const [domain, setDomain] = useState('');
+
+  /*
+   * Snapshot of the domain actually being connected — kept separate from the (still-editable)
+   * input value above, so a "다시 확인하기" retry after a timeout can't accidentally check a
+   * domain the user has since typed over.
+   */
+  const [connectedDomain, setConnectedDomain] = useState('');
   const [state, setState] = useState<ConnectState>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const pollCountRef = useRef(0);
@@ -44,7 +51,7 @@ export function CustomDomainConnect({ projectName }: CustomDomainConnectProps) {
 
         if (!response.ok || !data.success) {
           setState('error');
-          setErrorMessage(data.error || '상태 확인에 실패했어요.');
+          setErrorMessage(data.error || '상태를 확인하지 못했어요. 잠시 후 다시 시도해주세요.');
 
           return;
         }
@@ -55,14 +62,18 @@ export function CustomDomainConnect({ projectName }: CustomDomainConnectProps) {
         }
 
         if (pollCountRef.current >= MAX_POLLS) {
-          // Not an error — DNS propagation can take a while. Stop polling; the user can re-check later.
+          /*
+           * Not an error — DNS propagation can take a while. Stop auto-polling and let the user
+           * manually re-check, rather than silently freezing on "확인하고 있어요..." forever.
+           */
+          setState('timeout');
           return;
         }
 
         pollStatus(connectedDomain);
       } catch {
         setState('error');
-        setErrorMessage('상태 확인에 실패했어요.');
+        setErrorMessage('상태를 확인하지 못했어요. 잠시 후 다시 시도해주세요.');
       }
     }, POLL_INTERVAL_MS);
   };
@@ -98,6 +109,7 @@ export function CustomDomainConnect({ projectName }: CustomDomainConnectProps) {
         return;
       }
 
+      setConnectedDomain(trimmed);
       setState('pending');
       pollCountRef.current = 0;
       pollStatus(trimmed);
@@ -105,6 +117,12 @@ export function CustomDomainConnect({ projectName }: CustomDomainConnectProps) {
       setState('error');
       setErrorMessage('도메인 연결에 실패했어요. 잠시 후 다시 시도해주세요.');
     }
+  };
+
+  const handleRecheck = () => {
+    setState('pending');
+    pollCountRef.current = 0;
+    pollStatus(connectedDomain);
   };
 
   if (!TODO_IS_PRO_USER) {
@@ -145,17 +163,26 @@ export function CustomDomainConnect({ projectName }: CustomDomainConnectProps) {
 
       {state === 'pending' && (
         <>
-          <p className="cr-caption">도메인 상태를 확인하고 있어요 (대기 중)...</p>
+          <p className="cr-caption">도메인을 연결하고 있어요. 조금 걸릴 수 있어요.</p>
           <p className="cr-caption">
             도메인을 다른 곳에서 등록했다면, 등록기관의 DNS 설정에서 CNAME 레코드를 추가해주세요:{' '}
             <span className="cr-mono">
-              {domain || '도메인'} → {projectName}.pages.dev
+              {connectedDomain || domain || '도메인'} → {projectName}.pages.dev
             </span>
           </p>
         </>
       )}
 
-      {state === 'active' && <p className="cr-caption">도메인이 연결됐어요 (활성).</p>}
+      {state === 'timeout' && (
+        <>
+          <p className="cr-caption">아직 연결 중이에요. DNS 반영에 시간이 더 걸릴 수 있어요.</p>
+          <button type="button" onClick={handleRecheck} className="cr-btn outline" style={{ width: 'fit-content' }}>
+            다시 확인하기
+          </button>
+        </>
+      )}
+
+      {state === 'active' && <p className="cr-caption">도메인이 연결됐어요.</p>}
 
       {state === 'error' && errorMessage && <p className="cr-caption">{errorMessage}</p>}
     </div>

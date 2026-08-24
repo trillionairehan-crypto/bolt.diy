@@ -251,7 +251,9 @@ export function ErrorBoundary() {
         padding: '2rem',
       }}
     >
-      <p style={{ fontSize: '0.9rem', color: '#57534e', margin: 0 }}>화면에 문제가 생겼어요</p>
+      <p style={{ fontSize: '0.9rem', color: 'var(--bolt-elements-textSecondary)', margin: 0 }}>
+        화면에 문제가 생겼어요
+      </p>
       <button
         onClick={() => window.location.reload()}
         style={{
