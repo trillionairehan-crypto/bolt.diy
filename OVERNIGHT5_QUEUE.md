@@ -1,4 +1,4 @@
-다음 감사 영역: 생성
+다음 감사 영역: 미리보기/워크벤치
 
 [완료] ChatBox.tsx 전송 버튼이 공백만 입력해도 활성화(input.length 기준) → trim 기준으로 수정 — aff3c5c
 [완료] PromptClarification.tsx "바로 만들기"/"만들기" 더블탭 시 onComplete(→generateNewApp) 중복 호출 가능 → completedRef 가드 추가 — aff3c5c
@@ -23,3 +23,4 @@
 - app/routes/pricing.tsx에 커밋 안 된 실제 PortOne 결제 연동 변경(loader + requestPayment 호출)이 작업 트리에 계속 남아있음(사이클 6 기준 여전히 미커밋). 이 세션들이 만든 변경이 아니고, 실제 결제 SDK를 호출하는 미완성 기능(서버 측 재검증 TODO 미해결)이라 자동 세션이 임의로 커밋하거나 되돌리지 않고 그대로 둠. 아침에 사람이 직접 검토 필요.
 - 사이클 5(감사 대상: 요금제/결제)에서 코드 수정 없이 감사만 진행 — 발견 사항은 전부 구조적(인증/티어 시스템 부재)이라 OVERNIGHT5_IMPROVEMENTS.md 항목 4로 기록. 자세한 내용은 PROGRESS.md 사이클 5 기록 참고.
 - 사이클 6(감사 대상: 다크모드)에서 서브에이전트로 앱 전체 재검색, 이전 사이클들이 놓친 같은 버그 클래스(하드코딩 accent hex) 9곳(7개 파일)을 찾아 전부 수정·테스트 추가·커밋함(b204747). `app/utils/globalErrorRecovery.ts`의 React 트리 밖 크래시 카드는 판단 보류로 IMPROVEMENTS.md 항목 1에 남김(의도적 설계인지 불명확). `app/components/chat/StarterTemplates.tsx`는 프로덕션에서 도달 불가한 죽은 코드 경로로 확인되어 손 안 댐. `app/root.tsx`의 404 히어로는 의도된 고정 코랄로 재확인, 그대로 둠.
+- 사이클 10(감사 대상: 생성)에서 서브에이전트로 액션 실행/파싱/스트리밍 표면 감사, 실제 크래시 버그(잘못된 `boltAction` 태그 → 어디서도 안 잡히는 throw → 채팅 전체 에러 화면) 발견해 수정·테스트 추가·커밋함(`d158d4b`). 나머지 4건(Supabase 실패 무음, 영어 에러 문구, 빌드 실패 중복 알림, cp/mv 죽은 검증 경고)은 IMPROVEMENTS.md 항목 9에 기록만 하고 손 안 댐.

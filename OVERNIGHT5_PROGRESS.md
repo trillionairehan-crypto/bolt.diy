@@ -186,3 +186,13 @@
 - **커밋**: `aff3c5c`
 - **범위 밖으로 남긴 것(구조적 판단 필요, IMPROVEMENTS.md 항목 7·8로 기록)**: (1) 온보딩 완료 직후 `generateNewApp()`이 무료 생성 한도 초과/네트워크 오류로 실패하면, 이미 랜딩/온보딩 UI가 언마운트된 뒤라 사용자가 빈 채팅창만 보게 되는 문제 — 토스트 하나만 스쳐 지나가고 재시도 수단이 없음. 상태 전환 순서를 바꾸거나 실패 시 되돌리는 UX 설계가 필요해 보류. (2) `generateAppQuestions.ts`가 API 실패와 "정상적으로 추가 질문 없음"을 구분 없이 둘 다 `null`/빈 배열로 처리해 완전히 조용함 — 실패를 사용자에게 어떻게 노출할지(또는 안 할지) 판단 근거 부족해 보류. 그 외 낮은 우선순위(모바일 섹션 padding 반응형 부재)는 기록 없이 넘김.
 - **다음 감사 영역**: 생성으로 갱신.
+
+### [03:35] Phase 2 — 사이클 10 (감사 대상: 생성)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 306/306 통과, `pnpm run build` 성공(client+server). `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 큐에도 기록돼 있음) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `action-runner.ts`(액션 실행), `message-parser.ts`(스트리밍 파싱), `Artifact.tsx`/`Messages.client.tsx`(진행 상황 렌더), `api.chat.ts`(서버 스트리밍 라우트)를 대상으로 스트림 에러/불완전 태그 처리, 무음 실패, 한국어 문구, 다크모드/모바일 관점으로 점검 요청. 보고받은 5건 전부 직접 Read로 재검증(콜 체인 추적 포함).
+- **변경(1건, 크래시 버그 — 검증 완료 후 수정)**: `app/lib/runtime/message-parser.ts`(`#parseActionTag` 호출부, `parse()` 내부) — Supabase 액션의 `operation`이 `migration`/`query`가 아니거나 `migration`인데 `filePath`가 없으면 `#parseActionTag`가 `throw`하는데, 이를 잡는 `try/catch`가 `useMessageParser.ts`→`Chat.client.tsx`→`EnhancedStreamingMessageParser.parse` 어느 호출 체인에도 없어서 `ChatErrorBoundary`까지 전파돼 채팅 세션 전체가 에러 화면으로 크래시되는 구조였음(AI가 이런 태그를 출력하는 건 드물지만 한 번이라도 발생하면 사용자가 대화를 통째로 잃음). `#parseActionTag` 호출을 `try/catch`로 감싸 실패 시 해당 액션 태그만 건너뛰고(`state.insideAction`을 true로 만들지 않고 `i`를 태그 끝으로 이동) 나머지 스트림 파싱은 계속하도록 수정.
+- **테스트**: `app/lib/runtime/message-parser.spec.ts`에 신규 2건(잘못된 operation / migration인데 filePath 없음, 둘 다 `runTest` 헬퍼로 "안 던지고 다음 액션은 정상 처리됨"을 스냅샷으로 검증).
+- **검증**: `corepack pnpm vitest run` 308/308 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `d158d4b`
+- **범위 밖으로 남긴 것(구조적 판단 필요, `OVERNIGHT5_IMPROVEMENTS.md` 항목 9로 기록)**: (1) Supabase 액션 실패가 알림 없이 완전히 무음(콜백 미호출 + `Artifact.tsx`가 목록에서 아예 필터링) — 알림 플러밍 신설이 필요해 보류. (2) 쉘 액션 에러 제목 6개가 영어로 하드코딩돼 한국어 UI에 그대로 노출 — 다른 참조 여부 전수 확인 먼저 필요. (3) 빌드 실패 시 알림이 두 번 뜨고 두 번째가 항상 'Dev Server Failed'로 잘못 표시 — 실제 사용자 영향 브라우저 재현 필요(확신도 중간). (4) `cp`/`mv` 원본 없음 검증 결과가 호출부에서 읽히지 않아 항상 버려지는 죽은 코드 — 낮은 우선순위.
+- **다음 감사 영역**: 미리보기/워크벤치로 갱신.
