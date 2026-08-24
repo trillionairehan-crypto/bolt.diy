@@ -29,6 +29,8 @@ preview-output
 /.cache
 /build
 functions/build/
+# Vite writes this transient file when vite.config.ts's own load crashes — never meant to be committed
+vite.config.ts.timestamp-*.mjs
 .env.local
 .env
 .dev.vars
