@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useStore } from '@nanostores/react';
-import { logStore } from '~/lib/stores/logs';
 import {
   supabaseConnection,
   isConnecting,
@@ -63,51 +62,6 @@ export function useSupabaseConnection() {
 
     initConnection();
   }, []);
-
-  const handleConnect = async () => {
-    isConnecting.set(true);
-
-    try {
-      const cleanToken = connection.token.trim();
-
-      const response = await fetch('/api/supabase', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token: cleanToken,
-        }),
-      });
-
-      const data = (await response.json()) as any;
-
-      if (!response.ok) {
-        throw new Error(data.error || '연결에 실패했어요');
-      }
-
-      updateSupabaseConnection({
-        user: data.user,
-        token: connection.token,
-        stats: data.stats,
-      });
-
-      toast.success('Supabase에 연결됐어요');
-
-      setIsProjectsExpanded(true);
-
-      return true;
-    } catch (error) {
-      console.error('Connection error:', error);
-      logStore.logError('Failed to authenticate with Supabase', { error });
-      toast.error(error instanceof Error ? error.message : '연결 키가 올바르지 않아요. 다시 확인해주세요.');
-      updateSupabaseConnection({ user: null, token: '' });
-
-      return false;
-    } finally {
-      isConnecting.set(false);
-    }
-  };
 
   /**
    * The simplified connect path (project URL + anon key only — no personal access token, no
@@ -230,14 +184,12 @@ export function useSupabaseConnection() {
     setIsProjectsExpanded,
     isDropdownOpen,
     setIsDropdownOpen,
-    handleConnect,
     handleSimpleConnect,
     simpleConnecting,
     simpleConnectError,
     handleDisconnect,
     selectProject,
     handleCreateProject,
-    updateToken: (token: string) => updateSupabaseConnection({ ...connection, token }),
 
     /*
      * Single source of truth (app/lib/stores/supabase.ts computes this for both the token+project
