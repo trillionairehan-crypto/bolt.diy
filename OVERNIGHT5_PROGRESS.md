@@ -230,3 +230,14 @@
 - **커밋**: `54326e0`
 - **범위 밖으로 남긴 것(구조적/판단 필요, `OVERNIGHT5_IMPROVEMENTS.md` 항목 12로 기록)**: (1) `freeTrial.ts`의 로그인 사용자 조회/증가 함수가 "Supabase 클라이언트 없음" 상황을 다르게 처리(조회는 조용히 0, 증가는 throw) — 메터링 관련이라 위험 회피, 손 안 댐. (2) `freeTrial.ts`의 게스트 localStorage 카운터가 원자성 없는 read-modify-write라 동시 요청 시 언더카운트 가능 — 마찬가지로 메터링, 손 안 댐. (3) `api.cloudflare-domain.ts`의 도메인 정규식이 한글 도메인을 거부하면서 퓨니코드 안내가 없음 — 낮은 우선순위 UX 갭. (4) `cloudflarePages.ts`의 무료 배지 문구 "Made with 코랄레드"(영어+한국어 혼용) — 의도적 브랜딩 관용구일 가능성 높아 기록만.
 - **다음 감사 영역**: 다크모드로 갱신.
+
+### [04:24] Phase 2 — 사이클 14 (감사 대상: 다크모드)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 321/321 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 작업, 수정 금지 파일) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/` 전체(이미 정리된 파일들 제외 지시)를 대상으로 하드코딩 accent hex 신규 사례, 죽은 dark 토큰, 저대비/불일치 다크모드 표면을 재검색. 보고받은 5건 전부 직접 Grep/Read로 재검증.
+- **발견·수정(1건)**: `app/routes/privacy.tsx:178`, `app/routes/terms.tsx:121,172`, `app/components/legal/LegalPageLayout.tsx:26` — 법률 페이지(개인정보처리방침/이용약관) 링크 4곳이 `text-[#FF5330]` 하드코딩. 이 페이지들은 배경/텍스트/보더 전부 `bolt-elements-*` 테마 토큰을 쓰는데 링크만 라이트모드 고정 코랄로 남아 다크모드 `--accent`와 어긋났음. `OVERNIGHT5_IMPROVEMENTS.md` 항목 1에 "미확인"으로 남아있던 후보였는데 이번에 직접 확인해 버그로 확정 — `login.tsx`/`signup.tsx`가 이미 쓰는 `style={{ color: 'var(--accent)' }}` 패턴으로 통일.
+- **판단 보류(수정 안 함, 확신도 낮거나 범위 확장 필요)**: (1) `NetlifyConnection.tsx:861-862`의 `text-bolt-elements-textDestructive`가 `uno.config.ts`에 정의 안 된 죽은 토큰 — 에러 메시지 강조색이 빠지는 문제로 보이나 에러 상황에서만 보여 확신도/영향도 중간, 다음 사이클 후보로 남김. (2) `NetlifyTab.tsx`/`NetlifyConnection.tsx`의 `bolt-elements-link-text`/`link-textHover` 죽은 토큰 4곳 — 같은 패턴, 범위 확인 더 필요. (3) GitHub/GitLab 저장소 카드의 `icon-warning`/`icon-info` 죽은 토큰 다수(별 아이콘 등 색상 누락) — 파일 수가 많아 범위 큼, 다음 사이클로 미룸. (4) `Search.tsx:203`의 `text-gray-500`이 형제 상태(`text-bolt-elements-textTertiary`)와 토큰 불일치 — 확신도 낮은 스타일 닛(nit)으로 판단, 손 안 댐.
+- **테스트**: `app/legalPagesAccentAudit.spec.ts` 신규 3건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm vitest run` 324/324 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `6f9b309`
+- **범위 밖으로 남긴 것**: 위 판단 보류 4건 모두 `OVERNIGHT5_IMPROVEMENTS.md` 항목 13으로 신규 기록.
+- **다음 감사 영역**: 모바일로 갱신.

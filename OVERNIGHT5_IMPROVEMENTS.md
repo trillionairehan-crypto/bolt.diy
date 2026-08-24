@@ -1,5 +1,13 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 13. 다크모드 감사(사이클 14) — 죽은 토큰/토큰 불일치 4건, 범위 확장 필요해 보류
+Explore 서브에이전트로 `app/` 전체 재검색, 법률 페이지 링크 하드코딩 건(고침, `6f9b309`)은 별도. 아래 4건은 확인은 했으나 범위가 넓거나 확신도가 낮아 손 안 댐:
+
+- **`app/components/@settings/tabs/netlify/components/NetlifyConnection.tsx:861-862`의 `text-bolt-elements-textDestructive`가 `uno.config.ts`에 정의 안 된 죽은 토큰** — 빌드 실패 에러 메시지의 강조색(빨강)이 빠지는 것으로 보임(`icon-error`가 올바른 토큰일 가능성). **왜 안 고쳤나**: 에러 상황에서만 노출돼 실사용 빈도가 낮고, 정확한 대체 토큰 확정에 UI 스크린샷 확인이 필요해 보류. **제안**: `text-bolt-elements-icon-error`로 교체 검토.
+- **`NetlifyTab.tsx:931,1085`/`NetlifyConnection.tsx:653,774`의 `bolt-elements-link-text`/`link-textHover`가 죽은 토큰**(정의된 건 `bolt-elements-link`뿐) — 링크가 라이트에선 상속색, 다크에선 죽은 hover 클래스로 렌더. **왜 안 고쳤나**: 4곳 전부 같은 파일 내 여러 위치라 한 번에 고쳐야 하는데 이번 사이클은 이미 다른 항목을 처리해 범위 초과, 다음 사이클 후보로 남김.
+- **GitHub/GitLab 저장소 카드 다수 파일의 `icon-warning`/`icon-info`/`icon-accent` 죽은 토큰** — `GitHubStats.tsx`, `RepositoryCard.tsx`(github/gitlab 둘 다), `GitHubRepositoryCard.tsx`, `StatsDisplay.tsx` 등 별점/포크/레포 아이콘이 색 없이 렌더. **왜 안 고쳤나**: 파일 수가 많고(6개 이상) `uno.config.ts`의 `icon` 테마 블록에 어떤 토큰을 새로 추가할지 결정이 먼저 필요해 최소 변경 범위를 넘어섬. **제안**: `uno.config.ts`에 `icon-warning`/`icon-info` 토큰 정의를 추가하거나 기존 `icon-primary`/`icon-secondary`로 통일하는 방향을 사람이 먼저 결정 권장.
+- **`app/components/workbench/Search.tsx:203`의 `text-gray-500`이 형제 상태(`text-bolt-elements-textTertiary`)와 토큰 불일치** — "검색 중..."은 테마 토큰인데 "No results found."는 하드코딩 Tailwind 회색. **왜 안 고쳤나**: 다크모드에서도 대비가 크게 나쁘진 않아 보여 확신도 낮은 스타일 닛으로 판단, 우선순위 낮음.
+
 ## 12. 요금제/결제 감사(사이클 13) — 크래시 버그 1건은 고침, 나머지는 판단 보류
 Explore 서브에이전트로 `pricing.tsx`(수정 금지 파일, 감사 대상에서 제외)를 뺀 요금제/결제 연결 표면(`api.payment.*`, `api.cloudflare-domain.ts`, `api.cloudflare-deploy.ts`, `freeTrial.ts`, `cloudflarePages.ts`)을 감사. 가장 확실한 것(`api.cloudflare-deploy.ts`가 손상된 base64 파일 콘텐츠에 대해 안내 없는 원시 500으로 크래시)은 직접 재검증 후 수정·테스트 추가·커밋(`54326e0`). 아래는 확인은 했으나 손 안 댄 것:
 
@@ -46,7 +54,7 @@ Phase 2 사이클 1·2에서 3개 파일(`PromptClarification.tsx`, `Artifact.ts
 - `app/components/ui/Logo.tsx`, `app/components/landing/CoralredHero.tsx` — 브랜드 로고/마케팅 히어로. 마찬가지로 고정색이 맞을 가능성 높음.
 - `app/root.tsx` — 브라우저 UI(주소창 등)에 쓰는 `theme-color` meta 태그일 가능성. 고정값이 맞음.
 - `app/utils/paletteToHue.ts`, `app/lib/onboarding/answer-directives.ts` — hue↔hex 룩업 테이블 자체. `#FF5330`이 `--hue: 33`의 "대표 hex"로 쓰이는 상수라 여기 있는 건 정상(값 자체가 이 상수를 정의하는 곳).
-- `app/routes/privacy.tsx`, `app/routes/terms.tsx`, `app/components/legal/LegalPageLayout.tsx` — 미확인, 로고/헤더 부분일 가능성.
+- `app/routes/privacy.tsx`, `app/routes/terms.tsx`, `app/components/legal/LegalPageLayout.tsx` — ✅ **판단 완료·수정됨(사이클 14)**. 로고/헤더가 아니라 본문 링크 4곳(이메일/내부 링크)이었고, 이 페이지들은 배경/텍스트/보더 전부 테마 토큰을 쓰는데 링크만 하드코딩이라 버그로 확인 → `var(--accent)`로 교체, `app/legalPagesAccentAudit.spec.ts`로 회귀 방지.
 - `app/components/chat/APIKeyManager.tsx`, `ChatBox.tsx`(SVG 그라디언트만; isLanding 전용 인라인 스타일 블록은 의도된 고정색이라 그대로 둠), `ChatErrorBoundary.tsx`, `ModelSelector.tsx`, `app/components/deploy/GitHubDeploymentDialog.tsx`, `GitLabDeploymentDialog.tsx`, `app/components/sidebar/HistoryItem.tsx`, `Menu.client.tsx`, `app/components/ui/Slider.tsx`, `app/components/workbench/FileTree.tsx` — ✅ **모두 판단 완료·수정됨**(FileTree/GitHub·GitLabDeploymentDialog는 사이클 3·4에서, 나머지 7개는 사이클 6에서). 전부 앱 작업 화면 안 요소로 확인돼 `var(--accent)`/`var(--on-accent)`/`var(--accent-hover)`로 교체, `app/darkModeAccentAudit.spec.ts`로 회귀 방지.
 - `app/root.tsx` 404 히어로(`background: '#FF5330'` 등 여러 곳) — 확인 결과 의도된 고정 코랄 브랜드 화면(로고 `onCoral` variant 사용)이 맞음. 단, 같은 파일의 **일반** `ErrorBoundary`(비-404 렌더 크래시 화면)의 재시작 버튼은 별개로 하드코딩돼 있었고 이건 버그였음 — 사이클 6에서 `var(--accent)`로 수정.
 - `app/components/chat/StarterTemplates.tsx` — 미확인이었으나 `SHOW_DEV_TOOLS && !chatStarted` 뒤에 있는 죽은 코드 경로(프로덕션에서 도달 불가)로 확인됨. 실사용 버그 아님 — 손 안 댐, 낮은 우선순위로 남김.

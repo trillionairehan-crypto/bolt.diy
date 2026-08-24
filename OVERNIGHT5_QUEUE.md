@@ -1,4 +1,4 @@
-다음 감사 영역: 다크모드
+다음 감사 영역: 모바일
 
 [완료] Cloudflare 배포 API(api.cloudflare-deploy.ts)가 손상된 base64 파일 콘텐츠에 안내 없는 원시 500으로 크래시하던 문제 → try/catch로 감싸 친절한 한국어 400 응답 — (사이클 13)
 [완료] GitHub/GitLab/Vercel/Netlify 배포 훅(useXDeploy)의 토스트/throw Error 문구가 CloudflareDeploy.client.tsx만 빼고 전부 영어 → 4개 파일 전부 한국어로 통일 — (사이클 12)
@@ -22,6 +22,7 @@
 [완료] Phase2 사이클4(배포) GitHubDeploymentDialog.tsx/GitLabDeploymentDialog.tsx #FF5330/#E44A28 하드코딩 → var(--accent)/var(--on-accent)/var(--accent-hover) — cf6f6d9
 [완료] Phase2 사이클6(다크모드) ChatBox/Slider/APIKeyManager/ModelSelector/Menu.client/HistoryItem/ChatErrorBoundary/root.tsx 하드코딩 accent hex → var(--accent) 계열 — b204747
 [손절] CORALRED_NEW_METERING 메터링 버그 — 코드 수정은 이미 준비돼 있으나 DB 마이그레이션(RUN-1-metering.sql) 미적용 확인 전에 플래그를 켜면 로그인 사용자 전체 생성 차단 장애 위험. 사람이 먼저 Supabase에 마이그레이션 적용 후 재시도 필요 (자세한 내용 OVERNIGHT5_BLOCKED.md)
+[완료] 법률 페이지(privacy/terms/LegalPageLayout) 링크 4곳이 하드코딩 #FF5330 라이트모드 코랄로 남아 다크모드 --accent와 어긋나던 문제 → var(--accent)로 통일 — (사이클 14)
 
 ## 참고 (큐 항목 아님)
 - 사이클 12(감사 대상: 배포)에서 서브에이전트로 배포 표면 재검색, "GitHub/GitLab/Vercel/Netlify 배포 훅 double-click 레이스" 후보는 직접 코드 확인 결과 `DeployButton.tsx`가 5개 프로바이더 전부에 공유 `isDeploying` state로 버튼을 동시에 disabled 처리하고 있어 실질적 위험이 낮다고 판단(오탐에 가까움, 수정 안 함). 영어 토스트/에러 문구 4개 파일 전부는 실제 버그로 확인돼 수정·테스트·커밋함(`f7c5d57`). `VercelDeploymentLink.client.tsx`의 fetch 실패 무음 처리는 구조적 판단(에러 vs 미배포 구분 UX 설계 필요)이라 `OVERNIGHT5_IMPROVEMENTS.md`에 기록만 함.
