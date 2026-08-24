@@ -13,7 +13,7 @@ export default function ProfileTab() {
   const debouncedUpdate = useCallback(
     debounce((field: 'username' | 'bio', value: string) => {
       updateProfile({ [field]: value });
-      toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} updated`);
+      toast.success(field === 'username' ? '사용자 이름이 업데이트됐어요' : '소개가 업데이트됐어요');
     }, 1000),
     [],
   );
@@ -35,19 +35,19 @@ export default function ProfileTab() {
         const base64String = reader.result as string;
         updateProfile({ avatar: base64String });
         setIsUploading(false);
-        toast.success('Profile picture updated');
+        toast.success('프로필 사진이 업데이트됐어요');
       };
 
       reader.onerror = () => {
         console.error('Error reading file:', reader.error);
         setIsUploading(false);
-        toast.error('Failed to update profile picture');
+        toast.error('프로필 사진을 업데이트하지 못했어요');
       };
       reader.readAsDataURL(file);
     } catch (error) {
       console.error('Error uploading avatar:', error);
       setIsUploading(false);
-      toast.error('Failed to update profile picture');
+      toast.error('프로필 사진을 업데이트하지 못했어요');
     }
   };
 
@@ -81,7 +81,7 @@ export default function ProfileTab() {
               {profile.avatar ? (
                 <img
                   src={profile.avatar}
-                  alt="Profile"
+                  alt="프로필"
                   className={classNames(
                     'w-full h-full object-cover',
                     'transition-all duration-300 ease-out',
@@ -117,14 +117,14 @@ export default function ProfileTab() {
             </div>
 
             <div className="flex-1 pt-1">
-              <label className="block text-base font-medium text-bolt-elements-textPrimary mb-1">Profile Picture</label>
-              <p className="text-sm text-bolt-elements-textSecondary">Upload a profile picture or avatar</p>
+              <label className="block text-base font-medium text-bolt-elements-textPrimary mb-1">프로필 사진</label>
+              <p className="text-sm text-bolt-elements-textSecondary">프로필 사진이나 아바타를 업로드하세요</p>
             </div>
           </div>
 
           {/* Username Input */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-bolt-elements-textPrimary mb-2">Username</label>
+            <label className="block text-sm font-medium text-bolt-elements-textPrimary mb-2">사용자 이름</label>
             <div className="relative group">
               <div className="absolute left-3.5 top-1/2 -translate-y-1/2">
                 <div className="i-ph:user-circle-fill w-5 h-5 text-bolt-elements-textTertiary transition-colors group-focus-within:text-purple-500" />
@@ -142,14 +142,14 @@ export default function ProfileTab() {
                   'focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50',
                   'transition-all duration-300 ease-out',
                 )}
-                placeholder="Enter your username"
+                placeholder="사용자 이름을 입력하세요"
               />
             </div>
           </div>
 
           {/* Bio Input */}
           <div className="mb-8">
-            <label className="block text-sm font-medium text-bolt-elements-textPrimary mb-2">Bio</label>
+            <label className="block text-sm font-medium text-bolt-elements-textPrimary mb-2">소개</label>
             <div className="relative group">
               <div className="absolute left-3.5 top-3">
                 <div className="i-ph:text-aa w-5 h-5 text-bolt-elements-textTertiary transition-colors group-focus-within:text-purple-500" />
@@ -168,7 +168,7 @@ export default function ProfileTab() {
                   'resize-none',
                   'h-32',
                 )}
-                placeholder="Tell us about yourself"
+                placeholder="자신에 대해 소개해주세요"
               />
             </div>
           </div>
