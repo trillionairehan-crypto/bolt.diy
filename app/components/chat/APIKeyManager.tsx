@@ -89,23 +89,23 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
     <div className="flex items-center justify-between py-3 px-1">
       <div className="flex items-center gap-2 flex-1">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-bolt-elements-textSecondary">{provider?.name} API Key:</span>
+          <span className="text-sm font-medium text-bolt-elements-textSecondary">{provider?.name} API 키:</span>
           {!isEditing && (
             <div className="flex items-center gap-2">
               {apiKey ? (
                 <>
                   <div className="i-ph:check-circle-fill text-green-500 w-4 h-4" />
-                  <span className="text-xs text-green-500">Set via UI</span>
+                  <span className="text-xs text-green-500">화면에서 설정됨</span>
                 </>
               ) : isEnvKeySet ? (
                 <>
                   <div className="i-ph:check-circle-fill text-green-500 w-4 h-4" />
-                  <span className="text-xs text-green-500">Set via environment variable</span>
+                  <span className="text-xs text-green-500">환경 변수로 설정됨</span>
                 </>
               ) : (
                 <>
                   <div className="i-ph:x-circle-fill text-red-500 w-4 h-4" />
-                  <span className="text-xs text-red-500">Not Set (Please set via UI or ENV_VAR)</span>
+                  <span className="text-xs text-red-500">설정 안 됨 (화면 또는 환경 변수로 설정해 주세요)</span>
                 </>
               )}
             </div>
@@ -119,7 +119,7 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
             <input
               type="password"
               value={tempKey}
-              placeholder="Enter API Key"
+              placeholder="API 키 입력"
               onChange={(e) => setTempKey(e.target.value)}
               className="w-[min(300px,calc(100vw-10rem))] px-3 py-1.5 text-sm rounded border border-bolt-elements-borderColor
                         bg-bolt-elements-prompt-background text-bolt-elements-textPrimary
@@ -127,14 +127,14 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
             />
             <IconButton
               onClick={handleSave}
-              title="Save API Key"
+              title="API 키 저장"
               className="bg-green-500/10 hover:bg-green-500/20 text-green-500"
             >
               <div className="i-ph:check w-4 h-4" />
             </IconButton>
             <IconButton
               onClick={() => setIsEditing(false)}
-              title="Cancel"
+              title="취소"
               className="bg-red-500/10 hover:bg-red-500/20 text-red-500"
             >
               <div className="i-ph:x w-4 h-4" />
@@ -145,7 +145,7 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
             {
               <IconButton
                 onClick={() => setIsEditing(true)}
-                title="Edit API Key"
+                title="API 키 수정"
                 className="bg-blue-500/10 hover:bg-blue-500/20 text-blue-500"
               >
                 <div className="i-ph:pencil-simple w-4 h-4" />
@@ -154,10 +154,10 @@ export const APIKeyManager: React.FC<APIKeyManagerProps> = ({ provider, apiKey, 
             {provider?.getApiKeyLink && !apiKey && (
               <IconButton
                 onClick={() => window.open(provider?.getApiKeyLink)}
-                title="Get API Key"
+                title="API 키 발급받기"
                 className="bg-[var(--accent)]/10 hover:bg-[var(--accent)]/20 text-[var(--accent)] flex items-center gap-2"
               >
-                <span className="text-xs whitespace-nowrap">{provider?.labelForGetApiKey || 'Get API Key'}</span>
+                <span className="text-xs whitespace-nowrap">{provider?.labelForGetApiKey || 'API 키 발급받기'}</span>
                 <div className={`${provider?.icon || 'i-ph:key'} w-4 h-4`} />
               </IconButton>
             )}
