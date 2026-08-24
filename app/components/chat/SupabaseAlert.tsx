@@ -74,7 +74,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
 
       if (!response.ok) {
         const errorData = (await response.json()) as any;
-        throw new Error(`Supabase 저장 기능 적용에 실패했어요: ${errorData.error?.message || response.statusText}`);
+        throw new Error(`저장 기능 적용에 실패했어요: ${errorData.error?.message || response.statusText}`);
       }
 
       const result = await response.json();
@@ -83,7 +83,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
     } catch (error) {
       console.error('Failed to execute Supabase action:', error);
       postMessage(
-        `*Supabase 저장 기능을 적용하다가 문제가 생겼어요. 고쳐서 다시 알려줘*\n\`\`\`\n${error instanceof Error ? error.message : String(error)}\n\`\`\`\n`,
+        `*저장 기능을 적용하다가 문제가 생겼어요. 고쳐서 다시 알려줘*\n\`\`\`\n${error instanceof Error ? error.message : String(error)}\n\`\`\`\n`,
       );
     } finally {
       setIsExecuting(false);
@@ -115,13 +115,13 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3 }}
-        className="max-w-chat rounded-lg border-l-2 border-l-[#098F5F] border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2"
+        className="max-w-chat rounded-lg border-l-2 border-l-[var(--accent)] border border-bolt-elements-borderColor bg-bolt-elements-background-depth-2"
       >
         {/* Header */}
         <div className="p-4 pb-2">
           <div className="flex items-center gap-2">
-            <img height="10" width="18" crossOrigin="anonymous" src="https://cdn.simpleicons.org/supabase" alt="" />
-            <h3 className="text-sm font-medium text-[#3DCB8F]">{title}</h3>
+            <div className="i-ph:database w-[18px] h-[18px] text-[var(--accent)]" />
+            <h3 className="text-sm font-medium text-[var(--accent-text)]">{title}</h3>
           </div>
         </div>
 
@@ -171,10 +171,10 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                 onClick={handleConnectClick}
                 className={classNames(
                   `px-3 py-2 rounded-md text-sm font-medium`,
-                  'bg-[#098F5F]',
-                  'hover:bg-[#0aa06c]',
-                  'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
-                  'text-white',
+                  'bg-[var(--accent)]',
+                  'hover:bg-[var(--accent-hover)]',
+                  'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)]',
+                  'text-[var(--on-accent)]',
                   'flex items-center gap-1.5',
                 )}
               >
@@ -186,10 +186,10 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                 disabled={isExecuting}
                 className={classNames(
                   `px-3 py-2 rounded-md text-sm font-medium`,
-                  'bg-[#098F5F]',
-                  'hover:bg-[#0aa06c]',
-                  'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
-                  'text-white',
+                  'bg-[var(--accent)]',
+                  'hover:bg-[var(--accent-hover)]',
+                  'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)]',
+                  'text-[var(--on-accent)]',
                   'flex items-center gap-1.5',
                   isExecuting ? 'opacity-70 cursor-not-allowed' : '',
                 )}
@@ -209,10 +209,10 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                   }}
                   className={classNames(
                     `px-3 py-2 rounded-md text-sm font-medium`,
-                    'bg-[#098F5F]',
-                    'hover:bg-[#0aa06c]',
-                    'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500',
-                    'text-white',
+                    'bg-[var(--accent)]',
+                    'hover:bg-[var(--accent-hover)]',
+                    'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)]',
+                    'text-[var(--on-accent)]',
                     'flex items-center gap-1.5',
                   )}
                 >

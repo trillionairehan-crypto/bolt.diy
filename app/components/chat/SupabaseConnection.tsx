@@ -16,7 +16,7 @@ const inputClassName = classNames(
   'bg-[#F8F8F8] dark:bg-[#1A1A1A]',
   'border border-[#E5E5E5] dark:border-[#333333]',
   'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-  'focus:outline-none focus:ring-1 focus:ring-[#3ECF8E]',
+  'focus:outline-none focus:ring-1 focus:ring-[var(--accent)]',
   'disabled:opacity-50',
 );
 
@@ -129,20 +129,15 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
           disabled={connecting}
           onClick={() => setIsDialogOpen(!isDialogOpen)}
           className={classNames(
-            'hover:bg-bolt-elements-item-backgroundActive !text-white flex items-center gap-2 whitespace-nowrap',
-            { '!px-2': !showLabel },
+            'hover:bg-bolt-elements-item-backgroundActive flex items-center gap-2 whitespace-nowrap',
+            {
+              '!px-2': !showLabel,
+            },
           )}
           title={isConnected ? '저장 기능이 켜졌어요' : '앱에 로그인과 저장 기능을 쓰려면 연결이 필요해요'}
         >
-          <img
-            className="w-4 h-4 shrink-0"
-            height="20"
-            width="20"
-            crossOrigin="anonymous"
-            src="https://cdn.simpleicons.org/supabase"
-            alt=""
-          />
-          {showLabel && <span className="ml-1 text-xs">{isConnected ? 'Supabase 연결됨' : 'Supabase 연결'}</span>}
+          <div className="i-ph:database w-4 h-4 shrink-0 text-[var(--accent)]" />
+          {showLabel && <span className="ml-1 text-xs">{isConnected ? '저장 기능 켜짐' : '저장 기능 켜기'}</span>}
         </Button>
       </div>
 
@@ -152,14 +147,7 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
             {!isConnected ? (
               <div className="space-y-5">
                 <DialogTitle>
-                  <img
-                    className="w-5 h-5"
-                    height="24"
-                    width="24"
-                    crossOrigin="anonymous"
-                    src="https://cdn.simpleicons.org/supabase"
-                    alt=""
-                  />
+                  <div className="i-ph:database w-5 h-5 text-[var(--accent)]" />
                   저장 기능 연결하기
                 </DialogTitle>
                 <p className="text-sm text-bolt-elements-textSecondary -mt-3">
@@ -180,7 +168,7 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                       href="https://supabase.com/dashboard/sign-up"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-sm text-[#3ECF8E] hover:underline"
+                      className="inline-flex items-center gap-1 text-sm text-[var(--accent-text)] hover:underline"
                     >
                       Supabase 가입하러 가기
                       <div className="i-ph:arrow-square-out w-4 h-4" />
@@ -257,8 +245,8 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                     disabled={simpleConnecting || !simpleUrl.trim() || !simpleAnonKey.trim()}
                     className={classNames(
                       'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
-                      'bg-[#3ECF8E] text-white',
-                      'hover:bg-[#3BBF84]',
+                      'bg-[var(--accent)] text-[var(--on-accent)]',
+                      'hover:bg-[var(--accent-hover)]',
                       'disabled:opacity-50 disabled:cursor-not-allowed',
                     )}
                   >
@@ -279,19 +267,12 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
             ) : !isPatConnection ? (
               <div className="space-y-4">
                 <DialogTitle>
-                  <img
-                    className="w-5 h-5"
-                    height="24"
-                    width="24"
-                    crossOrigin="anonymous"
-                    src="https://cdn.simpleicons.org/supabase"
-                    alt=""
-                  />
+                  <div className="i-ph:database w-5 h-5 text-[var(--accent)]" />
                   저장 기능
                 </DialogTitle>
 
                 <div className="flex items-center gap-3 p-3 bg-[#F8F8F8] dark:bg-[#1A1A1A] rounded-lg">
-                  <div className="i-ph:check-circle-fill w-5 h-5 text-[#3ECF8E] shrink-0" />
+                  <div className="i-ph:check-circle-fill w-5 h-5 text-bolt-elements-icon-success shrink-0" />
                   <div className="min-w-0">
                     <h4 className="text-sm font-medium text-bolt-elements-textPrimary">연결됐어요</h4>
                     <p className="text-xs text-bolt-elements-textSecondary truncate">
@@ -314,15 +295,8 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
               <div className="space-y-4">
                 <div className="flex items-center justify-between mb-2">
                   <DialogTitle>
-                    <img
-                      className="w-5 h-5"
-                      height="24"
-                      width="24"
-                      crossOrigin="anonymous"
-                      src="https://cdn.simpleicons.org/supabase"
-                      alt=""
-                    />
-                    Supabase 연결
+                    <div className="i-ph:database w-5 h-5 text-[var(--accent)]" />
+                    저장 기능
                   </DialogTitle>
                 </div>
 
@@ -364,7 +338,7 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                         </button>
                         <button
                           onClick={() => handleCreateProject()}
-                          className="px-2 py-1 rounded-md text-xs bg-[#3ECF8E] text-white hover:bg-[#3BBF84] flex items-center gap-1"
+                          className="px-2 py-1 rounded-md text-xs bg-[var(--accent)] text-[var(--on-accent)] hover:bg-[var(--accent-hover)] flex items-center gap-1"
                         >
                           <div className="i-ph:plus w-3 h-3" />새 프로젝트
                         </button>
@@ -384,12 +358,12 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                             {supabaseConn.stats.projects.map((project) => (
                               <div
                                 key={project.id}
-                                className="block p-3 rounded-lg border border-[#E5E5E5] dark:border-[#1A1A1A] hover:border-[#3ECF8E] dark:hover:border-[#3ECF8E] transition-colors"
+                                className="block p-3 rounded-lg border border-[#E5E5E5] dark:border-[#1A1A1A] hover:border-[var(--accent)] dark:hover:border-[var(--accent)] transition-colors"
                               >
                                 <div className="flex items-center justify-between">
                                   <div>
                                     <h5 className="text-sm font-medium text-bolt-elements-textPrimary flex items-center gap-1">
-                                      <div className="i-ph:database w-3 h-3 text-[#3ECF8E]" />
+                                      <div className="i-ph:database w-3 h-3 text-[var(--accent)]" />
                                       {project.name}
                                     </h5>
                                     <div className="text-xs text-bolt-elements-textSecondary mt-1">
@@ -401,8 +375,8 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                                     className={classNames(
                                       'px-3 py-1 rounded-md text-xs',
                                       supabaseConn.selectedProjectId === project.id
-                                        ? 'bg-[#3ECF8E] text-white'
-                                        : 'bg-[#F0F0F0] dark:bg-[#252525] text-bolt-elements-textSecondary hover:bg-[#3ECF8E] hover:text-white',
+                                        ? 'bg-[var(--accent)] text-[var(--on-accent)]'
+                                        : 'bg-[#F0F0F0] dark:bg-[#252525] text-bolt-elements-textSecondary hover:bg-[var(--accent)] hover:text-[var(--on-accent)]',
                                     )}
                                   >
                                     {supabaseConn.selectedProjectId === project.id ? (
@@ -449,7 +423,7 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
 
 function StepBadge({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-6 h-6 rounded-full bg-[#3ECF8E] text-white text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">
+    <div className="w-6 h-6 rounded-full bg-[var(--accent)] text-[var(--on-accent)] text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">
       {children}
     </div>
   );

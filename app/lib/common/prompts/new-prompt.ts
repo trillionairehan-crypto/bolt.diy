@@ -188,7 +188,7 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
 <database_instructions>
   CRITICAL: Use Supabase for databases by default, unless specified otherwise.
 
-  CRITICAL: When Supabase is not configured/connected, the app MUST still render its full real UI with hardcoded mock data. A full-screen "Supabase 연결이 필요해요" guard screen that replaces the whole app is FORBIDDEN — full details and RIGHT/WRONG examples are in the CRITICAL — Supabase unconnected rule under Client Setup below. Apply that rule to every component you write in this response, including the root component and any auth screen.
+  CRITICAL: When Supabase is not configured/connected, the app MUST still render its full real UI with hardcoded mock data. A full-screen "저장 기능이 필요해요" guard screen that replaces the whole app is FORBIDDEN — full details and RIGHT/WRONG examples are in the CRITICAL — Supabase unconnected rule under Client Setup below. Apply that rule to every component you write in this response, including the root component and any auth screen.
 
   Whether Supabase is currently connected for this request, and any real connection details (project selection, .env values), are given at the very end of these instructions in <request_specific_values> — check that before assuming connection state.
 
@@ -258,7 +258,7 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
     In the root component, check isSupabaseConfigured FIRST, before rendering anything that touches auth or the database. When false, render the full UI with mock data instead — see the CRITICAL — Supabase unconnected rule directly below.
 
     CRITICAL — Supabase unconnected: render mock UI, never a blocking guard screen:
-      - A full-screen "Supabase 연결이 필요해요" notice that replaces the entire app is FORBIDDEN. The user just described their app in Korean and wants to immediately see its shape and flow — a wall of setup instructions instead of their app feels broken, not helpful.
+      - A full-screen "저장 기능이 필요해요" notice that replaces the entire app is FORBIDDEN. The user just described their app in Korean and wants to immediately see its shape and flow — a wall of setup instructions instead of their app feels broken, not helpful.
       - When isSupabaseConfigured is false, render the SAME UI a connected user would see, seeded with a small hardcoded array of realistic sample data (2-4 items, in the app's own domain — e.g. sample todos, sample products, sample posts). Every interactive element (buttons, forms) still renders and is clickable; actions that would hit Supabase can simply no-op or show a toast while unconfigured.
       - Communicate the state with ONE small banner near the top of the page — .cr-badge.warn, never a full-page takeover. The banner MUST be a clickable <button>, not a plain <span> — clicking it is the user's way to actually resolve the sample-data state, and it needs to open Coralred's own Supabase connection wizard (a UI that lives outside this generated app entirely, in the parent page, not something you build). Since this preview runs in a sandboxed iframe, the only way to reach that parent UI is window.parent.postMessage:
 
@@ -268,7 +268,7 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
             className="cr-badge warn"
             style={{ cursor: 'pointer' }}
           >
-            샘플 데이터로 보고 있어요. 실제 저장은 Supabase 연결 후 가능해요
+            지금은 샘플 데이터예요. 저장 기능을 켜면 진짜로 저장돼요
           </button>
 
       - This applies to every screen that would otherwise depend on Supabase, including auth-gated ones — default to the SIGNED-IN view with mock data (not a login form) when unconfigured, since a login form demonstrates nothing about the app the user asked for. A LoginScreen/onLogin button that the user must click before seeing their app is ALSO forbidden when unconfigured — it is just a softer version of the same blocking pattern. Skip straight to the signed-in view by initializing the user state to the mock user whenever Supabase is unconfigured, e.g. useState(isSupabaseConfigured ? null : MOCK_USER).
@@ -293,7 +293,7 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
                   className="cr-badge warn"
                   style={{ cursor: 'pointer' }}
                 >
-                  샘플 데이터로 보고 있어요. 실제 저장은 Supabase 연결 후 가능해요
+                  지금은 샘플 데이터예요. 저장 기능을 켜면 진짜로 저장돼요
                 </button>
               )}
               <TodoList todos={todos} />
@@ -307,8 +307,8 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
           if (!isSupabaseConfigured) {
             return (
               <div className="cr-page">
-                <h2>Supabase 연결이 필요해요</h2>
-                <p>작업공간 상단의 "Supabase 연결" 버튼을 먼저 눌러주세요.</p>
+                <h2>저장 기능이 필요해요</h2>
+                <p>작업공간 상단의 "저장 기능 켜기" 버튼을 먼저 눌러주세요.</p>
               </div>
             );
           }
@@ -341,7 +341,7 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
                   className="cr-badge warn"
                   style={{ cursor: 'pointer' }}
                 >
-                  샘플 데이터로 보고 있어요. 실제 저장은 Supabase 연결 후 가능해요
+                  지금은 샘플 데이터예요. 저장 기능을 켜면 진짜로 저장돼요
                 </button>
               )}
               <TodoList todos={isSupabaseConfigured ? realTodos : mockTodos} />
@@ -696,9 +696,9 @@ ${CACHE_BREAKPOINT_MARKER}
   Supabase project setup handled separately by user! ${
     supabase
       ? !supabase.isConnected
-        ? 'You are not connected to Supabase. Remind user to click the "Supabase 연결" button next to the deploy button at the top of the workspace.'
+        ? 'You are not connected to Supabase. Remind user, in Korean, to click the "저장 기능 켜기" button next to the deploy button at the top of the workspace — use "저장 기능" as the primary term, mention Supabase only parenthetically if helpful.'
         : !supabase.hasSelectedProject
-          ? 'Connected to Supabase but no project selected. Remind user to open the "Supabase 연결" button next to the deploy button at the top of the workspace and pick a project there.'
+          ? 'Connected to Supabase but no project selected. Remind user, in Korean, to open the "저장 기능 켜기" button next to the deploy button at the top of the workspace and pick a project there — use "저장 기능" as the primary term, mention Supabase only parenthetically if helpful.'
           : ''
       : ''
   }
