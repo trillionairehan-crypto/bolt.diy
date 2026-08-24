@@ -349,7 +349,7 @@ function FileContextMenu({
               toast.error(`${file.name} 파일을 올리지 못했어요`);
             }
           } catch (error) {
-            toast.error(`Error uploading ${file.name}`);
+            toast.error(`${file.name} 파일을 올리지 못했어요`);
             logger.error(error);
           }
         }
@@ -406,7 +406,7 @@ function FileContextMenu({
         toast.error(isFolder ? '폴더를 삭제하지 못했어요' : '파일을 삭제하지 못했어요');
       }
     } catch (error) {
-      toast.error(`Error deleting ${isFolder ? 'folder' : 'file'}`);
+      toast.error(isFolder ? '폴더를 삭제하지 못했어요' : '파일을 삭제하지 못했어요');
       logger.error(error);
     }
   };
@@ -426,7 +426,7 @@ function FileContextMenu({
         toast.error(`파일을 잠그지 못했어요`);
       }
     } catch (error) {
-      toast.error(`Error locking file`);
+      toast.error('파일을 잠그지 못했어요');
       logger.error(error);
     }
   };
@@ -446,7 +446,7 @@ function FileContextMenu({
         toast.error(`파일 잠금을 해제하지 못했어요`);
       }
     } catch (error) {
-      toast.error(`Error unlocking file`);
+      toast.error('파일 잠금을 해제하지 못했어요');
       logger.error(error);
     }
   };
@@ -466,7 +466,7 @@ function FileContextMenu({
         toast.error(`폴더를 잠그지 못했어요`);
       }
     } catch (error) {
-      toast.error(`Error locking folder`);
+      toast.error('폴더를 잠그지 못했어요');
       logger.error(error);
     }
   };
@@ -486,7 +486,7 @@ function FileContextMenu({
         toast.error(`폴더 잠금을 해제하지 못했어요`);
       }
     } catch (error) {
-      toast.error(`Error unlocking folder`);
+      toast.error('폴더 잠금을 해제하지 못했어요');
       logger.error(error);
     }
   };
