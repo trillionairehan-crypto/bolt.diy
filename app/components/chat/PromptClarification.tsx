@@ -35,8 +35,6 @@ interface RecordedAnswer {
   label: string;
 }
 
-const ACCENT = '#FF5330';
-
 const EMPTY_DIRECTIVES: GenerationDirectives = { promptAdditions: [] };
 
 function buildFinalPromptAndDirectives(
@@ -234,7 +232,7 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
         <div className="absolute top-0 left-0 right-0 h-1 bg-bolt-elements-borderColor overflow-hidden">
           <div
             className="h-full transition-[width] duration-300 ease-out"
-            style={{ width: `${progressPct}%`, background: ACCENT }}
+            style={{ width: `${progressPct}%`, background: 'var(--accent)' }}
           />
         </div>
 
@@ -250,7 +248,7 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
 
         {status === 'waitingForDynamic' && (
           <div className="flex flex-col items-center gap-4 py-10 text-center">
-            <div className="i-svg-spinners:90-ring-with-bg text-4xl" style={{ color: ACCENT }} />
+            <div className="i-svg-spinners:90-ring-with-bg text-4xl" style={{ color: 'var(--accent)' }} />
             <p className="text-base text-bolt-elements-textPrimary">이 앱에 맞는 질문을 확인하고 있어요</p>
           </div>
         )}
@@ -283,7 +281,7 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
                         !isPending && 'hover:border-[var(--accent)] hover:bg-[var(--accent-soft)]',
                       )}
                       style={{
-                        border: isPending ? `2px solid ${ACCENT}` : '1px solid var(--border)',
+                        border: isPending ? '2px solid var(--accent)' : '1px solid var(--border)',
                         color: 'var(--text)',
                         background: isPending ? 'var(--accent-soft)' : 'var(--surface)',
                       }}
@@ -295,7 +293,7 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ duration: 0.15 }}
                           className="i-ph:check-circle-fill text-xl shrink-0"
-                          style={{ color: ACCENT }}
+                          style={{ color: 'var(--accent)' }}
                         />
                       )}
                     </button>
@@ -331,14 +329,14 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
                     }}
                     placeholder="직접 입력해주세요"
                     className="w-full min-h-[52px] rounded-xl border px-5 py-3.5 text-base outline-none bg-transparent"
-                    style={{ borderColor: ACCENT, color: 'var(--text)' }}
+                    style={{ borderColor: 'var(--accent)', color: 'var(--text)' }}
                   />
                   <button
                     type="button"
                     onClick={handleCustomAnswer}
                     disabled={!customInput.trim()}
-                    className="self-end min-h-11 rounded-full px-5 text-sm font-semibold text-white disabled:opacity-40 transition-opacity duration-150"
-                    style={{ backgroundColor: ACCENT }}
+                    className="self-end min-h-11 rounded-full px-5 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-40 transition-opacity duration-150"
+                    style={{ backgroundColor: 'var(--accent)' }}
                   >
                     확인
                   </button>
@@ -369,8 +367,8 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
             <button
               type="button"
               onClick={() => onComplete(finalPrompt.trim() || initialPrompt, directives)}
-              className="w-full min-h-14 rounded-xl px-5 py-4 text-base font-bold text-white transition-opacity duration-150 hover:opacity-90 active:opacity-80"
-              style={{ backgroundColor: ACCENT }}
+              className="w-full min-h-14 rounded-xl px-5 py-4 text-base font-bold text-[var(--on-accent)] transition-opacity duration-150 hover:opacity-90 active:opacity-80"
+              style={{ backgroundColor: 'var(--accent)' }}
             >
               만들기
             </button>
