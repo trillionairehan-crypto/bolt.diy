@@ -348,7 +348,7 @@ export function GitHubCacheManager({ className = '', showStats = true }: GitHubC
             size="sm"
             onClick={handleClearAll}
             disabled={isLoading}
-            className="flex items-center gap-1 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+            className="flex items-center gap-1 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 border-red-200 dark:border-red-800/60 hover:border-red-300 dark:hover:border-red-700"
           >
             <Trash2 className="w-3 h-3" />
             <span className="text-xs">Clear All</span>
