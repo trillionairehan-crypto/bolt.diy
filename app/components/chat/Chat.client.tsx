@@ -640,6 +640,23 @@ export const ChatImpl = memo(
     const handleClarificationComplete = (finalPrompt: string, directives: GenerationDirectives) => {
       setClarifyingPrompt(null);
 
+      /*
+       * Bug 1 fix: chatStarted previously only flipped true later, inside runAnimation() (called
+       * from generateNewApp() below) — an async function that awaits a framer-motion animate()
+       * call before setting it. That left a real window where clarifyingPrompt was already null
+       * (PromptClarification unmounted) but chatStarted was still false, which renders BaseChat's
+       * landing layout (centered card, isLanding=true ChatBox styling, id="intro" hero) instead
+       * of the chat layout — the actual send/input bar chatBoxSection is shared between both
+       * layouts, but the landing one is visually and structurally different enough that it read
+       * as "the input disappeared" once generation (driven independently by the message/workbench
+       * state) kept going. Setting both in the same handler, in the same tick, means React batches
+       * them into one update — no intermediate render can observe "cleared survey, still landing".
+       * runAnimation() still runs its own (now redundant but harmless) chatStarted=true — it
+       * early-returns via its own `if (chatStarted) return` once this has taken effect.
+       */
+      chatStore.setKey('started', true);
+      setChatStarted(true);
+
       const hueHex = directives.hue !== undefined ? hueToRepresentativeHex(directives.hue) : undefined;
       const designSchemeOverride: DesignScheme | undefined = hueHex
         ? { ...defaultDesignScheme, palette: { ...defaultDesignScheme.palette, primary: hueHex } }
