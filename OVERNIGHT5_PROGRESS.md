@@ -648,3 +648,17 @@
 - **커밋**: `4163dc7`
 - **문서 갱신**: `OVERNIGHT5_IMPROVEMENTS.md` 항목 31에서 이번에 고친 2건을 제거하고 남은 2건(`EditorPanel.tsx` 영어 라벨, inspector 클립보드 `.catch` 누락)만 남김.
 - **다음 감사 영역**: 배포로 갱신.
+
+### [11:41] Phase 2 — 사이클 10 (감사 대상: 배포, 6회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 414/414 통과, `corepack pnpm run build` 성공(client+server). `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음 — 이전 사이클들의 판단대로 이번에도 손 안 댐(사용자 본인 진행 중 작업, 자동 세션이 만든 변경 아님).
+- **감사 방법**: Explore 서브에이전트로 Cloudflare/GitHub/GitLab/Netlify/Vercel 배포 표면 전체(다이얼로그, 배포 훅, API 라우트)를 대상으로 엣지 케이스·에러 처리 누락·무음 실패·다크모드/모바일 관점으로 점검 요청(이미 알려진 항목은 제외하도록 명시). 보고받은 5건을 직접 Read로 재확인.
+- **발견 및 변경(2건, 전부 검증 완료 후 수정, 실보안 문제라 우선순위 최상위로 판단)**:
+  1. `app/lib/services/gitlabApiService.ts:105-111` — private `_headers` getter가 모든 GitLab API 요청마다 `console.log('GitLab API token info:', { tokenLength, tokenPrefix: token.substring(0,10)+'...', tokenType })`를 남기고 있었음(디버깅용 잔재로 추정). GitLab 배포 다이얼로그를 열 때마다(user/projects/createProject/commitFiles 등 모든 호출에서) 토큰 앞부분이 반복 노출 — 브라우저 확장이나 Sentry 같은 에러 모니터링의 콘솔 브레드크럼에 캡처될 위험이 있는 실질적 보안 문제로 판단해 최우선 처리 → 로그 전체 제거.
+  2. `app/components/deploy/GitLabDeploymentDialog.tsx:424,513` — 다이얼로그 닫기 버튼 2곳의 `sr-only` 텍스트가 "Close dialog" 영어로 남아있었음(같은 파일 304행, `GitHubDeploymentDialog.tsx`는 이미 "닫기" — 화면엔 안 보이는 스크린리더 전용 텍스트라 수 차례 사이클 동안 수동 QA에서 계속 놓쳐짐, 사이클 36 IMPROVEMENTS 항목 32에서 이미 발견만 되고 보류됐던 항목) → "닫기"로 통일.
+  3. `app/components/chat/VercelDeploymentLink.client.tsx:105` / `app/routes/api.vercel-deploy.ts:176-183` — 배포 URL 조회 폴백 경로(프로젝트에 아직 별칭·배포 목록이 없을 때 발동)가 Vercel 액세스 토큰을 `/api/vercel-deploy?projectId=...&token=...` URL 쿼리 파라미터로 전송하고 있었음. 같은 라우트의 POST `action`은 이미 JSON 바디로, 같은 컴포넌트의 다른 fetch 호출은 이미 `Authorization` 헤더로 토큰을 보내는데 이 GET `loader`만 예외 — 쿼리 스트링 토큰은 서버/프록시 접근 로그와 브라우저 방문 기록에 그대로 남아 헤더 방식보다 노출 범위가 넓음 → client는 `Authorization: Bearer ${token}` 헤더로, loader는 `request.headers.get('Authorization')`에서 읽도록 수정(`projectId`는 민감정보 아니라 쿼리 유지).
+- **테스트**: `app/components/deploy/deployAuditCycle51.spec.ts` 신규 6건(소스 grep 방식, 기존 관행과 동일). 수정 전 코드로 `git stash`해 3건(GitLab 관련)이 실제로 실패하는 것 확인 후 `git stash pop`으로 복원 — 재현 확정 후 커밋.
+- **부수 정리**: 사이클 50이 lint 없이 커밋해 남긴 `app/previewWindowOpenSilentFailureAudit.spec.ts`의 기존 prettier 포맷 에러(무관한 이슈, 로직 변경 없음)를 `eslint --fix`로 정리 — lint가 항상 깨끗한 상태를 유지하도록 함께 커밋.
+- **검증**: `corepack pnpm vitest run` 420/420 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `3662d79`(GitLab 토큰 로그 + Close dialog), `6eb0e00`(Vercel URL 토큰 노출)
+- **범위 밖으로 남긴 것**: 서브에이전트가 함께 보고한 2건(`CloudflareDeploy.client.tsx`/`NetlifyDeploy.client.tsx`의 아티팩트 ID 충돌, `NetlifyDeploy.client.tsx` 폴링 루프 `.ok` 체크 누락) — 둘 다 구조 판단이 더 필요해 `OVERNIGHT5_IMPROVEMENTS.md` 항목 37에 기록만 함.
+- **다음 감사 영역**: 요금제/결제로 갱신.
