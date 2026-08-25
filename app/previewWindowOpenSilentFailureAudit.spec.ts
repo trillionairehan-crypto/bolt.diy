@@ -22,6 +22,8 @@ describe('미리보기/워크벤치 감사(사이클 50) — window.open 실패 
     const branchSnippet = standardWindowBranch.slice(0, standardWindowBranch.indexOf('openInNewTab'));
 
     expect(branchSnippet).toContain('newWindow.focus()');
-    expect(branchSnippet).toContain("toast.error('팝업이 차단되어 새 창을 열 수 없어요. 브라우저의 팝업 차단을 해제해 주세요.')");
+    expect(branchSnippet).toContain(
+      "toast.error('팝업이 차단되어 새 창을 열 수 없어요. 브라우저의 팝업 차단을 해제해 주세요.')",
+    );
   });
 });
