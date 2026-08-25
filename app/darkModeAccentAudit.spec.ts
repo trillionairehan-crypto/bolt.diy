@@ -73,3 +73,15 @@ describe('VercelDeploymentLink.client.tsx 링크 아이콘 hover가 순수 검�
     expect(source).toContain('hover:text-bolt-elements-textPrimary');
   });
 });
+
+describe('NetlifyDeploymentLink.client.tsx 링크 아이콘 hover가 고정 Netlify 브랜드 틸 대신 테마 토큰을 쓴다 (VercelDeploymentLink.client.tsx와 동일 패턴/사용처)', () => {
+  const source = readFileSync(join(__dirname, 'components/chat/NetlifyDeploymentLink.client.tsx'), 'utf-8');
+
+  it('has no hardcoded hover:text-[#00AD9F]', () => {
+    expect(source).not.toContain('hover:text-[#00AD9F]');
+  });
+
+  it('uses hover:text-bolt-elements-textPrimary instead', () => {
+    expect(source).toContain('hover:text-bolt-elements-textPrimary');
+  });
+});
