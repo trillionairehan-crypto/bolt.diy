@@ -650,7 +650,7 @@ export default function NetlifyConnection() {
                               href={site.ssl_url || site.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-sm flex items-center gap-1 transition-colors text-bolt-elements-link-text hover:text-bolt-elements-link-textHover dark:text-white dark:hover:text-bolt-elements-link-textHover"
+                              className="text-sm flex items-center gap-1 transition-colors text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <CloudIcon className="h-3 w-3 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
@@ -771,7 +771,7 @@ export default function NetlifyConnection() {
                                   href={deploy.deploy_url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-1 transition-colors text-bolt-elements-link-text hover:text-bolt-elements-link-textHover dark:text-white dark:hover:text-bolt-elements-link-textHover"
+                                  className="flex items-center gap-1 transition-colors text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   <CloudIcon className="h-3 w-3 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />

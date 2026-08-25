@@ -85,3 +85,27 @@ describe('NetlifyDeploymentLink.client.tsx 링크 아이콘 hover가 고정 Netl
     expect(source).toContain('hover:text-bolt-elements-textPrimary');
   });
 });
+
+/**
+ * Phase 2 사이클 45 (감사 대상: 다크모드, 8회차) — `bolt-elements-link-text`/`bolt-elements-link-textHover`는
+ * uno.config.ts의 `elements` 토큰 테이블에 한 번도 정의된 적 없는 죽은 클래스라(정의된 건
+ * `bolt-elements-messages-linkColor` 및 `bolt-elements-item-contentAccent`뿐), 라이트 모드 링크 색은
+ * 상속색으로 조용히 폴백되고 다크 모드 hover는 아무 변화도 없었음(사이클 14 IMPROVEMENTS 항목 13에서
+ * 발견만 되고 범위 초과로 보류됐던 항목, 이번 사이클에서 수정).
+ */
+describe('NetlifyTab.tsx/NetlifyConnection.tsx 배포 URL 링크가 죽은 bolt-elements-link-text 토큰 대신 실제 정의된 토큰을 쓴다', () => {
+  const files = [
+    'components/@settings/tabs/netlify/NetlifyTab.tsx',
+    'components/@settings/tabs/netlify/components/NetlifyConnection.tsx',
+  ];
+
+  it.each(files)('%s has no references to the undefined bolt-elements-link-text/-textHover tokens', (file) => {
+    const source = readFileSync(join(__dirname, file), 'utf-8');
+    expect(source).not.toContain('bolt-elements-link-text');
+  });
+
+  it.each(files)('%s deploy URL links use the real bolt-elements-item-contentAccent token', (file) => {
+    const source = readFileSync(join(__dirname, file), 'utf-8');
+    expect(source.match(/text-bolt-elements-item-contentAccent/g)?.length).toBeGreaterThanOrEqual(4);
+  });
+});

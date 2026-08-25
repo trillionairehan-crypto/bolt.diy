@@ -928,7 +928,7 @@ export default function NetlifyTab() {
                                 href={site.ssl_url || site.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-sm flex items-center gap-1 transition-colors text-bolt-elements-link-text hover:text-bolt-elements-link-textHover dark:text-white dark:hover:text-bolt-elements-link-textHover"
+                                className="text-sm flex items-center gap-1 transition-colors text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <div className="i-ph:cloud w-3 h-3 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
@@ -1082,7 +1082,7 @@ export default function NetlifyTab() {
                                   href={deploy.deploy_url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-1 transition-colors text-bolt-elements-link-text hover:text-bolt-elements-link-textHover dark:text-white dark:hover:text-bolt-elements-link-textHover"
+                                  className="flex items-center gap-1 transition-colors text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent"
                                   onClick={(e) => e.stopPropagation()}
                                 >
                                   <div className="i-ph:cloud w-3 h-3 text-bolt-elements-item-contentAccent dark:text-bolt-elements-item-contentAccent" />
