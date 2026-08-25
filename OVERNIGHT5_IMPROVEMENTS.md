@@ -1,5 +1,13 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 35. 온보딩 감사(사이클 40, 5회차) — ?prompt= 딥링크 공백 가드는 고침, 나머지 4건은 판단 보류
+Explore 서브에이전트로 `PromptClarification.tsx`/`BaseChat.tsx`/`ChatBox.tsx`/`Chat.client.tsx`를 재감사(사이클 9·17·33에서 이미 고친 항목은 재보고 제외 지시). 확신도 medium인 것(`?prompt=` 딥링크 핸들러의 공백 가드 누락)만 직접 재검증 후 수정·테스트 추가·커밋(`9f6fbec`). 아래 4건은 확인만 하고 손 안 댐:
+
+- **`PromptClarification.tsx:182, 214-229` — 옵션 선택 220ms 지연 타이머가 "바로 만들기" 스킵으로 인한 언마운트 시 정리되지 않음** — `selectOption`이 `recordAnswer`를 220ms `setTimeout`으로 지연시키는데, `handleSkip`("바로 만들기", `pendingOptionId` 가드 없음)이 그 사이 호출되면 부모가 `clarifyingPrompt`를 지워 컴포넌트가 언마운트되고, 지연된 콜백이 언마운트된 컴포넌트에 상태 업데이트를 시도함(React 18에서는 사실상 무해하지만 다른 곳에 이미 있는 completedRef 가드와 일관성이 없는 사각지대). **왜 안 고쳤나**: 사이클 17(항목 16)에서 이미 유사한 레이스로 기록됐던 항목이라 새 정보 없이 재확인만 하고 우선순위를 올리지 않음. **제안**: 언마운트 시 `clearTimeout`하는 `useEffect` cleanup 추가.
+- **`PromptClarification.tsx:381-395` — 요약 편집 textarea를 공백으로 지우고 "만들기"를 누르면 안내 없이 원본 프롬프트로 되돌아감** — `finalPrompt.trim() || initialPrompt` 폴백이 사용자가 의도적으로 편집 내용을 지운 것과 실수로 전부 지운 것을 구분 못 함. **왜 안 고쳤나**: 사용자 의도를 구분할 방법이 없어(토스트로 알릴지, 되돌리기 버튼을 줄지) UX 설계 판단이 먼저 필요. **제안**: 폴백이 발동하면 "원래 내용으로 되돌아갔어요" 토스트 정도로 최소화해서 시작 권장.
+- **`PromptClarification.tsx:381-387` — 요약 textarea가 내부 마커 문자열(`ONBOARDING_ADDITIONS_MARKER`)을 그대로 사용자에게 노출** — 사용자가 이 부분을 편집/삭제하면 `UserMessage.tsx`의 `splitDisplayText`가 마커를 못 찾아 "답변 N개 반영됨" 배지가 안 뜨거나 마커 원문이 채팅 메시지에 그대로 보일 수 있음. **왜 안 고쳤나**: 마커를 UI에서 완전히 숨기려면 편집 가능한 textarea와 내부 플러밍(prompt 조합 로직)을 분리하는 설계 변경이 필요해 최소 변경 범위를 벗어남. **제안**: 편집 UI를 "원래 아이디어"와 "추가 답변 목록"으로 분리해서 마커 문자열 자체를 사용자 눈에 안 보이게 재설계.
+- **`RotatingPlaceholder.tsx:44-53` — 내부 `setTimeout`이 언마운트 시 정리 안 됨** — `setInterval`은 cleanup되지만 그 안에서 크로스페이드용으로 거는 `setTimeout`은 추적/clear 안 됨. **왜 안 고쳤나**: React 18에서 사실상 무해(언마운트된 컴포넌트의 setState는 no-op)한 린트성 이슈라 우선순위 낮음. **제안**: 다음 정리 사이클에서 `useRef`로 타임아웃 ID 추적 후 cleanup에서 clear.
+
 ## 31. 생성 감사(사이클 34, 4회차) — 스트리밍 중복 버그는 고침, 공유 샘플러 드롭 위험은 판단 보류
 Explore 서브에이전트로 `message-parser.ts`/`action-runner.ts`/`workbench.ts`/`useMessageParser.ts`/`Artifact.tsx`/`api.chat.ts`를 재감사(사이클 10·18·26에서 이미 기록된 8건은 재보고 제외 지시). 확신도 high인 것(`EnhancedStreamingMessageParser.parse()`가 자동 파일감지 발동 시 증분 반환 계약을 깨고 스트리밍마다 채팅 텍스트를 중복 누적시키던 문제)은 직접 Read로 재검증 후 수정·테스트 추가·커밋(`5d0b275`). 아래 1건은 확인만 하고 손 안 댐:
 

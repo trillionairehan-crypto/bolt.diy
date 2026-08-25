@@ -521,3 +521,14 @@
 - **커밋**: `d54235f`
 - **범위 밖으로 남긴 것**: (1) `Preview.tsx` 워크벤치 미리보기 툴바(772-863행)가 Device Mode 켰을 때 아이콘 최대 9개가 `flex-nowrap`으로 나열돼 375px에서 넘칠 수 있음(사이클 31 IMPROVEMENTS 항목 25에서 이미 기록, 툴바 재구성이 필요해 구조 변경으로 판단, 계속 미착수). (2) `ChatBox.tsx` 메인 채팅 입력창 아이콘 버튼들이 `h-8`(32px)로 하우스 44px 기준(`PromptClarification.tsx`의 `min-h-11`)보다 작음 — 여러 파일에 걸친 공유 클래스라 일괄 조정 필요(사이클 23 IMPROVEMENTS 항목 21에서 이미 기록). (3) `GitHubStats.tsx:192`/`StatsDisplay.tsx:42` 설정 다이얼로그 통계 그리드가 `grid-cols-4`/`grid-cols-3` 고정이고 형제 그리드는 이미 `md:grid-cols-4` 반응형 — 기계적인 수정이지만 이번 사이클 범위 밖, `OVERNIGHT5_IMPROVEMENTS.md` 항목 34로 신규 기록.
 - **다음 감사 영역**: 온보딩으로 갱신.
+
+### [09:27] Phase 2 — 사이클 40 (감사 대상: 온보딩, 5회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 388/388 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 진행 중 작업, 이 세션들이 만든 변경 아님) — diff 내용을 직접 확인해 이전 기록과 동일함을 재검증, 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `PromptClarification.tsx`/`BaseChat.tsx`/`ChatBox.tsx`/`Chat.client.tsx`(온보딩 완료 처리)를 대상으로 이미 고쳐진 항목(사이클 9·17·33 목록을 프롬프트에 명시)을 제외하고 재검색. 보고받은 5건 중 최상위 1건을 직접 Read로 재검증 후 수정.
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/chat/Chat.client.tsx:255-268` — `/templates`의 "이 템플릿으로 시작" 링크가 쓰는 `?prompt=` 쿼리 파라미터 딥링크 핸들러가 `if (prompt)`로 truthy 체크만 해서, 같은 파일의 메인 전송 경로(`sendMessage`, 691-693번 줄)가 이미 쓰는 `messageContent?.trim()` 공백 가드와 달리 `?prompt=%20%20` 같은 공백 문자열도 그대로 `setClarifyingPrompt`에 넘겨 빈 아이디어로 온보딩 명확화 화면이 열리던 불일치(URL 조작으로만 도달 가능, 일반 UI 클릭으로는 발생 안 함). `checkGenerationsAllowed()`는 크레딧을 소모하지 않고 통과 여부만 확인하므로 크레딧 낭비는 아니지만, 사용자에게 빈 프롬프트로 온보딩 화면이 열리는 혼란스러운 진입점.
+  → `if (prompt?.trim())`로 다른 진입점과 동일한 기준 통일.
+- **테스트**: 기존 `app/onboardingAudit.spec.ts`에 신규 1건 추가(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 389/389 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `9f6fbec`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 35로 기록)**: (1) `PromptClarification.tsx`의 옵션 선택 220ms 지연 타이머가 "바로 만들기" 스킵으로 인한 언마운트 시 정리(clearTimeout)되지 않아 언마운트 후 상태 업데이트 레이스 가능(확신도 medium, 사이클 17 항목 16에서 이미 유사 항목으로 기록됨 — 이번엔 정확한 라인 재확인만). (2) 요약 편집 textarea를 공백으로 지우고 "만들기"를 누르면 안내 없이 원본 프롬프트로 조용히 되돌아감(확신도 medium). (3) 요약 textarea가 내부 마커 문자열(`ONBOARDING_ADDITIONS_MARKER`)을 그대로 노출해 사용자가 편집하면 이후 "답변 N개 반영됨" 표시가 어긋날 수 있음(확신도 low-medium). (4) `RotatingPlaceholder.tsx`의 내부 setTimeout이 언마운트 시 정리 안 됨(확신도 low, React 18에서 사실상 무해).
+- **다음 감사 영역**: 생성으로 갱신.
