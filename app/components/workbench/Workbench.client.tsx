@@ -480,10 +480,10 @@ export const Workbench = memo(
           >
             <div
               className={classNames(
-                'fixed z-0 transition-[left,width] duration-200 bolt-ease-cubic-bezier',
+                'fixed transition-[left,width] duration-200 bolt-ease-cubic-bezier',
                 isSmallViewport
-                  ? 'top-0 bottom-0 w-full'
-                  : 'top-[calc(var(--header-height)+1.2rem)] bottom-6 w-[var(--workbench-inner-width)]',
+                  ? 'top-0 bottom-0 w-full z-max'
+                  : 'top-[calc(var(--header-height)+1.2rem)] bottom-6 w-[var(--workbench-inner-width)] z-0',
                 {
                   'left-0': showWorkbench && isSmallViewport,
                   'left-[var(--workbench-left)]': showWorkbench && !isSmallViewport,
