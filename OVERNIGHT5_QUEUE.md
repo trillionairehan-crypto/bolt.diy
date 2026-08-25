@@ -1,5 +1,6 @@
-다음 감사 영역: 미리보기/워크벤치
+다음 감사 영역: 배포
 
+[완료] 미리보기/워크벤치 감사(사이클 42, 5회차) — LockManager.tsx(설정 > 잠금 탭)의 검색 placeholder/필터 옵션("All"/"Files"/"Folders")/잠금 해제 확인·성공 토스트/빈 상태 안내/"Unlock all" 버튼/footer "N item(s) • N selected" 표시까지 전체가 영어로 하드코딩돼있던 문제(19번째 사이클에서 FileTree.tsx 업로드/삭제 토스트는 고쳤지만 이 별도 파일은 범위 밖이라 놓쳐짐, EditorPanel.tsx "Locks" 탭에서 항상 렌더되는 실사용 표면) → 전부 한국어로 번역, lockManagerKoreanAudit.spec.ts 신규 2건 — (사이클 42)
 [완료] 생성 감사(사이클 41, 5회차) — action-runner.ts의 #runFileAction이 webcontainer.fs.mkdir/writeFile 실패를 logger.error만 남기고 삼켜(재throw 없음), 디스크 부족/권한 오류 등으로 파일이 실제로 안 써져도 액션 상태가 'complete'로 표시되고 사용자에게 실패를 알릴 방법이 없던 문제(Supabase 액션 무음 실패와 같은 패턴이지만 가장 흔한 file 액션에서는 처음 확인) → catch 블록에서 재throw만 추가해 기존 #executeAction의 실패 처리 경로가 status를 'failed'로 정확히 설정하도록 수정, action-runner.spec.ts 신규 3건 — (사이클 41)
 [완료] 온보딩 감사(사이클 40, 5회차) — Chat.client.tsx의 ?prompt= 쿼리 파라미터 딥링크 핸들러(템플릿 "이 템플릿으로 시작" 링크가 사용)가 if (prompt)로 truthy 체크만 해서, 메인 전송 경로가 이미 쓰는 messageContent?.trim() 공백 가드와 달리 공백 문자열도 통과시켜 빈 아이디어로 온보딩 명확화 화면이 열리던 불일치 → if (prompt?.trim())로 통일 — (사이클 40)
 [완료] 모바일 감사(사이클 39, 6회차) — Header.tsx 랜딩 헤더에서 로그인 사용자에게 노출되는 "내 프로젝트" 텍스트+아바타 알약 버튼이 "요금제" 링크·테마 토글과 flex-wrap/축소 없이 한 줄로 나열돼 375px 뷰포트에서 폭 합 약 388px로 넘치던 문제(사이클 37 IMPROVEMENTS 항목 33 관찰 항목을 폭 계산으로 확인) → sm 미만에서 텍스트 라벨 숨기고 title로 접근성 유지(기존 ChatBox.tsx 이미지 첨부 버튼과 동일 패턴) — (사이클 39)

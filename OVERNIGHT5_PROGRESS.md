@@ -542,3 +542,14 @@
 - **커밋**: `3800c28`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 36으로 기록)**: (1) `enhanced-message-parser.ts`의 언랩 코드블록 자동감지 폴백이 파서 상태 전체를 리셋해 워크벤치가 사용자 의사와 무관하게 다시 열리고 매 렌더 전체 재파싱이 발생할 수 있음(확신도 high, 브라우저 재현은 못함). (2) 셸 명령 자동교정이 `action.content`를 nanostores 경유 없이 직접 mutate해 UI가 교정 전 명령을 계속 보여줄 수 있음(확신도 medium). (3) `addAction`의 `running` 상태 갱신이 실행 체인에 재대입되지 않아 여러 액션이 동시에 "실행 중"으로 잘못 표시될 수 있음(확신도 low-medium).
 - **다음 감사 영역**: 미리보기/워크벤치로 갱신.
+
+### [09:59] Phase 2 — 사이클 42 (감사 대상: 미리보기/워크벤치, 5회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 392/392 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 진행 중 작업, 이 세션들이 만든 변경 아님) — diff 내용을 직접 확인해 이전 기록과 동일함을 재검증, 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `app/components/workbench/**`, `app/lib/stores/workbench.ts`, `app/lib/stores/previews.ts`를 재감사(사이클 17·18·19·24·25·31·35·36·41 및 IMPROVEMENTS.md 항목 15/18/24/25/31/36에 이미 기록된 항목 목록을 프롬프트에 명시해 재보고 제외 지시). 보고받은 5건 중 최상위 1건을 직접 Read로 재검증.
+- **오탐 확인**: 서브에이전트가 최우선으로 보고한 `TerminalTabs.tsx:156`의 "코랄레드 터미널"을 "깨진/의미불명 한국어"로 지목했으나, 직접 Read로 확인한 결과 "코랄레드"는 이 포크 자체의 한국어 브랜드명(오늘 지시서에도 "너는 코랄레드(bolt.diy 포크)"로 명시)이라 "코랄레드 터미널" = "Coralred Terminal"로 정상적인 의도된 문구임을 확인, 오탐으로 종결(수정 안 함).
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/workbench/LockManager.tsx` 전체 — 설정 > "Locks" 탭(잠긴 파일/폴더 관리 화면)의 검색 placeholder(`"Search..."`), 필터 옵션(`"All"/"Files"/"Folders"`), 선택 없이 잠금 해제 시도 시 토스트(`"No items selected to unlock."`), 성공 토스트(`` `Unlocked ${n} selected item(s).` ``), 전체 선택 라벨(`"All"`), "Unlock all" 버튼(라벨+title), 빈 상태 안내(`"No locked items found"`), 개별 항목 잠금 해제 버튼 title(`"Unlock"`)·성공 토스트(`` `${path} unlocked` ``), footer 항목 수 표시(`` `${n} item(s) • ${n} selected` ``)까지 전부 영어로 하드코딩. `EditorPanel.tsx`에서 "Locks" 탭으로 항상 렌더되는 실사용 표면(죽은 코드 아님, import 확인). 19번째 사이클에서 `FileTree.tsx`의 업로드/삭제/잠금 관련 catch 토스트는 이미 한국어로 고쳤지만, 이 잠금 *관리* 전용 별도 컴포넌트는 그때 범위 밖이었고 이후 사이클에서도 재감사 대상에 든 적 없어 처음 발견.
+- **테스트**: `app/lockManagerKoreanAudit.spec.ts` 신규 파일, 2건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 394/394 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `9e800f1`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 37로 기록)**: (1) `TerminalTabs.tsx`의 `closeTerminal(index)`가 중간 터미널을 닫을 때, 렌더 루프가 배열 위치 기준으로 재키잉되면서 실제로 언마운트되는 컴포넌트가 사용자가 닫은 인스턴스가 아니라 최고 인덱스 인스턴스일 수 있어 store의 터미널 참조가 꼬일 위험(확신도 medium, 코드 추론만, 재현 못함). (2) `ScreenshotSelector.tsx` 스크린샷 캡처 성공/실패 토스트 4곳 영어. (3) `PortDropdown.tsx:63` "Ports" 드롭다운 헤더 라벨 영어. (4) `InspectorPanel.tsx` 전체 영어 + 의심되는 오타 클래스(`bg-bolt-elements-bg-depth-1`, 실제 토큰은 `background-depth`) — 단 이 컴포넌트는 자기 자신 외에는 아무 데서도 import되지 않는 죽은 코드로 확인돼 우선순위 낮음.
+- **다음 감사 영역**: 배포로 갱신.

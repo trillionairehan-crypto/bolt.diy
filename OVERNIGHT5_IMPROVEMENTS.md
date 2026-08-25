@@ -1,5 +1,13 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 37. 미리보기/워크벤치 감사(사이클 42, 5회차) — LockManager.tsx 전체 번역은 고침, 나머지 4건은 판단 보류
+Explore 서브에이전트로 `app/components/workbench/**`/`app/lib/stores/workbench.ts`/`app/lib/stores/previews.ts`를 재감사(사이클 17·18·19·24·25·31·35·36·41 및 이미 기록된 항목들은 재보고 제외 지시). 최우선 보고 항목(`TerminalTabs.tsx`의 "코랄레드 터미널"을 깨진 한국어로 지목)은 직접 확인 결과 "코랄레드"가 이 포크의 정식 한국어 브랜드명이라 오탐으로 종결. 다음 확신도 high 항목(`LockManager.tsx` 전체 영어)은 직접 재검증 후 수정·테스트 추가·커밋(`9e800f1`). 아래 4건은 확인만 하고 손 안 댐:
+
+- **`TerminalTabs.tsx:36-65` + `Terminal.tsx:141-148` — 중간 터미널을 닫으면 store가 엉뚱한 인스턴스를 정리 대상으로 착각할 수 있음** — `closeTerminal(index)`는 `terminalRefs.current.get(index)`를 지우고 `terminalCount`를 줄이는데, 렌더 루프(`Array.from({length: terminalCount+1})`)가 순수 배열 위치로 `key={`terminal-${index}`}`를 매기기 때문에, 3개(0/1/2) 중 가운데(1)를 닫으면 실제로 React가 언마운트하는 건 사용자가 닫은 인스턴스가 아니라 최고 인덱스(2) 쪽일 수 있음. `Terminal.tsx`의 언마운트 cleanup은 `terminal.dispose()`만 호출하고 `workbenchStore.detachTerminal()`은 안 부르므로, store에 분리 안 된 참조가 남을 위험. **왜 안 고쳤나**: 코드 추론으로만 확인했고 실제 브라우저 재현(터미널 세션이 실제로 뒤바뀌는 것)은 못함, 고치려면 위치 기반 키/ref를 안정적인 터미널 ID 기반으로 바꾸는 구조 변경이 필요해 최소 변경 범위를 벗어남. **제안**: 다음 미리보기/워크벤치 사이클에서 터미널 3개 이상 열고 중간 걸 닫아 실제로 세션이 꼬이는지 재현 시도, 재현되면 배열 인덱스 대신 생성 시 부여하는 고유 ID로 ref/key를 관리하도록 리팩터.
+- **`ScreenshotSelector.tsx` 스크린샷 캡처 토스트 4곳 영어** — `toast.error('Failed to initialize screen capture')`(87행), `toast.success('Screenshot captured and added to chat')`(196행), `toast.error('Could not add screenshot to chat')`(198행), `toast.error('Failed to capture screenshot')`(205행). **왜 안 고쳤나**: 이번 사이클엔 더 넓은 표면(LockManager.tsx 전체 컴포넌트)을 우선 처리, 순수 문자열 치환이라 리스크는 낮음. **제안**: 다음 한국어 문구 감사 사이클 후보.
+- **`PortDropdown.tsx:63` "Ports" 드롭다운 헤더 라벨 영어** — 미리보기 포트 선택 드롭다운 상단 고정 라벨. **왜 안 고쳤나**: 사소한 1곳, 우선순위 낮음. **제안**: 위 ScreenshotSelector.tsx와 함께 다음 한국어 문구 사이클에서 일괄 처리 권장.
+- **`InspectorPanel.tsx` 전체 영어 + 의심되는 오타 클래스** — 컴포넌트 텍스트 전체가 영어이고 `bg-bolt-elements-bg-depth-1` 클래스를 쓰는데(uno.config.ts 기준 실제 토큰은 `background-depth` 계열로 보임, `bg-depth`는 오타 가능성), 자기 자신 말고는 어디서도 import되지 않는 죽은 코드로 확인됨. **왜 안 고쳤나**: 실사용자가 도달 못 하는 화면이라 우선순위 최하. **제안**: 나중에 이 패널을 실제로 연결할 계획이 있다면 그때 같이 번역·클래스 수정, 아니면 죽은 코드 정리 후보로만 남김.
+
 ## 36. 생성 감사(사이클 41, 5회차) — file 액션 mkdir/writeFile 무음 실패는 고침, 나머지 3건은 판단 보류
 Explore 서브에이전트로 `action-runner.ts`/`message-parser.ts`/`enhanced-message-parser.ts`/`useMessageParser.ts`/`workbench.ts`/`Artifact.tsx`를 재감사(사이클 10·18·26·34에서 이미 기록된 항목은 재보고 제외 지시). 보고받은 4건 중 확신도 high이고 가장 흔한 액션 타입(file)에 영향을 주는 것(`#runFileAction`의 mkdir/writeFile 실패 무음 삼킴)만 직접 Read로 재검증 후 수정·테스트 추가·커밋(`3800c28`). 아래 3건은 서브에이전트 보고를 받았으나 직접 재검증 없이 확신도만 기록, 손 안 댐:
 
