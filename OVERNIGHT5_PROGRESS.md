@@ -510,3 +510,14 @@
 - **검증**: `corepack pnpm vitest run` 386/386 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
 - **커밋**: `fd91f58`
 - **다음 감사 영역**: 모바일로 갱신.
+
+### [09:24] Phase 2 — 사이클 39 (감사 대상: 모바일, 6회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 386/386 통과, `pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 진행 중 작업, 이 세션들이 만든 변경 아님) — diff 내용을 직접 확인해 이전 기록과 동일함을 재검증, 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 375px 뷰포트 기준 고정폭 오버플로/터치타겟/래핑 없는 가로 레이아웃을 재검색(이미 고쳐진 항목 목록을 프롬프트에 명시해 중복 보고 방지). 보고받은 4건 중 최상위 1건을 직접 Read + 폭 계산으로 재검증.
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/header/Header.tsx:67-98` — 랜딩 헤더(홈 화면, `chat.started===false`)에서 로그인 사용자에게 "요금제" 링크 + `ThemeSwitch` + "내 프로젝트" 텍스트+아바타 알약 버튼이 `flex items-center justify-end gap-5`로 나열되는데 `flex-wrap`/`min-w-0`/축소 규칙이 전혀 없음. 폭 계산: 로고(~112px) + 헤더 `px-4`(32px) + "요금제"(~48px) + `gap-5` 2개(40px) + `ThemeSwitch`(~32px) + 알약 버튼(~124px) ≈ 388px, 375px 뷰포트를 넘침(사이클 37에서 IMPROVEMENTS 항목 33으로 "실기기 확인 필요"로만 관찰됐던 항목을 이번에 폭 계산으로 확정). 게스트(로그인 안 함) 변형은 알약이 "로그인"으로 더 짧아 ~341px로 이번엔 안 넘침 — 이번 수정 범위 밖.
+- **변경**: `app/components/header/Header.tsx` — 알약 버튼의 "내 프로젝트" 텍스트를 `<span className="hidden sm:inline">`로 감싸 `sm` 미만에서 숨기고 `title="내 프로젝트"`로 접근성 유지, 좌측 패딩을 `pl-4`→`pl-1.5 sm:pl-4`로 조정(텍스트 없을 때 과도한 여백 방지). `app/components/chat/ChatBox.tsx`의 "이미지 첨부" 버튼(`hidden sm:inline` 패턴)과 동일한 기존 하우스 컨벤션을 그대로 적용해 구조 변경 없이 처리.
+- **테스트**: `app/headerMobileOverflowAudit.spec.ts` 신규 2건(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm vitest run` 388/388 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `d54235f`
+- **범위 밖으로 남긴 것**: (1) `Preview.tsx` 워크벤치 미리보기 툴바(772-863행)가 Device Mode 켰을 때 아이콘 최대 9개가 `flex-nowrap`으로 나열돼 375px에서 넘칠 수 있음(사이클 31 IMPROVEMENTS 항목 25에서 이미 기록, 툴바 재구성이 필요해 구조 변경으로 판단, 계속 미착수). (2) `ChatBox.tsx` 메인 채팅 입력창 아이콘 버튼들이 `h-8`(32px)로 하우스 44px 기준(`PromptClarification.tsx`의 `min-h-11`)보다 작음 — 여러 파일에 걸친 공유 클래스라 일괄 조정 필요(사이클 23 IMPROVEMENTS 항목 21에서 이미 기록). (3) `GitHubStats.tsx:192`/`StatsDisplay.tsx:42` 설정 다이얼로그 통계 그리드가 `grid-cols-4`/`grid-cols-3` 고정이고 형제 그리드는 이미 `md:grid-cols-4` 반응형 — 기계적인 수정이지만 이번 사이클 범위 밖, `OVERNIGHT5_IMPROVEMENTS.md` 항목 34로 신규 기록.
+- **다음 감사 영역**: 온보딩으로 갱신.
