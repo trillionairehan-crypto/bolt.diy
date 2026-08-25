@@ -575,3 +575,14 @@
 - **커밋**: `1c391e1`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 39로 기록)**: (1) `app/routes/terms.tsx:86`가 존재하지 않는 "설정 화면을 통한 회원 탈퇴" 기능을 명시적으로 약속함(코드베이스 전체에 탈퇴 UI/API 없음, `signOut`만 존재) — 새 기능 구현 또는 법률 문구 수정이 필요해 사람 판단 대기. (2) `pricing.tsx`의 `.cr-grid-4` 4열 그리드가 태블릿 폭(761~1024px)에서 2열 브레이크포인트 없이 데스크톱 레이아웃 유지돼 카드가 좁아짐(확신도 medium).
 - **다음 감사 영역**: 다크모드로 갱신.
+
+### [10:32] Phase 2 — 사이클 45 (감사 대상: 다크모드, 8회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 400/400 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 진행 중 작업, 이 세션들이 만든 변경 아님) — diff 내용을 직접 확인해 이전 기록과 동일함을 재검증, 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: 큐 파일 자체가 전부 완료/손절 상태라 새 서브에이전트 감사 대신, `OVERNIGHT5_IMPROVEMENTS.md` 항목 13(사이클 14부터 "범위 초과"로 계속 보류돼온 다크모드 죽은 토큰 4건)을 먼저 재확인. 그중 `NetlifyTab.tsx:931,1085`/`NetlifyConnection.tsx:653,774`의 `bolt-elements-link-text`/`-textHover`가 여전히 남아있음을 grep으로 확인.
+- **발견·수정(1건, 검증 완료 후 수정)**: `uno.config.ts`의 `elements` 테마 토큰 테이블 전체를 확인한 결과 `link` 키 자체가 정의된 적이 없음(`link`가 들어간 유일한 항목은 `messages.linkColor`) — 즉 `text-bolt-elements-link-text`/`hover:text-bolt-elements-link-textHover`/`dark:hover:text-bolt-elements-link-textHover`는 UnoCSS가 매칭 규칙을 못 찾아 스타일이 전혀 생성되지 않는 죽은 클래스였음. 라이트 모드에서는 링크 색이 조용히 상속색으로 폴백되고(주변에 명시적 색 지정 없음), 다크 모드는 `dark:text-white`로만 보이되 hover 시 색 변화가 전혀 없었음(밑줄은 별도 `<span>`에 항상 고정으로 있어 완전히 안 보이진 않지만 의도된 링크 hover 피드백은 없는 상태). 4곳 모두 배포된 사이트 URL을 여는 실사용 링크(Netlify 설정 탭, 연결 후 항상 노출).
+  → 같은 줄 바로 앞 아이콘이 이미 쓰고 있던 실제 정의된 토큰 `text-bolt-elements-item-contentAccent`(라이트/다크 공용 단일 값)로 4곳 전부 통일, 존재하지 않던 hover 변형은 제거(기존에도 실질적으로 동작한 적 없었으므로 동작 변화 없음).
+- **테스트**: 기존 `app/darkModeAccentAudit.spec.ts`에 신규 describe 블록 1개, 4건 추가(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 404/404 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `515bba6`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 40으로 기록)**: (1) `McpTab.tsx:201`의 `text-bolt-elements-link`도 같은 이유로 죽은 토큰(정의된 적 없음)이지만 이번 사이클 범위(다크모드 죽은 link 토큰 4곳)를 넘어서는 별도 파일이라 손 안 댐. (2) `NetlifyConnection.tsx:861-862`의 `text-bolt-elements-textDestructive` 죽은 토큰(항목 13에서 이미 기록된 별개 항목)은 기존 판단대로 계속 보류.
+- **다음 감사 영역**: 모바일로 갱신.

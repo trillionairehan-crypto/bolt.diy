@@ -1,5 +1,11 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 40. 다크모드 감사(사이클 45, 8회차) — 죽은 link 토큰(item 13) 수정, 신규 발견 1건은 판단 보류
+`NetlifyTab.tsx`/`NetlifyConnection.tsx`의 `bolt-elements-link-text`/`-textHover` 죽은 토큰(항목 13, 사이클 14부터 보류)을 직접 재검증 후 수정·테스트 추가·커밋(`515bba6`). 이 과정에서 새로 확인된 것:
+
+- **`app/components/@settings/tabs/mcp/McpTab.tsx:201`의 `text-bolt-elements-link`도 마찬가지로 `uno.config.ts`에 정의된 적 없는 죽은 토큰** — `elements` 테마 블록 전체를 확인한 결과 `link` 키 자체가 없고(`link`가 들어간 건 `messages.linkColor`뿐), 이번에 고친 4곳과 같은 버그 클래스지만 이번 사이클 범위(다크모드 감사, 죽은 link 토큰 4곳)를 넘어서는 별도 파일이라 손 안 댐. **제안**: 다음 다크모드 감사 사이클에서 `hover:underline`과 함께 쓰이고 있어 밑줄 자체는 보이지만 색은 상속되는 상태 — `text-bolt-elements-item-contentAccent` 또는 `text-bolt-elements-messages-linkColor`로 교체 검토.
+- **`NetlifyConnection.tsx:861-862`의 `text-bolt-elements-textDestructive`** — 항목 13(사이클 14)에서 이미 기록된 별도 죽은 토큰, 이번 사이클에서 손 안 댐(대체 토큰 확정에 화면 확인 필요, 기존 판단 유지).
+
 ## 39. 요금제/결제 감사(사이클 44, 7회차) — 템플릿 자동선택 무한로딩은 고침, 나머지 2건은 판단 보류
 Explore 서브에이전트로 `pricing.tsx`(PortOne 미완성 연동 제외), 구독/크레딧/`freeTrial.ts`, `BaseChat.tsx`/`Chat.client.tsx` 무료 생성 배지, `ModelSelector.tsx`를 재감사(사이클 21·29·37 및 IMPROVEMENTS.md 항목 4/28/33 등 이미 기록된 항목은 재보고 제외 지시). 최우선 보고 항목(`selectStarterTemplate()`가 fetch/JSON 파싱 예외를 그대로 throw해 무료 생성 크레딧만 차감되고 화면이 무한 로딩으로 멈추던 문제)은 직접 재검증 후 수정·테스트 추가·커밋(`1c391e1`). 아래 2건은 확인만 하고 손 안 댐:
 
@@ -150,7 +156,7 @@ Explore 서브에이전트로 `app/components/**`/`app/routes/**` 전체를 재�
 Explore 서브에이전트로 `app/` 전체 재검색, 법률 페이지 링크 하드코딩 건(고침, `6f9b309`)은 별도. 아래 4건은 확인은 했으나 범위가 넓거나 확신도가 낮아 손 안 댐:
 
 - **`app/components/@settings/tabs/netlify/components/NetlifyConnection.tsx:861-862`의 `text-bolt-elements-textDestructive`가 `uno.config.ts`에 정의 안 된 죽은 토큰** — 빌드 실패 에러 메시지의 강조색(빨강)이 빠지는 것으로 보임(`icon-error`가 올바른 토큰일 가능성). **왜 안 고쳤나**: 에러 상황에서만 노출돼 실사용 빈도가 낮고, 정확한 대체 토큰 확정에 UI 스크린샷 확인이 필요해 보류. **제안**: `text-bolt-elements-icon-error`로 교체 검토.
-- **`NetlifyTab.tsx:931,1085`/`NetlifyConnection.tsx:653,774`의 `bolt-elements-link-text`/`link-textHover`가 죽은 토큰**(정의된 건 `bolt-elements-link`뿐) — 링크가 라이트에선 상속색, 다크에선 죽은 hover 클래스로 렌더. **왜 안 고쳤나**: 4곳 전부 같은 파일 내 여러 위치라 한 번에 고쳐야 하는데 이번 사이클은 이미 다른 항목을 처리해 범위 초과, 다음 사이클 후보로 남김.
+- ~~**`NetlifyTab.tsx:931,1085`/`NetlifyConnection.tsx:653,774`의 `bolt-elements-link-text`/`link-textHover`가 죽은 토큰**~~ ✅ **사이클 45에서 수정됨** — 같은 파일 아이콘이 이미 쓰던 실제 정의된 토큰 `text-bolt-elements-item-contentAccent`로 4곳 통일, `darkModeAccentAudit.spec.ts` 회귀 테스트 추가(`515bba6`).
 - **GitHub/GitLab 저장소 카드 다수 파일의 `icon-warning`/`icon-info`/`icon-accent` 죽은 토큰** — `GitHubStats.tsx`, `RepositoryCard.tsx`(github/gitlab 둘 다), `GitHubRepositoryCard.tsx`, `StatsDisplay.tsx` 등 별점/포크/레포 아이콘이 색 없이 렌더. **왜 안 고쳤나**: 파일 수가 많고(6개 이상) `uno.config.ts`의 `icon` 테마 블록에 어떤 토큰을 새로 추가할지 결정이 먼저 필요해 최소 변경 범위를 넘어섬. **제안**: `uno.config.ts`에 `icon-warning`/`icon-info` 토큰 정의를 추가하거나 기존 `icon-primary`/`icon-secondary`로 통일하는 방향을 사람이 먼저 결정 권장.
 - **`app/components/workbench/Search.tsx:203`의 `text-gray-500`이 형제 상태(`text-bolt-elements-textTertiary`)와 토큰 불일치** — "검색 중..."은 테마 토큰인데 "No results found."는 하드코딩 Tailwind 회색. **왜 안 고쳤나**: 다크모드에서도 대비가 크게 나쁘진 않아 보여 확신도 낮은 스타일 닛으로 판단, 우선순위 낮음.
 
