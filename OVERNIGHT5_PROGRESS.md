@@ -662,3 +662,18 @@
 - **커밋**: `3662d79`(GitLab 토큰 로그 + Close dialog), `6eb0e00`(Vercel URL 토큰 노출)
 - **범위 밖으로 남긴 것**: 서브에이전트가 함께 보고한 2건(`CloudflareDeploy.client.tsx`/`NetlifyDeploy.client.tsx`의 아티팩트 ID 충돌, `NetlifyDeploy.client.tsx` 폴링 루프 `.ok` 체크 누락) — 둘 다 구조 판단이 더 필요해 `OVERNIGHT5_IMPROVEMENTS.md` 항목 37에 기록만 함.
 - **다음 감사 영역**: 요금제/결제로 갱신.
+
+## 사이클 52 (감사 대상: 요금제/결제, 8회차) — 2026-08-25
+- **베이스라인**: 사이클 시작 시 `corepack pnpm vitest run` 420/420 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 미커밋 PortOne 결제 연동 변경은 여전히 그대로 남아있음(diff 재확인 결과 이전 사이클들이 기록한 것과 동일 스켈레톤 — 새로 생긴 변경 아님, 큐 참고 사항대로 이번에도 손 안 댐).
+- **큐 상태**: `[진행중]`/`[대기]` 항목 없음(전부 완료/손절) → 검증 사이클 진행. 큐 파일의 "다음 감사 영역"을 따라 요금제/결제 표면을 general-purpose 서브에이전트로 감사(이미 알려진 항목 — BaseChat 무료 배지 분기, selectStarterTemplate fetch 예외, ModelSelector 영어 하드코딩, freeTrial.ts 비일관성 오탐, api.payment.verify.ts 인증 부재, CORALRED_NEW_METERING, pricing.tsx 미커밋 PortOne 코드 — 는 재보고 금지 명시).
+- **발견(3건, 전부 직접 Read로 재확인 후 수정)**: `app/components/chat/ModelSelector.tsx`
+  1. (707행) 모델 검색 결과 개수 안내가 5개 초과 시 "모델 N개 찾음 (가장 잘 맞는 항목만 표시)"라고 안내했지만, `filteredModels`(195-233행)를 실제로 제한(슬라이스)하는 코드가 어디에도 없음을 직접 확인 — 802행의 `.map()`이 정렬된 전체 배열을 그대로 렌더. 검색 결과가 6개 이상이면 "일부만 표시"라고 오인시키는 거짓 안내였음.
+  2. (842행) 매치 점수 배지가 `{score}% match`로 영어 하드코딩 — 같은 컴포넌트의 다른 모든 문구는 이미 한국어(사이클 37에서 번역)인데 이 배지만 놓쳐짐.
+  3. (254-257행) 프로바이더 전환 시 `showFreeModelsOnly`는 리셋되지만 `modelSearchQuery`/`debouncedModelSearchQuery`는 리셋되지 않음(다른 프로바이더 선택 경로 366-367행/594-595행 둘 다 `providerSearchQuery`만 지우고 모델 검색어는 그대로 둠) — 이전 프로바이더에서 입력한 검색어가 남아있으면 새 프로바이더에 모델이 있어도 "사용 가능한 모델이 없어요"로 잘못 표시될 수 있음.
+- **수정**: (1) 거짓 안내 문구 제거(실제 제한 로직을 새로 구현하는 대신 문구를 사실과 맞춤 — 최소 변경). (2) "일치율 N%"로 번역. (3) 프로바이더 변경 `useEffect`에 `setModelSearchQuery('')`/`setDebouncedModelSearchQuery('')` 추가(포커스 이동이 있는 `clearModelSearch()` 대신 상태만 직접 리셋 — 드롭다운이 닫혀있을 수도 있는 시점이라 포커스 부작용 피함).
+- **변경**: `app/components/chat/ModelSelector.tsx`.
+- **테스트**: `app/components/chat/modelSelectorAuditCycle52.spec.ts` 신규 5건(소스 grep 방식). 수정 전 코드로 `git stash push -- app/components/chat/ModelSelector.tsx`해 4/5건이 실제로 실패하는 것 확인(나머지 1건은 원래도 통과하는 문구 존재 검증) 후 `git stash pop`으로 복원 — 재현 확정 후 커밋. 기존 `app/modelSelectorKoreanAudit.spec.ts`(사이클 37)가 단언하던 "가장 잘 맞는 항목만 표시" 문구 존재 검증은 그 문구 자체가 이번에 잘못된 것으로 확인돼 제거됨에 따라 해당 assertion도 함께 제거(테스트 약화가 아니라 검증 대상 문구가 버그였음을 반영).
+- **검증**: `corepack pnpm vitest run` 425/425 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(신규 파일 prettier 포맷 오류 1건 발견해 `eslint --fix`로 수정 후 재확인 — 무관한 기존 warning 1건만 남음, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `9605d9f`
+- **범위 밖으로 남긴 것**: 서브에이전트가 함께 보고한 `isModelLikelyFree`(102행)의 이름 부분 문자열 기반 무료 판정 후보(확신도 medium, 구체적 오탐 사례 미검증) — `OVERNIGHT5_IMPROVEMENTS.md` 항목 38에 기록만 함.
+- **다음 감사 영역**: 다크모드로 갱신.
