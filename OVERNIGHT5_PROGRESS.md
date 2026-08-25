@@ -564,3 +564,14 @@
 - **커밋**: `d5ebd1e`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 38로 기록)**: (1) GitHub/GitLab/Vercel/Netlify 배포 아티팩트 제목 4곳이 영어("GitHub Deployment" 등, Cloudflare만 한국어). (2) `VercelDeploymentLink.client.tsx`가 채팅 전환 시 이전 채팅의 배포 링크를 계속 보여줄 수 있음(`deploymentUrl` state가 `currentChatId` 변경에 리셋 안 됨, Netlify 쪽은 매 렌더 스토어에서 새로 읽어 문제 없음). (3) Netlify/Vercel 배포 훅이 빌드 산출물을 `utf-8` 텍스트로 읽어 바이너리 자산이 깨질 수 있음(Cloudflare는 이미 바이트 안전 읽기로 수정됨, 자체 주석에도 명시). (4) `DeployButton.tsx` 서브메뉴 4개 항목이 메인 버튼과 달리 `isStreaming` disabled 가드 없음.
 - **다음 감사 영역**: 요금제/결제로 갱신.
+
+### [10:14] Phase 2 — 사이클 44 (감사 대상: 요금제/결제, 7회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 397/397 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 진행 중 작업, 이 세션들이 만든 변경 아님) — diff 내용을 직접 확인해 이전 기록과 동일함을 재검증, 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `pricing.tsx`(PortOne 부분 제외), 구독/크레딧/`freeTrial.ts`, `BaseChat.tsx`/`Chat.client.tsx` 무료 생성 배지, `ModelSelector.tsx`를 재감사(사이클 21·29·37 및 IMPROVEMENTS.md 항목 4/28/33 등 이미 기록된 항목 목록을 프롬프트에 명시해 재보고 제외 지시). 보고받은 3건 중 최상위 1건을 직접 Read로 재검증 후 수정.
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/chat/Chat.client.tsx:519-533`의 `generateNewApp()`이 `checkGenerationsAllowed()` 통과 직후 `recordGenerationUsed()`로 무료 생성 크레딧을 **먼저 차감**하고 `setFakeLoading(true)`를 띄운 뒤, `autoSelectTemplate`가 켜져 있으면(기본값 true, `settings.ts:285`) `selectStarterTemplate()`를 호출함. 그런데 `app/utils/selectStarterTemplate.ts:102-106`의 `fetch('/api/llmcall')`/`response.json()` 호출은 어떤 try/catch도 없이 그대로 예외를 전파했고, 호출부인 `handleClarificationComplete`(677행)도 `generateNewApp(...)`을 await/catch 없이 fire-and-forget으로 부르기 때문에, 네트워크 오류나 비-JSON 응답(500 HTML 에러 페이지 등) 시 예외가 unhandled rejection이 되어 `setFakeLoading(false)`에 도달하지 못하고 채팅 화면이 무한 로딩 상태로 멈춤. 크레딧은 이미 차감된 뒤라 새로고침해도 복구 안 됨.
+- **변경**: `app/utils/selectStarterTemplate.ts` — `fetch`/`response.json()`/파싱 전체를 try/catch로 감싸, 실패 시 기존에 LLM 파싱 실패(`parseSelectedTemplate`가 null 반환) 때 이미 쓰던 것과 동일한 blank 템플릿 폴백(`{ template: 'blank', title: '' }`)으로 흡수하도록 수정. `Chat.client.tsx`는 건드리지 않음(blank 반환 시 이미 안전하게 baseline 경로로 이어짐).
+- **테스트**: `app/utils/selectStarterTemplate.spec.ts` 신규 파일, 3건(정상 파싱 성공 / fetch reject 시 blank 폴백 / 비-JSON 응답 시 blank 폴백, `vi.stubGlobal('fetch', ...)` 방식은 `generateAppQuestions.spec.ts`와 동일 패턴).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 400/400 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `1c391e1`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 39로 기록)**: (1) `app/routes/terms.tsx:86`가 존재하지 않는 "설정 화면을 통한 회원 탈퇴" 기능을 명시적으로 약속함(코드베이스 전체에 탈퇴 UI/API 없음, `signOut`만 존재) — 새 기능 구현 또는 법률 문구 수정이 필요해 사람 판단 대기. (2) `pricing.tsx`의 `.cr-grid-4` 4열 그리드가 태블릿 폭(761~1024px)에서 2열 브레이크포인트 없이 데스크톱 레이아웃 유지돼 카드가 좁아짐(확신도 medium).
+- **다음 감사 영역**: 다크모드로 갱신.

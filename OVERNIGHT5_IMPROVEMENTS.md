@@ -1,5 +1,11 @@
 # overnight5 — 구조 변경 필요/판단 필요 항목 (제안만, 수정 안 함)
 
+## 39. 요금제/결제 감사(사이클 44, 7회차) — 템플릿 자동선택 무한로딩은 고침, 나머지 2건은 판단 보류
+Explore 서브에이전트로 `pricing.tsx`(PortOne 미완성 연동 제외), 구독/크레딧/`freeTrial.ts`, `BaseChat.tsx`/`Chat.client.tsx` 무료 생성 배지, `ModelSelector.tsx`를 재감사(사이클 21·29·37 및 IMPROVEMENTS.md 항목 4/28/33 등 이미 기록된 항목은 재보고 제외 지시). 최우선 보고 항목(`selectStarterTemplate()`가 fetch/JSON 파싱 예외를 그대로 throw해 무료 생성 크레딧만 차감되고 화면이 무한 로딩으로 멈추던 문제)은 직접 재검증 후 수정·테스트 추가·커밋(`1c391e1`). 아래 2건은 확인만 하고 손 안 댐:
+
+- **`app/routes/terms.tsx:86` — 이용약관이 존재하지 않는 "설정 화면을 통한 회원 탈퇴" 기능을 명시적으로 약속함** — "회원은 언제든지 서비스 내 설정 화면을 통해 이용계약 해지(탈퇴)를 신청할 수 있으며..."라고 명시하지만, `app/components/@settings/**`/`app/routes/**` 전체를 검색해도 탈퇴/계정 삭제 UI·API가 전혀 없음(로그아웃 `signOut`만 존재, `app/lib/stores/auth.ts:77`). 결제/환불 조항(제10조) 바로 앞이라 유료 구독자가 해지를 원해도 실제 경로가 없는 상태. **왜 안 고쳤나**: 계정 삭제는 결제 해지·데이터 파기·Supabase 스키마까지 얽힌 새 기능 구현이라 "최소 변경" 범위를 크게 벗어나고, 법률 문서 자체를 코드가 임의로 고치는 것도 부적절해 사람 판단이 필요. **제안**: (1) 사람이 먼저 계정 삭제 기능을 실제로 만들지, 아니면 약관 문구를 현재 지원 범위(예: "고객센터로 문의")로 낮출지 결정, (2) 결정 전까지는 신규 유료 가입 전환율에 영향 없는 선에서 최소한 문구를 사실과 다르지 않게 조정하는 것을 권장.
+- **`app/routes/pricing.tsx:171-175` — 요금제 4열 그리드가 태블릿 폭(761px~약 1024px)에서 데스크톱 레이아웃 그대로 유지돼 카드가 좁아짐** — `.cr-grid-4`(`design-handoff/coralred-ui.css:180`, `repeat(4, 1fr)`)의 인라인 미디어쿼리가 `max-width: 760px`에서만 1열로 접히고 중간 폭(iPad 세로 768px 등)을 위한 2열 브레이크포인트가 없어, "이월(다음 달 최대 2배까지 누적)" 같은 긴 기능 문구가 좁은 컬럼에서 심하게 줄바꿈됨(확신도 medium). **왜 안 고쳤나**: 이번 사이클엔 크레딧 차감 후 무한 로딩(실제 생성 흐름이 막히는 더 심각한 버그)을 우선 처리, 이쪽은 순수 CSS 브레이크포인트 추가라 리스크는 낮음. **제안**: 다음 요금제/결제(또는 모바일) 감사 사이클에서 `@media (max-width: 1024px) { .cr-grid-4 { grid-template-columns: repeat(2, 1fr); } }` 같은 중간 브레이크포인트 추가(760px 이하 1열 규칙은 유지).
+
 ## 38. 배포 감사(사이클 43, 6회차) — ActionCommandError 헤더 영어 노출은 고침, 나머지 4건은 판단 보류
 Explore 서브에이전트로 `DeployButton.tsx`/5개 제공자 훅/`GitHubDeploymentDialog.tsx`/`GitLabDeploymentDialog.tsx`/`CustomDomainConnect.tsx`/배포·도메인 API 라우트/`action-runner.ts`/`DeployAlert.tsx`를 재감사(이미 알려진 항목 목록 제외 지시). 최우선 보고 항목(`ActionCommandError('Build Failed'/'Failed To Start Application', ...)`의 header가 `ChatAlert.tsx`에서 description으로 그대로 노출)은 직접 재검증 후 수정·테스트 추가·커밋(`d5ebd1e`). 아래 4건은 확인만 하고 손 안 댐:
 
