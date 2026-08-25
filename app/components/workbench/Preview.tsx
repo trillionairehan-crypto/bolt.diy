@@ -597,6 +597,9 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
 
           if (newWindow) {
             newWindow.focus();
+          } else {
+            console.error('Failed to open new window');
+            toast.error('팝업이 차단되어 새 창을 열 수 없어요. 브라우저의 팝업 차단을 해제해 주세요.');
           }
         }
       } else {
@@ -911,11 +914,16 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
                           const previewUrl = `/webcontainer/preview/${previewId}`;
 
                           // Open in a new window with simple parameters
-                          window.open(
+                          const newWindow = window.open(
                             previewUrl,
                             `preview-${previewId}`,
                             'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no,resizable=yes',
                           );
+
+                          if (!newWindow) {
+                            console.error('Failed to open new window');
+                            toast.error('팝업이 차단되어 새 창을 열 수 없어요. 브라우저의 팝업 차단을 해제해 주세요.');
+                          }
                         }}
                       >
                         <span>새 창에서 열기</span>
