@@ -357,6 +357,14 @@ export class StreamingMessageParser {
     this.#messages.clear();
   }
 
+  /**
+   * Clears only the tracked incremental position for a single message, leaving other
+   * in-flight messages' parse state untouched (unlike reset(), which clears all of them).
+   */
+  resetMessage(messageId: string) {
+    this.#messages.delete(messageId);
+  }
+
   #parseActionTag(input: string, actionOpenIndex: number, actionEndIndex: number) {
     const actionTag = input.slice(actionOpenIndex, actionEndIndex + 1);
 

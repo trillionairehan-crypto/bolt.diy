@@ -54,8 +54,8 @@ export class EnhancedStreamingMessageParser extends StreamingMessageParser {
       const enhancedInput = this._detectAndWrapCodeBlocks(messageId, input);
 
       if (enhancedInput !== input) {
-        // Reset and reparse the whole message with the enhanced input
-        this._resetParserState();
+        // Reset and reparse this message only (other in-flight messages must keep their state)
+        this._resetParserState(messageId);
         fullOutput = super.parse(messageId, enhancedInput);
       }
     }
@@ -65,10 +65,9 @@ export class EnhancedStreamingMessageParser extends StreamingMessageParser {
     return fullOutput;
   }
 
-  private _resetParserState() {
-    super.reset();
-    this._processedCodeBlocks.clear();
-    this._artifactCounter = 0;
+  private _resetParserState(messageId: string) {
+    super.resetMessage(messageId);
+    this._processedCodeBlocks.delete(messageId);
   }
 
   private _hasDetectedArtifacts(input: string): boolean {
@@ -541,7 +540,9 @@ ${content.trim()}
   }
 
   reset() {
-    this._resetParserState();
+    super.reset();
+    this._processedCodeBlocks.clear();
+    this._artifactCounter = 0;
     this._fullOutput.clear();
   }
 }
