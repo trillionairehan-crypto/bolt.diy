@@ -74,10 +74,11 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setSidebarOpen(true)}
-                className="flex items-center gap-2 text-sm font-semibold rounded-full pl-4 pr-1.5 py-1.5 hover:opacity-90 transition-opacity"
+                title="내 프로젝트"
+                className="flex items-center gap-2 text-sm font-semibold rounded-full pl-1.5 pr-1.5 py-1.5 sm:pl-4 hover:opacity-90 transition-opacity"
                 style={{ background: '#FAF7F0', color: '#FF5330' }}
               >
-                내 프로젝트
+                <span className="hidden sm:inline">내 프로젝트</span>
                 <span className="flex items-center justify-center w-6 h-6 rounded-full overflow-hidden bg-[#FF5330]/15 shrink-0">
                   {profile?.avatar ? (
                     <img src={profile.avatar} alt="" className="w-full h-full object-cover" />
