@@ -500,3 +500,13 @@
 - **커밋**: `e74886f`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 33으로 기록)**: (1) `Chat.client.tsx`의 `recordGenerationUsed` 실패 시 조용히 생성을 계속 허용하는 비대칭 처리(정책 결정 필요). (2) `Header.tsx` 랜딩 헤더의 요금제/테마/계정 pill이 반응형 처리 없이 나열돼 좁은 화면에서 오버플로 가능성(실기기 확인 필요). (3) 로그인 계정 소진 토스트에 요금제 이동 액션 부재(UX 설계 판단 필요).
 - **다음 감사 영역**: 다크모드로 갱신.
+
+### [09:12] Phase 2 — 사이클 38 (감사 대상: 다크모드, 5회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 384/384 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 진행 중 작업) — 이전 사이클들의 판단대로 이번에도 손 안 댐, diff 내용을 직접 확인해 이전 기록과 동일함을 재검증.
+- **감사 방법**: Explore 서브에이전트로 `app/components/`, `app/routes/`, `app/lib/` 전체를 대상으로 하드코딩 hex 색상, `dark:` 변형 없는 `bg-white`/`text-black`/`border-gray-*`, 남은 죽은 `dark:X-Y-dark` 토큰, 항상-라이트 표면을 재검색(이미 고쳐진 파일 목록을 프롬프트에 명시해 중복 보고 방지 요청). 보고받은 최상위 1건을 직접 Read로 재확인.
+- **발견 및 확인**: `NetlifyDeploymentLink.client.tsx:31`이 링크 아이콘 hover 색을 Netlify 브랜드 틸 `hover:text-[#00AD9F]`로 하드코딩. 완전히 동일한 마크업/툴팁 구조에 `DeployButton.tsx`(같은 배포 드롭다운, 210번대 줄)에서 나란히 렌더되는 `VercelDeploymentLink.client.tsx`는 사이클 6에서 정확히 이 패턴(`hover:text-[#000000]`)을 `hover:text-bolt-elements-textPrimary`로 이미 고쳤음(`darkModeAccentAudit.spec.ts`에 회귀 테스트 존재) — Netlify 쪽만 놓친 사각지대. 대비 계산상 `#00AD9F`가 다크 배경에서 완전히 안 보이는 수준은 아니었지만(대략 5:1대), 아이콘 자체가 Netlify 로고가 아니라 범용 `i-ph:link` 아이콘이라 브랜드색을 고정할 근거가 약하고, 바로 옆 동일 컴포넌트가 이미 테마 토큰으로 통일돼 있어 일관성 관점에서 명확한 수정 대상으로 판단.
+- **변경**: `app/components/chat/NetlifyDeploymentLink.client.tsx` 1곳 — `hover:text-[#00AD9F]` → `hover:text-bolt-elements-textPrimary`.
+- **테스트**: `app/darkModeAccentAudit.spec.ts`에 신규 2건 추가(Vercel 쪽 기존 테스트와 대칭 구조, 소스 grep 방식).
+- **검증**: `corepack pnpm vitest run` 386/386 통과, `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `fd91f58`
+- **다음 감사 영역**: 모바일로 갱신.

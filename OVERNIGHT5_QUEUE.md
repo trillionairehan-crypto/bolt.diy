@@ -1,5 +1,6 @@
-다음 감사 영역: 다크모드
+다음 감사 영역: 모바일
 
+[완료] 다크모드 감사(사이클 38, 5회차) — NetlifyDeploymentLink.client.tsx 링크 아이콘 hover가 고정 Netlify 브랜드 틸(#00AD9F)을 써서, DeployButton.tsx 같은 드롭다운에 나란히 렌더되는 동일 구조의 VercelDeploymentLink.client.tsx(사이클 6에서 hover:text-[#000000]→hover:text-bolt-elements-textPrimary로 이미 수정됨)와 어긋나던 불일치 → 동일하게 테마 토큰으로 통일 — (사이클 38)
 [완료] 요금제/결제 감사(사이클 37, 4회차) — ModelSelector.tsx 무료/유료 모델 필터·검색 결과 개수·로딩·빈 상태 문구(약 10곳)가 전부 영어로 하드코딩돼 바로 옆 이미 한국어인 검색창 placeholder와 한 화면에서 언어가 섞여 보이던 문제 → 전부 한국어로 번역 — (사이클 37)
 [완료] 배포 감사(사이클 36, 5회차) — ActionRunner#runBuildAction()이 쏘는 빌드 시작/실패/완료 onDeployAlert 3곳이 전부 영어("Building Application"/"Build Failed"/"Build Completed")로 하드코딩돼 있어, Cloudflare/GitHub/GitLab/Netlify/Vercel 5개 배포 제공자 전부에서 각 훅이 미리 설정한 한국어 배포 상태("빌드 중이에요" 등)를 빌드 실행 중/직후에 매번 영어로 덮어쓰던 문제(모든 artifact가 같은 workbenchStore.deployAlert atom을 공유해서 발생) → 3곳 전부 한국어로 번역 — (사이클 36)
 [완료] 미리보기/워크벤치 감사(사이클 35, 4회차) — DiffView.tsx "차이점" 탭이 다른 워크벤치 표면과 달리 상태 문구(Modified/No Changes/Streaming…)와 안내 문구(Files are identical/Select a file to view differences 등) 9곳이 전부 영어로 하드코딩돼 있던 문제 → 전부 한국어로 번역 — (사이클 35)
