@@ -489,3 +489,14 @@
 - **커밋**: (다음 커밋)
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 32로 기록)**: (1) `api.netlify-deploy.ts`/`api.vercel-deploy.ts`의 영어 에러 문구가 번역 없이 toast로 직행(확신도 high, 파일마다 10곳 이상이라 범위 큼). (2) `useVercelDeploy`/`useNetlifyDeploy`/`useGitHubDeploy`/`useGitLabDeploy` 4곳에 `useCloudflareDeploy`와 달리 더블클릭 재진입 가드 없음(확신도 medium, 설계 판단 필요). (3) `GitLabDeploymentDialog.tsx` sr-only "Close dialog" 2곳 미번역(낮은 우선순위, 다음 사이클에 바로 처리 가능).
 - **다음 감사 영역**: 요금제/결제로 갱신.
+
+### [09:00] Phase 2 — 사이클 37 (감사 대상: 요금제/결제, 4회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 382/382 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 진행 중 작업, 이 세션들이 만든 변경 아님) — 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 요금제/결제와 실제로 연결된 표면(설정 탭, 헤더/사이드바 요금제 링크, 무료 생성 잔여 횟수 표시, tier/plan 유틸, Made-with 배지 로직, 무료/유료 구분 조건문)을 대상으로 이미 알려진 항목(freeTrial.ts 메터링 동결, api.cloudflare-domain/deploy 인증 부재, CustomDomainConnect TODO_IS_PRO_USER, api.payment.verify/webhook 인증·재사용 방지 부재, BaseChat.tsx 용어 분기) 제외하고 재검색 요청. 보고받은 4건 중 최상위 1건을 직접 Read로 재검증 후 수정.
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/components/chat/ModelSelector.tsx` — 모델 드롭다운의 "무료 모델만" 필터 토글("Free models only"), 필터 켰을 때 개수("N free model(s)"), 검색 결과 개수("N model(s) found (showing best matches)"), 모델 목록 로딩("Loading models..."), 빈 상태 안내 5곳(검색 결과 없음/무료 모델 없음/로컬 프로바이더 미실행 안내 2곳/검색 팁/필터 해제 안내)이 전부 영어로 하드코딩. 바로 옆 프로바이더·모델 검색창 placeholder/aria-label과 무료 모델 배지 title은 이전 한국어 문구 감사 사이클에서 이미 한국어로 고쳐져 있어, 드롭다운 하나를 여는 순간 한국어와 영어가 섞여 보이던 일관성 문제.
+  → 전부 한국어로 번역.
+- **테스트**: 기존 `app/modelSelectorKoreanAudit.spec.ts`에 신규 2건 추가(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 384/384 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `e74886f`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 33으로 기록)**: (1) `Chat.client.tsx`의 `recordGenerationUsed` 실패 시 조용히 생성을 계속 허용하는 비대칭 처리(정책 결정 필요). (2) `Header.tsx` 랜딩 헤더의 요금제/테마/계정 pill이 반응형 처리 없이 나열돼 좁은 화면에서 오버플로 가능성(실기기 확인 필요). (3) 로그인 계정 소진 토스트에 요금제 이동 액션 부재(UX 설계 판단 필요).
+- **다음 감사 영역**: 다크모드로 갱신.
