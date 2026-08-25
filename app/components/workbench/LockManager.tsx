@@ -105,7 +105,7 @@ export function LockManager() {
   // Handle unlocking selected items
   const handleUnlockSelected = () => {
     if (selectedItems.size === 0) {
-      toast.error('No items selected to unlock.');
+      toast.error('잠금 해제할 항목을 선택해 주세요.');
       return;
     }
 
@@ -125,7 +125,7 @@ export function LockManager() {
     });
 
     if (unlockedCount > 0) {
-      toast.success(`Unlocked ${unlockedCount} selected item(s).`);
+      toast.success(`선택한 항목 ${unlockedCount}개의 잠금을 해제했어요.`);
       setSelectedItems(new Set()); // Clear selection after unlocking
     }
   };
@@ -148,7 +148,7 @@ export function LockManager() {
           <span className="absolute left-2 top-1/2 -translate-y-1/2 text-bolt-elements-textTertiary i-ph:magnifying-glass text-xs pointer-events-none" />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="검색..."
             className="w-full text-xs pl-6 pr-2 py-0.5 h-6 bg-bolt-elements-background-depth-2 text-bolt-elements-textPrimary rounded border border-bolt-elements-borderColor focus:outline-none"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -161,9 +161,9 @@ export function LockManager() {
           value={filter}
           onChange={(e) => setFilter(e.target.value as any)}
         >
-          <option value="all">All</option>
-          <option value="files">Files</option>
-          <option value="folders">Folders</option>
+          <option value="all">전체</option>
+          <option value="files">파일</option>
+          <option value="folders">폴더</option>
         </select>
       </div>
 
@@ -177,15 +177,15 @@ export function LockManager() {
             aria-label="Select all items"
             disabled={filteredAndSortedItems.length === 0} // Disable if no items to select
           />
-          <span>All</span>
+          <span>전체</span>
         </div>
         {selectedItems.size > 0 && (
           <button
             className="ml-auto px-2 py-0.5 rounded bg-bolt-elements-button-secondary-background hover:bg-bolt-elements-button-secondary-backgroundHover text-bolt-elements-button-secondary-text text-xs flex items-center gap-1"
             onClick={handleUnlockSelected}
-            title="Unlock all selected items"
+            title="선택한 항목 전체 잠금 해제"
           >
-            Unlock all
+            전체 잠금 해제
           </button>
         )}
         <div></div>
@@ -196,7 +196,7 @@ export function LockManager() {
         {filteredAndSortedItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-bolt-elements-textTertiary text-xs gap-2">
             <span className="i-ph:lock-open-duotone text-lg opacity-50" />
-            <span>No locked items found</span>
+            <span>잠긴 항목이 없어요</span>
           </div>
         ) : (
           <ul className="space-y-1">
@@ -239,9 +239,9 @@ export function LockManager() {
                       workbenchStore.unlockFolder(item.path);
                     }
 
-                    toast.success(`${item.path.replace('/home/project/', '')} unlocked`);
+                    toast.success(`${item.path.replace('/home/project/', '')} 잠금을 해제했어요`);
                   }}
-                  title="Unlock"
+                  title="잠금 해제"
                 >
                   <span className="i-ph:lock-open text-xs" />
                 </button>
@@ -254,7 +254,7 @@ export function LockManager() {
       {/* Footer */}
       <div className="px-2 py-1 border-t border-bolt-elements-borderColor bg-bolt-elements-background-depth-2 text-xs text-bolt-elements-textTertiary flex justify-between items-center">
         <div>
-          {filteredAndSortedItems.length} item(s) • {selectedItems.size} selected
+          {filteredAndSortedItems.length}개 항목 • {selectedItems.size}개 선택됨
         </div>
       </div>
     </div>
