@@ -101,7 +101,7 @@ export function Header() {
 
         {chat.started && ( // Display ChatDescription and HeaderActionButtons only when the chat has started.
           <>
-            <span className="flex-1 px-4 truncate text-center text-bolt-elements-textPrimary">
+            <span className="flex-1 min-w-0 px-4 truncate text-center text-bolt-elements-textPrimary">
               <ClientOnly>{() => <ChatDescription />}</ClientOnly>
             </span>
             <ClientOnly>
