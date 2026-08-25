@@ -251,9 +251,11 @@ export const ModelSelector = ({
       .sort((a, b) => b.searchScore - a.searchScore);
   }, [providerList, debouncedProviderSearchQuery]);
 
-  // Reset free models filter when provider changes
+  // Reset free models filter and model search when provider changes
   useEffect(() => {
     setShowFreeModelsOnly(false);
+    setModelSearchQuery('');
+    setDebouncedModelSearchQuery('');
   }, [provider?.name]);
 
   useEffect(() => {
@@ -703,9 +705,7 @@ export const ModelSelector = ({
 
               {/* Search Result Count */}
               {debouncedModelSearchQuery && filteredModels.length > 0 && (
-                <div className="text-xs text-bolt-elements-textTertiary px-1">
-                  모델 {filteredModels.length}개 찾음{filteredModels.length > 5 && ' (가장 잘 맞는 항목만 표시)'}
-                </div>
+                <div className="text-xs text-bolt-elements-textTertiary px-1">모델 {filteredModels.length}개 찾음</div>
               )}
 
               {/* Search Input */}
@@ -839,7 +839,7 @@ export const ModelSelector = ({
                           </span>
                           {debouncedModelSearchQuery && (modelOption as any).searchScore > 70 && (
                             <span className="text-xs text-green-500 font-medium">
-                              {(modelOption as any).searchScore.toFixed(0)}% match
+                              일치율 {(modelOption as any).searchScore.toFixed(0)}%
                             </span>
                           )}
                         </div>

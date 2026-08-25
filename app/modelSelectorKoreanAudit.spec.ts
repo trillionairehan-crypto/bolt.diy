@@ -50,7 +50,6 @@ describe('모델 선택기/코드 블록의 사용자 노출 문구가 한국어
     expect(source).not.toContain('showing best matches');
     expect(source).toContain('무료 모델만');
     expect(source).toContain('무료 모델 {filteredModels.length}개');
-    expect(source).toContain('가장 잘 맞는 항목만 표시');
   });
 
   it('ModelSelector.tsx 모델 목록 로딩/빈 상태 문구가 한국어다', () => {
