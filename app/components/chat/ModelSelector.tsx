@@ -693,12 +693,10 @@ export const ModelSelector = ({
                     )}
                   >
                     <span className="i-ph:gift text-xs" />
-                    Free models only
+                    무료 모델만
                   </button>
                   {showFreeModelsOnly && (
-                    <span className="text-xs text-bolt-elements-textTertiary">
-                      {filteredModels.length} free model{filteredModels.length !== 1 ? 's' : ''}
-                    </span>
+                    <span className="text-xs text-bolt-elements-textTertiary">무료 모델 {filteredModels.length}개</span>
                   )}
                 </div>
               )}
@@ -706,8 +704,7 @@ export const ModelSelector = ({
               {/* Search Result Count */}
               {debouncedModelSearchQuery && filteredModels.length > 0 && (
                 <div className="text-xs text-bolt-elements-textTertiary px-1">
-                  {filteredModels.length} model{filteredModels.length !== 1 ? 's' : ''} found
-                  {filteredModels.length > 5 && ' (showing best matches)'}
+                  모델 {filteredModels.length}개 찾음{filteredModels.length > 5 && ' (가장 잘 맞는 항목만 표시)'}
                 </div>
               )}
 
@@ -769,35 +766,35 @@ export const ModelSelector = ({
                 <div className="px-3 py-3 text-sm">
                   <div className="flex items-center gap-2 text-bolt-elements-textTertiary">
                     <span className="i-ph:spinner animate-spin" />
-                    Loading models...
+                    모델을 불러오는 중...
                   </div>
                 </div>
               ) : filteredModels.length === 0 ? (
                 <div className="px-3 py-3 text-sm">
                   <div className="text-bolt-elements-textTertiary mb-1">
                     {debouncedModelSearchQuery
-                      ? `No models match "${debouncedModelSearchQuery}"${showFreeModelsOnly ? ' (free only)' : ''}`
+                      ? `"${debouncedModelSearchQuery}"${showFreeModelsOnly ? ' (무료만)' : ''}와 일치하는 모델이 없어요`
                       : showFreeModelsOnly
-                        ? 'No free models available'
+                        ? '사용 가능한 무료 모델이 없어요'
                         : provider?.name && LOCAL_PROVIDERS.includes(provider.name)
-                          ? `No models found — is ${provider.name} running?`
-                          : 'No models available'}
+                          ? `모델을 찾을 수 없어요 — ${provider.name}이(가) 실행 중인가요?`
+                          : '사용 가능한 모델이 없어요'}
                   </div>
                   {!debouncedModelSearchQuery && provider?.name && LOCAL_PROVIDERS.includes(provider.name) && (
                     <div className="text-xs text-bolt-elements-textTertiary mt-1">
-                      Make sure {provider.name} is running and has at least one model loaded.
-                      {provider.name === 'Ollama' && ' Try: ollama pull llama3.2'}
-                      {provider.name === 'LMStudio' && ' Load a model in LM Studio first.'}
+                      {provider.name}이(가) 실행 중인지, 모델이 하나 이상 로드돼 있는지 확인해 주세요.
+                      {provider.name === 'Ollama' && ' 시도해 보세요: ollama pull llama3.2'}
+                      {provider.name === 'LMStudio' && ' LM Studio에서 먼저 모델을 로드해 주세요.'}
                     </div>
                   )}
                   {debouncedModelSearchQuery && (
                     <div className="text-xs text-bolt-elements-textTertiary">
-                      Try searching for model names, context sizes (e.g., "128k", "1M"), or capabilities
+                      모델 이름, 컨텍스트 크기(예: "128k", "1M") 또는 기능으로 검색해 보세요
                     </div>
                   )}
                   {showFreeModelsOnly && !debouncedModelSearchQuery && (
                     <div className="text-xs text-bolt-elements-textTertiary">
-                      Try disabling the "Free models only" filter to see all available models
+                      "무료 모델만" 필터를 꺼서 모든 모델을 볼 수 있어요
                     </div>
                   )}
                 </div>

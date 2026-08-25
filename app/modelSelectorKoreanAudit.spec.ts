@@ -41,4 +41,29 @@ describe('모델 선택기/코드 블록의 사용자 노출 문구가 한국어
     expect(source).not.toContain('title="Copy Code"');
     expect(source).toContain('title="코드 복사"');
   });
+
+  it('ModelSelector.tsx 무료/유료 모델 필터 문구가 한국어다', () => {
+    const source = readFileSync(join(__dirname, 'components/chat/ModelSelector.tsx'), 'utf-8');
+    expect(source).not.toContain('Free models only');
+    expect(source).not.toContain('} free model{');
+    expect(source).not.toContain('model(s) found');
+    expect(source).not.toContain('showing best matches');
+    expect(source).toContain('무료 모델만');
+    expect(source).toContain('무료 모델 {filteredModels.length}개');
+    expect(source).toContain('가장 잘 맞는 항목만 표시');
+  });
+
+  it('ModelSelector.tsx 모델 목록 로딩/빈 상태 문구가 한국어다', () => {
+    const source = readFileSync(join(__dirname, 'components/chat/ModelSelector.tsx'), 'utf-8');
+    expect(source).not.toContain('Loading models...');
+    expect(source).not.toContain('No models match');
+    expect(source).not.toContain('No free models available');
+    expect(source).not.toContain('No models found');
+    expect(source).not.toContain('No models available');
+    expect(source).not.toContain('Try searching for model names');
+    expect(source).not.toContain('Try disabling the "Free models only" filter');
+    expect(source).toContain('모델을 불러오는 중...');
+    expect(source).toContain('사용 가능한 무료 모델이 없어요');
+    expect(source).toContain('"무료 모델만" 필터를 꺼서 모든 모델을 볼 수 있어요');
+  });
 });
