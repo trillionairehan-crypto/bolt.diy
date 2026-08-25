@@ -532,3 +532,13 @@
 - **커밋**: `9f6fbec`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 35로 기록)**: (1) `PromptClarification.tsx`의 옵션 선택 220ms 지연 타이머가 "바로 만들기" 스킵으로 인한 언마운트 시 정리(clearTimeout)되지 않아 언마운트 후 상태 업데이트 레이스 가능(확신도 medium, 사이클 17 항목 16에서 이미 유사 항목으로 기록됨 — 이번엔 정확한 라인 재확인만). (2) 요약 편집 textarea를 공백으로 지우고 "만들기"를 누르면 안내 없이 원본 프롬프트로 조용히 되돌아감(확신도 medium). (3) 요약 textarea가 내부 마커 문자열(`ONBOARDING_ADDITIONS_MARKER`)을 그대로 노출해 사용자가 편집하면 이후 "답변 N개 반영됨" 표시가 어긋날 수 있음(확신도 low-medium). (4) `RotatingPlaceholder.tsx`의 내부 setTimeout이 언마운트 시 정리 안 됨(확신도 low, React 18에서 사실상 무해).
 - **다음 감사 영역**: 생성으로 갱신.
+
+### [09:38] Phase 2 — 사이클 41 (감사 대상: 생성, 5회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 389/389 통과, `corepack pnpm run build`(client+server) 성공, `corepack pnpm run typecheck` 0에러. `app/routes/pricing.tsx`의 기존 미완성 PortOne 연동 코드는 여전히 미커밋 상태로 남아있음(사용자 본인 진행 중 작업, 이 세션들이 만든 변경 아님) — diff 내용을 직접 확인해 이전 기록과 동일함을 재검증, 이전 사이클들의 판단대로 이번에도 손 안 댐.
+- **감사 방법**: Explore 서브에이전트로 `action-runner.ts`/`message-parser.ts`/`enhanced-message-parser.ts`/`useMessageParser.ts`/`workbench.ts`/`Artifact.tsx`를 재감사(사이클 10·18·26·34에서 이미 고친/기록된 항목 목록을 프롬프트에 명시해 제외 지시). 보고받은 4건 중 확신도 high, 가장 흔한 액션 타입에 영향, 크래시/데이터 손상급인 최상위 1건을 직접 Read로 재검증 후 수정.
+- **발견·수정(1건, 검증 완료 후 수정)**: `app/lib/runtime/action-runner.ts:334-341`(mkdir), `:370-375`(writeFile) — `#runFileAction`이 `webcontainer.fs.mkdir`/`webcontainer.fs.writeFile` 실패를 `catch`에서 `logger.error`만 남기고 삼켜(재throw 없음), 바깥 `#executeAction`(161-258행)의 try/catch가 이 실패를 감지할 방법이 없었음. 그 결과 디스크 부족/권한 오류 등으로 파일이 실제로 안 써져도 액션 상태가 `'complete'`로 표시되고 `Artifact.tsx`엔 초록 체크만 남아 사용자가 생성 결과물 손상을 알 방법이 없었음(이미 알려진 Supabase 액션 무음 실패 패턴 — IMPROVEMENTS.md 항목 9 — 과 동일 클래스지만 가장 흔한 file 액션에서는 처음 확인). `Artifact.tsx`가 `'failed'` 상태를 이미 렌더링하는 것을 확인해, catch 블록에서 재throw만 추가(새 알림 UI는 추가 안 함, 기존 `#executeAction`의 catch가 status를 `'failed'`로 정확히 설정).
+- **테스트**: `app/lib/runtime/action-runner.spec.ts` 신규 파일, 3건(mocked webcontainer로 mkdir 실패/writeFile 실패/정상 성공 각각의 최종 액션 상태 검증 — 이 파일에 대한 첫 실제 클래스 단위 테스트, 기존 message-parser 계열 순수 함수 테스트와 달리 생성자에 mock webcontainer Promise를 주입하는 방식).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(무관한 기존 warning 1건만, `auth.ts`), `corepack pnpm vitest run` 392/392 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `3800c28`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 36으로 기록)**: (1) `enhanced-message-parser.ts`의 언랩 코드블록 자동감지 폴백이 파서 상태 전체를 리셋해 워크벤치가 사용자 의사와 무관하게 다시 열리고 매 렌더 전체 재파싱이 발생할 수 있음(확신도 high, 브라우저 재현은 못함). (2) 셸 명령 자동교정이 `action.content`를 nanostores 경유 없이 직접 mutate해 UI가 교정 전 명령을 계속 보여줄 수 있음(확신도 medium). (3) `addAction`의 `running` 상태 갱신이 실행 체인에 재대입되지 않아 여러 액션이 동시에 "실행 중"으로 잘못 표시될 수 있음(확신도 low-medium).
+- **다음 감사 영역**: 미리보기/워크벤치로 갱신.
