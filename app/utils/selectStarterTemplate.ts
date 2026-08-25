@@ -99,26 +99,37 @@ export const selectStarterTemplate = async (options: { message: string; model: s
     provider,
     system: starterTemplateSelectionPrompt(templates),
   };
-  const response = await fetch('/api/llmcall', {
-    method: 'POST',
-    body: JSON.stringify(requestBody),
-  });
-  const respJson: { text: string } = await response.json();
-  console.log(respJson);
 
-  const { text } = respJson;
-  const selectedTemplate = parseSelectedTemplate(text);
+  try {
+    const response = await fetch('/api/llmcall', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+    });
+    const respJson: { text: string } = await response.json();
+    console.log(respJson);
 
-  if (selectedTemplate) {
-    return selectedTemplate;
-  } else {
-    console.log('No template selected, using blank template');
+    const { text } = respJson;
+    const selectedTemplate = parseSelectedTemplate(text);
 
-    return {
-      template: 'blank',
-      title: '',
-    };
+    if (selectedTemplate) {
+      return selectedTemplate;
+    }
+  } catch (error) {
+    /*
+     * A network failure or a non-JSON response (e.g. an HTML error page) here must not
+     * propagate: the caller (Chat.client.tsx#generateNewApp) has already deducted the
+     * user's free-generation credit and doesn't wrap this call, so an unhandled rejection
+     * would strand the chat in a permanent loading state. Degrade to blank instead.
+     */
+    console.error('Error selecting starter template, falling back to blank template:', error);
   }
+
+  console.log('No template selected, using blank template');
+
+  return {
+    template: 'blank',
+    title: '',
+  };
 };
 
 const getGitHubRepoContent = async (
