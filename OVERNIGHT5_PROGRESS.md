@@ -586,3 +586,14 @@
 - **커밋**: `515bba6`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 40으로 기록)**: (1) `McpTab.tsx:201`의 `text-bolt-elements-link`도 같은 이유로 죽은 토큰(정의된 적 없음)이지만 이번 사이클 범위(다크모드 죽은 link 토큰 4곳)를 넘어서는 별도 파일이라 손 안 댐. (2) `NetlifyConnection.tsx:861-862`의 `text-bolt-elements-textDestructive` 죽은 토큰(항목 13에서 이미 기록된 별개 항목)은 기존 판단대로 계속 보류.
 - **다음 감사 영역**: 모바일로 갱신.
+
+### [10:41] Phase 2 — 사이클 46 (감사 대상: 모바일, 9회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 404/404 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 미완성 PortOne 연동 코드는 여전히 미커밋 상태(사용자 본인 진행 중 작업, 이전 사이클들 기록과 동일 — 이번에도 손 안 댐).
+- **감사 방법**: Explore 서브에이전트로 헤더/워크벤치/설정 다이얼로그 등 반응형(sm:/md:/고정폭/fixed) 패턴을 재감사(과거 모바일 사이클에서 이미 고친 항목들은 프롬프트에서 제외 지시). 보고받은 3건 중 확신도 high, 실제 재현 가능한 근거(index.scss의 전역 overflow-x:hidden + flex 기본 min-width 규칙)까지 확보된 1건만 직접 Read로 재검증 후 수정.
+- **문제**: `Header.tsx:104` 채팅 헤더의 `ChatDescription`을 감싸는 `flex-1 px-4 truncate` span에 `min-w-0`이 없어, flex 아이템의 기본 min-width:auto 때문에 긴 채팅 제목이 있으면 span이 내용 폭 아래로 줄어들지 않고 `truncate`가 사실상 무력화됨. `index.scss:14`의 전역 `overflow-x: hidden`이 스크롤바 대신 조용히 클리핑을 일으켜, 좁은 화면(폰 폭)에서 오른쪽의 `ThemeSwitch`/`HeaderActionButtons`(배포 버튼 등)이 화면 밖으로 밀려 눌리지 않게 되던 문제.
+- **수정**: `min-w-0` 클래스 추가(1단어, 리팩터링 없음).
+- **테스트**: 기존 `app/headerMobileOverflowAudit.spec.ts`에 신규 describe 블록 1개, 1건 추가(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm vitest run` 405/405 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `47fce57`
+- **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 35로 기록)**: (1) `Workbench.client.tsx:536`의 가로 툴바 행에 `overflow-y-auto`가 붙어있어 오타로 의심(확신도 medium, 실기기 재현 필요). (2) `SupabaseConnection.tsx`/`HeaderActionButtons.client.tsx`의 라벨이 좁은 화면에서도 항상 노출돼 헤더 우측 공간을 차지(확신도 medium, 반응형 숨김 처리라는 설계 변경 필요).
+- **다음 감사 영역**: 한국어 문구로 갱신.
