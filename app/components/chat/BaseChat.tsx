@@ -3,7 +3,7 @@
  * Preventing TS checks with files presented in the video for a better presentation.
  */
 import type { JSONValue, UIMessage } from 'ai';
-import React, { type RefCallback, useEffect, useState, lazy, Suspense } from 'react';
+import React, { type RefCallback, useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { Menu } from '~/components/sidebar/Menu.client';
 import { classNames } from '~/utils/classNames';
@@ -203,6 +203,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const [isListening, setIsListening] = useState(false);
     const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
     const [transcript, setTranscript] = useState('');
+    const voiceBaseTextRef = useRef('');
     const [isModelLoading, setIsModelLoading] = useState<string | undefined>('all');
     const [progressAnnotations, setProgressAnnotations] = useState<ProgressAnnotation[]>([]);
     const expoUrl = useStore(expoUrlAtom);
@@ -253,7 +254,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
 
           if (handleInputChange) {
             const syntheticEvent = {
-              target: { value: transcript },
+              target: { value: voiceBaseTextRef.current + transcript },
             } as React.ChangeEvent<HTMLTextAreaElement>;
             handleInputChange(syntheticEvent);
           }
@@ -323,6 +324,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
 
     const startListening = () => {
       if (recognition) {
+        voiceBaseTextRef.current = input ? `${input} ` : '';
         recognition.start();
         setIsListening(true);
       }
@@ -343,6 +345,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         if (recognition) {
           recognition.abort(); // Stop current recognition
           setTranscript(''); // Clear transcript
+          voiceBaseTextRef.current = '';
           setIsListening(false);
 
           // Clear the input by triggering handleInputChange with empty value
