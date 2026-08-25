@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { getPlatformAuthHeaders } from '~/lib/supabase/platformAuthHeader';
 
 /**
  * TODO(티어 분기): no server-side subscription/tier lookup exists anywhere in this codebase yet
@@ -46,6 +47,7 @@ export function CustomDomainConnect({ projectName }: CustomDomainConnectProps) {
       try {
         const response = await fetch(
           `/api/cloudflare-domain?projectName=${encodeURIComponent(projectName)}&domain=${encodeURIComponent(connectedDomain)}`,
+          { headers: await getPlatformAuthHeaders() },
         );
         const data = (await response.json()) as { success?: boolean; status?: string; error?: string };
 
@@ -99,7 +101,7 @@ export function CustomDomainConnect({ projectName }: CustomDomainConnectProps) {
     try {
       const response = await fetch('/api/cloudflare-domain', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(await getPlatformAuthHeaders()) },
         body: JSON.stringify({ projectName, domain: trimmed }),
       });
 

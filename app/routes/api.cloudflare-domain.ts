@@ -1,5 +1,7 @@
 import { type ActionFunctionArgs, type LoaderFunctionArgs, json } from '@remix-run/cloudflare';
 import { addCustomDomain, CloudflareDeployError, getCustomDomainStatus } from '~/lib/services/cloudflarePages';
+import { getPlatformUserId } from '~/lib/cloud/cloudPlatformAuth';
+import { isProjectOwnedByOther } from '~/lib/deployedAppOwnership';
 
 const DOMAIN_PATTERN = /^(?!-)[a-z0-9-]{1,63}(?<!-)(\.(?!-)[a-z0-9-]{1,63}(?<!-))+$/i;
 
@@ -27,6 +29,12 @@ function toUserMessage(error: unknown): { message: string; status: number } {
 }
 
 export async function action({ request, context }: ActionFunctionArgs) {
+  const userId = await getPlatformUserId(request);
+
+  if (!userId) {
+    return json({ error: '로그인이 필요해요.' }, { status: 401 });
+  }
+
   const { accountId, apiToken } = getCredentials(context);
 
   if (!accountId || !apiToken) {
@@ -51,6 +59,10 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return json({ error: '도메인 주소가 올바르지 않아요. 예: myapp.com' }, { status: 400 });
   }
 
+  if (await isProjectOwnedByOther(projectName, userId)) {
+    return json({ error: '이 프로젝트는 다른 계정에 연결돼 있어요.' }, { status: 403 });
+  }
+
   try {
     const result = await addCustomDomain(accountId, apiToken, projectName, domain.toLowerCase());
     return json({ success: true, ...result });
@@ -64,6 +76,12 @@ export async function action({ request, context }: ActionFunctionArgs) {
 }
 
 export async function loader({ request, context }: LoaderFunctionArgs) {
+  const userId = await getPlatformUserId(request);
+
+  if (!userId) {
+    return json({ error: '로그인이 필요해요.' }, { status: 401 });
+  }
+
   const { accountId, apiToken } = getCredentials(context);
 
   if (!accountId || !apiToken) {
@@ -76,6 +94,10 @@ export async function loader({ request, context }: LoaderFunctionArgs) {
 
   if (!projectName || !domain) {
     return json({ error: '요청이 올바르지 않아요.' }, { status: 400 });
+  }
+
+  if (await isProjectOwnedByOther(projectName, userId)) {
+    return json({ error: '이 프로젝트는 다른 계정에 연결돼 있어요.' }, { status: 403 });
   }
 
   try {

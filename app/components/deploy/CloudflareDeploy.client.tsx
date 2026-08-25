@@ -13,6 +13,7 @@ import { recordDeployedApp, type StorageMode } from '~/lib/deployedApps';
 import { supabaseConnection } from '~/lib/stores/supabase';
 import { isServiceRoleKey } from '~/lib/supabase/keyRole';
 import { loadCloudAppForChat } from '~/lib/stores/cloud';
+import { getPlatformAuthHeaders } from '~/lib/supabase/platformAuthHeader';
 
 const ENV_FILE_PATH = '.env';
 
@@ -259,7 +260,7 @@ export function useCloudflareDeploy() {
 
       const response = await fetch('/api/cloudflare-deploy', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...(await getPlatformAuthHeaders()) },
         body: JSON.stringify({ projectName, files: fileContents }),
       });
 

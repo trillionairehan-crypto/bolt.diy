@@ -1,10 +1,33 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { action } from '~/routes/api.cloudflare-deploy';
+
+/*
+ * api.cloudflare-deploy.ts's action now requires auth (getPlatformUserId) before it ever reaches
+ * the file-content handling this suite tests — mocked here at the module level since the route
+ * builds its own Supabase client internally (no DI seam threaded through the route itself; that
+ * seam exists on getPlatformUserId/isProjectOwnedByOther for their own direct unit tests instead
+ * (cloudPlatformAuth.spec.ts, deployedAppOwnership.spec.ts) and for the route-level 401/403/200
+ * cases (api.cloudflare-deploy.security.spec.ts and friends). vi.mock calls are hoisted above
+ * imports by vitest's transform, so this still applies even though it's written after the static
+ * import above.
+ */
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: () => ({
+    auth: {
+      getUser: async (jwt: string) =>
+        jwt === 'valid-test-token'
+          ? { data: { user: { id: 'test-user-id' } }, error: null }
+          : { data: { user: null }, error: new Error('invalid token') },
+    },
+    rpc: async () => ({ data: false, error: null }),
+  }),
+}));
 
 function actionArgs(body: unknown) {
   return {
     request: new Request('https://coralred.test/api/cloudflare-deploy', {
       method: 'POST',
+      headers: { Authorization: 'Bearer valid-test-token' },
       body: JSON.stringify(body),
     }),
     context: { cloudflare: { env: {} } },

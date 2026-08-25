@@ -5,6 +5,8 @@ import {
   injectMadeWithBadge,
   type CloudflareDeployFile,
 } from '~/lib/services/cloudflarePages';
+import { getPlatformUserId } from '~/lib/cloud/cloudPlatformAuth';
+import { isProjectOwnedByOther } from '~/lib/deployedAppOwnership';
 
 interface DeployRequestBody {
   projectName: string;
@@ -47,6 +49,12 @@ function toUserMessage(error: unknown): { message: string; status: number } {
 }
 
 export async function action({ request, context }: ActionFunctionArgs) {
+  const userId = await getPlatformUserId(request);
+
+  if (!userId) {
+    return json({ error: '로그인이 필요해요.' }, { status: 401 });
+  }
+
   const accountId = context?.cloudflare?.env?.CLOUDFLARE_ACCOUNT_ID || process.env.CLOUDFLARE_ACCOUNT_ID;
   const apiToken = context?.cloudflare?.env?.CLOUDFLARE_API_TOKEN || process.env.CLOUDFLARE_API_TOKEN;
 
@@ -70,6 +78,10 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   if (!files || Object.keys(files).length === 0) {
     return json({ error: '배포할 파일이 없어요. 먼저 빌드가 성공했는지 확인해주세요.' }, { status: 400 });
+  }
+
+  if (await isProjectOwnedByOther(projectName, userId)) {
+    return json({ error: '이 프로젝트는 다른 계정에 연결돼 있어요.' }, { status: 403 });
   }
 
   // See injectMadeWithBadge's own TODO — unconditional until a real tier lookup exists.

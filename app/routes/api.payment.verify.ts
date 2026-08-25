@@ -1,5 +1,6 @@
 import { json, type ActionFunctionArgs } from '@remix-run/cloudflare';
 import { createScopedLogger } from '~/utils/logger';
+import { getPlatformUserId } from '~/lib/cloud/cloudPlatformAuth';
 
 const logger = createScopedLogger('api.payment.verify');
 
@@ -27,6 +28,12 @@ interface PortOnePayment {
 export async function action({ request, context }: ActionFunctionArgs) {
   if (request.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 });
+  }
+
+  const userId = await getPlatformUserId(request);
+
+  if (!userId) {
+    return json({ verified: false, error: 'login_required' }, { status: 401 });
   }
 
   const apiSecret = context.cloudflare?.env?.PORTONE_API_SECRET;
