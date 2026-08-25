@@ -597,3 +597,19 @@
 - **커밋**: `47fce57`
 - **범위 밖으로 남긴 것(`OVERNIGHT5_IMPROVEMENTS.md` 항목 35로 기록)**: (1) `Workbench.client.tsx:536`의 가로 툴바 행에 `overflow-y-auto`가 붙어있어 오타로 의심(확신도 medium, 실기기 재현 필요). (2) `SupabaseConnection.tsx`/`HeaderActionButtons.client.tsx`의 라벨이 좁은 화면에서도 항상 노출돼 헤더 우측 공간을 차지(확신도 medium, 반응형 숨김 처리라는 설계 변경 필요).
 - **다음 감사 영역**: 한국어 문구로 갱신.
+
+### [11:00] Phase 2 — 사이클 47 (감사 대상: 한국어 문구, 10회차)
+- **베이스라인 재확인**: `corepack pnpm vitest run` 405/405 통과, `corepack pnpm run build`(client+server) 성공. `app/routes/pricing.tsx`의 미완성 PortOne 연동 코드는 여전히 미커밋 상태(사용자 본인 진행 중 작업 — 이전 사이클들 판단대로 이번에도 손 안 댐, 커밋 시 `git apply --cached`로 내 변경 hunk만 분리 적용해 PortOne 변경은 계속 미커밋 상태로 유지).
+- **감사 방법**: Explore 서브에이전트로 이미 알려진 항목(GitHubAuthDialog 등 전체 미번역 4개 파일, "내 프로젝트"/"내 앱" 명명 불일치)을 제외 지시하고 조사 오류/용어 불일치/번역투/존댓말 불일치/영어 혼입 5개 클래스로 재감사. 보고받은 5건 전부 직접 Read/Grep으로 재검증.
+- **발견·수정(2건, 검증 완료 후 수정)**:
+  1. `AvatarDropdown.tsx:95,111` — 아바타 클릭 시 열리는 드롭다운의 "프로필 수정"/"설정" 메뉴 항목이 바로 아래 "로그인"/"로그아웃"과 달리 `Edit Profile`/`Settings` 영어로 하드코딩.
+  2. `pricing.tsx:73,76`(요금제 카드 기능 목록) + `guide.tsx:64-65`(가이드 문서) — 메시지 개수를 `월 35메시지`/`1메시지씩`처럼 단위 명사 없이 숫자 뒤에 명사를 바로 붙여 번역투로 표기. 같은 `pricing.tsx` FAQ 섹션(90-95행)은 이미 "요청 1건" 관례를 쓰고 있어 그 관례에 맞춰 "건" 단위로 통일.
+- **재검증 후 기각(3건, 오탐/근거 약함으로 판단, 수정 안 함)**:
+  1. `SupabaseConnection.tsx`의 "연결 정보 지우기"(코랄레드 자체 Cloud 연결 해제, `handleClearCloud`) vs "연결 끊기"(사용자 소유 Supabase 프로젝트 연결 해제, `handleDisconnect`) — 서로 다른 두 기능의 다른 액션이라 용어가 갈린 게 정상. 각 버튼의 토스트 문구도 자기 버튼 문구와 일치함을 확인.
+  2. `Workbench.client.tsx`의 "바뀐 파일"(팝오버 버튼, 파일 목록 전체 라벨) vs `DiffView.tsx`의 "수정됨"(개별 파일 상태 배지, "변경 없음"과 짝) — 서로 다른 종류의 UI 요소.
+  3. `Preview.tsx`의 "선택 그만하기" — 바로 옆 "전체 화면 나가기"/"기기 프레임 숨기기"와 같은 기존 관례(토글 on/off에 비대칭 동사)를 따르고 있어 문제 없음.
+- **변경**: `AvatarDropdown.tsx`(2곳), `pricing.tsx`(2곳, PortOne 변경과 분리해 이 hunk만 커밋), `guide.tsx`(1곳).
+- **테스트**: `koreanCopyAudit.spec.ts`에 신규 describe 블록 1개, 3건 추가(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(prettier 줄바꿈 오류 1건 발견해 `eslint --fix`로 수정 후 재확인 — 무관한 기존 warning 1건만 남음), `corepack pnpm vitest run` 408/408 통과, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `1a520ee`
+- **다음 감사 영역**: 온보딩으로 갱신(로테이션 처음부터 다시).
