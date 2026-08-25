@@ -254,7 +254,7 @@ export const ChatImpl = memo(
     useEffect(() => {
       const prompt = searchParams.get('prompt');
 
-      if (prompt) {
+      if (prompt?.trim()) {
         setSearchParams({});
 
         (async () => {

@@ -10,6 +10,7 @@ describe('온보딩 흐름 버그 수정', () => {
   const chatBoxSource = readFileSync(join(__dirname, 'components/chat/ChatBox.tsx'), 'utf-8');
   const clarificationSource = readFileSync(join(__dirname, 'components/chat/PromptClarification.tsx'), 'utf-8');
   const baseChatSource = readFileSync(join(__dirname, 'components/chat/BaseChat.tsx'), 'utf-8');
+  const chatClientSource = readFileSync(join(__dirname, 'components/chat/Chat.client.tsx'), 'utf-8');
 
   it('ChatBox.tsx 전송 버튼이 공백만 입력해도 비활성화된다 (input.length가 아닌 trim 기준)', () => {
     expect(chatBoxSource).not.toMatch(/!props\.isStreaming && props\.input\.length === 0 && props\.uploadedFiles/);
@@ -39,6 +40,14 @@ describe('온보딩 흐름 버그 수정', () => {
     expect(baseChatSource).not.toMatch(/borderRadius: 14,\s*\n\s*background: '#FF5330'/);
     expect(baseChatSource).toMatch(
       /borderRadius: 14,\s*\n\s*background: 'var\(--accent\)',\s*\n\s*color: 'var\(--on-accent\)'/,
+    );
+  });
+
+  it('Chat.client.tsx의 ?prompt= 딥링크 핸들러가 공백만 있는 값은 무시한다 (다른 진입점과 동일한 trim 기준)', () => {
+    expect(chatClientSource).not.toMatch(/const prompt = searchParams\.get\('prompt'\);\s*\n\s*if \(prompt\) \{/);
+    expect(chatClientSource).toContain("const prompt = searchParams.get('prompt');");
+    expect(chatClientSource).toMatch(
+      /const prompt = searchParams\.get\('prompt'\);\s*\n\s*if \(prompt\?\.trim\(\)\) \{/,
     );
   });
 });
