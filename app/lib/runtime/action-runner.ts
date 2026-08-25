@@ -312,7 +312,7 @@ export class ActionRunner {
     logger.debug(`${action.type} Shell Response: [exit code:${resp?.exitCode}]`);
 
     if (resp?.exitCode != 0) {
-      throw new ActionCommandError('Failed To Start Application', resp?.output || 'No Output Available');
+      throw new ActionCommandError('애플리케이션 시작 실패', resp?.output || 'No Output Available');
     }
 
     return resp;
@@ -521,7 +521,7 @@ export class ActionRunner {
         source: 'netlify',
       });
 
-      throw new ActionCommandError('Build Failed', output || 'No Output Available');
+      throw new ActionCommandError('빌드 실패', output || 'No Output Available');
     }
 
     // Trigger build success alert
