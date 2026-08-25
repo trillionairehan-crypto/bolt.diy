@@ -636,3 +636,15 @@
 - **커밋**: `345f0bc`
 - **범위 밖으로 남긴 것(서브에이전트가 함께 보고한 3건, 확신도 낮거나 범위가 커서 미수정)**: `<bolt-quick-actions>` 태그 감지가 `insideArtifact`/`insideAction` 상태 체크보다 먼저 실행돼 스트리밍 중인 파일 내용에 그 리터럴 문자열이 있으면 파일이 깨질 수 있는 문제, `rm -rf` 같은 결합 짧은 플래그를 셸 명령 자동교정이 못 알아봐 `-f`를 중복 삽입하는 문제(무해하지만 어색함), 내장 스타터 템플릿 파일 내용에 `</boltAction>` 리터럴이 있으면 가짜 assistant 메시지 파싱이 깨질 수 있는 문제 — 전부 `OVERNIGHT5_IMPROVEMENTS.md` 항목 41로 기록만 함.
 - **다음 감사 영역**: 미리보기/워크벤치로 갱신.
+
+## 사이클 50 (감사 대상: 미리보기/워크벤치, 5회차) — 2026-08-25
+- **베이스라인**: 사이클 시작 시 `corepack pnpm vitest run` 412/412 통과, `corepack pnpm run build`(client+server) 성공, `corepack pnpm run typecheck` 0에러 확인. `app/routes/pricing.tsx`의 미커밋 PortOne 결제 연동 변경은 여전히 그대로 남아있음(diff 내용 재확인 결과 이전 사이클들이 기록한 것과 동일한 미완성 스켈레톤 — 새로 생긴 변경 아님, 큐 참고 사항대로 이번에도 손 안 댐).
+- **큐 상태**: `[진행중]`/`[대기]` 항목 없음(전부 완료/손절) → 검증 사이클 진행. `OVERNIGHT5_IMPROVEMENTS.md` 항목 31이 이미 확신도 high로 기록해둔 `Preview.tsx`의 무음 팝업-차단 실패 2곳을 우선 처리(새 서브에이전트 감사 대신 기존 기록 재확인 방식 채택 — 이미 구체적 위치·근거가 있어 재조사가 낭비).
+- **발견**: `Preview.tsx`의 `openInNewWindow()` 중 "기기 프레임 없이 열기" 표준 창 분기(590-601행)와 창크기 드롭다운의 인라인 "새 창에서 열기" 핸들러(917-921행) 둘 다 `window.open()`의 반환값이 팝업 차단으로 `null`이어도 아무 처리 없이 조용히 끝남 — 같은 파일 기기 프레임 있는 분기(457-468행)는 사이클 11에서 이미 `toast.error`로 처리돼 있어 세 분기 중 두 곳만 놓친 상태였음. 두 위치 모두 직접 Read로 재확인 완료.
+- **수정**: 두 곳 모두 `if (!newWindow) { console.error(...); toast.error('팝업이 차단되어 새 창을 열 수 없어요. 브라우저의 팝업 차단을 해제해 주세요.'); }` 추가(기존 프레임 분기와 동일한 문구/패턴).
+- **변경**: `app/components/workbench/Preview.tsx`(2곳).
+- **테스트**: `app/previewWindowOpenSilentFailureAudit.spec.ts` 신규 2건(소스 grep 방식 — 토스트 문구 등장 횟수가 3회인지, 표준 창 분기 안에서 `focus()` 전에 `toast.error`가 존재하는지 검증). 수정 전 코드로 되돌려(`git stash push -- app/components/workbench/Preview.tsx`) 실제로 실패하는 것을 확인한 뒤 `git stash pop`으로 복원 — 재현 확정 후 커밋.
+- **검증**: `corepack pnpm vitest run` 414/414 통과(신규 2건 포함), `corepack pnpm run typecheck` 0에러, `corepack pnpm run build`(client+server) 성공.
+- **커밋**: `4163dc7`
+- **문서 갱신**: `OVERNIGHT5_IMPROVEMENTS.md` 항목 31에서 이번에 고친 2건을 제거하고 남은 2건(`EditorPanel.tsx` 영어 라벨, inspector 클립보드 `.catch` 누락)만 남김.
+- **다음 감사 영역**: 배포로 갱신.

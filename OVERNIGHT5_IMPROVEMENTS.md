@@ -278,12 +278,11 @@ Phase 2 검증 사이클(감사 대상: 모바일)에서 서브에이전트로 �
 - **제안**: 다음 온보딩 감사 사이클에서 (1) `progressPct` 계산을 `'waitingForDynamic'` 동안엔 최종 문항 수를 알 수 없다는 전제로 다시 설계(예: 동적 질문이 실제로 도착하기 전까지는 퍼센트를 고정하거나 별도 "질문 준비 중" 상태 표시)하는 것을 권장, (2) `ChatBox.tsx` 드래그오버 테두리를 `var(--accent)` 계열로 교체(다른 사이클들의 기존 패턴과 동일).
 
 ## 31. 미리보기/워크벤치 감사(4회차, 사이클 35)에서 발견된 나머지 4건 — 이번엔 DiffView.tsx 영어 하드코딩만 처리
-`app/components/workbench/Preview.tsx:590-601` — `openInNewWindow`의 "기기 프레임 없이 열기" 분기(프레임 있는 분기는 이미 `toast.error('팝업이 차단되어...')` 처리돼 있음, 아마 더 흔히 쓰이는 기본 경로)는 `window.open`이 팝업 차단으로 `null`을 반환해도 `if (newWindow)`만 체크하고 else 분기가 없어 사용자에게 아무 피드백 없이 조용히 아무 일도 안 일어남(확신도 high).
-`Preview.tsx:910-919` — 미리보기 창크기 드롭다운의 "새 창에서 열기" 메뉴 항목도 같은 클래스의 문제: 바로 위 "활성 미리보기 없음"/"URL 형식 오류" 가드는 이미 toast.error가 있는데(과거 사이클에서 추가), 정작 `window.open(...)` 자체의 반환값은 확인하지 않아 팝업 차단 시 무음 실패(확신도 high — 과거 사이클이 명시적으로 노렸던 버그 클래스를 이 지점만 놓침).
+(`Preview.tsx`의 무음 팝업-차단 실패 2건은 사이클 50에서 수정·커밋함 — `4163dc7`. 아래 남은 2건은 아직 미처리.)
 `app/components/workbench/EditorPanel.tsx:99,107,115,156,159` — 파일 탐색기 좌측 탭 라벨(`Files`/`Search`/`Locks`)과 저장 안 된 파일 브레드크럼 옆 `Save`/`Reset` 버튼이 영어 하드코딩. 바로 옆 "코드/차이점/미리보기" 슬라이더, "새 파일"/"새 폴더" 컨텍스트 메뉴는 전부 한국어라 이질감이 큼(확신도 medium-high).
 `Preview.tsx:691-703` — iframe에서 오는 `INSPECTOR_CLICK` 메시지 핸들러가 `navigator.clipboard.writeText(...).then(() => setSelectedElement?.(element))`로, 클립보드 쓰기가 실패(포커스 없음/권한 거부 — `postMessage` 핸들러 안이라 동기적 사용자 제스처 체인에서 이미 한 단계 떨어져 있어 발생 가능성 있음)하면 `.catch`가 없어 `setSelectedElement`가 아예 호출 안 됨. 반면 `setIsInspectorMode(false)`는 무조건 실행돼, 사용자는 "선택해서 고치기"로 요소를 클릭했는데 피커만 꺼지고 아무것도 선택되지 않은 채 이유를 알 수 없음(확신도 medium).
 - **왜 이번 세션에서 다 안 고쳤는지**: 방침상 한 사이클엔 하나의 정리된 작업만 함. 이번엔 "차이점" 탭 전체가 영어인 것(사용자가 탭을 누르는 순간 바로 보이는, 노출 빈도·위화감이 가장 큰 문제)을 먼저 처리(커밋 `36530fb`). 나머지 넷은 각각 몇 줄짜리 소규모 수정이라 다음 미리보기/워크벤치 감사 사이클에서 바로 처리 가능.
-- **제안**: 다음 미리보기/워크벤치 감사 사이클에서 우선순위 순으로: (1) `Preview.tsx` 두 곳의 무음 팝업-차단 실패(프레임 분기와 같은 `toast.error` 패턴 복붙), (2) `EditorPanel.tsx` 5개 라벨 한국어 번역, (3) inspector 클립보드 `.catch` 추가(피커를 끄기 전에 실패 시 토스트 안내).
+- **제안**: 다음 미리보기/워크벤치 감사 사이클에서 우선순위 순으로: (1) `EditorPanel.tsx` 5개 라벨 한국어 번역, (2) inspector 클립보드 `.catch` 추가(피커를 끄기 전에 실패 시 토스트 안내).
 
 ## 32. 배포 감사(5회차, 사이클 36)에서 발견된 나머지 3건 — 이번엔 빌드 액션 영어 알림만 처리
 `app/routes/api.netlify-deploy.ts`(예: 33, 57, 110, 156, 177, 225, 246, 254, 268행)와 `app/routes/api.vercel-deploy.ts`(예: 182, 194, 207, 230, 250, 282, 329, 429, 464, 468, 484행)가 `{ error: '...' }` 형태로 완전히 영어인 에러 메시지("Not connected to Netlify", "Failed to create site: ...", "Deployment failed", "Deploy preparation timed out" 등)를 그대로 반환하고, `NetlifyDeploy.client.tsx`/`VercelDeploy.client.tsx`가 이를 번역 없이 곧장 `toast.error(...)`로 띄움 — `api.cloudflare-deploy.ts`만 유일하게 `toUserMessage()` 한국어 매퍼를 갖고 있는 것과 대비됨(확신도 high).
