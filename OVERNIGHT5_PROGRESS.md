@@ -613,3 +613,14 @@
 - **검증**: `corepack pnpm run typecheck` 0에러, `corepack pnpm run lint` 통과(prettier 줄바꿈 오류 1건 발견해 `eslint --fix`로 수정 후 재확인 — 무관한 기존 warning 1건만 남음), `corepack pnpm vitest run` 408/408 통과, `corepack pnpm run build`(client+server) 성공.
 - **커밋**: `1a520ee`
 - **다음 감사 영역**: 온보딩으로 갱신(로테이션 처음부터 다시).
+
+## 사이클 48 (감사 대상: 온보딩, 5회차) — 2026-08-25
+- **베이스라인**: 사이클 시작 시 vitest 408/408 통과, `pnpm run build`(client+server) 성공 확인. `app/routes/pricing.tsx`에 이전 사이클들부터 남아있던 미커밋 PortOne 결제 연동 변경은 큐 참고 사항대로 그대로 둠(자동 세션이 임의로 커밋/원복하지 않음, 사람 검토 대상).
+- **발견**: 서브에이전트로 온보딩(랜딩~채팅 시작 전) 표면 감사, `BaseChat.tsx`의 `recognition.onresult`가 이번 인식 세션의 transcript만으로 textarea 값을 덮어써서 마이크를 켜기 전 직접 타이핑해둔 텍스트가 첫 인식 결과가 들어오는 순간 통째로 사라지던 문제 확인(음성+타이핑 혼용 시 데이터 손실, 실사용 영향 큼). 코드 직접 재확인으로 재현 경로 검증 완료.
+- **수정**: `startListening()`에서 마이크를 켜는 시점의 `input` 값을 `voiceBaseTextRef`에 저장해두고, `onresult`에서 새 transcript 앞에 이어붙이도록 수정. 메시지 전송 시(`handleSendMessage`) 기존 `transcript` 초기화 로직에 `voiceBaseTextRef` 초기화도 추가.
+- **변경**: `app/components/chat/BaseChat.tsx`(recognition 관련 4곳).
+- **테스트**: `voiceInputTextLossAudit.spec.ts` 신규 3건 추가(소스 grep 방식, 기존 관행과 동일).
+- **검증**: `corepack pnpm vitest run` 411/411 통과(신규 3건 포함), `corepack pnpm run build`(client+server) 에러 없이 성공.
+- **커밋**: `754c33d`
+- **나머지 발견**: 같은 조사에서 함께 나온 4건(`recognition.onend` 누락으로 자동 종료 시 UI가 "듣기 중"에 멈춰있는 문제, `onerror` 시 사용자 피드백 없음, `FilePreview.tsx` 삭제 버튼 44px 미만 터치 타겟, 생성 가능 여부 조회 중 SendButton 로딩 표시 없음)은 구조적 판단(UX 문구/재사용 컴포넌트 영향 범위)이 필요해 수정하지 않고 `OVERNIGHT5_IMPROVEMENTS.md` 항목 36으로 기록.
+- **다음 감사 영역**: 생성으로 갱신.

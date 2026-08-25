@@ -308,3 +308,13 @@ Phase 2 검증 사이클(감사 대상: 모바일)에서 서브에이전트로 �
 `app/components/@settings/tabs/connections/components/SupabaseConnection.tsx:215` / `app/components/header/HeaderActionButtons.client.tsx:26` — `showLabel` 기본값이 `true`이고 `HeaderActionButtons.client.tsx`가 좁은 화면에서 이를 오버라이드하지 않아, "저장 기능 켜짐"/"저장 기능 켜기" 텍스트가 항상 헤더에 렌더됨. 항목 위 `min-w-0` 수정으로 클리핑 자체는 해소됐지만, 이 라벨이 여전히 헤더 우측 공간을 폭 넓게 차지해 좁은 화면에서 제목이 실제로 보이는 글자 수를 줄이는 원인(확신도 medium, 구조 변경(아이콘 전용 반응형 처리)이 필요해 최소 변경 원칙을 벗어남).
 - **왜 이번 세션에서 다 안 고쳤는지**: 방침상 한 사이클엔 하나의 정리된 작업만 함. `Workbench.client.tsx`의 오타는 확신도가 medium이라 실기기 확인 없이 `-y-`를 `-x-`로 바꾸는 게 의도된 동작(세로 스크롤이 실제로 필요했을 가능성)을 깨뜨릴 위험이 있어 보류, `SupabaseConnection`/`HeaderActionButtons` 라벨은 반응형 숨김 처리(`hidden sm:inline` 류)가 필요한 설계 변경이라 다음 사이클로 미룸.
 - **제안**: 다음 모바일 감사 사이클에서 (1) `Workbench.client.tsx:536`을 실기기/375px 시뮬레이션으로 먼저 재현한 뒤 `overflow-x-auto`로 교체, (2) `HeaderActionButtons.client.tsx`에서 좁은 화면일 때 `showLabel={false}`를 전달하도록(다른 사이클들의 랜딩 헤더 `hidden sm:inline` 패턴과 동일) 수정.
+
+## 36. 온보딩 감사(5회차)에서 발견된 나머지 4건 — 이번엔 음성 입력 텍스트 덮어쓰기만 처리
+(가장 확신도 높고 실사용 영향이 큰 `BaseChat.tsx`의 `recognition.onresult`가 마이크 켜기 전 타이핑해둔 텍스트를 통째로 덮어쓰던 문제는 이번 사이클에서 수정·커밋함 — `754c33d`. 아래 4건은 같은 조사에서 함께 보고된 것.)
+
+`app/components/chat/BaseChat.tsx:233-269`(recognition 생성 `useEffect`) — `recognition.onend` 핸들러가 없어, 모바일 브라우저가 무음 지속으로 인식 세션을 자체 종료해도 `isListening` state가 갱신되지 않고 마이크 아이콘이 계속 "듣기 중" 상태로 남을 수 있음(확신도 medium, 브라우저별 auto-stop 동작에 의존).
+`app/components/chat/BaseChat.tsx:262-265`(`recognition.onerror`) — 마이크 권한 거부/네트워크 오류 시 `console.error`만 찍고 `setIsListening(false)`로 조용히 되돌릴 뿐, toast 등 사용자에게 보이는 실패 안내가 전혀 없음(위 `onend` 누락과 같은 코드 블록, 함께 다루는 게 자연스러움).
+`app/components/chat/FilePreview.tsx:21-26` — 첨부 이미지 삭제(X) 버튼이 `w-5 h-5`(20×20px)로 이 저장소의 44px 터치 타겟 기준에 못 미침(확신도 medium, 온보딩 전용은 아니고 대화 시작 후에도 재사용되는 공용 컴포넌트).
+`app/components/chat/Chat.client.tsx:711-719`(`sendMessage`, `!chatStarted` 분기) — `checkGenerationsAllowed()` 비동기 조회 중 `SendButton.client.tsx`가 `isStreaming` 기준으로만 로딩 표시를 하므로 이 구간엔 로딩 UI가 없어 느린 네트워크에서 중복 클릭 유발 가능(확신도 낮음 — `checkGenerationsAllowed`는 상태 변경 없는 순수 조회라 실질 피해는 없어 보임).
+- **왜 이번 세션에서 다 안 고쳤는지**: 방침상 한 사이클엔 하나의 정리된 작업만 함. `onend`/`onerror` 피드백은 UI 상태 설계(토스트 문구, 재시도 유도 여부)가 필요해 "최소 변경" 범위를 벗어나고, `FilePreview.tsx` 터치 타겟은 공용 컴포넌트라 다른 사용처(대화 중 이미지 첨부) 레이아웃도 함께 확인이 필요하며, `SendButton` 로딩 표시는 확신도가 낮아 보류.
+- **제안**: 다음 온보딩 감사 사이클에서 (1) `recognition.onend`에서 `setIsListening(false)` 추가(가장 작고 확실함), (2) `recognition.onerror`에 `event.error === 'not-allowed'`일 때 마이크 권한 거부 안내 toast 추가, (3) `FilePreview.tsx` 삭제 버튼을 `w-5 h-5`→`w-6 h-6` 이상으로 확대(다른 사이클들의 터치 타겟 수정 패턴과 동일), (4) 필요 시 `SendButton.client.tsx`에 생성 가능 여부 조회 중 로딩 스피너 표시 여부는 사람이 UX 판단 후 결정.

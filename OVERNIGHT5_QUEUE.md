@@ -1,5 +1,6 @@
-다음 감사 영역: 온보딩
+다음 감사 영역: 생성
 
+[완료] 온보딩 감사(사이클 48, 5회차) — BaseChat.tsx의 recognition.onresult가 이번 인식 세션의 transcript만으로 textarea 값을 덮어써서, 마이크를 켜기 전 직접 타이핑해둔 텍스트가 첫 인식 결과가 들어오는 순간 통째로 사라지던 문제(음성+타이핑 혼용 시 데이터 손실, 사이클 33은 미지원 브라우저 버튼 비활성화만 고치고 이 문제는 다루지 않았음) → startListening 시점의 input 값을 voiceBaseTextRef에 저장해 onresult에서 앞에 이어붙이도록 수정, voiceInputTextLossAudit.spec.ts 회귀 테스트 3건 추가 — (사이클 48)
 [완료] 한국어 문구 감사(사이클 47, 10회차) — AvatarDropdown.tsx(아바타 클릭 시 열리는 프로필/설정 드롭다운)의 "프로필 수정"/"설정" 메뉴 항목이 같은 메뉴 안 "로그인"/"로그아웃"과 달리 "Edit Profile"/"Settings" 영어로 하드코딩돼있던 문제, pricing.tsx의 요금제 카드 기능 목록과 guide.tsx 가이드 문서에서 메시지 개수를 "월 35메시지"/"1메시지씩"처럼 단위 명사 없이 숫자 뒤에 명사를 바로 붙여 번역투로 표기하던 문제(같은 pricing.tsx FAQ 섹션은 이미 "요청 1건"처럼 "건" 단위를 정상적으로 씀) → 드롭다운 2곳 번역, 메시지 표기 3곳(pricing.tsx 2곳/guide.tsx 1곳) "건" 단위로 통일, koreanCopyAudit.spec.ts에 회귀 테스트 3건 추가 — (사이클 47)
 [완료] 모바일 감사(사이클 46, 9회차) — Header.tsx의 chat.started 헤더에서 ChatDescription을 감싸는 flex-1 제목 span에 min-w-0이 없어 truncate가 flex 행에서 실제로 작동 안 하던 문제(flex 아이템 기본 min-width:auto 때문에 긴 채팅 제목이 있으면 span이 축소되지 않고 내용 폭을 그대로 차지, index.scss의 전역 overflow-x: hidden이 스크롤바 대신 조용히 클리핑을 일으켜 좁은 화면에서 오른쪽 테마 토글/배포 버튼이 화면 밖으로 밀려 눌리지 않게 됨) → min-w-0 추가, headerMobileOverflowAudit.spec.ts에 회귀 테스트 1건 추가 — (사이클 46)
 [완료] 다크모드 감사(사이클 45, 8회차) — NetlifyTab.tsx/NetlifyConnection.tsx의 배포 URL 링크 4곳이 uno.config.ts에 정의된 적 없는 죽은 토큰(bolt-elements-link-text/-textHover)을 써서 라이트 모드는 상속색 폴백, 다크 모드는 hover 변화 없음이던 문제(사이클 14 IMPROVEMENTS 항목 13에서 발견만 되고 범위 초과로 보류됐던 항목) → 같은 파일 아이콘이 이미 쓰던 실제 정의된 토큰 text-bolt-elements-item-contentAccent로 통일, darkModeAccentAudit.spec.ts 신규 4건 — (사이클 45)
