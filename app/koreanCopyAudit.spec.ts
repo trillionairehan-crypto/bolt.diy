@@ -27,3 +27,24 @@ describe('한국어 문구 감사 — 사이클 8', () => {
     expect(source).toContain("title: '말해요'");
   });
 });
+
+describe('한국어 문구 감사 — 사이클 47', () => {
+  it('AvatarDropdown.tsx: 프로필/설정 메뉴 항목이 영어("Edit Profile"/"Settings")가 아니라 한국어다', () => {
+    const source = readFileSync(join(__dirname, 'components/@settings/core/AvatarDropdown.tsx'), 'utf-8');
+    expect(source).not.toContain('Edit Profile');
+    expect(source).not.toContain('>Settings<');
+    expect(source).toContain('프로필 수정');
+  });
+
+  it('pricing.tsx: 메시지 개수 뒤에 단위 없이 숫자와 "메시지"가 바로 붙지 않고 "건" 단위가 있다', () => {
+    const source = readFileSync(join(__dirname, 'routes/pricing.tsx'), 'utf-8');
+    expect(source).not.toMatch(/\$\{plan\.messagesPerMonth[^}]*\}메시지/);
+    expect(source).toContain('월 메시지 ${plan.messagesPerMonth}건');
+  });
+
+  it('guide.tsx: "1메시지씩"이 아니라 기존 관행대로 "1건씩"을 쓴다', () => {
+    const source = readFileSync(join(__dirname, 'routes/guide.tsx'), 'utf-8');
+    expect(source).not.toContain('1메시지씩');
+    expect(source).toContain('1건씩');
+  });
+});

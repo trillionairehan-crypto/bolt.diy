@@ -92,7 +92,7 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             onClick={() => onSelectTab('profile')}
           >
             <div className="i-ph:user-circle w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
-            Edit Profile
+            프로필 수정
           </DropdownMenu.Item>
 
           <DropdownMenu.Item
@@ -108,7 +108,7 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             onClick={() => onSelectTab('settings')}
           >
             <div className="i-ph:gear-six w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
-            Settings
+            설정
           </DropdownMenu.Item>
 
           {isPlatformSupabaseConfigured && authUser && (

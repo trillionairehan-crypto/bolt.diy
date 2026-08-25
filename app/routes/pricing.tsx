@@ -56,10 +56,10 @@ const PLANS: PricingPlan[] = [
 ];
 
 function planFeatures(plan: PricingPlan): string[] {
-  const features = [`월 ${plan.messagesPerMonth}메시지`];
+  const features = [`월 메시지 ${plan.messagesPerMonth}건`];
 
   if (plan.carryOver) {
-    features.push(`이월 (다음 달 최대 ${plan.messagesPerMonth * 2}메시지까지 누적)`);
+    features.push(`이월 (다음 달 최대 메시지 ${plan.messagesPerMonth * 2}건까지 누적)`);
   }
 
   features.push(plan.brandingRemoved ? '코랄레드 브랜딩 완전 제거' : '코랄레드 브랜딩 표시');
