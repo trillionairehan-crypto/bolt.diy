@@ -33,3 +33,29 @@ describe('gitlabApiService.ts does not log token info to console', () => {
     expect(source).not.toMatch(/tokenPrefix/);
   });
 });
+
+/**
+ * api.vercel-deploy.ts's loader (GET) read the Vercel access token from a URL
+ * query parameter — unlike its own action (POST), which reads it from the JSON
+ * body. Query-string tokens land in server/proxy access logs and browser
+ * network history. Fixed by moving the token to the Authorization header, same
+ * as the fetched-projects path a few lines above the fallback call.
+ */
+describe('api.vercel-deploy.ts loader reads the token from a header, not the URL', () => {
+  it('does not read token from URL search params', () => {
+    const source = readFileSync(join(__dirname, '..', '..', 'routes', 'api.vercel-deploy.ts'), 'utf-8');
+    expect(source).not.toMatch(/searchParams\.get\(['"]token['"]\)/);
+  });
+
+  it('reads the token from the Authorization header instead', () => {
+    const source = readFileSync(join(__dirname, '..', '..', 'routes', 'api.vercel-deploy.ts'), 'utf-8');
+    expect(source).toMatch(/request\.headers\.get\(['"]Authorization['"]\)/);
+  });
+});
+
+describe('VercelDeploymentLink.client.tsx sends the token via Authorization header', () => {
+  it('does not put the token in the /api/vercel-deploy query string', () => {
+    const source = readFileSync(join(__dirname, '..', 'chat', 'VercelDeploymentLink.client.tsx'), 'utf-8');
+    expect(source).not.toMatch(/vercel-deploy\?projectId=\$\{projectId\}&token=/);
+  });
+});
