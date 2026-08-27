@@ -15,6 +15,22 @@ $code-font-size: 13px;
     margin-block-end: 16px;
   }
 
+  /*
+   * 모바일 타이포·간격 축소 (overnight5 모바일 v2 후속) — 1023px 이하에서만 적용, 1024px 이상
+   * (CoralredHero.module.scss와 같은 기준 — useViewport(1024)/lg: 브레이크포인트와 일치)은 이 블록
+   * 밖의 값을 그대로 씀. 14px은 이 코드베이스가 이미 쓰는 UnoCSS 기본 스케일의 text-sm과 같은 값이라
+   * 임의로 고른 숫자가 아님 — 제목(h1~h6)은 전부 em 단위라 이 font-size 하나만 줄여도 비례해서
+   * 같이 줄어든다.
+   */
+  @media (max-width: 1023px) {
+    font-size: 14px;
+    line-height: 1.5;
+
+    > *:not(:last-child) {
+      margin-block-end: 12px;
+    }
+  }
+
   :global(.artifact) {
     margin: 1.5em 0;
   }
@@ -166,6 +182,50 @@ $code-font-size: 13px;
 
     tr:nth-child(2n) {
       background-color: var(--bolt-elements-bg-depth-2);
+    }
+  }
+
+  // 나머지 여백도 위 font-size 축소 미디어쿼리와 같은 기준으로 같이 줄인다 (em이 아닌 고정 px 값들이라 별도 선언 필요).
+  @media (max-width: 1023px) {
+    :is(h1, h2, h3, h4, h5, h6) {
+      @include not-inside-actions {
+        margin-block-start: 16px;
+        margin-block-end: 10px;
+      }
+    }
+
+    p:not(:last-of-type) {
+      margin-block-end: 12px;
+    }
+
+    :is(ul, ol) {
+      @include not-inside-actions {
+        margin-block-end: 12px;
+      }
+    }
+
+    li {
+      @include not-inside-actions {
+        & + li {
+          margin-block-start: 6px;
+        }
+
+        > *:not(:last-child) {
+          margin-block-end: 12px;
+        }
+      }
+    }
+
+    pre {
+      padding: 14px 12px;
+    }
+
+    hr {
+      margin: 16px 0;
+    }
+
+    table :is(th, td) {
+      padding: 5px 8px;
     }
   }
 }
