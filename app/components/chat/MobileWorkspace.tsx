@@ -5,6 +5,8 @@ import { workbenchStore } from '~/lib/stores/workbench';
 import { mobileActiveTabStore, type MobileTab } from '~/lib/stores/mobileWorkspace';
 import { classNames } from '~/utils/classNames';
 import { Preview } from '~/components/workbench/Preview';
+import { Terminal } from '~/components/workbench/terminal/Terminal';
+import { themeStore } from '~/lib/stores/theme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
 
 interface MobileWorkspaceProps {
@@ -29,9 +31,25 @@ const TABS: { value: MobileTab; label: string; icon: string }[] = [
 export function MobileWorkspace({ chatColumnContent, setSelectedElement }: MobileWorkspaceProps) {
   const activeTab = useStore(mobileActiveTabStore);
   const hasPreview = useStore(computed(workbenchStore.previews, (previews) => previews.length > 0));
+  const theme = useStore(themeStore);
 
   return (
     <div className="flex flex-col w-full h-full min-h-0">
+      {/*
+        원인 조사(MOBILE_V2_FIX_REPORT.md 참고): npm install/npm run dev를 실제로 실행하는
+        WebContainer 셸(BoltShell)은 EditorPanel 안의 터미널 UI가 마운트되면서 attachBoltTerminal을
+        호출해야 초기화된다(action-runner.ts의 모든 shell/start 액션이 shell.ready()를 기다림). 데스크톱은
+        Workbench가 항상 이 터미널을 마운트하지만, 모바일은 Workbench를 아예 렌더하지 않아 셸이 영영
+        초기화되지 않았다 — 그래서 앱이 다 만들어져도 미리보기가 절대 뜨지 않았다. 이 터미널은 사용자에게
+        보여주는 게 아니라(hidden, 진입 경로 없음) 순수하게 셸을 초기화만 하기 위한 것 — 실제 터미널
+        UI/탭/코드 화면은 여전히 모바일에 없다.
+      */}
+      <Terminal
+        id="mobile-bolt-shell-init"
+        className="hidden"
+        theme={theme}
+        onTerminalReady={(terminal) => workbenchStore.attachBoltTerminal(terminal)}
+      />
       <div className="flex-1 min-h-0">
         {activeTab === 'chat' ? (
           chatColumnContent
