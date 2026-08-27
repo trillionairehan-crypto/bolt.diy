@@ -50,6 +50,14 @@ export class WorkbenchStore {
 
   showWorkbench: WritableAtom<boolean> = import.meta.hot?.data.showWorkbench ?? atom(false);
   currentView: WritableAtom<WorkbenchViewType> = import.meta.hot?.data.currentView ?? atom('code');
+
+  /*
+   * overnight5 모바일 v2 후속 — WebContainer.boot() 자체(또는 그 직후의 inspector 스크립트 설정)가
+   * 실패하면 이전에는 아무도 잡아서 알려주지 않았다(app/lib/webcontainer/index.ts에 .catch가 아예
+   * 없었음). 실기기 메모리 제약처럼 오늘 고칠 수 없는 원인일 수 있어서, 사용자가 최소한 "왜 안 되는지"는
+   * 알 수 있도록 플래그만 세운다 — MobileWorkspace.tsx가 이 값을 보고 빈 미리보기 안내 문구를 바꾼다.
+   */
+  webcontainerBootFailed: WritableAtom<boolean> = import.meta.hot?.data.webcontainerBootFailed ?? atom(false);
   unsavedFiles: WritableAtom<Set<string>> = import.meta.hot?.data.unsavedFiles ?? atom(new Set<string>());
   actionAlert: WritableAtom<ActionAlert | undefined> =
     import.meta.hot?.data.actionAlert ?? atom<ActionAlert | undefined>(undefined);
@@ -77,6 +85,7 @@ export class WorkbenchStore {
       import.meta.hot.data.unsavedFiles = this.unsavedFiles;
       import.meta.hot.data.showWorkbench = this.showWorkbench;
       import.meta.hot.data.currentView = this.currentView;
+      import.meta.hot.data.webcontainerBootFailed = this.webcontainerBootFailed;
       import.meta.hot.data.actionAlert = this.actionAlert;
       import.meta.hot.data.supabaseAlert = this.supabaseAlert;
       import.meta.hot.data.deployAlert = this.deployAlert;

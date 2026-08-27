@@ -57,6 +57,24 @@ if (!import.meta.env.SSR) {
         });
 
         return webcontainer;
+      })
+      .catch(async (error) => {
+        /*
+         * boot() (or the inspector-script setup right after it) rejecting was previously
+         * unhandled entirely — nothing ever caught it, so a real device hitting the memory
+         * limits WebContainer's own docs warn about (mobile tabs get far less memory than
+         * desktop, regardless of viewport size) failed completely silently: every awaiter of
+         * `webcontainer` throws once this rejects, but nothing told the user why the preview
+         * never showed up. This can't distinguish "which" failure (memory vs. something else),
+         * only that boot-or-setup never completed — see MOBILE_V2_INVESTIGATION_REPORT.md for
+         * why that's the honest limit of what's detectable here.
+         */
+        console.error('[WebContainer] Failed to boot:', error);
+
+        const { workbenchStore } = await import('~/lib/stores/workbench');
+        workbenchStore.webcontainerBootFailed.set(true);
+
+        throw error;
       });
 
   if (import.meta.hot) {

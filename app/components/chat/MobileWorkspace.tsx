@@ -31,6 +31,7 @@ const TABS: { value: MobileTab; label: string; icon: string }[] = [
 export function MobileWorkspace({ chatColumnContent, setSelectedElement }: MobileWorkspaceProps) {
   const activeTab = useStore(mobileActiveTabStore);
   const hasPreview = useStore(computed(workbenchStore.previews, (previews) => previews.length > 0));
+  const bootFailed = useStore(workbenchStore.webcontainerBootFailed);
   const theme = useStore(themeStore);
 
   return (
@@ -55,6 +56,12 @@ export function MobileWorkspace({ chatColumnContent, setSelectedElement }: Mobil
           chatColumnContent
         ) : hasPreview ? (
           <Preview setSelectedElement={setSelectedElement} />
+        ) : bootFailed ? (
+          <div className="flex flex-col items-center justify-center gap-2 w-full h-full text-center px-8 bg-bolt-elements-background-depth-1">
+            <div className="i-ph:warning-circle text-3xl text-bolt-elements-textTertiary" />
+            <p className="text-sm text-bolt-elements-textSecondary">이 기기에서는 미리보기를 열 수 없어요</p>
+            <p className="text-xs text-bolt-elements-textTertiary">컴퓨터에서 다시 확인해보세요</p>
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center gap-2 w-full h-full text-center px-8 bg-bolt-elements-background-depth-1">
             <div className="i-ph:device-mobile-camera text-3xl text-bolt-elements-textTertiary" />
