@@ -26,6 +26,7 @@ import { IconButton } from '~/components/ui/IconButton';
 import { Slider, type SliderOptions } from '~/components/ui/Slider';
 import { workbenchStore, type WorkbenchViewType } from '~/lib/stores/workbench';
 import { classNames } from '~/utils/classNames';
+import { SHOW_DEV_TOOLS } from '~/utils/featureFlags';
 import { cubicEasingFn } from '~/utils/easings';
 import { createScopedLogger, renderLogger } from '~/utils/logger';
 import { EditorPanel } from './EditorPanel';
@@ -382,6 +383,15 @@ export const Workbench = memo(
     const { showChat } = useStore(chatStore);
     const canHideChat = showWorkbench || !showChat;
 
+    /*
+     * 개발자용 UI 정리 (overnight5) — currentView로 가는 경로가 여러 곳에 있다(파일 잠금 충돌,
+     * AssistantMessage의 요약 안 코드 배지 클릭 등). 그 경로들을 일일이 다 막는 대신, 실제로
+     * "무엇을 보여줄지" 결정하는 지점(여기)에서 한 번만 클램프한다 — SHOW_DEV_TOOLS가 꺼져 있으면
+     * currentView가 뭘로 세팅되든 항상 미리보기만 보여준다. 저장된 값 자체는 안 건드리므로,
+     * 개발자 모드를 다시 켜면 기존 코드/차이점 탭 동작이 그대로 돌아온다.
+     */
+    const effectiveView = SHOW_DEV_TOOLS ? selectedView : 'preview';
+
     const streaming = useStore(streamingState);
     const { exportChat } = useChatHistory();
     const [isSyncing, setIsSyncing] = useState(false);
@@ -486,7 +496,9 @@ export const Workbench = memo(
                         }
                       }}
                     />
-                    <Slider selected={selectedView} options={sliderOptions} setSelected={setSelectedView} />
+                    {SHOW_DEV_TOOLS && (
+                      <Slider selected={selectedView} options={sliderOptions} setSelected={setSelectedView} />
+                    )}
                     <div className="ml-auto" />
                     <DropdownMenu.Root>
                       <DropdownMenu.Trigger asChild>
@@ -528,7 +540,7 @@ export const Workbench = memo(
                         ))}
                       </DropdownMenu.Content>
                     </DropdownMenu.Root>
-                    {selectedView === 'code' && (
+                    {effectiveView === 'code' && (
                       <div className="flex overflow-y-auto">
                         {/* Export Chat Button */}
                         <ExportChatButton exportChat={exportChat} />
@@ -590,7 +602,7 @@ export const Workbench = memo(
                       </div>
                     )}
 
-                    {selectedView === 'diff' && (
+                    {effectiveView === 'diff' && (
                       <FileModifiedDropdown fileHistory={fileHistory} onSelectFile={handleSelectFile} />
                     )}
                     <IconButton
@@ -603,7 +615,7 @@ export const Workbench = memo(
                     />
                   </div>
                   <div className="relative flex-1 overflow-hidden">
-                    <View initial={{ x: '0%' }} animate={{ x: selectedView === 'code' ? '0%' : '-100%' }}>
+                    <View initial={{ x: '0%' }} animate={{ x: effectiveView === 'code' ? '0%' : '-100%' }}>
                       <EditorPanel
                         editorDocument={currentDocument}
                         isStreaming={isStreaming}
@@ -618,7 +630,7 @@ export const Workbench = memo(
                         onFileReset={onFileReset}
                       />
                     </View>
-                    {selectedView === 'diff' && (
+                    {effectiveView === 'diff' && (
                       <div className="absolute inset-0">
                         <DiffViewErrorBoundary>
                           <Suspense fallback={null}>
@@ -627,7 +639,7 @@ export const Workbench = memo(
                         </DiffViewErrorBoundary>
                       </div>
                     )}
-                    <View initial={{ x: '100%' }} animate={{ x: selectedView === 'preview' ? '0%' : '100%' }}>
+                    <View initial={{ x: '100%' }} animate={{ x: effectiveView === 'preview' ? '0%' : '100%' }}>
                       <Preview setSelectedElement={setSelectedElement} />
                     </View>
                   </div>

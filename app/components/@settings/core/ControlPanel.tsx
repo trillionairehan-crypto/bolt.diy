@@ -53,6 +53,14 @@ const DEV_ONLY_TAB_IDS = new Set<TabType>([
   'event-logs',
   'local-providers',
   'cloud-providers',
+
+  /*
+   * 개발자용 UI 정리 (overnight5, DEV_UI_HIDE_REPORT.md 참고): features는 프롬프트/컨텍스트 최적화
+   * 등 개발자 설정 토글, data는 API 키·앱 설정 JSON 내보내기/가져오기 등 비개발자가 쓸 일이 없는
+   * 내용이라 추가.
+   */
+  'features',
+  'data',
 ]);
 
 const BetaLabel = () => (

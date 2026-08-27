@@ -6,6 +6,7 @@ import { isGitLabConnected } from '~/lib/stores/gitlabConnection';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { streamingState } from '~/lib/stores/streaming';
 import { classNames } from '~/utils/classNames';
+import { SHOW_DEV_TOOLS } from '~/utils/featureFlags';
 import { useState } from 'react';
 import { NetlifyDeploymentLink } from '~/components/chat/NetlifyDeploymentLink.client';
 import { VercelDeploymentLink } from '~/components/chat/VercelDeploymentLink.client';
@@ -166,127 +167,131 @@ export const DeployButton = ({
           {isDeploying && deployingTo === 'cloudflare' ? '배포 중...' : '배포하기'}
         </button>
 
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger
-            disabled={isDeploying || !activePreview || isStreaming}
-            aria-label="다른 방법으로 내보내기"
-            className="border-l border-[var(--on-accent)]/20 items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-2 py-1.5 bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:bg-[var(--accent-hover)] outline-[var(--accent)] flex"
-          >
-            <span className={classNames('i-ph:caret-down transition-transform')} />
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Content
-            className={classNames(
-              'z-[250] min-w-[220px]',
-              'bg-bolt-elements-background-depth-2',
-              'rounded-lg shadow-lg',
-              'border border-bolt-elements-borderColor',
-              'animate-in fade-in-0 zoom-in-95',
-              'py-1',
-            )}
-            sideOffset={5}
-            align="end"
-          >
-            <DropdownMenu.Sub>
-              <DropdownMenu.SubTrigger className={itemClassName}>
-                <span>다른 방법으로 내보내기</span>
-                <span className="i-ph:caret-right ml-auto text-bolt-elements-textTertiary" />
-              </DropdownMenu.SubTrigger>
-              <DropdownMenu.Portal>
-                <DropdownMenu.SubContent
-                  className={classNames(
-                    'z-[250] min-w-[220px]',
-                    'bg-bolt-elements-background-depth-2',
-                    'rounded-lg shadow-lg',
-                    'border border-bolt-elements-borderColor',
-                    'animate-in fade-in-0 zoom-in-95',
-                    'py-1',
-                  )}
-                  sideOffset={4}
-                  alignOffset={-4}
-                >
-                  <DropdownMenu.Item
-                    className={classNames(itemClassName, {
-                      'opacity-60 cursor-not-allowed': isDeploying || !activePreview || !netlifyConn.user,
-                    })}
-                    disabled={isDeploying || !activePreview || !netlifyConn.user}
-                    onClick={handleNetlifyDeployClick}
+        {/* 개발자용 UI 정리 (overnight5) — Netlify/Vercel/GitHub/GitLab 내보내기 옵션은 개발자 모드에서만.
+            기본 화면은 Cloudflare 원클릭 배포만 남긴다. */}
+        {SHOW_DEV_TOOLS && (
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger
+              disabled={isDeploying || !activePreview || isStreaming}
+              aria-label="다른 방법으로 내보내기"
+              className="border-l border-[var(--on-accent)]/20 items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-2 py-1.5 bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:bg-[var(--accent-hover)] outline-[var(--accent)] flex"
+            >
+              <span className={classNames('i-ph:caret-down transition-transform')} />
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content
+              className={classNames(
+                'z-[250] min-w-[220px]',
+                'bg-bolt-elements-background-depth-2',
+                'rounded-lg shadow-lg',
+                'border border-bolt-elements-borderColor',
+                'animate-in fade-in-0 zoom-in-95',
+                'py-1',
+              )}
+              sideOffset={5}
+              align="end"
+            >
+              <DropdownMenu.Sub>
+                <DropdownMenu.SubTrigger className={itemClassName}>
+                  <span>다른 방법으로 내보내기</span>
+                  <span className="i-ph:caret-right ml-auto text-bolt-elements-textTertiary" />
+                </DropdownMenu.SubTrigger>
+                <DropdownMenu.Portal>
+                  <DropdownMenu.SubContent
+                    className={classNames(
+                      'z-[250] min-w-[220px]',
+                      'bg-bolt-elements-background-depth-2',
+                      'rounded-lg shadow-lg',
+                      'border border-bolt-elements-borderColor',
+                      'animate-in fade-in-0 zoom-in-95',
+                      'py-1',
+                    )}
+                    sideOffset={4}
+                    alignOffset={-4}
                   >
-                    <img
-                      className="w-5 h-5"
-                      height="24"
-                      width="24"
-                      crossOrigin="anonymous"
-                      src="https://cdn.simpleicons.org/netlify"
-                    />
-                    <span className="mx-auto">
-                      {!netlifyConn.user ? 'Netlify 계정을 먼저 연결해주세요' : 'Netlify로 내보내기'}
-                    </span>
-                    {netlifyConn.user && <NetlifyDeploymentLink />}
-                  </DropdownMenu.Item>
+                    <DropdownMenu.Item
+                      className={classNames(itemClassName, {
+                        'opacity-60 cursor-not-allowed': isDeploying || !activePreview || !netlifyConn.user,
+                      })}
+                      disabled={isDeploying || !activePreview || !netlifyConn.user}
+                      onClick={handleNetlifyDeployClick}
+                    >
+                      <img
+                        className="w-5 h-5"
+                        height="24"
+                        width="24"
+                        crossOrigin="anonymous"
+                        src="https://cdn.simpleicons.org/netlify"
+                      />
+                      <span className="mx-auto">
+                        {!netlifyConn.user ? 'Netlify 계정을 먼저 연결해주세요' : 'Netlify로 내보내기'}
+                      </span>
+                      {netlifyConn.user && <NetlifyDeploymentLink />}
+                    </DropdownMenu.Item>
 
-                  <DropdownMenu.Item
-                    className={classNames(itemClassName, {
-                      'opacity-60 cursor-not-allowed': isDeploying || !activePreview || !vercelConn.user,
-                    })}
-                    disabled={isDeploying || !activePreview || !vercelConn.user}
-                    onClick={handleVercelDeployClick}
-                  >
-                    <img
-                      className="w-5 h-5 bg-black p-1 rounded"
-                      height="24"
-                      width="24"
-                      crossOrigin="anonymous"
-                      src="https://cdn.simpleicons.org/vercel/white"
-                      alt="vercel"
-                    />
-                    <span className="mx-auto">
-                      {!vercelConn.user ? 'Vercel 계정을 먼저 연결해주세요' : 'Vercel로 내보내기'}
-                    </span>
-                    {vercelConn.user && <VercelDeploymentLink />}
-                  </DropdownMenu.Item>
+                    <DropdownMenu.Item
+                      className={classNames(itemClassName, {
+                        'opacity-60 cursor-not-allowed': isDeploying || !activePreview || !vercelConn.user,
+                      })}
+                      disabled={isDeploying || !activePreview || !vercelConn.user}
+                      onClick={handleVercelDeployClick}
+                    >
+                      <img
+                        className="w-5 h-5 bg-black p-1 rounded"
+                        height="24"
+                        width="24"
+                        crossOrigin="anonymous"
+                        src="https://cdn.simpleicons.org/vercel/white"
+                        alt="vercel"
+                      />
+                      <span className="mx-auto">
+                        {!vercelConn.user ? 'Vercel 계정을 먼저 연결해주세요' : 'Vercel로 내보내기'}
+                      </span>
+                      {vercelConn.user && <VercelDeploymentLink />}
+                    </DropdownMenu.Item>
 
-                  <DropdownMenu.Item
-                    className={classNames(itemClassName, {
-                      'opacity-60 cursor-not-allowed': isDeploying || !activePreview,
-                    })}
-                    disabled={isDeploying || !activePreview}
-                    onClick={handleGitHubDeployClick}
-                  >
-                    <img
-                      className="w-5 h-5"
-                      height="24"
-                      width="24"
-                      crossOrigin="anonymous"
-                      src="https://cdn.simpleicons.org/github"
-                      alt="github"
-                    />
-                    <span className="mx-auto">GitHub로 내보내기</span>
-                  </DropdownMenu.Item>
+                    <DropdownMenu.Item
+                      className={classNames(itemClassName, {
+                        'opacity-60 cursor-not-allowed': isDeploying || !activePreview,
+                      })}
+                      disabled={isDeploying || !activePreview}
+                      onClick={handleGitHubDeployClick}
+                    >
+                      <img
+                        className="w-5 h-5"
+                        height="24"
+                        width="24"
+                        crossOrigin="anonymous"
+                        src="https://cdn.simpleicons.org/github"
+                        alt="github"
+                      />
+                      <span className="mx-auto">GitHub로 내보내기</span>
+                    </DropdownMenu.Item>
 
-                  <DropdownMenu.Item
-                    className={classNames(itemClassName, {
-                      'opacity-60 cursor-not-allowed': isDeploying || !activePreview || !gitlabIsConnected,
-                    })}
-                    disabled={isDeploying || !activePreview || !gitlabIsConnected}
-                    onClick={handleGitLabDeployClick}
-                  >
-                    <img
-                      className="w-5 h-5"
-                      height="24"
-                      width="24"
-                      crossOrigin="anonymous"
-                      src="https://cdn.simpleicons.org/gitlab"
-                      alt="gitlab"
-                    />
-                    <span className="mx-auto">
-                      {!gitlabIsConnected ? 'GitLab 계정을 먼저 연결해주세요' : 'GitLab으로 내보내기'}
-                    </span>
-                  </DropdownMenu.Item>
-                </DropdownMenu.SubContent>
-              </DropdownMenu.Portal>
-            </DropdownMenu.Sub>
-          </DropdownMenu.Content>
-        </DropdownMenu.Root>
+                    <DropdownMenu.Item
+                      className={classNames(itemClassName, {
+                        'opacity-60 cursor-not-allowed': isDeploying || !activePreview || !gitlabIsConnected,
+                      })}
+                      disabled={isDeploying || !activePreview || !gitlabIsConnected}
+                      onClick={handleGitLabDeployClick}
+                    >
+                      <img
+                        className="w-5 h-5"
+                        height="24"
+                        width="24"
+                        crossOrigin="anonymous"
+                        src="https://cdn.simpleicons.org/gitlab"
+                        alt="gitlab"
+                      />
+                      <span className="mx-auto">
+                        {!gitlabIsConnected ? 'GitLab 계정을 먼저 연결해주세요' : 'GitLab으로 내보내기'}
+                      </span>
+                    </DropdownMenu.Item>
+                  </DropdownMenu.SubContent>
+                </DropdownMenu.Portal>
+              </DropdownMenu.Sub>
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
+        )}
       </div>
 
       {/* GitHub Deployment Dialog */}

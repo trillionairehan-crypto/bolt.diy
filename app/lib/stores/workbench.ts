@@ -20,6 +20,7 @@ import { createSampler } from '~/utils/sampler';
 import type { ActionAlert, DeployAlert, SupabaseAlert } from '~/types/actions';
 import { createScopedLogger } from '~/utils/logger';
 import { findMissingRelativeImports, formatMissingImportsAlert } from '~/lib/runtime/file-reference-postprocess';
+import { SHOW_DEV_TOOLS } from '~/utils/featureFlags';
 
 const { saveAs } = fileSaver;
 const logger = createScopedLogger('WorkbenchStore');
@@ -49,7 +50,15 @@ export class WorkbenchStore {
   artifacts: Artifacts = import.meta.hot?.data.artifacts ?? map({});
 
   showWorkbench: WritableAtom<boolean> = import.meta.hot?.data.showWorkbench ?? atom(false);
-  currentView: WritableAtom<WorkbenchViewType> = import.meta.hot?.data.currentView ?? atom('code');
+
+  /*
+   * 개발자용 UI 정리 (overnight5) — SHOW_DEV_TOOLS가 꺼져 있으면(기본값) 코드/차이점 탭 자체가
+   * Workbench.client.tsx에서 화면에 안 보이게 클램프되므로, 첫 기본값이 'code'면 미리보기가
+   * 뜨기 전까지 잠깐이라도 빈 코드 화면이 보일 수 있다 — 아예 'preview'로 시작한다. 개발자 모드를
+   * 다시 켜면(SHOW_DEV_TOOLS = true) 기존처럼 'code'로 시작하는 동작이 그대로 돌아온다.
+   */
+  currentView: WritableAtom<WorkbenchViewType> =
+    import.meta.hot?.data.currentView ?? atom(SHOW_DEV_TOOLS ? 'code' : 'preview');
 
   /*
    * overnight5 모바일 v2 후속 — WebContainer.boot() 자체(또는 그 직후의 inspector 스크립트 설정)가
