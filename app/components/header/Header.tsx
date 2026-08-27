@@ -73,7 +73,8 @@ export function Header() {
             <a href="/pricing" className="text-sm font-medium hover:opacity-80" style={{ color: LANDING_TEXT_COLOR }}>
               요금제
             </a>
-            <ThemeSwitch className="!text-[#FAF7F0] hover:!opacity-80" />
+            {/* 다크모드는 출시 범위에서 제외 예정 — 이번엔 모바일 랜딩 헤더에서만 숨긴다. */}
+            {!isSmallViewport && <ThemeSwitch className="!text-[#FAF7F0] hover:!opacity-80" />}
             {authUser ? (
               <button
                 type="button"

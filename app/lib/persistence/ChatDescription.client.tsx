@@ -19,7 +19,7 @@ export function ChatDescription() {
   }
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center min-w-0">
       {editing ? (
         <form onSubmit={handleSubmit} className="flex items-center justify-center">
           <input
@@ -46,12 +46,12 @@ export function ChatDescription() {
         </form>
       ) : (
         <>
-          {currentDescription}
+          <span className="truncate min-w-0">{currentDescription}</span>
           <TooltipProvider>
             <WithTooltip tooltip="Rename chat">
               <button
                 type="button"
-                className="ml-2 i-ph:pencil-fill scale-110 hover:text-bolt-elements-item-contentAccent"
+                className="ml-2 shrink-0 i-ph:pencil-fill scale-110 hover:text-bolt-elements-item-contentAccent"
                 onClick={(event) => {
                   event.preventDefault();
                   toggleEditMode();
