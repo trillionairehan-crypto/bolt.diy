@@ -39,6 +39,7 @@ import type { GenerationDirectives } from '~/lib/onboarding/answer-directives';
 import { CoralredHero } from '~/components/landing/CoralredHero';
 import { ScrollHint } from '~/components/landing/ScrollHint';
 import { Logo } from '~/components/ui/Logo';
+import useViewport from '~/lib/hooks';
 
 /*
  * Lazy-loaded: Workbench.client.tsx pulls in the workbenchStore singleton (ActionRunner,
@@ -52,6 +53,14 @@ import { Logo } from '~/components/ui/Logo';
 const Workbench = lazy(() =>
   import('~/components/workbench/Workbench.client').then((module) => ({ default: module.Workbench })),
 );
+
+/*
+ * Lazy-loaded for the same reason as Workbench above: MobileWorkspace imports Preview, which pulls
+ * in the same heavy workbenchStore graph. Only ever mounted once isSmallViewport && chatStarted are
+ * both true (client-side only), so deferring it keeps that cost out of the initial bundle for
+ * everyone else, same as Workbench already does for desktop.
+ */
+const MobileWorkspace = lazy(() => import('./MobileWorkspace').then((module) => ({ default: module.MobileWorkspace })));
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
@@ -175,6 +184,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     ref,
   ) => {
     const TEXTAREA_MAX_HEIGHT = chatStarted ? 400 : 200;
+    const isSmallViewport = useViewport(1024);
     const authUser = useStore(authUserStore);
     const [freeGenerationsRemaining, setFreeGenerationsRemaining] = useState<number | null>(null);
 
@@ -411,226 +421,213 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       }
     };
 
-    const baseChat = (
-      <div
-        ref={ref}
-        className={classNames(styles.BaseChat, 'relative flex h-full w-full overflow-hidden')}
-        data-chat-visible={showChat}
-      >
-        <ClientOnly>{() => <Menu />}</ClientOnly>
-        <div className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
-          <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
-            {clarifyingPrompt ? (
-              <PromptClarification
-                initialPrompt={clarifyingPrompt}
-                onComplete={(finalPrompt, directives) => onClarificationComplete?.(finalPrompt, directives)}
-              />
-            ) : (
-              <>
-                {(() => {
-                  /*
-                   * Shared between both branches below so the alerts/progress/free-trial-notice/
-                   * ChatBox wiring (30+ props) isn't duplicated — only the surrounding chrome
-                   * (headline, card centering, StickToBottom's own className) differs by state.
-                   *
-                   * Split into messagesSection/inputSection (rather than one combined chunk) so the
-                   * chatStarted branch below can give messagesSection its own bounded, independently
-                   * scrolling box while inputSection sits outside it as a plain flex sibling — see the
-                   * chatStarted ternary a bit further down for why (input bar reachability fix).
-                   */
-                  const messagesSection = (
-                    <StickToBottom.Content className="flex flex-col gap-4 relative ">
-                      <ClientOnly>
-                        {() => {
-                          return chatStarted ? (
-                            <Messages
-                              className="flex flex-col w-full flex-1 max-w-chat pb-4 mx-auto z-1"
-                              messages={messages}
-                              parsedMessages={parsedMessages}
-                              isStreaming={isStreaming}
-                              append={append}
-                              chatMode={chatMode}
-                              setChatMode={setChatMode}
-                              provider={provider}
-                              model={model}
-                              addToolOutput={addToolOutput}
-                            />
-                          ) : null;
+    const chatColumnContent = clarifyingPrompt ? (
+      <PromptClarification
+        initialPrompt={clarifyingPrompt}
+        onComplete={(finalPrompt, directives) => onClarificationComplete?.(finalPrompt, directives)}
+      />
+    ) : (
+      <>
+        {(() => {
+          /*
+           * Shared between both branches below so the alerts/progress/free-trial-notice/
+           * ChatBox wiring (30+ props) isn't duplicated — only the surrounding chrome
+           * (headline, card centering, StickToBottom's own className) differs by state.
+           *
+           * Split into messagesSection/inputSection (rather than one combined chunk) so the
+           * chatStarted branch below can give messagesSection its own bounded, independently
+           * scrolling box while inputSection sits outside it as a plain flex sibling — see the
+           * chatStarted ternary a bit further down for why (input bar reachability fix).
+           */
+          const messagesSection = (
+            <StickToBottom.Content className="flex flex-col gap-4 relative ">
+              <ClientOnly>
+                {() => {
+                  return chatStarted ? (
+                    <Messages
+                      className="flex flex-col w-full flex-1 max-w-chat pb-4 mx-auto z-1"
+                      messages={messages}
+                      parsedMessages={parsedMessages}
+                      isStreaming={isStreaming}
+                      append={append}
+                      chatMode={chatMode}
+                      setChatMode={setChatMode}
+                      provider={provider}
+                      model={model}
+                      addToolOutput={addToolOutput}
+                    />
+                  ) : null;
+                }}
+              </ClientOnly>
+              <ScrollToBottom />
+            </StickToBottom.Content>
+          );
+
+          const inputSection = (
+            <>
+              <div
+                className={classNames('flex flex-col gap-2 w-full max-w-chat mx-auto z-prompt mb-6', {
+                  'my-auto': !chatStarted,
+                  'flex-shrink-0 mt-2': chatStarted,
+                })}
+              >
+                <div className="flex flex-col gap-2">
+                  {deployAlert && (
+                    <DeployChatAlert
+                      alert={deployAlert}
+                      clearAlert={() => clearDeployAlert?.()}
+                      postMessage={(message: string | undefined) => {
+                        sendMessage?.({} as any, message);
+                        clearSupabaseAlert?.();
+                      }}
+                    />
+                  )}
+                  {supabaseAlert && (
+                    <SupabaseChatAlert
+                      alert={supabaseAlert}
+                      clearAlert={() => clearSupabaseAlert?.()}
+                      postMessage={(message) => {
+                        sendMessage?.({} as any, message);
+                        clearSupabaseAlert?.();
+                      }}
+                    />
+                  )}
+                  {actionAlert && (
+                    <ChatAlert
+                      alert={actionAlert}
+                      clearAlert={() => clearAlert?.()}
+                      postMessage={(message) => {
+                        sendMessage?.({} as any, message);
+                        clearAlert?.();
+                      }}
+                    />
+                  )}
+                  {llmErrorAlert && <LlmErrorAlert alert={llmErrorAlert} clearAlert={() => clearLlmErrorAlert?.()} />}
+                </div>
+                {progressAnnotations && <ProgressCompilation data={progressAnnotations} />}
+                {freeGenerationsRemaining !== null && (
+                  <p
+                    className={classNames('text-xs px-1', { 'text-right': !chatStarted })}
+                    style={{ color: '#FAF7F0', opacity: 0.75, display: chatStarted ? 'none' : undefined }}
+                  >
+                    {freeGenerationsRemaining > 0 ? (
+                      <span key="remaining">
+                        {authUser ? '무료 생성' : '무료 체험'} {freeGenerationsRemaining}회 남았어요
+                      </span>
+                    ) : (
+                      <span key="exhausted">
+                        {authUser ? '무료 생성 횟수를 모두 사용했어요' : '무료 체험을 다 썼어요'}. 계속하려면{' '}
+                        <a href="/pricing" style={{ color: '#FAF7F0', textDecoration: 'underline' }}>
+                          요금제
+                        </a>
+                        를 확인해주세요
+                      </span>
+                    )}
+                  </p>
+                )}
+                <ChatBox
+                  isModelSettingsCollapsed={isModelSettingsCollapsed}
+                  setIsModelSettingsCollapsed={setIsModelSettingsCollapsed}
+                  provider={provider}
+                  setProvider={setProvider}
+                  providerList={providerList || (PROVIDER_LIST as ProviderInfo[])}
+                  model={model}
+                  setModel={setModel}
+                  modelList={modelList}
+                  apiKeys={apiKeys}
+                  isModelLoading={isModelLoading}
+                  onApiKeysChange={onApiKeysChange}
+                  uploadedFiles={uploadedFiles}
+                  setUploadedFiles={setUploadedFiles}
+                  imageDataList={imageDataList}
+                  setImageDataList={setImageDataList}
+                  textareaRef={textareaRef}
+                  input={input}
+                  handleInputChange={handleInputChange}
+                  handlePaste={handlePaste}
+                  TEXTAREA_MIN_HEIGHT={TEXTAREA_MIN_HEIGHT}
+                  TEXTAREA_MAX_HEIGHT={TEXTAREA_MAX_HEIGHT}
+                  isStreaming={isStreaming}
+                  handleStop={handleStop}
+                  handleSendMessage={handleSendMessage}
+                  enhancingPrompt={enhancingPrompt}
+                  enhancePrompt={enhancePrompt}
+                  isListening={isListening}
+                  speechRecognitionSupported={recognition !== null}
+                  startListening={startListening}
+                  stopListening={stopListening}
+                  chatStarted={chatStarted}
+                  exportChat={exportChat}
+                  qrModalOpen={qrModalOpen}
+                  setQrModalOpen={setQrModalOpen}
+                  handleFileUpload={handleFileUpload}
+                  chatMode={chatMode}
+                  setChatMode={setChatMode}
+                  designScheme={designScheme}
+                  setDesignScheme={setDesignScheme}
+                  selectedElement={selectedElement}
+                  setSelectedElement={setSelectedElement}
+                  onWebSearchResult={onWebSearchResult}
+                  isLanding={!chatStarted}
+                />
+              </div>
+            </>
+          );
+
+          // Only the !chatStarted (landing) branch needs the two pieces glued back together.
+          const chatBoxSection = (
+            <>
+              {messagesSection}
+              {inputSection}
+            </>
+          );
+
+          return (
+            <div
+              className={classNames('relative overflow-hidden', {
+                'flex flex-col items-center justify-center px-4 py-16': !chatStarted,
+                'h-full flex flex-col min-h-0': chatStarted,
+              })}
+              style={!chatStarted ? { background: '#FF5330', minHeight: '88vh' } : undefined}
+            >
+              {!chatStarted && (
+                <ClientOnly>{() => <CoralredHero onFocusPrompt={() => textareaRef?.current?.focus()} />}</ClientOnly>
+              )}
+              <div
+                className={classNames('flex flex-col min-w-0 relative z-10 w-full', {
+                  'h-full min-h-0': chatStarted,
+                })}
+              >
+                {!chatStarted ? (
+                  <div className="w-full mx-auto flex flex-col items-center" style={{ maxWidth: 760 }}>
+                    <div id="intro" className="flex flex-col items-center text-center mb-7 animate-fade-in">
+                      <Logo variant="onCoral" height={28} />
+                      <h1
+                        className="mt-6"
+                        style={{
+                          color: '#FAF7F0',
+                          fontWeight: 800,
+                          letterSpacing: '-0.02em',
+                          fontSize: 'clamp(30px, 4.2vw, 44px)',
+                          lineHeight: 1.15,
                         }}
-                      </ClientOnly>
-                      <ScrollToBottom />
-                    </StickToBottom.Content>
-                  );
-
-                  const inputSection = (
-                    <>
-                      <div
-                        className={classNames('flex flex-col gap-2 w-full max-w-chat mx-auto z-prompt mb-6', {
-                          'my-auto': !chatStarted,
-                          'flex-shrink-0 mt-2': chatStarted,
-                        })}
                       >
-                        <div className="flex flex-col gap-2">
-                          {deployAlert && (
-                            <DeployChatAlert
-                              alert={deployAlert}
-                              clearAlert={() => clearDeployAlert?.()}
-                              postMessage={(message: string | undefined) => {
-                                sendMessage?.({} as any, message);
-                                clearSupabaseAlert?.();
-                              }}
-                            />
-                          )}
-                          {supabaseAlert && (
-                            <SupabaseChatAlert
-                              alert={supabaseAlert}
-                              clearAlert={() => clearSupabaseAlert?.()}
-                              postMessage={(message) => {
-                                sendMessage?.({} as any, message);
-                                clearSupabaseAlert?.();
-                              }}
-                            />
-                          )}
-                          {actionAlert && (
-                            <ChatAlert
-                              alert={actionAlert}
-                              clearAlert={() => clearAlert?.()}
-                              postMessage={(message) => {
-                                sendMessage?.({} as any, message);
-                                clearAlert?.();
-                              }}
-                            />
-                          )}
-                          {llmErrorAlert && (
-                            <LlmErrorAlert alert={llmErrorAlert} clearAlert={() => clearLlmErrorAlert?.()} />
-                          )}
-                        </div>
-                        {progressAnnotations && <ProgressCompilation data={progressAnnotations} />}
-                        {freeGenerationsRemaining !== null && (
-                          <p
-                            className={classNames('text-xs px-1', { 'text-right': !chatStarted })}
-                            style={{ color: '#FAF7F0', opacity: 0.75, display: chatStarted ? 'none' : undefined }}
-                          >
-                            {freeGenerationsRemaining > 0 ? (
-                              <span key="remaining">
-                                {authUser ? '무료 생성' : '무료 체험'} {freeGenerationsRemaining}회 남았어요
-                              </span>
-                            ) : (
-                              <span key="exhausted">
-                                {authUser ? '무료 생성 횟수를 모두 사용했어요' : '무료 체험을 다 썼어요'}. 계속하려면{' '}
-                                <a href="/pricing" style={{ color: '#FAF7F0', textDecoration: 'underline' }}>
-                                  요금제
-                                </a>
-                                를 확인해주세요
-                              </span>
-                            )}
-                          </p>
-                        )}
-                        <ChatBox
-                          isModelSettingsCollapsed={isModelSettingsCollapsed}
-                          setIsModelSettingsCollapsed={setIsModelSettingsCollapsed}
-                          provider={provider}
-                          setProvider={setProvider}
-                          providerList={providerList || (PROVIDER_LIST as ProviderInfo[])}
-                          model={model}
-                          setModel={setModel}
-                          modelList={modelList}
-                          apiKeys={apiKeys}
-                          isModelLoading={isModelLoading}
-                          onApiKeysChange={onApiKeysChange}
-                          uploadedFiles={uploadedFiles}
-                          setUploadedFiles={setUploadedFiles}
-                          imageDataList={imageDataList}
-                          setImageDataList={setImageDataList}
-                          textareaRef={textareaRef}
-                          input={input}
-                          handleInputChange={handleInputChange}
-                          handlePaste={handlePaste}
-                          TEXTAREA_MIN_HEIGHT={TEXTAREA_MIN_HEIGHT}
-                          TEXTAREA_MAX_HEIGHT={TEXTAREA_MAX_HEIGHT}
-                          isStreaming={isStreaming}
-                          handleStop={handleStop}
-                          handleSendMessage={handleSendMessage}
-                          enhancingPrompt={enhancingPrompt}
-                          enhancePrompt={enhancePrompt}
-                          isListening={isListening}
-                          speechRecognitionSupported={recognition !== null}
-                          startListening={startListening}
-                          stopListening={stopListening}
-                          chatStarted={chatStarted}
-                          exportChat={exportChat}
-                          qrModalOpen={qrModalOpen}
-                          setQrModalOpen={setQrModalOpen}
-                          handleFileUpload={handleFileUpload}
-                          chatMode={chatMode}
-                          setChatMode={setChatMode}
-                          designScheme={designScheme}
-                          setDesignScheme={setDesignScheme}
-                          selectedElement={selectedElement}
-                          setSelectedElement={setSelectedElement}
-                          onWebSearchResult={onWebSearchResult}
-                          isLanding={!chatStarted}
-                        />
-                      </div>
-                    </>
-                  );
-
-                  // Only the !chatStarted (landing) branch needs the two pieces glued back together.
-                  const chatBoxSection = (
-                    <>
-                      {messagesSection}
-                      {inputSection}
-                    </>
-                  );
-
-                  return (
-                    <div
-                      className={classNames('relative overflow-hidden', {
-                        'flex flex-col items-center justify-center px-4 py-16': !chatStarted,
-                        'h-full flex flex-col min-h-0': chatStarted,
-                      })}
-                      style={!chatStarted ? { background: '#FF5330', minHeight: '88vh' } : undefined}
+                        오늘 뭘 만들까요?
+                      </h1>
+                    </div>
+                    <StickToBottom className="relative w-full" resize="smooth" initial="smooth">
+                      {chatBoxSection}
+                    </StickToBottom>
+                    <p
+                      className="text-center mt-4 animate-fade-in animation-delay-200"
+                      style={{ color: 'rgba(250, 247, 240, 0.7)', fontSize: 13 }}
                     >
-                      {!chatStarted && (
-                        <ClientOnly>
-                          {() => <CoralredHero onFocusPrompt={() => textareaRef?.current?.focus()} />}
-                        </ClientOnly>
-                      )}
-                      <div
-                        className={classNames('flex flex-col min-w-0 relative z-10 w-full', {
-                          'h-full min-h-0': chatStarted,
-                        })}
-                      >
-                        {!chatStarted ? (
-                          <div className="w-full mx-auto flex flex-col items-center" style={{ maxWidth: 760 }}>
-                            <div id="intro" className="flex flex-col items-center text-center mb-7 animate-fade-in">
-                              <Logo variant="onCoral" height={28} />
-                              <h1
-                                className="mt-6"
-                                style={{
-                                  color: '#FAF7F0',
-                                  fontWeight: 800,
-                                  letterSpacing: '-0.02em',
-                                  fontSize: 'clamp(30px, 4.2vw, 44px)',
-                                  lineHeight: 1.15,
-                                }}
-                              >
-                                오늘 뭘 만들까요?
-                              </h1>
-                            </div>
-                            <StickToBottom className="relative w-full" resize="smooth" initial="smooth">
-                              {chatBoxSection}
-                            </StickToBottom>
-                            <p
-                              className="text-center mt-4 animate-fade-in animation-delay-200"
-                              style={{ color: 'rgba(250, 247, 240, 0.7)', fontSize: 13 }}
-                            >
-                              코딩 없이, 한국어로 설명하면 앱이 완성돼요
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="relative h-full flex flex-col min-h-0">
-                            {/*
+                      코딩 없이, 한국어로 설명하면 앱이 완성돼요
+                    </p>
+                  </div>
+                ) : (
+                  <div className="relative h-full flex flex-col min-h-0">
+                    {/*
                               messagesSection gets its own bounded (flex-1 min-h-0) box so it — and
                               only it — scrolls; inputSection sits outside as a flex-shrink-0
                               sibling, so it's always on screen instead of relying on `position:
@@ -639,142 +636,163 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                               resolve to that non-scrolling ancestor and never engage, so the bar
                               just scrolled away with the messages — this is the fix for that.
                             */}
-                            <StickToBottom
-                              className="flex-1 min-h-0 flex flex-col pt-6 px-2 sm:px-6 modern-scrollbar"
-                              resize="smooth"
-                              initial="smooth"
-                            >
-                              {messagesSection}
-                            </StickToBottom>
-                            {inputSection}
-                          </div>
-                        )}
-                        <div className="flex flex-col justify-center">
-                          {!chatStarted && SHOW_DEV_TOOLS && (
-                            <div className="flex justify-center gap-2">
-                              {ImportButtons(importChat)}
-                              <GitCloneButton importChat={importChat} />
-                            </div>
-                          )}
-                          <div className="flex flex-col gap-5">
-                            {/*
+                    <StickToBottom
+                      className="flex-1 min-h-0 flex flex-col pt-6 px-2 sm:px-6 modern-scrollbar"
+                      resize="smooth"
+                      initial="smooth"
+                    >
+                      {messagesSection}
+                    </StickToBottom>
+                    {inputSection}
+                  </div>
+                )}
+                <div className="flex flex-col justify-center">
+                  {!chatStarted && SHOW_DEV_TOOLS && (
+                    <div className="flex justify-center gap-2">
+                      {ImportButtons(importChat)}
+                      <GitCloneButton importChat={importChat} />
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-5">
+                    {/*
                               ExamplePrompts (suggestion chips) intentionally not rendered on the
                               landing hero — component kept intact for possible reuse elsewhere later.
                             */}
-                            {!chatStarted && SHOW_DEV_TOOLS && <StarterTemplates />}
-                          </div>
-                        </div>
-                      </div>
-                      {!chatStarted && <ScrollHint />}
-                    </div>
-                  );
-                })()}
-                {!chatStarted && (
-                  <section style={{ background: 'var(--bg)', padding: '140px 0' }}>
-                    <div className="max-w-[1120px] mx-auto px-8">
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {LANDING_STEPS.map((step) => (
-                          <div
-                            key={step.title}
-                            className="flex flex-col gap-3 p-6 rounded-2xl transition-transform duration-150 ease-out hover:-translate-y-0.5"
-                            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
-                          >
-                            <span
-                              className="flex items-center justify-center"
-                              style={{
-                                width: 48,
-                                height: 48,
-                                borderRadius: 14,
-                                background: 'var(--accent)',
-                                color: 'var(--on-accent)',
-                                fontSize: 18,
-                                fontWeight: 700,
-                              }}
-                            >
-                              {step.number}
-                            </span>
-                            <h3 style={{ color: 'var(--text)', fontSize: 20, fontWeight: 600 }}>{step.title}</h3>
-                            <p style={{ color: 'var(--muted)', fontSize: 15 }}>{step.description}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </section>
-                )}
-
-                {/* 쇼케이스 섹션(만든 앱 스크린샷) 자리 — 스크린샷 준비되면 3단계 섹션과 요금제 티저 사이에 추가 */}
-
-                {!chatStarted && (
-                  <section style={{ background: '#FF5330', padding: '96px 0' }}>
-                    <div className="max-w-[1120px] mx-auto px-8 text-center">
-                      <p style={{ color: '#FAF7F0', fontSize: 20, fontWeight: 600, marginBottom: 24 }}>
-                        무료로 시작해서, 필요할 때 올려요
-                      </p>
-                      <a
-                        href="/pricing"
-                        className="inline-flex items-center justify-center rounded-md px-4 transition-opacity duration-150 hover:opacity-90 active:opacity-80"
-                        style={{
-                          height: 36,
-                          background: '#FAF7F0',
-                          color: '#FF5330',
-                          fontSize: 14,
-                          fontWeight: 500,
-                        }}
-                      >
-                        요금제 보기
-                      </a>
-                    </div>
-                  </section>
-                )}
-
-                {!chatStarted && (
-                  <footer className="px-4 lg:px-10 py-6 border-t border-bolt-elements-borderColor text-xs text-bolt-elements-textTertiary flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-                    <span>코랄레드</span>
-                    <span>·</span>
-                    <span>대표 한성민</span>
-                    <span>·</span>
-                    <span>사업자등록번호 383-23-02498</span>
-                    <span>·</span>
-                    <span>coralred@coralred.kr</span>
-                    <span>·</span>
-                    <a
-                      href="/pricing"
-                      className="text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary hover:underline"
+                    {!chatStarted && SHOW_DEV_TOOLS && <StarterTemplates />}
+                  </div>
+                </div>
+              </div>
+              {!chatStarted && <ScrollHint />}
+            </div>
+          );
+        })()}
+        {!chatStarted && (
+          <section style={{ background: 'var(--bg)', padding: '140px 0' }}>
+            <div className="max-w-[1120px] mx-auto px-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {LANDING_STEPS.map((step) => (
+                  <div
+                    key={step.title}
+                    className="flex flex-col gap-3 p-6 rounded-2xl transition-transform duration-150 ease-out hover:-translate-y-0.5"
+                    style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+                  >
+                    <span
+                      className="flex items-center justify-center"
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 14,
+                        background: 'var(--accent)',
+                        color: 'var(--on-accent)',
+                        fontSize: 18,
+                        fontWeight: 700,
+                      }}
                     >
-                      요금제
-                    </a>
-                    <span>·</span>
-                    <a
-                      href="/terms"
-                      className="text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary hover:underline"
-                    >
-                      이용약관
-                    </a>
-                    <span>·</span>
-                    <a
-                      href="/privacy"
-                      className="text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary hover:underline"
-                    >
-                      개인정보처리방침
-                    </a>
-                  </footer>
-                )}
-              </>
-            )}
-          </div>
+                      {step.number}
+                    </span>
+                    <h3 style={{ color: 'var(--text)', fontSize: 20, fontWeight: 600 }}>{step.title}</h3>
+                    <p style={{ color: 'var(--muted)', fontSize: 15 }}>{step.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* 쇼케이스 섹션(만든 앱 스크린샷) 자리 — 스크린샷 준비되면 3단계 섹션과 요금제 티저 사이에 추가 */}
+
+        {!chatStarted && (
+          <section style={{ background: '#FF5330', padding: '96px 0' }}>
+            <div className="max-w-[1120px] mx-auto px-8 text-center">
+              <p style={{ color: '#FAF7F0', fontSize: 20, fontWeight: 600, marginBottom: 24 }}>
+                무료로 시작해서, 필요할 때 올려요
+              </p>
+              <a
+                href="/pricing"
+                className="inline-flex items-center justify-center rounded-md px-4 transition-opacity duration-150 hover:opacity-90 active:opacity-80"
+                style={{
+                  height: 36,
+                  background: '#FAF7F0',
+                  color: '#FF5330',
+                  fontSize: 14,
+                  fontWeight: 500,
+                }}
+              >
+                요금제 보기
+              </a>
+            </div>
+          </section>
+        )}
+
+        {!chatStarted && (
+          <footer className="px-4 lg:px-10 py-6 border-t border-bolt-elements-borderColor text-xs text-bolt-elements-textTertiary flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+            <span>코랄레드</span>
+            <span>·</span>
+            <span>대표 한성민</span>
+            <span>·</span>
+            <span>사업자등록번호 383-23-02498</span>
+            <span>·</span>
+            <span>coralred@coralred.kr</span>
+            <span>·</span>
+            <a
+              href="/pricing"
+              className="text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary hover:underline"
+            >
+              요금제
+            </a>
+            <span>·</span>
+            <a
+              href="/terms"
+              className="text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary hover:underline"
+            >
+              이용약관
+            </a>
+            <span>·</span>
+            <a
+              href="/privacy"
+              className="text-bolt-elements-textTertiary hover:text-bolt-elements-textSecondary hover:underline"
+            >
+              개인정보처리방침
+            </a>
+          </footer>
+        )}
+      </>
+    );
+
+    const baseChat = (
+      <div
+        ref={ref}
+        className={classNames(styles.BaseChat, 'relative flex h-full w-full overflow-hidden')}
+        data-chat-visible={showChat}
+      >
+        <ClientOnly>{() => <Menu />}</ClientOnly>
+        {chatStarted && isSmallViewport ? (
           <ClientOnly>
             {() => (
               <Suspense fallback={null}>
-                <Workbench
-                  chatStarted={chatStarted}
-                  isStreaming={isStreaming}
-                  setSelectedElement={setSelectedElement}
-                  messages={messages}
-                />
+                <MobileWorkspace chatColumnContent={chatColumnContent} setSelectedElement={setSelectedElement} />
               </Suspense>
             )}
           </ClientOnly>
-        </div>
+        ) : (
+          <div className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
+            <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
+              {chatColumnContent}
+            </div>
+            <ClientOnly>
+              {() => (
+                <Suspense fallback={null}>
+                  <Workbench
+                    chatStarted={chatStarted}
+                    isStreaming={isStreaming}
+                    setSelectedElement={setSelectedElement}
+                    messages={messages}
+                  />
+                </Suspense>
+              )}
+            </ClientOnly>
+          </div>
+        )}
       </div>
     );
 

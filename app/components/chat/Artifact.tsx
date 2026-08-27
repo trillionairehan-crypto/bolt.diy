@@ -5,9 +5,11 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { createHighlighter, type BundledLanguage, type BundledTheme, type HighlighterGeneric } from 'shiki';
 import type { ActionState } from '~/lib/runtime/action-runner';
 import { workbenchStore } from '~/lib/stores/workbench';
+import { mobileActiveTabStore } from '~/lib/stores/mobileWorkspace';
 import { classNames } from '~/utils/classNames';
 import { cubicEasingFn } from '~/utils/easings';
 import { WORK_DIR } from '~/utils/constants';
+import useViewport from '~/lib/hooks';
 
 const highlighterOptions = {
   langs: ['shell'],
@@ -30,6 +32,7 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
   const userToggledActions = useRef(false);
   const [showActions, setShowActions] = useState(false);
   const [allActionFinished, setAllActionFinished] = useState(false);
+  const isSmallViewport = useViewport(1024);
 
   const artifacts = useStore(workbenchStore.artifacts);
   const artifact = artifacts[artifactId];
@@ -94,6 +97,12 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
           <button
             className="flex items-stretch bg-bolt-elements-artifacts-background hover:bg-bolt-elements-artifacts-backgroundHover w-full overflow-hidden"
             onClick={() => {
+              // 모바일 전용 레이아웃: 워크벤치는 아예 렌더되지 않으므로 미리보기 탭으로 전환한다.
+              if (isSmallViewport) {
+                mobileActiveTabStore.set('preview');
+                return;
+              }
+
               const showWorkbench = workbenchStore.showWorkbench.get();
               workbenchStore.showWorkbench.set(!showWorkbench);
             }}
@@ -104,7 +113,7 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
                 {dynamicTitle}
               </div>
               <div className="w-full w-full text-bolt-elements-textSecondary text-xs mt-0.5">
-                누르면 작업 화면이 열려요
+                {isSmallViewport ? '누르면 미리보기가 열려요' : '누르면 작업 화면이 열려요'}
               </div>
             </div>
           </button>

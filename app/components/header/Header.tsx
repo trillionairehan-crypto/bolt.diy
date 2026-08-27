@@ -9,6 +9,8 @@ import { classNames } from '~/utils/classNames';
 import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
 import { Logo } from '~/components/ui/Logo';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
+import { DeployButton } from '~/components/deploy/DeployButton';
+import useViewport from '~/lib/hooks';
 
 /*
  * Lazy-loaded: HeaderActionButtons only imports `workbenchStore` to read `previews` for the
@@ -32,6 +34,8 @@ export function Header() {
   const sidebarOpen = useStore(sidebarOpenStore);
   const authUser = useStore(authUserStore);
   const profile = useStore(profileStore);
+  const isSmallViewport = useViewport(1024);
+  const isMobileWorkspace = chat.started && isSmallViewport;
 
   /*
    * The landing hero is a full-bleed coral section — the header sits directly above it in normal
@@ -60,7 +64,7 @@ export function Header() {
             />
           )}
           <a href="/" className="flex items-center gap-2">
-            <Logo height={24} variant={isLanding ? 'onCoral' : 'default'} />
+            <Logo height={isMobileWorkspace ? 20 : 24} variant={isLanding ? 'onCoral' : 'default'} />
           </a>
         </div>
 
@@ -104,15 +108,20 @@ export function Header() {
             <span className="flex-1 min-w-0 px-4 truncate text-center text-bolt-elements-textPrimary">
               <ClientOnly>{() => <ChatDescription />}</ClientOnly>
             </span>
+            {/* 모바일 전용 레이아웃(isMobileWorkspace)에서는 배포하기만 노출 — 테마 토글/Supabase 연결/디버그 도구 없음. */}
             <ClientOnly>
-              {() => (
-                <div className="flex items-center gap-1">
-                  <ThemeSwitch />
-                  <Suspense fallback={null}>
-                    <HeaderActionButtons chatStarted={chat.started} />
-                  </Suspense>
-                </div>
-              )}
+              {() =>
+                isMobileWorkspace ? (
+                  <DeployButton />
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <ThemeSwitch />
+                    <Suspense fallback={null}>
+                      <HeaderActionButtons chatStarted={chat.started} />
+                    </Suspense>
+                  </div>
+                )
+              }
             </ClientOnly>
           </>
         )}
