@@ -10,6 +10,7 @@ import {
   dialogBackdropVariants,
 } from '~/components/ui/Dialog';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
+import { DARK_MODE_ENABLED } from '~/utils/featureFlags';
 import { SettingsButton } from '~/components/ui/SettingsButton';
 import { Button } from '~/components/ui/Button';
 import { db, deleteById, getAll, chatId, type ChatHistoryItem, useChatHistory } from '~/lib/persistence';
@@ -571,7 +572,8 @@ export const Menu = () => {
                 <span className="i-ph:rocket-launch" />
               </a>
             </div>
-            <ThemeSwitch />
+            {/* 다크모드 출시 제외 (overnight5, DEV_UI_HIDE_REPORT.md) */}
+            {DARK_MODE_ENABLED && <ThemeSwitch />}
           </div>
           <div className="border-t border-gray-100 dark:border-gray-800/50 px-4 py-2 text-[11px] text-gray-400 dark:text-gray-600 flex flex-wrap items-center gap-x-1.5">
             <span>코랄레드</span>

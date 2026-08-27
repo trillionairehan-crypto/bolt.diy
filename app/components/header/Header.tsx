@@ -11,6 +11,7 @@ import { Logo } from '~/components/ui/Logo';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
 import { DeployButton } from '~/components/deploy/DeployButton';
 import useViewport from '~/lib/hooks';
+import { DARK_MODE_ENABLED } from '~/utils/featureFlags';
 
 /*
  * Lazy-loaded: HeaderActionButtons only imports `workbenchStore` to read `previews` for the
@@ -73,8 +74,8 @@ export function Header() {
             <a href="/pricing" className="text-sm font-medium hover:opacity-80" style={{ color: LANDING_TEXT_COLOR }}>
               요금제
             </a>
-            {/* 다크모드는 출시 범위에서 제외 예정 — 이번엔 모바일 랜딩 헤더에서만 숨긴다. */}
-            {!isSmallViewport && <ThemeSwitch className="!text-[#FAF7F0] hover:!opacity-80" />}
+            {/* 다크모드 출시 제외 (overnight5, DEV_UI_HIDE_REPORT.md) — DARK_MODE_ENABLED로 전체 숨김. */}
+            {DARK_MODE_ENABLED && !isSmallViewport && <ThemeSwitch className="!text-[#FAF7F0] hover:!opacity-80" />}
             {authUser ? (
               <button
                 type="button"
@@ -116,7 +117,7 @@ export function Header() {
                   <DeployButton />
                 ) : (
                   <div className="flex items-center gap-1">
-                    <ThemeSwitch />
+                    {DARK_MODE_ENABLED && <ThemeSwitch />}
                     <Suspense fallback={null}>
                       <HeaderActionButtons chatStarted={chat.started} />
                     </Suspense>

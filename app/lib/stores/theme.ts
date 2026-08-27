@@ -1,5 +1,6 @@
 import { atom } from 'nanostores';
 import { logStore } from './logs';
+import { DARK_MODE_ENABLED } from '~/utils/featureFlags';
 
 export type Theme = 'dark' | 'light';
 
@@ -14,6 +15,11 @@ export const DEFAULT_THEME = 'light';
 export const themeStore = atom<Theme>(initStore());
 
 function initStore() {
+  // 다크모드 출시 제외 (overnight5) — 이전에 dark로 저장해둔 사용자도 라이트로 뜨게 한다.
+  if (!DARK_MODE_ENABLED) {
+    return DEFAULT_THEME;
+  }
+
   if (!import.meta.env.SSR) {
     const persistedTheme = localStorage.getItem(kTheme) as Theme | undefined;
     const themeAttribute = document.querySelector('html')?.getAttribute('data-theme');
@@ -27,6 +33,11 @@ function initStore() {
 const THEME_TRANSITION_MS = 200;
 
 export function toggleTheme() {
+  // 다크모드 출시 제외 (overnight5) — 토글 버튼은 전부 숨겼지만, 방어적으로 여기서도 막는다.
+  if (!DARK_MODE_ENABLED) {
+    return;
+  }
+
   const currentTheme = themeStore.get();
   const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 

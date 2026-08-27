@@ -13,6 +13,7 @@ import { cssTransition, ToastContainer } from 'react-toastify';
 import { createScopedLogger } from './utils/logger';
 import { initGlobalErrorRecovery } from './utils/globalErrorRecovery';
 import { Logo } from './components/ui/Logo';
+import { DARK_MODE_ENABLED } from './utils/featureFlags';
 
 import reactToastifyStyles from 'react-toastify/dist/ReactToastify.css?url';
 import globalStyles from './styles/index.scss?url';
@@ -46,19 +47,29 @@ export const links: LinksFunction = () => [
   },
 ];
 
-const inlineThemeCode = stripIndents`
-  setTutorialKitTheme();
+/*
+ * 다크모드 출시 제외 (overnight5) — DARK_MODE_ENABLED가 꺼져 있으면 localStorage에 저장된 값이나
+ * OS의 다크 모드 설정과 상관없이 항상 'light'로 고정한다. 이 스크립트는 하이드레이션 전에 실행돼서
+ * 화면 깜빡임(잘못된 테마가 잠깐 보였다가 바뀌는 것)을 막는 용도라, DARK_MODE_ENABLED의 "현재 값"을
+ * 빌드 시점에 그대로 문자열에 박아넣는다 — 브라우저에서 이 플래그를 다시 import하는 게 아니다.
+ */
+const inlineThemeCode = DARK_MODE_ENABLED
+  ? stripIndents`
+    setTutorialKitTheme();
 
-  function setTutorialKitTheme() {
-    let theme = localStorage.getItem('bolt_theme');
+    function setTutorialKitTheme() {
+      let theme = localStorage.getItem('bolt_theme');
 
-    if (!theme) {
-      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      if (!theme) {
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+
+      document.querySelector('html')?.setAttribute('data-theme', theme);
     }
-
-    document.querySelector('html')?.setAttribute('data-theme', theme);
-  }
-`;
+  `
+  : stripIndents`
+    document.querySelector('html')?.setAttribute('data-theme', 'light');
+  `;
 
 export const Head = createHead(() => (
   <>
