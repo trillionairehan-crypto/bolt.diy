@@ -30,7 +30,6 @@ import { cubicEasingFn } from '~/utils/easings';
 import { createScopedLogger, renderLogger } from '~/utils/logger';
 import { EditorPanel } from './EditorPanel';
 import { Preview } from './Preview';
-import useViewport from '~/lib/hooks';
 
 import { chatStore } from '~/lib/stores/chat';
 import type { ElementInfo } from './Inspector';
@@ -39,7 +38,6 @@ import { useChatHistory } from '~/lib/persistence';
 import { streamingState } from '~/lib/stores/streaming';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { ConfirmationDialog } from '~/components/ui/Dialog';
-import { shouldSwitchToPreviewOnMobileOpen } from '~/utils/workbenchMobileLayout';
 
 const logger = createScopedLogger('Workbench');
 
@@ -384,7 +382,6 @@ export const Workbench = memo(
     const { showChat } = useStore(chatStore);
     const canHideChat = showWorkbench || !showChat;
 
-    const isSmallViewport = useViewport(1024);
     const streaming = useStore(streamingState);
     const { exportChat } = useChatHistory();
     const [isSyncing, setIsSyncing] = useState(false);
@@ -398,24 +395,6 @@ export const Workbench = memo(
         setSelectedView('preview');
       }
     }, [hasPreview]);
-
-    /*
-     * overnight5 mobile layout fix: on a narrow viewport the workbench opens as a full-screen
-     * takeover (see the isSmallViewport branch below), and non-developer users should land on
-     * "미리보기" rather than "코드" — but only on the closed-to-open transition, so it doesn't
-     * fight a tab the user already picked while it's open (e.g. they're mid-way through reading a
-     * diff and a new artifact opens). wasWorkbenchOpen tracks the previous render's value across
-     * renders without itself triggering one.
-     */
-    const wasWorkbenchOpen = useRef(showWorkbench);
-
-    useEffect(() => {
-      if (shouldSwitchToPreviewOnMobileOpen(wasWorkbenchOpen.current, showWorkbench, isSmallViewport)) {
-        setSelectedView('preview');
-      }
-
-      wasWorkbenchOpen.current = showWorkbench;
-    }, [showWorkbench, isSmallViewport]);
 
     useEffect(() => {
       workbenchStore.setDocuments(files);
@@ -480,24 +459,15 @@ export const Workbench = memo(
           >
             <div
               className={classNames(
-                'fixed transition-[left,width] duration-200 bolt-ease-cubic-bezier',
-                isSmallViewport
-                  ? 'top-0 bottom-0 w-full z-max'
-                  : 'top-[calc(var(--header-height)+1.2rem)] bottom-6 w-[var(--workbench-inner-width)] z-0',
+                'fixed top-[calc(var(--header-height)+1.2rem)] bottom-6 w-[var(--workbench-inner-width)] z-0 transition-[left,width] duration-200 bolt-ease-cubic-bezier',
                 {
-                  'left-0': showWorkbench && isSmallViewport,
-                  'left-[var(--workbench-left)]': showWorkbench && !isSmallViewport,
+                  'left-[var(--workbench-left)]': showWorkbench,
                   'left-[100%]': !showWorkbench,
                 },
               )}
             >
-              <div className={classNames('absolute inset-0', isSmallViewport ? '' : 'px-2 lg:px-4')}>
-                <div
-                  className={classNames(
-                    'h-full flex flex-col bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor shadow-sm overflow-hidden',
-                    { 'rounded-lg': !isSmallViewport },
-                  )}
-                >
+              <div className="absolute inset-0 px-2 lg:px-4">
+                <div className="h-full flex flex-col bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor shadow-sm rounded-lg overflow-hidden">
                   <div
                     className="flex items-center px-3 py-2 border-b border-bolt-elements-borderColor gap-1.5"
                     style={{
@@ -506,10 +476,10 @@ export const Workbench = memo(
                     }}
                   >
                     <button
-                      className={`${showChat ? 'i-ph:sidebar-simple-fill' : 'i-ph:sidebar-simple'} text-lg text-bolt-elements-textSecondary mr-1 shrink-0`}
+                      className={`${showChat ? 'i-ph:sidebar-simple-fill' : 'i-ph:sidebar-simple'} text-lg text-bolt-elements-textSecondary mr-1`}
                       title={showChat ? '채팅 숨기기' : '채팅 보이기'}
                       aria-label={showChat ? '채팅 숨기기' : '채팅 보이기'}
-                      disabled={!canHideChat || isSmallViewport}
+                      disabled={!canHideChat}
                       onClick={() => {
                         if (canHideChat) {
                           chatStore.setKey('showChat', !showChat);
@@ -518,124 +488,114 @@ export const Workbench = memo(
                     />
                     <Slider selected={selectedView} options={sliderOptions} setSelected={setSelectedView} />
                     <div className="ml-auto" />
-                    {/*
-                      overnight5 mobile fix: this cluster (history dropdown + view-specific action
-                      buttons) is the part that used to get visually crushed on narrow screens —
-                      there just isn't room for all of it next to the slider on a phone. Scrolling
-                      it horizontally instead keeps every button fully legible and tappable; the
-                      close button below stays outside this wrapper (shrink-0) so it's always
-                      visible without scrolling.
-                    */}
-                    <div className="flex items-center gap-1.5 overflow-x-auto min-w-0">
-                      <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
-                          <IconButton icon="i-ph:clock-counter-clockwise" title="이전 시점으로 되돌리기" />
-                        </DropdownMenu.Trigger>
-                        <DropdownMenu.Content
-                          className={classNames(
-                            'min-w-[280px] max-h-[360px] overflow-y-auto z-[250]',
-                            'bg-[var(--surface-2)] text-bolt-elements-textPrimary',
-                            'rounded-lg shadow-[var(--shadow-overlay,0_20px_50px_rgba(23,16,14,0.18))]',
-                            'border border-bolt-elements-borderColor',
-                            'animate-in fade-in-0 zoom-in-95',
-                            'py-1',
-                          )}
-                          sideOffset={5}
-                          align="end"
-                        >
-                          <div className="px-3 py-1.5 text-xs text-bolt-elements-textTertiary">
-                            되돌아갈 시점을 골라주세요
+                    <DropdownMenu.Root>
+                      <DropdownMenu.Trigger asChild>
+                        <IconButton icon="i-ph:clock-counter-clockwise" title="이전 시점으로 되돌리기" />
+                      </DropdownMenu.Trigger>
+                      <DropdownMenu.Content
+                        className={classNames(
+                          'min-w-[280px] max-h-[360px] overflow-y-auto z-[250]',
+                          'bg-[var(--surface-2)] text-bolt-elements-textPrimary',
+                          'rounded-lg shadow-[var(--shadow-overlay,0_20px_50px_rgba(23,16,14,0.18))]',
+                          'border border-bolt-elements-borderColor',
+                          'animate-in fade-in-0 zoom-in-95',
+                          'py-1',
+                        )}
+                        sideOffset={5}
+                        align="end"
+                      >
+                        <div className="px-3 py-1.5 text-xs text-bolt-elements-textTertiary">
+                          되돌아갈 시점을 골라주세요
+                        </div>
+                        {checkpoints.length === 0 && (
+                          <div className="px-3 py-2 text-sm text-bolt-elements-textTertiary">
+                            아직 되돌아갈 시점이 없어요
                           </div>
-                          {checkpoints.length === 0 && (
-                            <div className="px-3 py-2 text-sm text-bolt-elements-textTertiary">
-                              아직 되돌아갈 시점이 없어요
-                            </div>
-                          )}
-                          {checkpoints.map((checkpoint) => (
-                            <DropdownMenu.Item
-                              key={checkpoint.id}
-                              className="cursor-pointer flex flex-col items-start w-full px-3 py-2 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive gap-0.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-bolt-elements-focus transition-colors duration-150 ease-out"
-                              onClick={() => requestRewind(checkpoint.id, checkpoint.label)}
-                            >
-                              {formatCheckpointTime(checkpoint.time) && (
-                                <span className="text-xs text-bolt-elements-textTertiary">
-                                  {formatCheckpointTime(checkpoint.time)}
-                                </span>
-                              )}
-                              <span className="truncate w-full">{checkpoint.label}</span>
-                            </DropdownMenu.Item>
-                          ))}
-                        </DropdownMenu.Content>
-                      </DropdownMenu.Root>
-                      {selectedView === 'code' && (
-                        <div className="flex shrink-0">
-                          {/* Export Chat Button */}
-                          <ExportChatButton exportChat={exportChat} />
+                        )}
+                        {checkpoints.map((checkpoint) => (
+                          <DropdownMenu.Item
+                            key={checkpoint.id}
+                            className="cursor-pointer flex flex-col items-start w-full px-3 py-2 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive gap-0.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-bolt-elements-focus transition-colors duration-150 ease-out"
+                            onClick={() => requestRewind(checkpoint.id, checkpoint.label)}
+                          >
+                            {formatCheckpointTime(checkpoint.time) && (
+                              <span className="text-xs text-bolt-elements-textTertiary">
+                                {formatCheckpointTime(checkpoint.time)}
+                              </span>
+                            )}
+                            <span className="truncate w-full">{checkpoint.label}</span>
+                          </DropdownMenu.Item>
+                        ))}
+                      </DropdownMenu.Content>
+                    </DropdownMenu.Root>
+                    {selectedView === 'code' && (
+                      <div className="flex overflow-y-auto">
+                        {/* Export Chat Button */}
+                        <ExportChatButton exportChat={exportChat} />
 
-                          {/* Sync Button */}
-                          <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden ml-1">
-                            <DropdownMenu.Root>
-                              <DropdownMenu.Trigger
-                                disabled={isSyncing || streaming}
-                                className="rounded-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:bg-[var(--accent-hover)] outline-[var(--accent)] flex gap-1.7"
-                              >
-                                {isSyncing ? '저장 중...' : '저장'}
-                                <span className={classNames('i-ph:caret-down transition-transform')} />
-                              </DropdownMenu.Trigger>
-                              <DropdownMenu.Content
-                                className={classNames(
-                                  'min-w-[240px] z-[250]',
-                                  'bg-[var(--surface-2)] text-bolt-elements-textPrimary',
-                                  'rounded-lg shadow-[var(--shadow-overlay,0_20px_50px_rgba(23,16,14,0.18))]',
-                                  'border border-bolt-elements-borderColor',
-                                  'animate-in fade-in-0 zoom-in-95',
-                                  'py-1',
-                                )}
-                                sideOffset={5}
-                                align="end"
-                              >
-                                <DropdownMenu.Item
-                                  className={classNames(
-                                    'cursor-pointer flex items-center w-full px-4 py-2 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive gap-2 rounded-md group relative',
-                                  )}
-                                  onClick={handleSyncFiles}
-                                  disabled={isSyncing}
-                                >
-                                  <div className="flex items-center gap-2">
-                                    {isSyncing ? (
-                                      <div className="i-ph:spinner" />
-                                    ) : (
-                                      <div className="i-ph:cloud-arrow-down" />
-                                    )}
-                                    <span>{isSyncing ? '저장 중...' : '파일 저장'}</span>
-                                  </div>
-                                </DropdownMenu.Item>
-                              </DropdownMenu.Content>
-                            </DropdownMenu.Root>
-                          </div>
-
-                          {/* Toggle Terminal Button */}
-                          <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden ml-1">
-                            <button
-                              onClick={() => {
-                                workbenchStore.toggleTerminal(!workbenchStore.showTerminal.get());
-                              }}
+                        {/* Sync Button */}
+                        <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden ml-1">
+                          <DropdownMenu.Root>
+                            <DropdownMenu.Trigger
+                              disabled={isSyncing || streaming}
                               className="rounded-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:bg-[var(--accent-hover)] outline-[var(--accent)] flex gap-1.7"
                             >
-                              <div className="i-ph:terminal" />
-                              터미널
-                            </button>
-                          </div>
+                              {isSyncing ? '저장 중...' : '저장'}
+                              <span className={classNames('i-ph:caret-down transition-transform')} />
+                            </DropdownMenu.Trigger>
+                            <DropdownMenu.Content
+                              className={classNames(
+                                'min-w-[240px] z-[250]',
+                                'bg-[var(--surface-2)] text-bolt-elements-textPrimary',
+                                'rounded-lg shadow-[var(--shadow-overlay,0_20px_50px_rgba(23,16,14,0.18))]',
+                                'border border-bolt-elements-borderColor',
+                                'animate-in fade-in-0 zoom-in-95',
+                                'py-1',
+                              )}
+                              sideOffset={5}
+                              align="end"
+                            >
+                              <DropdownMenu.Item
+                                className={classNames(
+                                  'cursor-pointer flex items-center w-full px-4 py-2 text-sm text-bolt-elements-textPrimary hover:bg-bolt-elements-item-backgroundActive gap-2 rounded-md group relative',
+                                )}
+                                onClick={handleSyncFiles}
+                                disabled={isSyncing}
+                              >
+                                <div className="flex items-center gap-2">
+                                  {isSyncing ? (
+                                    <div className="i-ph:spinner" />
+                                  ) : (
+                                    <div className="i-ph:cloud-arrow-down" />
+                                  )}
+                                  <span>{isSyncing ? '저장 중...' : '파일 저장'}</span>
+                                </div>
+                              </DropdownMenu.Item>
+                            </DropdownMenu.Content>
+                          </DropdownMenu.Root>
                         </div>
-                      )}
 
-                      {selectedView === 'diff' && (
-                        <FileModifiedDropdown fileHistory={fileHistory} onSelectFile={handleSelectFile} />
-                      )}
-                    </div>
+                        {/* Toggle Terminal Button */}
+                        <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden ml-1">
+                          <button
+                            onClick={() => {
+                              workbenchStore.toggleTerminal(!workbenchStore.showTerminal.get());
+                            }}
+                            className="rounded-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:bg-[var(--accent-hover)] outline-[var(--accent)] flex gap-1.7"
+                          >
+                            <div className="i-ph:terminal" />
+                            터미널
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedView === 'diff' && (
+                      <FileModifiedDropdown fileHistory={fileHistory} onSelectFile={handleSelectFile} />
+                    )}
                     <IconButton
                       icon="i-ph:x-circle"
-                      className="-mr-1 shrink-0"
+                      className="-mr-1"
                       size="xl"
                       onClick={() => {
                         workbenchStore.showWorkbench.set(false);
