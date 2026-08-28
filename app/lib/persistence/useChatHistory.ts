@@ -295,11 +295,20 @@ ${value.content}
 
       let _urlId = urlId;
 
-      if (!urlId && firstArtifact?.id) {
-        const urlId = await getUrlId(db, firstArtifact.id);
-        _urlId = urlId;
-        navigateChat(urlId);
-        setUrlId(urlId);
+      /*
+       * GEN_STALL_FIX.md — this used to shadow the outer `urlId` with `const urlId = ...` here,
+       * so the SECOND `if (!urlId)` below (after this block) kept reading the stale, pre-render
+       * React state instead of the value just resolved — letting both branches call navigateChat()
+       * with two different ids in the same pass (and again on the next call, before setUrlId's
+       * state update had landed), bouncing the URL between a temp artifact-derived id and the real
+       * sequential chat id. `_urlId` (already correctly threaded through this function) is the one
+       * to check from here on, not the outer `urlId`.
+       */
+      if (!_urlId && firstArtifact?.id) {
+        const resolvedUrlId = await getUrlId(db, firstArtifact.id);
+        _urlId = resolvedUrlId;
+        navigateChat(resolvedUrlId);
+        setUrlId(resolvedUrlId);
       }
 
       let chatSummary: string | undefined = undefined;
@@ -321,7 +330,7 @@ ${value.content}
 
         chatId.set(nextId);
 
-        if (!urlId) {
+        if (!_urlId) {
           navigateChat(nextId);
         }
       }

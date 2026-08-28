@@ -580,7 +580,20 @@ export const ChatImpl = memo(
               },
             ]);
 
-            regenerate();
+            /*
+             * GEN_STALL_FIX.md — regenerate() was fired without await/catch: if its returned
+             * promise rejects (or throws synchronously before making a request), nothing in this
+             * file ever saw it — an unhandled rejection that looks, from the user's side, like
+             * generation just silently stopped after "기본 파일을 만들었어요". This log is the
+             * checkpoint that proves generateNewApp actually reached the trigger call; the .catch
+             * below makes sure a rejection surfaces (console + the existing error-alert UI) instead
+             * of vanishing.
+             */
+            logger.info('generateNewApp: template seeded, triggering regenerate()');
+            regenerate().catch((e) => {
+              logger.error('generateNewApp: regenerate() rejected after template import', e);
+              handleError(e, 'chat');
+            });
             setInput('');
             Cookies.remove(PROMPT_COOKIE_KEY);
 
@@ -627,7 +640,12 @@ export const ChatImpl = memo(
         },
       ]);
 
-      regenerate();
+      // GEN_STALL_FIX.md — same reasoning as the template-import branch above.
+      logger.info('generateNewApp: baseline seeded, triggering regenerate()');
+      regenerate().catch((e) => {
+        logger.error('generateNewApp: regenerate() rejected after baseline seed', e);
+        handleError(e, 'chat');
+      });
       setFakeLoading(false);
       setInput('');
       Cookies.remove(PROMPT_COOKIE_KEY);
