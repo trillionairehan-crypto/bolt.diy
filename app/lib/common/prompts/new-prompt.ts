@@ -168,8 +168,14 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   ICONS: lucide-react in React output; otherwise inline SVG with stroke="currentColor",
     stroke-width 1.5, size 16 or 20. Icons only when they carry function — never decoration.
 
-  CHARTS: one accent color for the emphasized series only; all other series use border/muted
-    tones. Never multicolor palettes, never gradients.
+  CHARTS: include a trend or breakdown chart only in apps that genuinely handle numeric data
+    over time or by category (asset/budget trackers, 가계부, logs) — never add one just to fill
+    space in an app that has no such data. Build it with plain SVG or CSS only (bars as styled
+    divs, a line as an SVG path, etc.) — never install a charting library. Every preview runs a
+    fresh npm install inside WebContainer, so one extra dependency here costs load time and
+    reliability on every single generated app, not just this one. One accent color for the
+    emphasized series only; all other series use border/muted tones. Never multicolor palettes,
+    never gradients.
 
   FORBIDDEN: raw color values, arbitrary px sizes, gradients on backgrounds, emoji in UI,
     font families beyond Schibsted Grotesk / IBM Plex Mono / Pretendard, drop shadows on cards,
@@ -647,14 +653,25 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - No simplistic headers; they must be immersive, animated, and reflective of the brand’s core identity and mission
   - No designs that could be mistaken for free templates or overused patterns; every element must feel intentional and tailored
 
+  Screen Density:
+  - Body content sits inside a max-width container (roughly 960-1200px) centered on the page — never full-bleed text or controls on desktop.
+  - Two or more cards/sections at the same level lay out side-by-side in a grid on desktop, not stacked full-width one under another.
+  - Key metrics/numbers sit in a horizontal row near the top of the view, not buried lower in a list.
+  - If the bottom half of a desktop screen is empty, treat that as a layout bug to fix, not an acceptable outcome for a content-light screen.
+  - This describes the desktop breakpoint specifically — mobile-first still applies below it, collapsing to single-column stacks as usual.
+
+  Starting Data:
+  - The app opens already filled with realistic, Korea-context example data through whichever storage it actually uses (coralred Cloud db.create, Supabase inserts, or local state) — Korean names, 원 amounts with proper comma formatting, plausible dates. Never an empty list on first load; an empty state reads as broken, not "clean," to a non-developer seeing their new app for the first time.
+  - Give the user an obvious, low-friction way to clear the example data (e.g. a "예시 데이터 지우기" button or menu item) instead of making them delete rows one by one.
+
   Subject-Matter Visual Metaphor:
-  - Choose colors, icons, and visual motifs that reflect the app's actual subject matter — not just generic UI defaults. A generated app should look like it was built for its topic, not stamped from a template
-  - Example: a fitness/workout app leans into energetic colors (oranges, reds) and motion-suggestive icons (running figure, heartbeat line, dumbbell)
-  - Example: a finance/budget app leans into trustworthy colors (deep blues, greens) and icons like graphs, wallets, or vaults
-  - Example: a community/social app leans into warm, connective colors and icons like people, chat bubbles, or shared spaces
-  - Example: a reading/book-tracking app leans into calm, literary tones (warm neutrals, deep amber) with icons like open books, bookmarks, or reading lamps
+  - Choose icons and visual motifs that reflect the app's actual subject matter — not just generic UI defaults. A generated app should look like it was built for its topic, not stamped from a template
+  - Example: a fitness/workout app leans into motion-suggestive icons (running figure, heartbeat line, dumbbell)
+  - Example: a finance/budget app leans into icons like graphs, wallets, coins, or vaults to feel trustworthy — never by shifting the accent color toward blue or green; the brand's coral --hue stays exactly as set for every category, finance included
+  - Example: a community/social app leans into connective icons like people, chat bubbles, or shared spaces
+  - Example: a reading/book-tracking app leans into icons like open books, bookmarks, or reading lamps
   - Apply this to hero sections, empty states, and icon choices throughout the app — not just the landing page
-  - Always express the metaphor through icon choice and imagery only — never through the accent color itself. The category color examples above (blues for finance, greens for nature, etc.) describe the icon/imagery mood, not literal --accent overrides; the accent stays whatever --hue is set to
+  - Always express the metaphor through icon choice and imagery only — never through the accent color itself. The accent stays whatever --hue is set to, regardless of category
   - Reason: apps that visually reflect their subject matter feel more crafted and trustworthy to non-developer users, compared to generic template-like UI
 
   Interaction Patterns:
