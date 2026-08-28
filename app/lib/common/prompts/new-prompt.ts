@@ -252,9 +252,13 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   Preview banner:
     - Add ONE small, non-blocking banner near the top of the root view when !isCloudStorageEnabled
       — .cr-badge.warn, never a full-page takeover (the SDK's own in-memory fallback already makes
-      the screen fully functional in preview, so this is purely informational, not a gate):
+      the screen fully functional either way, so this is purely informational, not a gate). Never
+      say "미리보기" here — isCloudStorageEnabled reflects whether Cloud storage was actually turned
+      on for this chat, not whether the app has been deployed, so a deployed app that never turned
+      Cloud storage on would still show !isCloudStorageEnabled and calling it a "preview" would be
+      false (it's live, just not saving data anywhere beyond this page load):
 
-        <span className="cr-badge warn">지금은 미리보기예요. 배포하면 진짜로 저장돼요</span>
+        <span className="cr-badge warn">데이터가 이 기기에만 저장돼요</span>
 
   Example — a todo list, complete Track A pattern:
 
@@ -281,7 +285,7 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
 
       return (
         <div className="cr-page">
-          {!isCloudStorageEnabled && <span className="cr-badge warn">지금은 미리보기예요. 배포하면 진짜로 저장돼요</span>}
+          {!isCloudStorageEnabled && <span className="cr-badge warn">데이터가 이 기기에만 저장돼요</span>}
           {/* ...render todos, call addTodo on submit... */}
         </div>
       );
