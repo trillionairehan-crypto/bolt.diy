@@ -10,6 +10,7 @@ import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
 import { Logo } from '~/components/ui/Logo';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
 import { DeployButton } from '~/components/deploy/DeployButton';
+import { SupabaseConnection } from '~/components/chat/SupabaseConnection';
 import useViewport from '~/lib/hooks';
 import { DARK_MODE_ENABLED } from '~/utils/featureFlags';
 
@@ -110,11 +111,18 @@ export function Header() {
             <span className="flex-1 min-w-0 px-4 truncate text-center text-bolt-elements-textPrimary">
               <ClientOnly>{() => <ChatDescription />}</ClientOnly>
             </span>
-            {/* 모바일 전용 레이아웃(isMobileWorkspace)에서는 배포하기만 노출 — 테마 토글/Supabase 연결/디버그 도구 없음. */}
+            {/* 모바일 전용 레이아웃(isMobileWorkspace) — 테마 토글/디버그 도구는 여전히 없음. 저장 기능
+                켜기는 TRUST_FIX_REPORT.md 작업 4로 아이콘 버튼(showLabel={false})만 추가 — 헤더가
+                좁아 라벨까지 넣으면 배포하기 버튼과 겹치고, 이 기능은 배포 제공자 드롭다운과 성격이
+                달라(SHOW_DEV_TOOLS로 가려진 그 드롭다운에 억지로 넣는 것보다) 데스크톱과 같은 자기
+                버튼을 그대로 축소해서 쓰는 쪽이 자연스럽다. */}
             <ClientOnly>
               {() =>
                 isMobileWorkspace ? (
-                  <DeployButton />
+                  <div className="flex items-center gap-1">
+                    <SupabaseConnection showLabel={false} />
+                    <DeployButton />
+                  </div>
                 ) : (
                   <div className="flex items-center gap-1">
                     {DARK_MODE_ENABLED && <ThemeSwitch />}
