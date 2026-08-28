@@ -1,12 +1,22 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { issueCloudAppToken, hashCloudAppToken } from './cloudToken';
+import { createScopedLogger } from '~/utils/logger';
+
+const logger = createScopedLogger('cloudProvision');
 
 export const MAX_CLOUD_APPS_PER_OWNER = 5;
 export const FREE_TIER_DAYS = 7;
 
+/*
+ * CLOUD_PROVISION_FIX.md — reason is split (not just 'server_error') so the two Supabase
+ * operations this function does are distinguishable both in the server log line each branch
+ * writes below and in the user-facing error code the route maps them to, without ever exposing
+ * the actual Postgres error text (message/code/hint only ever go to console.error, never into the
+ * returned result).
+ */
 export type ProvisionCloudAppResult =
   | { ok: true; appId: string; token: string; expiresAt: string }
-  | { ok: false; reason: 'quota_exceeded' | 'server_error' };
+  | { ok: false; reason: 'quota_exceeded' | 'quota_check_failed' | 'insert_failed' };
 
 /**
  * Task 5's "Cloud 켜기" — one call, immediately usable. The token is returned to the caller
@@ -23,7 +33,17 @@ export async function provisionCloudApp(
     .eq('owner_user_id', ownerUserId);
 
   if (countError) {
-    return { ok: false, reason: 'server_error' };
+    /*
+     * createScopedLogger joins args via string interpolation (`${acc} ${current}`), which would
+     * print a raw object as the useless literal "[object Object]" — JSON.stringify it explicitly
+     * so the actual Postgres error code/message/hint show up in wrangler tail.
+     */
+    logger.error(
+      'cloud_apps quota check failed',
+      JSON.stringify({ code: countError.code, message: countError.message, hint: countError.hint }),
+    );
+
+    return { ok: false, reason: 'quota_check_failed' };
   }
 
   if ((count ?? 0) >= MAX_CLOUD_APPS_PER_OWNER) {
@@ -44,7 +64,12 @@ export async function provisionCloudApp(
   });
 
   if (insertError) {
-    return { ok: false, reason: 'server_error' };
+    logger.error(
+      'cloud_apps insert failed',
+      JSON.stringify({ code: insertError.code, message: insertError.message, hint: insertError.hint }),
+    );
+
+    return { ok: false, reason: 'insert_failed' };
   }
 
   return { ok: true, appId, token, expiresAt };
