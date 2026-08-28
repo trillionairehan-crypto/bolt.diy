@@ -189,6 +189,28 @@ export const ChatImpl = memo(
     } = useChat({
       transport: new DefaultChatTransport({
         api: '/api/chat',
+        /*
+         * GEN_STALL_FIX2.md — diagnostic only, no behavior change: HttpChatTransport.sendMessages
+         * accepts a custom `fetch` and falls back to it instead of the global one, so this wrapper
+         * sees every actual dispatch/response/abort for /api/chat without touching library code.
+         * Added because the previous round's regenerate().catch() never fires when the request is
+         * aborted (Chat.regenerate()'s own catch treats AbortError as a normal outcome and returns
+         * null instead of rejecting) — this is the only way to see an abort from here.
+         */
+        fetch: (input, init) => {
+          logger.info('api/chat fetch: dispatching');
+
+          return fetch(input, init)
+            .then((response) => {
+              logger.info('api/chat fetch: response received', response.status, response.ok);
+              return response;
+            })
+            .catch((fetchError: unknown) => {
+              const err = fetchError as { name?: string; message?: string };
+              logger.error('api/chat fetch: failed before a response arrived', err?.name, err?.message);
+              throw fetchError;
+            });
+        },
         body: () => ({
           apiKeys,
           files,
@@ -590,10 +612,12 @@ export const ChatImpl = memo(
              * of vanishing.
              */
             logger.info('generateNewApp: template seeded, triggering regenerate()');
-            regenerate().catch((e) => {
-              logger.error('generateNewApp: regenerate() rejected after template import', e);
-              handleError(e, 'chat');
-            });
+            regenerate()
+              .then(() => logger.info('generateNewApp: regenerate() settled (template import)'))
+              .catch((e) => {
+                logger.error('generateNewApp: regenerate() rejected after template import', e);
+                handleError(e, 'chat');
+              });
             setInput('');
             Cookies.remove(PROMPT_COOKIE_KEY);
 
@@ -642,10 +666,12 @@ export const ChatImpl = memo(
 
       // GEN_STALL_FIX.md — same reasoning as the template-import branch above.
       logger.info('generateNewApp: baseline seeded, triggering regenerate()');
-      regenerate().catch((e) => {
-        logger.error('generateNewApp: regenerate() rejected after baseline seed', e);
-        handleError(e, 'chat');
-      });
+      regenerate()
+        .then(() => logger.info('generateNewApp: regenerate() settled (baseline)'))
+        .catch((e) => {
+          logger.error('generateNewApp: regenerate() rejected after baseline seed', e);
+          handleError(e, 'chat');
+        });
       setFakeLoading(false);
       setInput('');
       Cookies.remove(PROMPT_COOKIE_KEY);
