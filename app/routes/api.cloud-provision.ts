@@ -31,6 +31,26 @@ export async function action({ request, context }: ActionFunctionArgs) {
   }
 
   const env = context?.cloudflare?.env ?? {};
+
+  /*
+   * CLOUD_QC_TRACE.md — never the values, only whether each var came through non-empty and how
+   * long it is (a wrong-key mixup, e.g. anon key pasted where the service key belongs, would still
+   * show a plausible length here — this is a presence/shape check, not a correctness check).
+   * Logged on every call (not just failures) so it's there to correlate against whatever else this
+   * request logs next.
+   */
+  logger.info(
+    'env check',
+    JSON.stringify({
+      hasCloudSupabaseUrl: !!env.CLOUD_SUPABASE_URL,
+      cloudSupabaseUrlLength: env.CLOUD_SUPABASE_URL?.length ?? 0,
+      hasCloudSupabaseServiceKey: !!env.CLOUD_SUPABASE_SERVICE_KEY,
+      cloudSupabaseServiceKeyLength: env.CLOUD_SUPABASE_SERVICE_KEY?.length ?? 0,
+      hasCloudAppTokenSecret: !!env.CLOUD_APP_TOKEN_SECRET,
+      cloudAppTokenSecretLength: env.CLOUD_APP_TOKEN_SECRET?.length ?? 0,
+    }),
+  );
+
   const supabase = getCloudSupabaseClient(env);
   const secret = env.CLOUD_APP_TOKEN_SECRET;
 

@@ -27,20 +27,43 @@ export async function provisionCloudApp(
   secret: string,
   ownerUserId: string,
 ): Promise<ProvisionCloudAppResult> {
-  const { count, error: countError } = await supabase
-    .from('cloud_apps')
-    .select('id', { count: 'exact', head: true })
-    .eq('owner_user_id', ownerUserId);
+  /*
+   * CLOUD_QC_TRACE.md — this used to be { count: 'exact', head: true } (a HEAD request). PostgREST
+   * error responses are only ever readable off res.text(), and an HTTP HEAD response can never
+   * carry a body at all (that's the protocol, not a postgrest-js bug) — so any error from a HEAD
+   * request always lands here as the empty-body fallback `error = { message: body }` with body ===
+   * '', regardless of what actually went wrong server-side. Dropping head:true (this table's owner
+   * only ever has up to MAX_CLOUD_APPS_PER_OWNER=5 rows, so fetching real rows instead of just a
+   * count header is free) means a real PostgREST error body — message/details/hint/code — can
+   * actually reach this log line the next time this fails.
+   */
+  const {
+    count,
+    error: countError,
+    status: countStatus,
+    statusText: countStatusText,
+  } = await supabase.from('cloud_apps').select('id', { count: 'exact' }).eq('owner_user_id', ownerUserId);
 
   if (countError) {
     /*
      * createScopedLogger joins args via string interpolation (`${acc} ${current}`), which would
      * print a raw object as the useless literal "[object Object]" — JSON.stringify it explicitly
-     * so the actual Postgres error code/message/hint show up in wrangler tail.
+     * so the actual Postgres error code/message/hint show up in wrangler tail. status/statusText
+     * are the one field that's meaningful even for the empty-body HEAD-request failure mode above
+     * (a bare non-2xx HTTP status is still visible even when the body is empty) — see
+     * CLOUD_QC_TRACE.md.
      */
     logger.error(
       'cloud_apps quota check failed',
-      JSON.stringify({ code: countError.code, message: countError.message, hint: countError.hint }),
+      JSON.stringify({
+        name: (countError as { name?: string }).name,
+        code: countError.code,
+        message: countError.message,
+        details: (countError as { details?: string }).details,
+        hint: countError.hint,
+        status: countStatus,
+        statusText: countStatusText,
+      }),
     );
 
     return { ok: false, reason: 'quota_check_failed' };
@@ -55,7 +78,11 @@ export async function provisionCloudApp(
   const tokenHash = await hashCloudAppToken(token);
   const expiresAt = new Date(Date.now() + FREE_TIER_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
-  const { error: insertError } = await supabase.from('cloud_apps').insert({
+  const {
+    error: insertError,
+    status: insertStatus,
+    statusText: insertStatusText,
+  } = await supabase.from('cloud_apps').insert({
     id: appId,
     owner_user_id: ownerUserId,
     app_secret_hash: tokenHash,
@@ -66,7 +93,15 @@ export async function provisionCloudApp(
   if (insertError) {
     logger.error(
       'cloud_apps insert failed',
-      JSON.stringify({ code: insertError.code, message: insertError.message, hint: insertError.hint }),
+      JSON.stringify({
+        name: (insertError as { name?: string }).name,
+        code: insertError.code,
+        message: insertError.message,
+        details: (insertError as { details?: string }).details,
+        hint: insertError.hint,
+        status: insertStatus,
+        statusText: insertStatusText,
+      }),
     );
 
     return { ok: false, reason: 'insert_failed' };
