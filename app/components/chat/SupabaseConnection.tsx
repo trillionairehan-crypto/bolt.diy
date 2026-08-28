@@ -55,6 +55,16 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
   const isCloudOn = !!cloudApp;
   const isStorageOn = isConnected || isCloudOn;
 
+  /*
+   * TRUST_FIX_REPORT.md 작업 1 — 배포하면 api.cloud-set-origin이 cloud_apps.expires_at을 30일
+   * 뒤로 늘리고, 그 값이 CloudflareDeploy.client.tsx를 거쳐 여기 cloudAppState까지 갱신된다. 그래서
+   * "7일"/"30일"을 하드코딩하지 않고 실제 만료 시각에서 남은 일수를 그대로 계산해서 보여준다 —
+   * 배포 전이면 7 근처, 배포 직후면 30 근처, 그 사이 어느 시점이든 항상 정확하다.
+   */
+  const cloudDaysRemaining = cloudApp?.expiresAt
+    ? Math.max(1, Math.ceil((new Date(cloudApp.expiresAt).getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
+    : null;
+
   useEffect(() => {
     cloudAppState.set(currentChatId ? loadCloudAppForChat(currentChatId) : null);
   }, [currentChatId]);
@@ -266,8 +276,8 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                       코랄레드로 바로 켜기 <span className="text-[var(--accent-text)]">(추천)</span>
                     </h4>
                     <p className="text-xs text-bolt-elements-textSecondary">
-                      가입도 키 복사도 없이 한 번에 켜져요. 체험용이라 7일 뒤 데이터가 정리돼요 — 계속 쓰려면 요금제를
-                      확인해주세요.
+                      가입도 키 복사도 없이 한 번에 켜져요. 7일 동안 저장되고, 배포한 앱은 30일 동안 저장돼요. 계속
+                      쓰려면 요금제를 확인해주세요.
                     </p>
                   </div>
                 </button>
@@ -309,7 +319,9 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                       코랄레드 저장 기능이 켜졌어요
                     </h4>
                     <p className="text-xs text-bolt-elements-textSecondary">
-                      체험용이라 7일 뒤 데이터가 정리돼요. 계속 쓰려면 요금제를 확인해주세요.
+                      {cloudDaysRemaining !== null
+                        ? `${cloudDaysRemaining}일 뒤에 데이터가 정리돼요. 계속 쓰려면 요금제를 확인해주세요.`
+                        : '체험용이라 시간이 지나면 데이터가 정리돼요. 계속 쓰려면 요금제를 확인해주세요.'}
                     </p>
                   </div>
                 </div>

@@ -12,7 +12,7 @@ import { formatBuildFailureOutput } from './deployUtils';
 import { recordDeployedApp, type StorageMode } from '~/lib/deployedApps';
 import { supabaseConnection } from '~/lib/stores/supabase';
 import { isServiceRoleKey } from '~/lib/supabase/keyRole';
-import { loadCloudAppForChat } from '~/lib/stores/cloud';
+import { loadCloudAppForChat, saveCloudAppForChat } from '~/lib/stores/cloud';
 import { getPlatformAuthHeaders } from '~/lib/supabase/platformAuthHeader';
 
 const ENV_FILE_PATH = '.env';
@@ -288,20 +288,39 @@ export function useCloudflareDeploy() {
         note: data.isFirstDeploy ? '방금 만든 주소예요. 1분 정도 후에 다시 열어보면 더 잘 열려요.' : undefined,
       });
 
+      /*
+       * TRUST_FIX_REPORT.md 작업 1 — cloud-set-origin이 성공하면 cloud_apps.expires_at이
+       * 30일 뒤로 늘어난 새 값을 응답에 담아 돌려준다. 그 값으로 로컬 상태(cloudAppState)와
+       * /apps에 기록될 storageExpiresAt을 갱신해야, 배포 직후부터 "30일 남음"이 정확히
+       * 보인다 — 갱신하지 않으면 배포 전(7일) 값이 그대로 남아 화면에 거짓 정보가 뜬다.
+       */
+      let deployedExpiresAt = cloudInjected?.expiresAt ?? null;
+
       if (cloudInjected) {
         const cloudApp = loadCloudAppForChat(currentChatId);
 
         if (cloudApp) {
-          fetch('/api/cloud-set-origin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${cloudApp.token}` },
-            body: JSON.stringify({ appId: cloudApp.appId, origin: data.url }),
-          }).catch(() => {
+          try {
+            const setOriginResponse = await fetch('/api/cloud-set-origin', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${cloudApp.token}` },
+              body: JSON.stringify({ appId: cloudApp.appId, origin: data.url }),
+            });
+
+            const setOriginData = (await setOriginResponse.json()) as { expiresAt?: string };
+
+            if (setOriginResponse.ok && setOriginData.expiresAt) {
+              deployedExpiresAt = setOriginData.expiresAt;
+              saveCloudAppForChat(currentChatId, { ...cloudApp, expiresAt: setOriginData.expiresAt });
+            }
+          } catch {
             /*
              * Best-effort — a failure here just means the storage API stays 403 for this app until
-             * the next successful deploy retries it; the deploy itself already succeeded.
+             * the next successful deploy retries it; the deploy itself already succeeded. The expiry
+             * extension is best-effort in the same way — deployedExpiresAt just falls back to the
+             * pre-deploy (7-day) value above.
              */
-          });
+          }
         }
       }
 
@@ -314,7 +333,7 @@ export function useCloudflareDeploy() {
         provider: 'cloudflare',
         projectName,
         storageMode,
-        storageExpiresAt: cloudInjected?.expiresAt ?? null,
+        storageExpiresAt: deployedExpiresAt,
       });
 
       toast.success('배포가 끝났어요!');

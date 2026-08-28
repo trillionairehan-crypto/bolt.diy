@@ -7,6 +7,13 @@ const logger = createScopedLogger('cloudProvision');
 export const MAX_CLOUD_APPS_PER_OWNER = 5;
 export const FREE_TIER_DAYS = 7;
 
+/**
+ * TRUST_FIX_REPORT.md 작업 1 — 배포된 앱은 cloud_apps.expires_at이 이 값만큼(지금부터) 늘어난다.
+ * api.cloud-set-origin.ts가 배포 성공마다 호출되므로, 재배포할 때마다 만료일이 다시 30일 뒤로
+ * 밀린다(계속 쓰는 앱일수록 오래 유지되는 의도된 동작).
+ */
+export const DEPLOYED_TIER_DAYS = 30;
+
 /*
  * CLOUD_PROVISION_FIX.md — reason is split (not just 'server_error') so the two Supabase
  * operations this function does are distinguishable both in the server log line each branch
