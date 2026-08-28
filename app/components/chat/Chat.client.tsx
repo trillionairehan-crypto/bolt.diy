@@ -200,6 +200,20 @@ export const ChatImpl = memo(
         fetch: (input, init) => {
           logger.info('api/chat fetch: dispatching');
 
+          /*
+           * GEN_STALL_FIX2.md follow-up — confirmed via this same wrapper that the request is
+           * aborted (AbortError, "signal is aborted without reason") before any response arrives.
+           * Every .abort() call site found by reading Chat.stop()/handleError/the component tree
+           * turned out to be unreachable from this exact flow (stop() is only invoked from a manual
+           * button and from handleError, and handleError's onError trigger is never called for an
+           * AbortError — Chat.regenerate()'s own catch returns before reaching it). This listener
+           * doesn't change behavior — it just captures a stack trace at the moment abort() actually
+           * fires, which is the only way left to find the real caller without browser access.
+           */
+          init?.signal?.addEventListener('abort', () => {
+            logger.error('api/chat fetch: abort signal fired — call stack:', new Error().stack);
+          });
+
           return fetch(input, init)
             .then((response) => {
               logger.info('api/chat fetch: response received', response.status, response.ok);
