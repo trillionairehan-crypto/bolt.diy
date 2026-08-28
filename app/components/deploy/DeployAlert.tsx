@@ -13,7 +13,7 @@ interface DeployAlertProps {
 }
 
 export default function DeployChatAlert({ alert, clearAlert, postMessage }: DeployAlertProps) {
-  const { type, title, description, content, url, stage, buildStatus, deployStatus } = alert;
+  const { type, title, description, content, url, stage, buildStatus, deployStatus, reason } = alert;
   const [copied, setCopied] = useState(false);
   const supabaseConn = useStore(supabaseConnection);
 
@@ -228,9 +228,15 @@ export default function DeployChatAlert({ alert, clearAlert, postMessage }: Depl
               transition={{ delay: 0.3 }}
             >
               <div className={classNames('flex gap-2')}>
-                {type === 'error' && (
-                  <button
-                    onClick={() => postMessage(`*이 배포 오류를 고쳐줘*\n\`\`\`\n${content || description}\n\`\`\`\n`)}
+                {/*
+                  TRUST_FIX_REPORT.md 작업 3 — 로그인이 안 돼 있어서 실패한 경우, AI에게
+                  물어봐도 고칠 수 있는 문제가 아니라서 그 버튼 대신 로그인 페이지로 바로
+                  이동하는 버튼을 보여준다. 로그인 후 이 채팅으로 돌아오는 복귀 경로는 아직
+                  없다 — TRUST_FIX_REPORT.md에 기록.
+                */}
+                {type === 'error' && reason === 'auth_required' ? (
+                  <a
+                    href="/login"
                     className={classNames(
                       `px-2 py-1.5 rounded-md text-sm font-medium`,
                       'bg-bolt-elements-button-primary-background',
@@ -240,9 +246,26 @@ export default function DeployChatAlert({ alert, clearAlert, postMessage }: Depl
                       'flex items-center gap-1.5',
                     )}
                   >
-                    <div className="i-ph:chat-circle-duotone"></div>
-                    코랄레드에게 물어보기
-                  </button>
+                    <div className="i-ph:sign-in-duotone"></div>
+                    로그인하기
+                  </a>
+                ) : (
+                  type === 'error' && (
+                    <button
+                      onClick={() => postMessage(`*이 배포 오류를 고쳐줘*\n\`\`\`\n${content || description}\n\`\`\`\n`)}
+                      className={classNames(
+                        `px-2 py-1.5 rounded-md text-sm font-medium`,
+                        'bg-bolt-elements-button-primary-background',
+                        'hover:bg-bolt-elements-button-primary-backgroundHover',
+                        'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bolt-elements-button-danger-background',
+                        'text-bolt-elements-button-primary-text',
+                        'flex items-center gap-1.5',
+                      )}
+                    >
+                      <div className="i-ph:chat-circle-duotone"></div>
+                      코랄레드에게 물어보기
+                    </button>
+                  )
                 )}
                 <button
                   onClick={clearAlert}

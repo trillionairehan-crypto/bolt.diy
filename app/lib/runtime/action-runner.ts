@@ -624,6 +624,9 @@ export class ActionRunner {
       /** Extra non-error detail shown alongside a successful/in-progress alert (e.g. a first-deploy caveat). */
       note?: string;
       source?: 'netlify' | 'vercel' | 'github' | 'gitlab' | 'cloudflare';
+
+      /** TRUST_FIX_REPORT.md 작업 3 — see DeployAlert['reason'] in ~/types/actions. */
+      reason?: 'auth_required';
     },
   ): void {
     if (!this.onDeployAlert) {
@@ -659,6 +662,7 @@ export class ActionRunner {
       buildStatus: buildStatus as any,
       deployStatus: deployStatus as any,
       source: details?.source || 'netlify',
+      reason: details?.reason,
     });
   }
 

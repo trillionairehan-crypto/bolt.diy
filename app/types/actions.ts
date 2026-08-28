@@ -60,6 +60,13 @@ export interface DeployAlert {
   buildStatus?: 'pending' | 'running' | 'complete' | 'failed';
   deployStatus?: 'pending' | 'running' | 'complete' | 'failed';
   source?: 'vercel' | 'netlify' | 'github' | 'gitlab' | 'cloudflare';
+
+  /**
+   * TRUST_FIX_REPORT.md 작업 3 — set when the failure is specifically "not logged in" (not a
+   * general deploy/build error), so DeployAlert.tsx can offer a login button instead of the usual
+   * "코랄레드에게 물어보기" action (asking the AI to fix a login problem makes no sense).
+   */
+  reason?: 'auth_required';
 }
 
 export interface LlmErrorAlertType {

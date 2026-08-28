@@ -273,7 +273,18 @@ export function useCloudflareDeploy() {
 
       if (!response.ok || !data.success || !data.url) {
         const errorMessage = data.error || '배포에 실패했어요. 잠시 후 다시 시도해주세요.';
-        deployArtifact.runner.handleDeployAction('deploying', 'failed', { error: errorMessage, source: 'cloudflare' });
+
+        /*
+         * TRUST_FIX_REPORT.md 작업 3 — api.cloudflare-deploy.ts returns 401 specifically when the
+         * user isn't logged in (getPlatformUserId returned null) — a distinct case from a build/
+         * deploy failure, so DeployAlert.tsx can offer a login button instead of "코랄레드에게
+         * 물어보기" for it.
+         */
+        deployArtifact.runner.handleDeployAction('deploying', 'failed', {
+          error: errorMessage,
+          source: 'cloudflare',
+          reason: response.status === 401 ? 'auth_required' : undefined,
+        });
         throw new Error(errorMessage);
       }
 
