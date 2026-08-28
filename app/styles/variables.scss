@@ -6,9 +6,15 @@
   /* Coralred kit primitives — brand hue is the only value a future rebrand should need to touch.
      Formulas mirror design-handoff/coralred-ui.css exactly, so this stays in sync with the kit. */
   --hue: 33;
-  --bg: oklch(0.985 0.002 var(--hue));
-  --surface: oklch(1 0 0);
-  --surface-2: oklch(0.995 0.001 var(--hue));
+  /*
+   * overnight5 배경 크림 조정 — bg/surface/surface-2 채도가 너무 낮아서(0.001~0.002) hue가 이미
+   * 33(코랄과 동일)이어도 사실상 무채색으로 보였다. 세 값 다 hue는 그대로 두고 채도만 소폭 올려서
+   * 코랄과 같은 계열로 읽히게 했다 — 상대적인 밝기 순서(surface > surface-2 > bg)는 그대로 유지.
+   * BG_TONE_REPORT.md 참고.
+   */
+  --bg: oklch(0.97 0.01 var(--hue));
+  --surface: oklch(0.995 0.006 var(--hue));
+  --surface-2: oklch(0.985 0.008 var(--hue));
   --border: oklch(0.92 0.006 var(--hue));
   --border-strong: oklch(0.88 0.008 var(--hue));
   --muted: oklch(0.55 0.01 var(--hue));
@@ -29,10 +35,14 @@
   --err: oklch(0.5 0.15 25);
   --err-bg: oklch(0.95 0.03 25);
 
-  /* Auth pages (/login, /signup) only — brand cream page backdrop in light mode, matching the
-     landing hero's card treatment; falls back to the normal --bg in dark mode rather than a
-     custom dark cream, since there's no equivalent "brand dark cream" defined anywhere else. */
-  --auth-page-bg: #faf7f0;
+  /*
+   * Auth pages (/login, /signup) only — brand cream page backdrop in light mode. Used to be a
+   * standalone hardcoded #faf7f0 (hue ~88, nowhere near the brand's hue 33 — the same "따로 논다"
+   * problem this whole pass fixed for --bg). Now that --bg itself carries the brand hue/warmth,
+   * pointing this at it removes the duplicate literal and matches how dark mode already does it
+   * below (--auth-page-bg: var(--bg)) rather than needing a second, separately-tracked cream.
+   */
+  --auth-page-bg: var(--bg);
 
   --bolt-elements-borderColor: var(--border);
   --bolt-elements-borderColorActive: var(--accent);
