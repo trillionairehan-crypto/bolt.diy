@@ -277,6 +277,16 @@ export const ChatImpl = memo(
 
     const isLoading = status === 'submitted' || status === 'streaming';
 
+    /*
+     * Preview errors while a generation is still streaming (e.g. main.tsx importing a file that
+     * hasn't been written yet) are the expected/self-resolving case the auto-fix effect below now
+     * waits out — surfacing the "should Coralred fix it?" banner for that window is just noise,
+     * since it auto-clears as soon as isLoading flips false. Terminal-source alerts keep showing
+     * immediately; they were never part of the silent auto-fix path.
+     */
+    const visibleActionAlert =
+      actionAlert && (actionAlert.source !== 'preview' || !isLoading) ? actionAlert : undefined;
+
     const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       setInput(event.target.value);
     };
@@ -992,7 +1002,7 @@ export const ChatImpl = memo(
         setUploadedFiles={setUploadedFiles}
         imageDataList={imageDataList}
         setImageDataList={setImageDataList}
-        actionAlert={actionAlert}
+        actionAlert={visibleActionAlert}
         clearAlert={() => workbenchStore.clearAlert()}
         supabaseAlert={supabaseAlert}
         clearSupabaseAlert={() => workbenchStore.clearSupabaseAlert()}
