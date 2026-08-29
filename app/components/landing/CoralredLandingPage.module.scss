@@ -68,66 +68,36 @@ $coral: #ff5330;
 
 .heroMiddle {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  column-gap: clamp(16px, 4vw, 56px);
-  padding: 32px 0;
-}
-
-.ctaColumn {
-  justify-self: end;
-  align-self: end;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 14px;
-  padding-bottom: clamp(8px, 4vw, 28px);
-}
-
-.primaryCta {
-  font-size: 16px;
-  font-weight: 700;
-  color: $cream;
-  background: $coral;
-  border: none;
-  border-radius: 999px;
-  padding: 15px 28px;
-  cursor: pointer;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-
-  &:hover {
-    opacity: 0.9;
-  }
-}
-
-.showcaseLink {
-  font-size: 14px;
-  font-weight: 500;
-  color: $ink-soft;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-
-  &:hover {
-    color: $ink;
-  }
-}
-
-.logoColumn {
-  justify-self: center;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 32px 0;
 }
 
-.taglineColumn {
-  justify-self: start;
+// The cluster (logo + copy) sits slightly left of center, leaving whitespace on the
+// right — a plain translateX on the centered flex container, not a layout hack.
+.heroCluster {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 3vw, 48px);
+  transform: translateX(-7%);
+}
+
+.logoColumn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+// Logo -> tagline -> button -> caption as one column, so the whole thing reads as a
+// single visual flow (button moved up from the old bottom-left corner placement).
+.heroCopy {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 10px;
+  max-width: 380px;
 }
 
 .taglineMain {
@@ -148,14 +118,29 @@ $coral: #ff5330;
   margin: 0;
 }
 
-.corner {
-  position: absolute;
-  left: clamp(20px, 5vw, 64px);
-  bottom: 20px;
+.primaryCta {
+  font-size: 16px;
+  font-weight: 700;
+  color: $cream;
+  background: $coral;
+  border: none;
+  border-radius: 999px;
+  padding: 15px 28px;
+  cursor: pointer;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  margin-top: 14px;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.trialCaption {
   font-size: 13px;
   font-weight: 500;
   color: $ink-soft;
-  margin: 0;
+  margin: 10px 0 0;
 }
 
 // ---------- Logo assembly ----------
@@ -254,7 +239,7 @@ $coral: #ff5330;
 // ---------- Section 2 — Showcase ----------
 
 .showcase {
-  padding: clamp(64px, 10vw, 120px) clamp(20px, 5vw, 64px) 0;
+  padding: clamp(64px, 10vw, 120px) clamp(20px, 5vw, 64px) clamp(64px, 10vw, 120px);
 }
 
 .showcaseTitle {
@@ -334,6 +319,7 @@ $coral: #ff5330;
 .mockupHeader {
   font-size: 13px;
   font-weight: 700;
+  color: $ink;
   margin: 0;
 }
 
@@ -344,9 +330,11 @@ $coral: #ff5330;
   margin: 0;
 }
 
+// The one coral emphasis point per card, per the "카드 색 통일" request.
 .mockupNumber {
   font-size: 24px;
   font-weight: 700;
+  color: $coral;
   letter-spacing: -0.02em;
   margin: 0;
 }
@@ -364,16 +352,9 @@ $coral: #ff5330;
     font-weight: 500;
     color: $ink;
     padding-left: 10px;
-    border-left: 2px solid;
+    border-left: 2px solid $ink-soft;
     line-height: 1.4;
   }
-}
-
-.cardName {
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  margin: 0;
 }
 
 .cardDesc {
@@ -396,14 +377,28 @@ $coral: #ff5330;
 .infoBlock {
   max-width: 1080px;
   margin: 0 auto;
-  padding: clamp(48px, 7vw, 88px) clamp(20px, 5vw, 64px) 0;
+  padding: clamp(96px, 14vw, 176px) clamp(20px, 5vw, 64px);
 }
 
-.infoBlockHeader {
+.infoBlockRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(24px, 5vw, 64px);
+}
+
+.infoBlockText {
+  flex: 1;
+  min-width: 0;
+}
+
+// Title and the "자세히" link sit right next to each other on the same left edge,
+// not pushed to opposite ends — replaces the old space-between header row.
+.infoBlockHeaderRow {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: clamp(20px, 3vw, 32px);
 }
 
@@ -412,6 +407,18 @@ $coral: #ff5330;
   font-weight: 700;
   letter-spacing: -0.02em;
   margin: 0;
+}
+
+.infoBlockLink {
+  font-size: 12px;
+  font-weight: 500;
+  color: $ink-soft;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    color: $ink;
+  }
 }
 
 .infoList {
@@ -431,12 +438,51 @@ $coral: #ff5330;
   }
 }
 
+// Concept-illustrating shapes only — lines/fills, no icons, coral + warm-gray only.
+.trustGraphic {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  width: clamp(100px, 14vw, 160px);
+  height: clamp(90px, 12vw, 130px);
+}
+
+.trustBox {
+  flex: 1;
+  align-self: stretch;
+  border: 1.5px solid $ink-soft;
+  border-radius: 6px;
+  background: rgba(139, 126, 112, 0.07);
+}
+
+.trustBoxAccent {
+  border-color: $coral;
+  background: rgba(255, 83, 48, 0.09);
+}
+
+// Staircase of 3 steps (the 3 plans); coral opacity (set inline per-step) indicates tier.
+.pricingGraphic {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  width: clamp(100px, 14vw, 160px);
+  height: clamp(90px, 12vw, 130px);
+}
+
+.pricingStep {
+  flex: 1;
+  background: $coral;
+  border-radius: 4px 4px 0 0;
+}
+
 // ---------- Final CTA ----------
 
 .finalCta {
   max-width: 1080px;
   margin: 0 auto;
-  padding: clamp(64px, 10vw, 120px) clamp(20px, 5vw, 64px) clamp(56px, 8vw, 88px);
+  padding: clamp(96px, 14vw, 176px) clamp(20px, 5vw, 64px) clamp(56px, 8vw, 88px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -521,10 +567,9 @@ $coral: #ff5330;
     display: none;
   }
 
-  .heroMiddle {
-    grid-template-columns: 1fr;
-    row-gap: 28px;
-    justify-items: center;
+  .heroCluster {
+    flex-direction: column;
+    transform: none;
     text-align: center;
   }
 
@@ -532,15 +577,10 @@ $coral: #ff5330;
     order: 1;
   }
 
-  .taglineColumn {
+  .heroCopy {
     order: 2;
     align-items: center;
-  }
-
-  .ctaColumn {
-    order: 3;
-    align-items: center;
-    width: 100%;
+    max-width: 100%;
   }
 
   .primaryCta {
@@ -548,10 +588,8 @@ $coral: #ff5330;
     text-align: center;
   }
 
-  .corner {
-    position: static;
+  .trialCaption {
     text-align: center;
-    margin-top: 24px;
   }
 
   .hero {
@@ -562,10 +600,17 @@ $coral: #ff5330;
     grid-template-columns: 1fr;
   }
 
-  .infoBlockHeader {
+  .infoBlockRow {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: clamp(24px, 8vw, 40px);
+  }
+
+  .trustGraphic,
+  .pricingGraphic {
+    align-self: center;
+    width: 140px;
+    height: 100px;
   }
 }
 

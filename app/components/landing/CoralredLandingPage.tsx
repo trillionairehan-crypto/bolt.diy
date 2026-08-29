@@ -246,7 +246,6 @@ interface AppMockup {
   name: string;
   desc: string;
   url: string;
-  accent: string;
   kind: 'number' | 'list';
   label?: string;
   value?: string;
@@ -255,16 +254,16 @@ interface AppMockup {
 
 /*
  * 6개 예시 앱 — 이름/설명은 사용자가 준 문구를 그대로 씀. 마지막 둘(동네 미용실, 책갈피)은
- * "이름(설명)" 형태로 안 주어져서 짧은 이름을 새로 붙였다. 목업 화면 안 강조색은 앱마다 다르게
- * (실제 앱들이 그러하듯) — 카드 프레임/페이지 자체의 브랜드 색 규칙과는 별개. 주소는 실제로
- * 배포된 프로젝트를 가리키지 않는 예시 형태 텍스트라 미니 브라우저의 가짜 주소창에만 쓴다.
+ * "이름(설명)" 형태로 안 주어져서 짧은 이름을 새로 붙였다. 목업 화면 안 강조색은 이제 카드마다
+ * 다르지 않다 — 잉크/회갈색만 쓰고, number 타입의 큰 숫자 한 곳에만 코랄을 준다(전역 "코랄은
+ * 로고·시작하기 버튼·강조 한 곳만" 규칙 그대로). 주소는 실제로 배포된 프로젝트를 가리키지 않는
+ * 예시 형태 텍스트라 미니 브라우저의 가짜 주소창에만 쓴다.
  */
 const SHOWCASE_APPS: AppMockup[] = [
   {
     name: '모카빈 카페',
     desc: '포인트 적립',
     url: 'coralred-app-31.pages.dev',
-    accent: '#B45309',
     kind: 'number',
     label: '내 포인트',
     value: '1,240P',
@@ -273,7 +272,6 @@ const SHOWCASE_APPS: AppMockup[] = [
     name: '자산모아',
     desc: '자산 현황',
     url: 'coralred-app-47.pages.dev',
-    accent: '#0E7490',
     kind: 'number',
     label: '총 자산',
     value: '8,450,000원',
@@ -282,7 +280,6 @@ const SHOWCASE_APPS: AppMockup[] = [
     name: '은혜교회 소식',
     desc: '공지 리스트',
     url: 'coralred-app-52.pages.dev',
-    accent: '#6D28D9',
     kind: 'list',
     items: ['주일예배 안내', '청년부 모임', '성경공부반 모집'],
   },
@@ -290,7 +287,6 @@ const SHOWCASE_APPS: AppMockup[] = [
     name: '트렌드파일럿',
     desc: '투자 기록',
     url: 'coralred-app-63.pages.dev',
-    accent: '#15803D',
     kind: 'number',
     label: '이번 달 수익률',
     value: '+12.4%',
@@ -299,7 +295,6 @@ const SHOWCASE_APPS: AppMockup[] = [
     name: '동네 미용실',
     desc: '예약 시간표',
     url: 'coralred-app-74.pages.dev',
-    accent: '#BE185D',
     kind: 'list',
     items: ['10:00 컷트', '13:00 펌', '15:30 염색'],
   },
@@ -307,17 +302,12 @@ const SHOWCASE_APPS: AppMockup[] = [
     name: '책갈피',
     desc: '독서 기록',
     url: 'coralred-app-89.pages.dev',
-    accent: '#4338CA',
     kind: 'list',
     items: ['아주 작은 습관의 힘', '불편한 편의점', '눈물의 왕'],
   },
 ];
 
-const TRUST_LINES = [
-  '앱마다 데이터가 분리돼서 저장돼요',
-  '배포와 결제는 본인 확인을 거친 뒤에만 실행돼요',
-  '만들다 실패하면 횟수를 차감하지 않아요',
-];
+const TRUST_LINES = ['내 앱 데이터는 내 것만', '함부로 배포되지 않아요', '실패하면 돈을 받지 않아요'];
 
 const PRICING_LINES = [
   '무료 0원 · 앱 만들어보기',
@@ -356,23 +346,21 @@ export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
         </div>
 
         <div className={styles.heroMiddle}>
-          <div className={styles.ctaColumn}>
-            <button type="button" className={styles.primaryCta} onClick={onEnter}>
-              시작하기
-            </button>
-          </div>
+          <div className={styles.heroCluster}>
+            <div className={styles.logoColumn}>
+              <LogoAssembly className={styles.logoAssembly} />
+            </div>
 
-          <div className={styles.logoColumn}>
-            <LogoAssembly className={styles.logoAssembly} />
-          </div>
-
-          <div className={styles.taglineColumn}>
-            <p className={styles.taglineMain}>아이디어만 가져오세요</p>
-            <p className={styles.taglineSub}>쓰면 앱이 되고, 주소가 생겨요</p>
+            <div className={styles.heroCopy}>
+              <p className={styles.taglineMain}>아이디어만 가져오세요</p>
+              <p className={styles.taglineSub}>설명만 하세요. 나머지는 저희가</p>
+              <button type="button" className={styles.primaryCta} onClick={onEnter}>
+                시작하기
+              </button>
+              <p className={styles.trialCaption}>가입 없이 첫 앱을 만들어볼 수 있어요</p>
+            </div>
           </div>
         </div>
-
-        <p className={styles.corner}>가입 없이 첫 앱을 만들어볼 수 있어요</p>
       </section>
 
       <section
@@ -395,29 +383,22 @@ export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
                   <span className={styles.addressBar}>{app.url}</span>
                 </div>
                 <div className={styles.browserContent}>
-                  <p className={styles.mockupHeader} style={{ color: app.accent }}>
-                    {app.name}
-                  </p>
+                  <p className={styles.mockupHeader}>{app.name}</p>
                   {app.kind === 'number' ? (
                     <>
                       <p className={styles.mockupLabel}>{app.label}</p>
-                      <p className={styles.mockupNumber} style={{ color: app.accent }}>
-                        {app.value}
-                      </p>
+                      <p className={styles.mockupNumber}>{app.value}</p>
                     </>
                   ) : (
                     <ul className={styles.mockupList}>
                       {app.items?.map((item) => (
-                        <li key={item} style={{ borderColor: app.accent }}>
-                          {item}
-                        </li>
+                        <li key={item}>{item}</li>
                       ))}
                     </ul>
                   )}
                 </div>
               </div>
 
-              <p className={styles.cardName}>{app.name}</p>
               <p className={styles.cardDesc}>{app.desc}</p>
             </div>
           ))}
@@ -428,34 +409,57 @@ export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
         ref={trustReveal.ref}
         className={classNames(styles.infoBlock, styles.reveal, { [styles.revealVisible]: trustReveal.visible })}
       >
-        <div className={styles.infoBlockHeader}>
-          <h3 className={styles.infoBlockTitle}>만든 다음이 더 중요하니까</h3>
-          <a href="#" className={styles.showcaseLink}>
-            기술과 보안 자세히
-          </a>
+        <div className={styles.infoBlockRow}>
+          <div className={styles.infoBlockText}>
+            <div className={styles.infoBlockHeaderRow}>
+              <h3 className={styles.infoBlockTitle}>만든 다음이 더 중요하니까</h3>
+              <a href="#" className={styles.infoBlockLink}>
+                기술과 보안 자세히
+              </a>
+            </div>
+            <ul className={classNames(styles.infoList, { [styles.revealVisible]: trustReveal.visible })}>
+              {TRUST_LINES.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* 데이터가 앱마다 분리된 상자에 담긴 모습 — 선/면만, 코랄+회갈색 */}
+          <div className={styles.trustGraphic} aria-hidden="true">
+            <span className={styles.trustBox} />
+            <span className={styles.trustBox} />
+            <span className={classNames(styles.trustBox, styles.trustBoxAccent)} />
+            <span className={styles.trustBox} />
+          </div>
         </div>
-        <ul className={classNames(styles.infoList, { [styles.revealVisible]: trustReveal.visible })}>
-          {TRUST_LINES.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
       </section>
 
       <section
         ref={pricingReveal.ref}
         className={classNames(styles.infoBlock, styles.reveal, { [styles.revealVisible]: pricingReveal.visible })}
       >
-        <div className={styles.infoBlockHeader}>
-          <h3 className={styles.infoBlockTitle}>요금제</h3>
-          <a href="/pricing" className={styles.showcaseLink}>
-            요금제 자세히
-          </a>
+        <div className={styles.infoBlockRow}>
+          <div className={styles.infoBlockText}>
+            <div className={styles.infoBlockHeaderRow}>
+              <h3 className={styles.infoBlockTitle}>요금제</h3>
+              <a href="/pricing" className={styles.infoBlockLink}>
+                요금제 자세히
+              </a>
+            </div>
+            <ul className={classNames(styles.infoList, { [styles.revealVisible]: pricingReveal.visible })}>
+              {PRICING_LINES.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </div>
+
+          {/* 세 플랜을 나타내는 계단형 도형 — 코랄 농도(투명도)로 단계 표현 */}
+          <div className={styles.pricingGraphic} aria-hidden="true">
+            <span className={styles.pricingStep} style={{ height: '38%', opacity: 0.35 }} />
+            <span className={styles.pricingStep} style={{ height: '68%', opacity: 0.65 }} />
+            <span className={styles.pricingStep} style={{ height: '100%', opacity: 1 }} />
+          </div>
         </div>
-        <ul className={classNames(styles.infoList, { [styles.revealVisible]: pricingReveal.visible })}>
-          {PRICING_LINES.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
       </section>
 
       <section
