@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { classNames } from '~/utils/classNames';
 import { PROVIDER_LIST, SHOW_DEV_TOOLS } from '~/utils/constants';
@@ -10,7 +10,6 @@ import { ScreenshotStateManager } from './ScreenshotStateManager';
 import { SendButton } from './SendButton.client';
 import { IconButton } from '~/components/ui/IconButton';
 import { toast } from 'react-toastify';
-import { SpeechRecognitionButton } from '~/components/chat/SpeechRecognition';
 import { ExpoQrModal } from '~/components/workbench/ExpoQrModal';
 import styles from './BaseChat.module.scss';
 import type { ProviderInfo } from '~/types/model';
@@ -27,13 +26,15 @@ const SHOW_ENHANCE_BUTTON = false;
  * Every `--bolt-elements-*` variable the card's descendants read (WebSearch popover, IconButton,
  * the Shift+Return kbd hint, etc.) is re-scoped to these values on the card wrapper via inline
  * CSS custom properties, so none of those child components need their own isLanding prop.
+ * Values match the landing page's own brand tokens exactly (app/components/landing/
+ * CoralredLandingPage.module.scss: $cream/$ink/$ink-soft) — previously a close-but-different set.
  */
-const LANDING_CARD_BG = '#FAF7F0';
-const LANDING_CARD_BG_2 = '#F2EADD';
-const LANDING_INK = '#2B211C';
-const LANDING_MUTED = '#8A7A70';
-const LANDING_BORDER = '#E8DFD3';
-const LANDING_HOVER = 'rgba(43, 33, 28, 0.06)';
+const LANDING_CARD_BG = '#FBF5EE';
+const LANDING_CARD_BG_2 = '#F2E9DC';
+const LANDING_INK = '#1A1A1A';
+const LANDING_MUTED = '#8B7E70';
+const LANDING_BORDER = 'rgba(26, 26, 26, 0.12)';
+const LANDING_HOVER = 'rgba(26, 26, 26, 0.06)';
 
 interface ChatBoxProps {
   isModelSettingsCollapsed: boolean;
@@ -83,6 +84,30 @@ interface ChatBoxProps {
 
 export const ChatBox: React.FC<ChatBoxProps> = (props) => {
   const isLanding = props.isLanding ?? false;
+
+  /*
+   * Attach/link/voice used to be three separate buttons — now one "+" menu, each item delegating
+   * to the same existing handlers (handleFileUpload, WebSearch's own popover, start/stopListening).
+   */
+  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
+  const [webSearchOpen, setWebSearchOpen] = useState(false);
+  const attachMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!attachMenuOpen) {
+      return undefined;
+    }
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (attachMenuRef.current && !attachMenuRef.current.contains(event.target as Node)) {
+        setAttachMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [attachMenuOpen]);
 
   return (
     <div
@@ -304,19 +329,78 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
         />
         <div className="flex flex-nowrap justify-between items-center text-sm p-4 pt-3 w-full">
           <div className="flex flex-nowrap gap-3 items-center min-w-0">
-            <IconButton
-              title="이미지 첨부"
-              className="flex items-center h-8 gap-1.5 px-2 shrink-0 whitespace-nowrap !text-bolt-elements-textSecondary"
-              onClick={() => props.handleFileUpload()}
-            >
-              <div className="i-ph:paperclip text-base"></div>
-              <span className={classNames('text-[13px]', isLanding ? 'hidden sm:inline' : 'hidden')}>이미지</span>
-            </IconButton>
-            <WebSearch
-              onSearchResult={(result) => props.onWebSearchResult?.(result)}
-              disabled={props.isStreaming}
-              showLabel={isLanding}
-            />
+            {props.isListening ? (
+              <button
+                type="button"
+                onClick={props.stopListening}
+                className="flex items-center h-8 gap-1.5 px-2 rounded-md text-[13px] font-medium shrink-0 whitespace-nowrap"
+                style={{ color: '#FF5330' }}
+              >
+                <div className="i-ph:microphone-fill text-base animate-pulse" />
+                듣는 중
+              </button>
+            ) : (
+              <div ref={attachMenuRef} className="relative">
+                <IconButton
+                  title="첨부"
+                  className="flex items-center h-8 gap-1.5 px-2 shrink-0 whitespace-nowrap !text-bolt-elements-textSecondary"
+                  onClick={() => setAttachMenuOpen((open) => !open)}
+                >
+                  <div className="i-ph:plus text-lg" />
+                </IconButton>
+                {attachMenuOpen && (
+                  <div
+                    className="absolute bottom-full left-0 mb-2 flex flex-col gap-0.5 rounded-lg border p-1.5 shadow-lg whitespace-nowrap"
+                    style={{
+                      background: 'var(--bolt-elements-background-depth-1)',
+                      borderColor: 'var(--bolt-elements-borderColor)',
+                    }}
+                  >
+                    <button
+                      type="button"
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[13px] text-left hover:bg-bolt-elements-item-backgroundActive text-bolt-elements-textPrimary"
+                      onClick={() => {
+                        props.handleFileUpload();
+                        setAttachMenuOpen(false);
+                      }}
+                    >
+                      <div className="i-ph:paperclip text-base" />
+                      이미지 첨부
+                    </button>
+                    <button
+                      type="button"
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[13px] text-left hover:bg-bolt-elements-item-backgroundActive text-bolt-elements-textPrimary"
+                      onClick={() => {
+                        setWebSearchOpen(true);
+                        setAttachMenuOpen(false);
+                      }}
+                    >
+                      <div className="i-ph:link text-base" />
+                      사이트 링크
+                    </button>
+                    <button
+                      type="button"
+                      disabled={props.isStreaming || !props.speechRecognitionSupported}
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[13px] text-left hover:bg-bolt-elements-item-backgroundActive text-bolt-elements-textPrimary disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={() => {
+                        props.startListening();
+                        setAttachMenuOpen(false);
+                      }}
+                    >
+                      <div className="i-ph:microphone text-base" />
+                      음성 입력
+                    </button>
+                  </div>
+                )}
+                <WebSearch
+                  onSearchResult={(result) => props.onWebSearchResult?.(result)}
+                  disabled={props.isStreaming}
+                  showTrigger={false}
+                  open={webSearchOpen}
+                  onOpenChange={setWebSearchOpen}
+                />
+              </div>
+            )}
             {SHOW_ENHANCE_BUTTON && (
               <IconButton
                 title="Enhance prompt"
@@ -335,13 +419,6 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               </IconButton>
             )}
 
-            <SpeechRecognitionButton
-              isListening={props.isListening}
-              onStart={props.startListening}
-              onStop={props.stopListening}
-              disabled={props.isStreaming || !props.speechRecognitionSupported}
-              showLabel={isLanding}
-            />
             {props.chatStarted && (
               <IconButton
                 title="대화 모드"

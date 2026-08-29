@@ -7,6 +7,13 @@ interface WebSearchProps {
   onSearchResult: (result: string) => void;
   disabled?: boolean;
   showLabel?: boolean;
+
+  /** Controlled open state — omit to let WebSearch manage its own (uncontrolled) internal state. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+
+  /** false hides WebSearch's own trigger button — for callers that open it from elsewhere (e.g. a "+" menu). */
+  showTrigger?: boolean;
 }
 
 interface WebSearchData {
@@ -38,8 +45,17 @@ function formatSearchResult(data: WebSearchData): string {
   return parts.join('\n');
 }
 
-export function WebSearch({ onSearchResult, disabled = false, showLabel = true }: WebSearchProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function WebSearch({
+  onSearchResult,
+  disabled = false,
+  showLabel = true,
+  open,
+  onOpenChange,
+  showTrigger = true,
+}: WebSearchProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = open ?? internalOpen;
+  const setIsOpen = onOpenChange ?? setInternalOpen;
   const [isSearching, setIsSearching] = useState(false);
   const [url, setUrl] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -102,19 +118,21 @@ export function WebSearch({ onSearchResult, disabled = false, showLabel = true }
 
   return (
     <div ref={containerRef} className="relative">
-      <IconButton
-        title="참고할 사이트 주소 넣기"
-        disabled={disabled || isSearching}
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center h-8 gap-1.5 px-2 shrink-0 whitespace-nowrap !text-bolt-elements-textSecondary"
-      >
-        {isSearching ? (
-          <div className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress text-base animate-spin" />
-        ) : (
-          <div className="i-ph:link text-base" />
-        )}
-        <span className={classNames('text-[13px]', showLabel ? 'hidden sm:inline' : 'hidden')}>사이트</span>
-      </IconButton>
+      {showTrigger && (
+        <IconButton
+          title="참고할 사이트 주소 넣기"
+          disabled={disabled || isSearching}
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center h-8 gap-1.5 px-2 shrink-0 whitespace-nowrap !text-bolt-elements-textSecondary"
+        >
+          {isSearching ? (
+            <div className="i-svg-spinners:90-ring-with-bg text-bolt-elements-loader-progress text-base animate-spin" />
+          ) : (
+            <div className="i-ph:link text-base" />
+          )}
+          <span className={classNames('text-[13px]', showLabel ? 'hidden sm:inline' : 'hidden')}>사이트</span>
+        </IconButton>
+      )}
       {isOpen && (
         <div
           className={classNames(

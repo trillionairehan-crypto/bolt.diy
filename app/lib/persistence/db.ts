@@ -4,9 +4,18 @@ import type { ChatHistoryItem } from './useChatHistory';
 import type { Snapshot } from './types'; // Import Snapshot type
 
 export interface IChatMetadata {
-  gitUrl: string;
+  gitUrl?: string;
   gitBranch?: string;
   netlifySiteId?: string;
+
+  /**
+   * The id of the chat this one's "app" lineage traces back to — set once, at creation, and
+   * inherited by every fork/duplicate. A chat that IS its own root has this equal to its own id
+   * (set in useChatHistory's storeMessageHistory) or, for chats created before this field existed,
+   * simply omits it — readers should fall back to the chat's own id in that case. Used to group the
+   * sidebar's chat list by "app" instead of by date.
+   */
+  rootChatId?: string;
 }
 
 const logger = createScopedLogger('ChatHistory');
@@ -239,7 +248,13 @@ export async function forkChat(db: IDBDatabase, chatId: string, messageId: strin
   // Get messages up to and including the selected message
   const messages = chat.messages.slice(0, messageIndex + 1);
 
-  return createChatFromMessages(db, chat.description ? `${chat.description} (fork)` : 'Forked chat', messages);
+  // Forks stay in the same "app" group as their source chat — see IChatMetadata.rootChatId.
+  const rootChatId = chat.metadata?.rootChatId ?? chat.id;
+
+  return createChatFromMessages(db, chat.description ? `${chat.description} (fork)` : 'Forked chat', messages, {
+    ...chat.metadata,
+    rootChatId,
+  });
 }
 
 export async function duplicateChat(db: IDBDatabase, id: string): Promise<string> {
@@ -249,7 +264,13 @@ export async function duplicateChat(db: IDBDatabase, id: string): Promise<string
     throw new Error('Chat not found');
   }
 
-  return createChatFromMessages(db, `${chat.description || 'Chat'} (copy)`, chat.messages);
+  // Duplicates stay in the same "app" group as their source chat — see IChatMetadata.rootChatId.
+  const rootChatId = chat.metadata?.rootChatId ?? chat.id;
+
+  return createChatFromMessages(db, `${chat.description || 'Chat'} (copy)`, chat.messages, {
+    ...chat.metadata,
+    rootChatId,
+  });
 }
 
 export async function createChatFromMessages(

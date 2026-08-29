@@ -13,19 +13,20 @@ describe('한국어 문구 감사 — 사이클 8', () => {
     expect(source).toContain('GitLab으로 내보내기');
   });
 
-  it('Menu.client.tsx: 같은 채팅 목록을 가리키는 라벨이 "채팅"과 "대화"로 갈리지 않고 "대화"로 통일돼 있다', () => {
+  /*
+   * 채팅 홈 화면/사이드바 재설계로 사이드바는 "대화" 목록이 아니라 "앱"(포크/복제 계보로 묶인
+   * 대화 그룹) 목록이 됐다 — "채팅"/"대화" 두 동의어가 같은 개념을 가리키며 갈리던 예전 문제와
+   * 달리, 지금은 "앱"(그룹)과 "대화"(그룹 안 개별 항목)가 서로 다른 개념이라 함께 쓰여도 된다.
+   * 검색창/그룹 라벨이 새 "앱" 어휘로 일관돼 있는지만 확인.
+   */
+  it('Menu.client.tsx: 앱 목록 검색이 "채팅 검색"이 아니라 "앱 검색"으로 일관돼 있다', () => {
     const source = readFileSync(join(__dirname, 'components/sidebar/Menu.client.tsx'), 'utf-8');
     expect(source).not.toContain('채팅 검색');
     expect(source).not.toContain('내 채팅');
-    expect(source).toContain('대화 검색...');
-    expect(source).toContain('내 대화');
+    expect(source).toContain('앱 검색...');
   });
 
-  it('BaseChat.tsx: 랜딩 3단계 안내 제목이 조건절(말하면)이 아니라 다른 두 단계와 같은 평서형이다', () => {
-    const source = readFileSync(join(__dirname, 'components/chat/BaseChat.tsx'), 'utf-8');
-    expect(source).not.toContain("title: '말하면'");
-    expect(source).toContain("title: '말해요'");
-  });
+  // BaseChat.tsx의 랜딩 3단계 안내 섹션은 채팅 홈 화면 재설계로 통째로 삭제됐다 — 더 이상 존재하지 않음.
 });
 
 describe('한국어 문구 감사 — 사이클 47', () => {

@@ -35,11 +35,10 @@ describe('실사용 앱 UI 표면들이 var(--accent) 계열 토큰을 쓰고 �
     expect(source).toContain("background: 'var(--accent)'");
   });
 
-  it('Menu.client.tsx selection-mode toggle uses var(--on-accent)/var(--accent-hover)', () => {
-    const source = readFileSync(join(__dirname, 'components/sidebar/Menu.client.tsx'), 'utf-8');
-    expect(source).toContain('var(--on-accent)');
-    expect(source).toContain('var(--accent-hover)');
-  });
+  /*
+   * Menu.client.tsx's selection-mode toggle (checked here before) was removed in the chat
+   * home/sidebar redesign — the bulk-select UI it belonged to no longer exists.
+   */
 
   it('ChatErrorBoundary.tsx reload button uses var(--accent)/var(--on-accent)', () => {
     const source = readFileSync(join(__dirname, 'components/chat/ChatErrorBoundary.tsx'), 'utf-8');

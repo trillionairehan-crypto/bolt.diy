@@ -1,0 +1,368 @@
+$ink: #1a1a1a;
+$ink-soft: #8b7e70;
+$cream: #fbf5ee;
+$coral: #ff5330;
+
+// Invisibly grows a small control's tap area to the 44px minimum — same pattern as the landing
+// page's %tapTargetExpand, kept here (not shared) since SCSS modules don't share placeholders
+// across files.
+%tapTargetExpand {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(26, 26, 26, 0.4);
+}
+
+.panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: $cream;
+  border-right: 1px solid rgba(26, 26, 26, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/*
+ * Two full-size layers cross-fade inside .panel while its own width animates (framer-motion) —
+ * avoids remounting content on every collapse/expand. .panel itself spans the full viewport
+ * height (top:0) so an EXPANDED panel can legitimately overlay Header.tsx's own top bar, same as
+ * before this redesign — but both layers' own content starts below the header height, so neither
+ * the collapsed rail's toggle nor the expanded content's top row visually doubles up with the
+ * header's own logo/toggle icons sitting in that same top strip.
+ */
+.railLayer,
+.contentLayer {
+  position: absolute;
+  inset: 0;
+  padding-top: var(--header-height);
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.15s ease-out;
+}
+
+.railLayerHidden,
+.contentLayerHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.railToggle {
+  @extend %tapTargetExpand;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 56px;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
+.contentLayer {
+  overflow: hidden;
+}
+
+.topRow {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+}
+
+.collapseButton {
+  @extend %tapTargetExpand;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: $ink-soft;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(26, 26, 26, 0.06);
+    color: $ink;
+  }
+}
+
+.newAppButton {
+  @extend %tapTargetExpand;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  background: $coral;
+  color: $cream;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 10px;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    opacity: 0.92;
+  }
+}
+
+.searchRow {
+  flex-shrink: 0;
+  padding: 0 12px 8px;
+}
+
+.searchInput {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 12px;
+  background: rgba(26, 26, 26, 0.04);
+  border: 1px solid rgba(26, 26, 26, 0.08);
+  border-radius: 8px;
+  font-size: 13px;
+  color: $ink;
+
+  &::placeholder {
+    color: $ink-soft;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: rgba(255, 83, 48, 0.4);
+  }
+}
+
+.appList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 8px 8px;
+}
+
+.emptyCaption {
+  padding: 24px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: $ink-soft;
+}
+
+// ---------- App group ----------
+
+.appGroupHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(26, 26, 26, 0.05);
+  }
+}
+
+.appGroupChevron {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: $ink-soft;
+  transition: transform 0.15s ease-out;
+}
+
+.appGroupChevronOpen {
+  transform: rotate(90deg);
+}
+
+.appGroupName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: $ink;
+}
+
+.appGroupCount {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: $ink-soft;
+}
+
+.appGroupActions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s ease-out;
+
+  .appGroupHeader:hover & {
+    opacity: 1;
+  }
+}
+
+.appGroupActionButton {
+  @extend %tapTargetExpand;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: none;
+  border: none;
+  color: $ink-soft;
+  cursor: pointer;
+
+  &:hover {
+    color: $coral;
+  }
+}
+
+.appGroupChats {
+  padding-left: 22px;
+}
+
+// ---------- Account area ----------
+
+.accountArea {
+  flex-shrink: 0;
+  border-top: 1px solid rgba(26, 26, 26, 0.08);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.accountRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 26, 26, 0.06);
+  color: $ink-soft;
+}
+
+.accountName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: $ink;
+}
+
+.accountIconButton {
+  @extend %tapTargetExpand;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: $ink-soft;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(26, 26, 26, 0.06);
+    color: $ink;
+  }
+}
+
+.pricingLink {
+  @extend %tapTargetExpand;
+  font-size: 12px;
+  font-weight: 500;
+  color: $ink-soft;
+  text-decoration: none;
+  width: fit-content;
+
+  &:hover {
+    color: $ink;
+  }
+}
+
+.loginLink {
+  @extend %tapTargetExpand;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  background: rgba(255, 83, 48, 0.1);
+  color: $coral;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+
+  &:hover {
+    background: rgba(255, 83, 48, 0.16);
+  }
+}
+
+// ---------- Quota bar ----------
+
+.quotaBar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quotaTrack {
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(26, 26, 26, 0.08);
+  overflow: hidden;
+}
+
+.quotaFill {
+  height: 100%;
+  background: $coral;
+  border-radius: 999px;
+  transition: width 0.2s ease-out;
+}
+
+.quotaLabel {
+  font-size: 11px;
+  color: $ink-soft;
+}

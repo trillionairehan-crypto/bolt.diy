@@ -33,6 +33,7 @@ import { EditorPanel } from './EditorPanel';
 import { Preview } from './Preview';
 
 import { chatStore } from '~/lib/stores/chat';
+import { setSidebarOpen } from '~/lib/stores/sidebar';
 import type { ElementInfo } from './Inspector';
 import { ExportChatButton } from '~/components/chat/chatExportAndImport/ExportChatButton';
 import { useChatHistory } from '~/lib/persistence';
@@ -375,6 +376,24 @@ export const Workbench = memo(
 
     const hasPreview = useStore(computed(workbenchStore.previews, (previews) => previews.length > 0));
     const showWorkbench = useStore(workbenchStore.showWorkbench);
+
+    /*
+     * Sidebar auto-collapses the moment the workbench/preview opens, so attention goes to the
+     * result — a one-shot trigger on the false->true transition (via the ref below), not a
+     * continuous "keep it closed" rule, so the user can still reopen the sidebar afterward without
+     * this fighting them.
+     */
+    const hasAutoCollapsedRef = useRef(false);
+
+    useEffect(() => {
+      if (showWorkbench && !hasAutoCollapsedRef.current) {
+        hasAutoCollapsedRef.current = true;
+        setSidebarOpen(false);
+      } else if (!showWorkbench) {
+        hasAutoCollapsedRef.current = false;
+      }
+    }, [showWorkbench]);
+
     const selectedFile = useStore(workbenchStore.selectedFile);
     const currentDocument = useStore(workbenchStore.currentDocument);
     const unsavedFiles = useStore(workbenchStore.unsavedFiles);

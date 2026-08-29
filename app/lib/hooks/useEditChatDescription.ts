@@ -93,8 +93,12 @@ export function useEditChatDescription({
 
     const lengthValid = trimmedDesc.length > 0 && trimmedDesc.length <= 100;
 
-    // Allow letters, numbers, spaces, and common punctuation but exclude characters that could cause issues
-    const characterValid = /^[a-zA-Z0-9\s\-_.,!?()[\]{}'"]+$/.test(trimmedDesc);
+    /*
+     * Allow letters, numbers, spaces, common punctuation, and Hangul (precomposed syllables
+     * 가-힣 plus standalone Jamo ㄱ-ㅎ/ㅏ-ㅣ) — this is a Korean-language product, so without the
+     * Hangul ranges every Korean rename (the common case) silently failed with a toast error.
+     */
+    const characterValid = /^[a-zA-Z0-9\s\-_.,!?()[\]{}'"가-힣ㄱ-ㅎㅏ-ㅣ]+$/.test(trimmedDesc);
 
     if (!lengthValid) {
       toast.error('Description must be between 1 and 100 characters.');

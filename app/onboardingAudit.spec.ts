@@ -9,7 +9,6 @@ import { describe, expect, it } from 'vitest';
 describe('온보딩 흐름 버그 수정', () => {
   const chatBoxSource = readFileSync(join(__dirname, 'components/chat/ChatBox.tsx'), 'utf-8');
   const clarificationSource = readFileSync(join(__dirname, 'components/chat/PromptClarification.tsx'), 'utf-8');
-  const baseChatSource = readFileSync(join(__dirname, 'components/chat/BaseChat.tsx'), 'utf-8');
   const chatClientSource = readFileSync(join(__dirname, 'components/chat/Chat.client.tsx'), 'utf-8');
 
   it('ChatBox.tsx 전송 버튼이 공백만 입력해도 비활성화된다 (input.length가 아닌 trim 기준)', () => {
@@ -36,12 +35,7 @@ describe('온보딩 흐름 버그 수정', () => {
     expect(clarificationSource).toContain("if (e.key === 'Enter' && !e.nativeEvent.isComposing)");
   });
 
-  it('BaseChat.tsx 3단계 안내 배지가 다크모드에서 라이트모드 고정 코랄 대신 var(--accent)를 쓴다', () => {
-    expect(baseChatSource).not.toMatch(/borderRadius: 14,\s*\n\s*background: '#FF5330'/);
-    expect(baseChatSource).toMatch(
-      /borderRadius: 14,\s*\n\s*background: 'var\(--accent\)',\s*\n\s*color: 'var\(--on-accent\)'/,
-    );
-  });
+  // BaseChat.tsx의 랜딩 3단계 안내 배지는 채팅 홈 화면 재설계로 그 섹션째 삭제됐다 — 더 이상 존재하지 않음.
 
   it('Chat.client.tsx의 ?prompt= 딥링크 핸들러가 공백만 있는 값은 무시한다 (다른 진입점과 동일한 trim 기준)', () => {
     expect(chatClientSource).not.toMatch(/const prompt = searchParams\.get\('prompt'\);\s*\n\s*if \(prompt\) \{/);

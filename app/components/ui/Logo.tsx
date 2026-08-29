@@ -11,12 +11,15 @@ interface LogoProps {
 
   /** Wordmark text color override. Defaults to the theme text token for 'default', cream for 'onCoral'. */
   textColor?: string;
+
+  /** false renders just the symbol — small top-bar/rail placements where "코랄레드" text doesn't fit. */
+  showWordmark?: boolean;
 }
 
 const SYMBOL_FILL = { default: '#FF5330', onCoral: '#FAF7F0' } as const;
 
 /** Coralred mark, inline SVG (same coordinates as public/logo/coralred-symbol.svg). */
-export function Logo({ height = 24, className, variant = 'default', textColor }: LogoProps) {
+export function Logo({ height = 24, className, variant = 'default', textColor, showWordmark = true }: LogoProps) {
   const mainFill = SYMBOL_FILL[variant];
   const resolvedTextColor = textColor ?? (variant === 'onCoral' ? '#FAF7F0' : 'var(--bolt-elements-textPrimary)');
 
@@ -30,9 +33,11 @@ export function Logo({ height = 24, className, variant = 'default', textColor }:
         <rect x="289" y="84" width="84" height="84" rx="26" fill="#FFB5A3" />
         <rect x="289" y="344" width="84" height="84" rx="26" fill="#FFB5A3" />
       </svg>
-      <span translate="no" style={{ color: resolvedTextColor, fontWeight: 700, fontSize: 18 }}>
-        코랄레드
-      </span>
+      {showWordmark && (
+        <span translate="no" style={{ color: resolvedTextColor, fontWeight: 700, fontSize: 18 }}>
+          코랄레드
+        </span>
+      )}
     </span>
   );
 }

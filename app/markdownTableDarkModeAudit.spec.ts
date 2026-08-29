@@ -31,13 +31,10 @@ describe('Markdown.module.scss 테이블/h6 스타일이 테마 토큰을 쓰고
   });
 });
 
-describe('Menu.client.tsx "내 앱" 사이드바 링크 아이콘이 다크모드 색상 변형을 갖는다', () => {
-  const source = readFileSync(join(__dirname, 'components/sidebar/Menu.client.tsx'), 'utf-8');
-
-  it('"내 앱" link has a dark: variant next to its light-mode #666 color', () => {
-    const match = source.match(/href="\/apps"[\s\S]*?className="([^"]+)"/);
-    expect(match).not.toBeNull();
-    expect(match?.[1]).toContain('text-[#666]');
-    expect(match?.[1]).toContain('dark:text-gray-500');
-  });
-});
+/*
+ * Menu.client.tsx's old "내 앱" (/apps) rocket-icon link (checked here before) was removed in the
+ * chat home/sidebar redesign — sidebar/BaseChat.tsx's cream/ink surfaces are now a deliberately
+ * fixed brand palette (Sidebar.module.scss/ChatHome.module.scss, no `dark:` variants at all),
+ * the same precedent as the 404 coral hero in darkModeAccentAudit.spec.ts. /apps is now reached
+ * via DeployedAppCards.tsx's "전체 보기" link instead.
+ */

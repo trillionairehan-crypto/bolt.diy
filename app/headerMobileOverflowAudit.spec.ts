@@ -7,20 +7,18 @@ import { describe, expect, it } from 'vitest';
  * 로그인 사용자에게 "요금제" 링크 + 테마 토글 + "내 프로젝트" 텍스트+아바타 알약 버튼이
  * flex-wrap/축소 없이 한 줄로 나열돼, 375px 뷰포트에서 폭 합이 ~388px로 뷰포트를 넘치던 문제.
  * OVERNIGHT5_PROGRESS.md 해당 사이클 기록 참고.
+ *
+ * 채팅 홈 화면/사이드바 재설계로 "요금제" 링크와 "내 프로젝트" 알약 버튼(가변 폭 텍스트 라벨)은
+ * 헤더에서 완전히 사라지고 고정 크기(32px) 아이콘 버튼 하나로 대체됐다 — 넘칠 만한 가변폭
+ * 텍스트가 이제 헤더 오른쪽에 없으므로 이 문제 자체가 구조적으로 재발할 수 없다.
  */
-describe('Header.tsx 랜딩 헤더의 로그인 알약 버튼이 좁은 화면에서 넘치지 않는다', () => {
-  it('"내 프로젝트" 라벨이 sm 미만에서 숨겨지고 title로 접근성이 유지된다', () => {
+describe('Header.tsx 오른쪽 컨트롤이 좁은 화면에서 넘치지 않는다', () => {
+  it('프로필 버튼이 라벨 없는 고정 크기 아이콘 버튼이라 넘칠 가변폭 텍스트가 없다', () => {
     const source = readFileSync(join(__dirname, 'components/header/Header.tsx'), 'utf-8');
 
-    expect(source).toContain('title="내 프로젝트"');
-    expect(source).toContain('<span className="hidden sm:inline">내 프로젝트</span>');
-  });
-
-  it('알약 버튼 좌측 패딩이 sm 미만에서 줄어들어 아바타만 남았을 때 여백이 과하지 않다', () => {
-    const source = readFileSync(join(__dirname, 'components/header/Header.tsx'), 'utf-8');
-
-    expect(source).not.toContain('pl-4 pr-1.5 py-1.5 hover:opacity-90');
-    expect(source).toContain('pl-1.5 pr-1.5 py-1.5 sm:pl-4');
+    expect(source).toContain('aria-label="프로필"');
+    expect(source).toContain('w-8 h-8 rounded-full');
+    expect(source).not.toContain('내 프로젝트');
   });
 });
 
@@ -35,6 +33,6 @@ describe('Header.tsx 채팅 헤더의 제목이 flex 행에서 실제로 줄임(
   it('제목 span에 min-w-0이 있어 flex-1이 내용 폭 아래로 줄어들 수 있다', () => {
     const source = readFileSync(join(__dirname, 'components/header/Header.tsx'), 'utf-8');
 
-    expect(source).toContain('className="flex-1 min-w-0 px-4 truncate text-center text-bolt-elements-textPrimary"');
+    expect(source).toContain('className="flex-1 min-w-0 px-4 truncate text-center"');
   });
 });

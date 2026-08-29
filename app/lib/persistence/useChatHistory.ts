@@ -330,6 +330,15 @@ ${value.content}
 
         chatId.set(nextId);
 
+        /*
+         * A genuinely new chat (not a fork/duplicate, which already arrive with rootChatId set —
+         * see forkChat/duplicateChat in db.ts) becomes its own app-group root here, once, at the
+         * moment it first gets an id. Sidebar grouping (groupChatsByApp) reads this field.
+         */
+        if (!chatMetadata.get()?.rootChatId) {
+          chatMetadata.set({ ...chatMetadata.get(), rootChatId: nextId } as IChatMetadata);
+        }
+
         if (!_urlId) {
           navigateChat(nextId);
         }
