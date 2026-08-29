@@ -382,7 +382,7 @@ export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
 
             <div className={styles.heroCopy}>
               <p className={styles.taglineMain}>아이디어만 가져오세요</p>
-              <p className={styles.taglineSub}>설명만 하세요. 나머지는 저희가</p>
+              <p className={styles.taglineSub}>쓰면 앱이 되고, 주소가 생겨요</p>
               <button type="button" className={styles.primaryCta} onClick={onEnter}>
                 시작하기
               </button>
