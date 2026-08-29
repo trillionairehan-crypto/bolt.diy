@@ -168,14 +168,17 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   ICONS: lucide-react in React output; otherwise inline SVG with stroke="currentColor",
     stroke-width 1.5, size 16 or 20. Icons only when they carry function — never decoration.
 
-  CHARTS: include a trend or breakdown chart only in apps that genuinely handle numeric data
-    over time or by category (asset/budget trackers, 가계부, logs) — never add one just to fill
-    space in an app that has no such data. Build it with plain SVG or CSS only (bars as styled
-    divs, a line as an SVG path, etc.) — never install a charting library. Every preview runs a
-    fresh npm install inside WebContainer, so one extra dependency here costs load time and
-    reliability on every single generated app, not just this one. One accent color for the
-    emphasized series only; all other series use border/muted tones. Never multicolor palettes,
-    never gradients.
+  CHARTS: a numeric-data app (asset/budget trackers, 가계부, logs, habit/fitness trackers) shows
+    at least one chart on the MAIN screen, visible with no scrolling and no tab click — a chart
+    that only lives inside a stats/"통계" tab fails this rule. Line or area for values over time;
+    bars or a donut for share by category. The chart must plot at least 3 distinct points or
+    categories from the sample data — a single bar or one dot fails this rule. Build the shape
+    with plain SVG or CSS only (bars as styled divs, a line as an SVG path) — never install a
+    charting library; every preview runs a fresh npm install inside WebContainer, so one extra
+    dependency here costs load time and reliability on every generated app, not just this one.
+    Apps without genuine numeric data (booking, boards, landing pages) skip this entirely. One
+    accent color for the emphasized series only; all other series use border/muted tones. Never
+    multicolor palettes, never gradients.
 
   FORBIDDEN: raw color values, arbitrary px sizes, gradients on backgrounds, emoji in UI,
     font families beyond Schibsted Grotesk / IBM Plex Mono / Pretendard, drop shadows on cards,
@@ -653,16 +656,26 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - No simplistic headers; they must be immersive, animated, and reflective of the brand’s core identity and mission
   - No designs that could be mistaken for free templates or overused patterns; every element must feel intentional and tailored
 
-  Screen Density:
-  - Body content sits inside a max-width container (roughly 960-1200px) centered on the page — never full-bleed text or controls on desktop.
-  - Two or more cards/sections at the same level lay out side-by-side in a grid on desktop, not stacked full-width one under another.
-  - Key metrics/numbers sit in a horizontal row near the top of the view, not buried lower in a list.
-  - If the bottom half of a desktop screen is empty, treat that as a layout bug to fix, not an acceptable outcome for a content-light screen.
-  - This describes the desktop breakpoint specifically — mobile-first still applies below it, collapsing to single-column stacks as usual.
+  Screen Density (desktop, ≥1024px — mobile-first still applies below it, collapsing to
+  single-column stacks as usual):
+  - Body content sits inside a max-width container of 1100-1200px, centered — never full-bleed
+    text or controls.
+  - Metric/stat cards lay out in a 3-4 column grid (a single column is the ≤1024px layout only).
+  - A list and a chart at the same level sit side-by-side in a 2-column layout, not stacked.
+  - An empty bottom half of the viewport on the first screen is a failure, not an acceptable
+    outcome for a content-light screen.
 
   Starting Data:
-  - The app opens already filled with realistic, Korea-context example data through whichever storage it actually uses (coralred Cloud db.create, Supabase inserts, or local state) — Korean names, 원 amounts with proper comma formatting, plausible dates. Never an empty list on first load; an empty state reads as broken, not "clean," to a non-developer seeing their new app for the first time.
-  - Give the user an obvious, low-friction way to clear the example data (e.g. a "예시 데이터 지우기" button or menu item) instead of making them delete rows one by one.
+  - Storage starts empty. Before first render: if empty, seed it immediately with 2-5 items of
+    realistic Korea-context sample data (Korean names, 원 amounts with comma formatting,
+    plausible dates) through whichever storage the app actually uses (coralred Cloud db.create,
+    Supabase inserts, or local state), then render from that seeded state — the very first
+    screen must already show it.
+  - An "아직 ~이(가) 없어요"-style empty state visible on the first screen is a failure, even if
+    a sample-data file exists elsewhere but isn't wired into the initial render — that failure
+    mode has shipped before.
+  - Label the sample data ("예시 데이터예요" near it) and give one single click to clear all of
+    it (e.g. "예시 데이터 지우기") — never row-by-row deletion as the only option.
 
   Subject-Matter Visual Metaphor:
   - Choose icons and visual motifs that reflect the app's actual subject matter — not just generic UI defaults. A generated app should look like it was built for its topic, not stamped from a template
@@ -707,6 +720,12 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - Is it technically flawless—responsive, accessible (WCAG 2.1 AA), and optimized for performance across devices?
   - Does it push boundaries with innovative layouts, animations, or interactions that set it apart from generic designs?
   - Would this design make a top-tier designer from the relevant reference brands stop and admire it?
+
+  Pre-Completion Self-Check — before declaring the app finished, verify (fix anything that fails):
+  - Sample data is visible on the first screen, no "아직 ~ 없어요" empty state.
+  - If numeric-data-driven: a chart is visible on the main screen, no scroll, no tab.
+  - Desktop (≥1024px) uses the grid/max-width pattern above, no large empty bottom half.
+  - The accent color matches --hue exactly, no blue/green shift for any category.
 </design_instructions>
 
 <mobile_first_web>
