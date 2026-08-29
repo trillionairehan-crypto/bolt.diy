@@ -19,8 +19,16 @@
   --border-strong: oklch(0.88 0.008 var(--hue));
   --muted: oklch(0.55 0.01 var(--hue));
   --text: oklch(0.2 0.008 var(--hue));
-  --accent: oklch(0.58 0.19 var(--hue));
-  --accent-hover: oklch(0.52 0.19 var(--hue));
+  /*
+   * 코랄 톤 재보정 (오버나이트) — 기존 oklch(0.58 0.19 33)은 캔버스 라운드트립으로 실측하면
+   * rgb(211, 62, 33) (#D33E21), 즉 시그니처 코랄(#FF5330, rgb(255, 83, 48))보다 눈에 띄게 어두운
+   * 값으로 렌더링되고 있었다 — "기본값은 #FF5330 기준 실측 OKLCH hue"라는 옛 주석과 실제로
+   * 달랐던 것. oklch(0.69 0.22 33)이 캔버스 실측상 #FF5330과 사실상 동일(rgb(255, 84, 50),
+   * 오차 ±2)해서 그 값으로 교체 — hover는 "살짝만 어둡게"로 오klch(0.64 0.22 33)(rgb(244, 66, 29)).
+   * design-handoff/coralred-ui.css도 이 파일과 값이 동일해야 한다는 주석이 있어 그쪽도 같이 고침.
+   */
+  --accent: oklch(0.69 0.22 var(--hue));
+  --accent-hover: oklch(0.64 0.22 var(--hue));
   --accent-soft: oklch(0.97 0.015 var(--hue));
   --accent-ring: oklch(0.9 0.06 var(--hue));
   --accent-text: oklch(from var(--accent) min(l, 0.5) calc(c * 0.92) h);

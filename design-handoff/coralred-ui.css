@@ -24,8 +24,10 @@
   --border-strong: oklch(0.88 0.008 var(--hue));
   --muted: oklch(0.55 0.01 var(--hue));
   --text: oklch(0.2 0.008 var(--hue));
-  --accent: oklch(0.58 0.19 var(--hue));
-  --accent-hover: oklch(0.52 0.19 var(--hue));
+  /* 코랄 톤 재보정 — app/styles/variables.scss와 동일 값(그 파일의 주석에 계산 근거 있음),
+     이 파일 자체 규칙("이 파일과 값이 같아야 함")대로 계속 동기화. */
+  --accent: oklch(0.69 0.22 var(--hue));
+  --accent-hover: oklch(0.64 0.22 var(--hue));
   --accent-soft: oklch(0.97 0.015 var(--hue));
   --accent-ring: oklch(0.9 0.06 var(--hue));
   /* 텍스트로 쓰는 액센트 — 밝은 hue(노랑/라임)에서도 읽히도록 L을 0.5로 클램프 */

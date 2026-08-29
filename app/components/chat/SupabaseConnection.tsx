@@ -208,22 +208,22 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
 
   return (
     <div className="relative">
+      {/* "배포하기"(DeployButton.tsx)와 같은 형태(단색 코랄 채움) — 이전엔 이 버튼만 중립 배경 +
+          코랄 텍스트로 스타일이 달랐다. */}
       <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden mr-2 text-sm">
-        <Button
-          active
+        <button
+          type="button"
           disabled={connecting}
           onClick={() => setIsDialogOpen(!isDialogOpen)}
-          className={classNames(
-            'hover:bg-bolt-elements-item-backgroundActive flex items-center gap-2 whitespace-nowrap',
-            {
-              '!px-2': !showLabel,
-            },
-          )}
           title={isStorageOn ? '저장 기능이 켜졌어요' : '앱에 로그인과 저장 기능을 쓰려면 연결이 필요해요'}
+          className={classNames(
+            'items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:bg-[var(--accent-hover)] outline-[var(--accent)] flex gap-1.5',
+            { '!px-2': !showLabel },
+          )}
         >
-          <div className="i-ph:database w-4 h-4 shrink-0 text-[var(--accent)]" />
-          {showLabel && <span className="ml-1 text-xs">{isStorageOn ? '저장 기능 켜짐' : '저장 기능 켜기'}</span>}
-        </Button>
+          <div className="i-ph:database w-4 h-4 shrink-0" />
+          {showLabel && <span>{isStorageOn ? '저장 기능 켜짐' : '저장 기능 켜기'}</span>}
+        </button>
       </div>
 
       <DialogRoot
@@ -618,36 +618,5 @@ function StepBadge({ children }: { children: React.ReactNode }) {
     <div className="w-6 h-6 rounded-full bg-[var(--accent)] text-[var(--on-accent)] text-xs font-semibold flex items-center justify-center shrink-0 mt-0.5">
       {children}
     </div>
-  );
-}
-
-interface ButtonProps {
-  active?: boolean;
-  disabled?: boolean;
-  children?: any;
-  onClick?: VoidFunction;
-  className?: string;
-  title?: string;
-}
-
-function Button({ active = false, disabled = false, children, onClick, className, title }: ButtonProps) {
-  return (
-    <button
-      className={classNames(
-        'flex items-center p-1.5',
-        {
-          'bg-bolt-elements-item-backgroundDefault hover:bg-bolt-elements-item-backgroundActive text-bolt-elements-textTertiary hover:text-bolt-elements-textPrimary':
-            !active,
-          'bg-bolt-elements-item-backgroundDefault text-bolt-elements-item-contentAccent': active && !disabled,
-          'bg-bolt-elements-item-backgroundDefault text-alpha-gray-20 dark:text-alpha-white-20 cursor-not-allowed':
-            disabled,
-        },
-        className,
-      )}
-      onClick={onClick}
-      title={title}
-    >
-      {children}
-    </button>
   );
 }

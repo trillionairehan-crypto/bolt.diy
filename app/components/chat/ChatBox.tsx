@@ -394,23 +394,6 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               </IconButton>
             )}
 
-            {props.chatStarted && (
-              <IconButton
-                title="대화 모드"
-                className={classNames(
-                  'transition-all flex items-center gap-1 px-1.5 shrink-0 whitespace-nowrap',
-                  props.chatMode === 'discuss'
-                    ? '!bg-bolt-elements-item-backgroundAccent !text-bolt-elements-item-contentAccent'
-                    : 'bg-bolt-elements-item-backgroundDefault text-bolt-elements-item-contentDefault',
-                )}
-                onClick={() => {
-                  props.setChatMode?.(props.chatMode === 'discuss' ? 'build' : 'discuss');
-                }}
-              >
-                <div className={`i-ph:chats text-xl`} />
-                {props.chatMode === 'discuss' ? <span className="hidden">대화</span> : <span />}
-              </IconButton>
-            )}
             {SHOW_DEV_TOOLS && (
               <IconButton
                 title="모델 설정"

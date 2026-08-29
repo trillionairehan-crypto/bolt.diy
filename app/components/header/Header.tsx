@@ -2,7 +2,6 @@ import { lazy, Suspense } from 'react';
 import { useStore } from '@nanostores/react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { chatStore } from '~/lib/stores/chat';
-import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
 import { DeployButton } from '~/components/deploy/DeployButton';
 import { SupabaseConnection } from '~/components/chat/SupabaseConnection';
@@ -36,9 +35,8 @@ export function Header() {
     >
       {chat.started ? (
         <>
-          <span className="flex-1 min-w-0 px-4 truncate text-center">
-            <ClientOnly>{() => <ChatDescription />}</ClientOnly>
-          </span>
+          {/* 앱 제목(연필 아이콘 포함)은 헤더에서 제거 — 사이드바에서 확인 가능하다. */}
+          <div className="flex-1" />
           {/* 모바일 전용 레이아웃(isMobileWorkspace) — 테마 토글/디버그 도구는 여전히 없음. 저장 기능
               켜기는 TRUST_FIX_REPORT.md 작업 4로 아이콘 버튼(showLabel={false})만 추가 — 헤더가
               좁아 라벨까지 넣으면 배포하기 버튼과 겹치고, 이 기능은 배포 제공자 드롭다운과 성격이

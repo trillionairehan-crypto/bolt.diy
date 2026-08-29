@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { classNames } from '~/utils/classNames';
+import styles from './PromptClarification.module.scss';
 import {
   QUESTION_BANK,
   selectQuestions,
@@ -245,28 +246,25 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
   const progressPct = status === 'summary' ? 100 : Math.min(100, (currentStep / Math.max(questions.length, 1)) * 100);
 
   return (
-    <div className="mt-[10vh] max-w-[560px] mx-auto px-4 lg:px-0 w-full">
+    <div className={classNames(styles.screen, 'h-full w-full flex flex-col')}>
+      <div className={styles.progressTrack}>
+        <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
+      </div>
+
+      <div className="w-full flex justify-end px-4 lg:px-8 pt-4">
+        <button
+          type="button"
+          onClick={handleSkip}
+          className="min-h-11 inline-flex items-center bg-transparent border-none text-sm font-medium text-bolt-elements-textSecondary hover:text-[var(--accent-text)] transition-colors duration-150"
+        >
+          바로 만들기
+        </button>
+      </div>
+
       <div
-        className="relative rounded-[20px] p-6 lg:p-8 overflow-hidden border border-bolt-elements-borderColor"
-        style={{ background: 'var(--surface)' }}
+        className={classNames(styles.content, 'flex-1 flex flex-col items-center px-4 lg:px-0 w-full')}
+        style={{ paddingTop: 'clamp(48px, 15vh, 160px)' }}
       >
-        <div className="absolute top-0 left-0 right-0 h-1 bg-bolt-elements-borderColor overflow-hidden">
-          <div
-            className="h-full transition-[width] duration-300 ease-out"
-            style={{ width: `${progressPct}%`, background: 'var(--accent)' }}
-          />
-        </div>
-
-        <div className="flex items-center justify-end mb-6 mt-2">
-          <button
-            type="button"
-            onClick={handleSkip}
-            className="min-h-11 inline-flex items-center text-sm font-medium px-3 rounded-full text-bolt-elements-textSecondary hover:bg-bolt-elements-item-backgroundActive hover:text-bolt-elements-textPrimary transition-colors duration-150"
-          >
-            바로 만들기
-          </button>
-        </div>
-
         {status === 'waitingForDynamic' && (
           <div className="flex flex-col items-center gap-4 py-10 text-center">
             <div className="i-svg-spinners:90-ring-with-bg text-4xl" style={{ color: 'var(--accent)' }} />
@@ -282,12 +280,10 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
               animate={{ opacity: 1, y: 0 }}
               exit={reducedMotion ? undefined : { opacity: 0, transition: { duration: 0.12 } }}
               transition={{ duration: 0.16 }}
-              className="flex flex-col gap-4"
+              className="flex flex-col items-center w-full"
             >
-              <h2 className="text-xl lg:text-2xl font-bold leading-snug text-bolt-elements-textPrimary">
-                {currentQuestion.question}
-              </h2>
-              <div className="flex flex-col gap-3">
+              <h2 className={styles.question}>{currentQuestion.question}</h2>
+              <div className={classNames(styles.options, 'w-full max-w-[520px]')}>
                 {normalOptions.map((option) => {
                   const isPending = pendingOptionId === option.id;
 
@@ -297,15 +293,7 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
                       type="button"
                       onClick={() => selectOption(option)}
                       disabled={pendingOptionId !== null}
-                      className={classNames(
-                        'w-full min-h-[52px] text-left rounded-xl px-5 py-3.5 text-base font-medium flex items-center justify-between gap-3 transition-colors duration-150 active:scale-[0.98]',
-                        !isPending && 'hover:border-[var(--accent)] hover:bg-[var(--accent-soft)]',
-                      )}
-                      style={{
-                        border: isPending ? '2px solid var(--accent)' : '1px solid var(--border)',
-                        color: 'var(--text)',
-                        background: isPending ? 'var(--accent-soft)' : 'var(--surface)',
-                      }}
+                      className={classNames(styles.optionButton, isPending && styles.optionButtonActive)}
                     >
                       <span>{option.label}</span>
                       {isPending && (
@@ -320,24 +308,23 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
                     </button>
                   );
                 })}
-
-                {/* "잘 모르겠어요" is visually de-emphasized (dashed border, muted text, no fill) so
-                    picking it feels like a low-stakes pass rather than a real fifth choice. */}
-                {unsureOption && (
-                  <button
-                    type="button"
-                    onClick={() => selectOption(unsureOption)}
-                    disabled={pendingOptionId !== null}
-                    className="w-full min-h-11 text-left rounded-xl border border-dashed px-5 py-3 text-sm font-medium transition-colors duration-150 active:scale-[0.98] hover:border-[var(--accent)]"
-                    style={{ borderColor: 'var(--border)', color: 'var(--muted)', background: 'transparent' }}
-                  >
-                    {unsureOption.label}
-                  </button>
-                )}
               </div>
 
+              {/* "잘 모르겠어요"/"직접 입력할게요" are one step weaker than the options above —
+                  small text links, not another bordered button in the list. */}
+              {unsureOption && (
+                <button
+                  type="button"
+                  onClick={() => selectOption(unsureOption)}
+                  disabled={pendingOptionId !== null}
+                  className={classNames(styles.weakLink, 'mt-6')}
+                >
+                  {unsureOption.label}
+                </button>
+              )}
+
               {showCustomInput ? (
-                <div className="flex flex-col gap-2 mt-1">
+                <div className="flex flex-col gap-2 mt-4 w-full max-w-[520px]">
                   <input
                     autoFocus
                     type="text"
@@ -366,7 +353,7 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
                 <button
                   type="button"
                   onClick={() => setShowCustomInput(true)}
-                  className="min-h-11 inline-flex items-center text-sm font-medium text-left underline underline-offset-4 text-bolt-elements-textSecondary"
+                  className="min-h-11 inline-flex items-center bg-transparent border-none text-sm font-medium mt-2 underline underline-offset-4 text-bolt-elements-textSecondary hover:text-[var(--accent-text)] transition-colors duration-150"
                 >
                   직접 입력할게요
                 </button>
@@ -376,8 +363,8 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
         </AnimatePresence>
 
         {status === 'summary' && (
-          <div className="flex flex-col gap-4">
-            <h2 className="text-xl lg:text-2xl font-bold text-bolt-elements-textPrimary">이렇게 만들게요</h2>
+          <div className="flex flex-col gap-4 w-full max-w-[520px]">
+            <h2 className={styles.question}>이렇게 만들게요</h2>
             <textarea
               value={finalPrompt}
               onChange={(e) => setFinalPrompt(e.target.value)}
