@@ -19,7 +19,11 @@ import Cookies from 'js-cookie';
 import { createSampler } from '~/utils/sampler';
 import type { ActionAlert, DeployAlert, SupabaseAlert } from '~/types/actions';
 import { createScopedLogger } from '~/utils/logger';
-import { findMissingRelativeImports, formatMissingImportsAlert } from '~/lib/runtime/file-reference-postprocess';
+import {
+  findMissingRelativeImports,
+  formatMissingImportsAlert,
+  isScannableSourceFile,
+} from '~/lib/runtime/file-reference-postprocess';
 import { SHOW_DEV_TOOLS } from '~/utils/featureFlags';
 
 const { saveAs } = fileSaver;
@@ -149,10 +153,12 @@ export class WorkbenchStore {
   }
 
   /**
-   * Proactively checks a just-closed artifact's written files for relative imports that don't
-   * resolve to any file that was actually written — the LLM occasionally imports a file it
-   * forgets to create. Never throws: a failure here must not break the app, so any error is
-   * logged and swallowed. When nothing is missing, this is a no-op (no alert, no noise).
+   * Proactively checks the whole current project (not just the just-closed artifact's own
+   * writes — see the two comments below) for relative imports that don't resolve to any file
+   * that actually exists — the LLM occasionally imports a file it forgets to create. Never
+   * throws: a failure here must not break the app, so any error is logged and swallowed. When
+   * nothing is missing, any stale alert this same checker set earlier is cleared; otherwise
+   * this is a no-op (no alert, no noise).
    */
   async checkArtifactFileReferences(artifactId: string): Promise<void> {
     try {
@@ -171,21 +177,44 @@ export class WorkbenchStore {
       }
 
       const wc = await webcontainer;
-      const writtenFiles = fileActions.map((action) => ({
-        path: path.isAbsolute(action.filePath) ? action.filePath : path.join(wc.workdir, action.filePath),
-        content: action.content,
-      }));
-
       const currentFiles = this.files.get();
+
+      /*
+       * Scoped to just this artifact's own writes, a broken import written by an EARLIER
+       * artifact (e.g. main.tsx from the template/baseline seed) only ever got checked once, at
+       * that artifact's own close — even after a LATER artifact (the real generated content)
+       * went on to create the file that was missing. The alert this set was never cleared in
+       * that case, so it kept firing the auto-fix well after the app was actually fine (reported:
+       * the preview already renders correctly, yet the chat still auto-sends a "fix the preview
+       * error" message). Scanning every currently-known scannable file as a potential importer —
+       * not just this artifact's — means each artifact close re-validates the WHOLE project
+       * against its latest state, so an import that resolves now is recognized as fixed even if
+       * it didn't a moment ago.
+       */
+      const writtenFiles: Array<{ path: string; content: string }> = [];
+
+      for (const [filePath, dirent] of Object.entries(currentFiles)) {
+        if (dirent?.type === 'file' && isScannableSourceFile(filePath)) {
+          writtenFiles.push({ path: filePath, content: dirent.content });
+        }
+      }
+
       const fileExists = (absolutePath: string) => currentFiles[absolutePath]?.type === 'file';
 
       const missing = findMissingRelativeImports(writtenFiles, fileExists);
 
       if (missing.length === 0) {
+        const current = this.actionAlert.get();
+
+        // Only clear an alert this exact checker set — never a different detector's (e.g. a still-active VITE_COMPILE_ERROR).
+        if (current?.source === 'preview' && current.title === 'Missing File') {
+          this.clearAlert();
+        }
+
         return;
       }
 
-      logger.debug(`Found ${missing.length} unresolved relative import(s) in artifact ${artifactId}`);
+      logger.debug(`Found ${missing.length} unresolved relative import(s) across the project`);
 
       const { description, content } = formatMissingImportsAlert(missing, wc.workdir);
 

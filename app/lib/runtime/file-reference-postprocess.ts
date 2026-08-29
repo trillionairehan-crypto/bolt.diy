@@ -6,8 +6,11 @@
  * but only reactively: after the dev server is already running, and only for files the live
  * import graph actually reaches (a written-but-never-imported dead file, or an import branch the
  * app doesn't hit on first render, would never trigger it). This module does the same check
- * proactively against the full file set of a just-closed artifact, so it can catch it earlier and
- * more completely, and name the exact missing file/line instead of relying on Vite's error text.
+ * proactively — workbench.ts's checkArtifactFileReferences runs it against every currently-known
+ * scannable file each time an artifact closes, not just that artifact's own writes, so an import
+ * written by an earlier artifact gets re-validated once a later one creates the file it needed —
+ * so it can catch it earlier and more completely, and name the exact missing file/line instead of
+ * relying on Vite's error text.
  */
 
 import { path } from '~/utils/path';
@@ -25,7 +28,7 @@ export interface MissingImportRef {
 
 const SCANNABLE_EXTENSIONS = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'];
 
-function isScannableSourceFile(filePath: string): boolean {
+export function isScannableSourceFile(filePath: string): boolean {
   return SCANNABLE_EXTENSIONS.some((ext) => filePath.endsWith(ext));
 }
 
