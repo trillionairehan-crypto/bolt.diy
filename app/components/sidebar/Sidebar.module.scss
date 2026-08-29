@@ -132,11 +132,7 @@ $coral: #ff5330;
   }
 }
 
-.searchRow {
-  flex-shrink: 0;
-  padding: 0 12px 8px;
-}
-
+// Also reused by AppGroup.tsx's inline app-rename input.
 .searchInput {
   width: 100%;
   min-height: 36px;
@@ -160,7 +156,7 @@ $coral: #ff5330;
 .appList {
   flex: 1;
   overflow-y: auto;
-  padding: 0 8px 8px;
+  padding: 8px 8px 8px;
 }
 
 .emptyCaption {
@@ -260,9 +256,55 @@ $coral: #ff5330;
 }
 
 .accountRow {
+  @extend %tapTargetExpand;
   display: flex;
   align-items: center;
   gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 4px 6px;
+  margin: -4px -6px;
+  border-radius: 8px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(26, 26, 26, 0.05);
+  }
+}
+
+.accountMenuContent {
+  min-width: 200px;
+  z-index: 1000;
+  background: $cream;
+  border: 1px solid rgba(26, 26, 26, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(26, 26, 26, 0.14);
+  padding: 6px;
+}
+
+.accountMenuItem {
+  @extend %tapTargetExpand;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $ink;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+
+  &:hover,
+  &[data-highlighted] {
+    background: rgba(255, 83, 48, 0.08);
+    color: $coral;
+  }
 }
 
 .avatar {

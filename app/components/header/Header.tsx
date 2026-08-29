@@ -2,18 +2,12 @@ import { lazy, Suspense } from 'react';
 import { useStore } from '@nanostores/react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { chatStore } from '~/lib/stores/chat';
-import { sidebarOpenStore, toggleSidebar, setSidebarOpen } from '~/lib/stores/sidebar';
-import { authUserStore } from '~/lib/stores/auth';
-import { profileStore } from '~/lib/stores/profile';
-import { classNames } from '~/utils/classNames';
 import { ChatDescription } from '~/lib/persistence/ChatDescription.client';
-import { Logo } from '~/components/ui/Logo';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
 import { DeployButton } from '~/components/deploy/DeployButton';
 import { SupabaseConnection } from '~/components/chat/SupabaseConnection';
 import useViewport from '~/lib/hooks';
 import { DARK_MODE_ENABLED } from '~/utils/featureFlags';
-import styles from './Header.module.scss';
 
 /*
  * Lazy-loaded: HeaderActionButtons only imports `workbenchStore` to read `previews` for the
@@ -32,9 +26,6 @@ const HeaderActionButtons = lazy(() =>
 
 export function Header() {
   const chat = useStore(chatStore);
-  const sidebarOpen = useStore(sidebarOpenStore);
-  const authUser = useStore(authUserStore);
-  const profile = useStore(profileStore);
   const isSmallViewport = useViewport(1024);
   const isMobileWorkspace = chat.started && isSmallViewport;
 
@@ -43,19 +34,6 @@ export function Header() {
       className="flex items-center gap-3 px-4 border-b h-[var(--header-height)]"
       style={{ background: '#FBF5EE', borderColor: 'rgba(26, 26, 26, 0.08)', color: '#1A1A1A' }}
     >
-      <div className="flex items-center gap-2 z-logo shrink-0">
-        <button
-          type="button"
-          onClick={toggleSidebar}
-          aria-label="사이드바 열기/닫기"
-          aria-expanded={sidebarOpen}
-          className={classNames('i-ph:sidebar-simple-duotone text-xl', styles.tapTarget)}
-        />
-        <a href="/" className="flex items-center">
-          <Logo height={isMobileWorkspace ? 20 : 24} showWordmark={false} />
-        </a>
-      </div>
-
       {chat.started ? (
         <>
           <span className="flex-1 min-w-0 px-4 truncate text-center">
@@ -87,25 +65,6 @@ export function Header() {
       ) : (
         <div className="flex-1" />
       )}
-
-      <button
-        type="button"
-        onClick={() => setSidebarOpen(true)}
-        aria-label="프로필"
-        className={classNames(
-          'flex items-center justify-center w-8 h-8 rounded-full overflow-hidden shrink-0',
-          styles.tapTarget,
-        )}
-        style={{ background: 'rgba(26, 26, 26, 0.06)', color: '#8B7E70' }}
-      >
-        {profile?.avatar ? (
-          <img src={profile.avatar} alt="" className="w-full h-full object-cover" />
-        ) : authUser ? (
-          <span className="i-ph:user-fill text-sm" />
-        ) : (
-          <span className="i-ph:user text-sm" />
-        )}
-      </button>
     </header>
   );
 }

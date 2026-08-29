@@ -531,10 +531,14 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
           return (
             <div
               className={classNames('relative overflow-hidden', {
-                'flex flex-col items-center justify-center px-4 py-16': !chatStarted,
+                'flex flex-col items-center px-4 pb-16': !chatStarted,
                 'h-full flex flex-col min-h-0': chatStarted,
               })}
-              style={!chatStarted ? { background: '#FBF5EE', minHeight: '88vh' } : undefined}
+              style={
+                !chatStarted
+                  ? { background: '#FBF5EE', minHeight: '88vh', paddingTop: 'clamp(32px, 19vh, 220px)' }
+                  : undefined
+              }
             >
               <div
                 className={classNames('flex flex-col min-w-0 relative z-10 w-full', {

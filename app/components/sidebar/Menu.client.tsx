@@ -10,14 +10,14 @@ import {
   DialogTitle,
   dialogBackdropVariants,
 } from '~/components/ui/Dialog';
-import { SettingsButton } from '~/components/ui/SettingsButton';
 import { Logo } from '~/components/ui/Logo';
 import { db, deleteById, getAll, type ChatHistoryItem, useChatHistory } from '~/lib/persistence';
 import { cubicEasingFn } from '~/utils/easings';
 import { groupChatsByApp } from './groupChatsByApp';
 import { AppGroup } from './AppGroup';
 import { QuotaBar } from './QuotaBar';
-import { useSearchFilter } from '~/lib/hooks/useSearchFilter';
+import { AccountMenu } from './AccountMenu';
+import type { TabType } from '~/components/@settings/core/types';
 import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { profileStore } from '~/lib/stores/profile';
@@ -82,11 +82,7 @@ export const Menu = () => {
   const profile = useStore(profileStore);
   const authUser = useStore(authUserStore);
   const isSmallViewport = useViewport(1024);
-
-  const { filteredItems: filteredList, handleSearchChange } = useSearchFilter({
-    items: list,
-    searchFields: ['description'],
-  });
+  const [settingsInitialTab, setSettingsInitialTab] = useState<TabType | null>(null);
 
   const loadEntries = useCallback(() => {
     if (db) {
@@ -194,7 +190,8 @@ export const Menu = () => {
     loadEntries();
   };
 
-  const handleSettingsClick = () => {
+  const handleOpenSettings = (tab: TabType | null = null) => {
+    setSettingsInitialTab(tab);
     setIsSettingsOpen(true);
     setSidebarOpen(false);
   };
@@ -205,7 +202,7 @@ export const Menu = () => {
     setDialogContent(content);
   }, []);
 
-  const groups = groupChatsByApp(filteredList);
+  const groups = groupChatsByApp(list);
 
   /*
    * Desktop: thin rail when collapsed, full panel when expanded. Mobile: fully off-canvas when
@@ -245,7 +242,7 @@ export const Menu = () => {
         </div>
 
         <div className={classNames(styles.contentLayer, { [styles.contentLayerHidden]: showRail })}>
-          {/* 1. 새 앱 만들기 */}
+          {/* 1. 새 앱 만들기 — 접기는 이 로고를 다시 누르는 것으로 (얇은 띠의 로고와 같은 아이콘/동작). */}
           <div className={styles.topRow}>
             {!isSmallViewport && (
               <button
@@ -254,7 +251,7 @@ export const Menu = () => {
                 onClick={() => setSidebarOpen(false)}
                 aria-label="사이드바 접기"
               >
-                <span className="i-ph:caret-line-left" />
+                <Logo height={20} showWordmark={false} />
               </button>
             )}
             <a href="/" className={styles.newAppButton}>
@@ -263,15 +260,6 @@ export const Menu = () => {
           </div>
 
           {/* 2. 내 앱 목록 */}
-          <div className={styles.searchRow}>
-            <input
-              className={styles.searchInput}
-              type="search"
-              placeholder="앱 검색..."
-              onChange={handleSearchChange}
-              aria-label="앱 검색"
-            />
-          </div>
           <div className={styles.appList}>
             {isLoadingList ? (
               <div className="space-y-2 px-1 pt-1">
@@ -279,7 +267,7 @@ export const Menu = () => {
                   <Skeleton key={i} className="h-9 w-full" />
                 ))}
               </div>
-            ) : filteredList.length === 0 ? (
+            ) : list.length === 0 ? (
               <p className={styles.emptyCaption}>{list.length === 0 ? '아직 만든 앱이 없어요' : '찾는 앱이 없어요'}</p>
             ) : (
               groups.map((group) => (
@@ -300,31 +288,26 @@ export const Menu = () => {
             )}
           </div>
 
-          {/* 3. 계정 영역 */}
+          {/* 3. 계정 영역 — 이름/아바타를 누르면 프로필·설정·요금제·로그아웃 메뉴가 열린다. */}
           <div className={styles.accountArea}>
             {authUser ? (
-              <>
-                <div className={styles.accountRow}>
-                  <div className={styles.avatar}>
-                    {profile?.avatar ? (
-                      <img
-                        src={profile.avatar}
-                        alt={profile?.username || 'User'}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="i-ph:user-fill" />
-                    )}
-                  </div>
-                  <span className={styles.accountName}>
-                    {authUser.user_metadata?.full_name || authUser.email || profile?.username || '내 계정'}
-                  </span>
-                  <SettingsButton onClick={handleSettingsClick} />
+              <AccountMenu onOpenSettings={handleOpenSettings}>
+                <div className={styles.avatar}>
+                  {profile?.avatar ? (
+                    <img
+                      src={profile.avatar}
+                      alt={profile?.username || 'User'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="i-ph:user-fill" />
+                  )}
                 </div>
-                <a href="/pricing" className={styles.pricingLink}>
-                  요금제
-                </a>
-              </>
+                <span className={styles.accountName}>
+                  {authUser.user_metadata?.full_name || authUser.email || profile?.username || '내 계정'}
+                </span>
+                <span className="i-ph:caret-up-down" style={{ color: '#8B7E70', flexShrink: 0 }} />
+              </AccountMenu>
             ) : (
               isPlatformSupabaseConfigured && (
                 <a href="/login" className={styles.loginLink}>
@@ -412,7 +395,7 @@ export const Menu = () => {
       </motion.div>
 
       <Suspense fallback={null}>
-        <ControlPanel open={isSettingsOpen} onClose={handleSettingsClose} />
+        <ControlPanel open={isSettingsOpen} onClose={handleSettingsClose} initialTab={settingsInitialTab} />
       </Suspense>
     </>
   );

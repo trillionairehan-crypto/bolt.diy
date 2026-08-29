@@ -13,7 +13,6 @@ import type { TabType, Profile } from './types';
 import { TAB_LABELS, DEFAULT_TAB_CONFIG, TAB_DESCRIPTIONS } from './constants';
 import { DialogTitle } from '~/components/ui/Dialog';
 import { AvatarDropdown } from './AvatarDropdown';
-import BackgroundRays from '~/components/ui/BackgroundRays';
 
 // Import all tab components
 import ProfileTab from '~/components/@settings/tabs/profile/ProfileTab';
@@ -34,6 +33,9 @@ import McpTab from '~/components/@settings/tabs/mcp/McpTab';
 interface ControlPanelProps {
   open: boolean;
   onClose: () => void;
+
+  /** Opens straight to this tab instead of the tile grid — e.g. the sidebar's "프로필" menu item. */
+  initialTab?: TabType | null;
 }
 
 // Beta status for experimental features
@@ -64,12 +66,14 @@ const DEV_ONLY_TAB_IDS = new Set<TabType>([
 ]);
 
 const BetaLabel = () => (
-  <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-purple-500/10 dark:bg-purple-500/20">
-    <span className="text-[10px] font-medium text-purple-600 dark:text-purple-400">BETA</span>
+  <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(255, 83, 48, 0.1)' }}>
+    <span className="text-[10px] font-medium" style={{ color: '#FF5330' }}>
+      BETA
+    </span>
   </div>
 );
 
-export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
+export const ControlPanel = ({ open, onClose, initialTab = null }: ControlPanelProps) => {
   // State
   const [activeTab, setActiveTab] = useState<TabType | null>(null);
   const [loadingTab, setLoadingTab] = useState<TabType | null>(null);
@@ -124,7 +128,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
       .sort((a, b) => a.order - b.order);
   }, [tabConfiguration, profile?.preferences?.notifications, baseTabConfig]);
 
-  // Reset to default view when modal opens/closes
+  // Reset to default view (or the requested initialTab) when modal opens/closes
   useEffect(() => {
     if (!open) {
       // Reset when closing
@@ -132,8 +136,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
       setLoadingTab(null);
       setShowTabManagement(false);
     } else {
-      // When opening, set to null to show the main view
-      setActiveTab(null);
+      setActiveTab(initialTab);
     }
   }, [open]);
 
@@ -269,31 +272,33 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
             <div
               className={classNames(
                 'w-[95vw] sm:w-[90vw] max-w-[1200px] h-[90vh]',
-                'bg-bolt-elements-background-depth-1',
                 'rounded-2xl shadow-2xl',
-                'border border-bolt-elements-borderColor',
                 'flex flex-col overflow-hidden',
                 'relative',
                 'transform transition-all duration-200 ease-out',
                 open ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4',
               )}
+              style={{ background: '#FBF5EE', border: '1px solid rgba(26, 26, 26, 0.1)' }}
             >
-              <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                <BackgroundRays />
-              </div>
               <div className="relative z-10 flex flex-col h-full">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-bolt-elements-borderColor">
+                <div
+                  className="flex items-center justify-between px-6 py-4 border-b"
+                  style={{ borderColor: 'rgba(26, 26, 26, 0.08)' }}
+                >
                   <div className="flex items-center space-x-4">
                     {(activeTab || showTabManagement) && (
                       <button
                         onClick={handleBack}
-                        className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-colors duration-150"
+                        className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-[#FF5330]/10 group transition-colors duration-150"
                       >
-                        <div className="i-ph:arrow-left w-4 h-4 text-bolt-elements-textSecondary group-hover:text-purple-500 transition-colors" />
+                        <div
+                          className="i-ph:arrow-left w-4 h-4 group-hover:text-[#FF5330] transition-colors"
+                          style={{ color: '#8B7E70' }}
+                        />
                       </button>
                     )}
-                    <DialogTitle className="text-xl font-semibold text-bolt-elements-textPrimary">
+                    <DialogTitle className="text-xl font-semibold" style={{ color: '#1A1A1A' }}>
                       {showTabManagement ? '탭 관리' : activeTab ? TAB_LABELS[activeTab] : '설정'}
                     </DialogTitle>
                   </div>
@@ -307,9 +312,12 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                     {/* Close Button */}
                     <button
                       onClick={handleClose}
-                      className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-purple-500/10 dark:hover:bg-purple-500/20 group transition-all duration-200"
+                      className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-[#FF5330]/10 group transition-all duration-200"
                     >
-                      <div className="i-ph:x w-4 h-4 text-bolt-elements-textSecondary group-hover:text-purple-500 transition-colors" />
+                      <div
+                        className="i-ph:x w-4 h-4 group-hover:text-[#FF5330] transition-colors"
+                        style={{ color: '#8B7E70' }}
+                      />
                     </button>
                   </div>
                 </div>
@@ -322,8 +330,7 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
                     'hover:overflow-y-auto',
                     'scrollbar scrollbar-w-2',
                     'scrollbar-track-transparent',
-                    'scrollbar-thumb-[#E5E5E5] hover:scrollbar-thumb-[#CCCCCC]',
-                    'dark:scrollbar-thumb-[#333333] dark:hover:scrollbar-thumb-[#444444]',
+                    'scrollbar-thumb-[#E5DCCC] hover:scrollbar-thumb-[#D8CBB5]',
                     'will-change-scroll',
                     'touch-auto',
                   )}

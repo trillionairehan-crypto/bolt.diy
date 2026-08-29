@@ -11,7 +11,6 @@ import { SendButton } from './SendButton.client';
 import { IconButton } from '~/components/ui/IconButton';
 import { toast } from 'react-toastify';
 import { ExpoQrModal } from '~/components/workbench/ExpoQrModal';
-import styles from './BaseChat.module.scss';
 import type { ProviderInfo } from '~/types/model';
 import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
@@ -116,11 +115,12 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
         isLanding
           ? [
               'rounded-[20px]',
+              'border',
               'shadow-[0_1px_2px_rgba(23,16,14,0.10),0_12px_40px_rgba(23,16,14,0.18)]',
               'focus-within:shadow-[0_1px_2px_rgba(23,16,14,0.10),0_20px_54px_rgba(23,16,14,0.24)]',
-              'focus-within:ring-[3px] focus-within:ring-[rgba(250,247,240,0.35)]',
+              'focus-within:border-[#FF5330]/40',
               'focus-within:-translate-y-px',
-              'transition-[box-shadow,transform] duration-150 ease-[cubic-bezier(.2,.6,.3,1)]',
+              'transition-[box-shadow,transform,border-color] duration-150 ease-[cubic-bezier(.2,.6,.3,1)]',
             ].join(' ')
           : 'bg-bolt-elements-background-depth-2 rounded-lg border border-bolt-elements-borderColor',
 
@@ -134,6 +134,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
         isLanding
           ? ({
               background: LANDING_CARD_BG,
+              borderColor: LANDING_BORDER,
               '--bolt-elements-textPrimary': LANDING_INK,
               '--bolt-elements-textSecondary': LANDING_MUTED,
               '--bolt-elements-textTertiary': LANDING_MUTED,
@@ -148,32 +149,6 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           : undefined
       }
     >
-      <svg className={classNames(styles.PromptEffectContainer)}>
-        <defs>
-          <linearGradient
-            id="line-gradient"
-            x1="20%"
-            y1="0%"
-            x2="-14%"
-            y2="10%"
-            gradientUnits="userSpaceOnUse"
-            gradientTransform="rotate(-45)"
-          >
-            <stop offset="0%" style={{ stopColor: 'var(--accent)' }} stopOpacity="0%"></stop>
-            <stop offset="40%" style={{ stopColor: 'var(--accent)' }} stopOpacity="80%"></stop>
-            <stop offset="50%" style={{ stopColor: 'var(--accent)' }} stopOpacity="80%"></stop>
-            <stop offset="100%" style={{ stopColor: 'var(--accent)' }} stopOpacity="0%"></stop>
-          </linearGradient>
-          <linearGradient id="shine-gradient">
-            <stop offset="0%" stopColor="white" stopOpacity="0%"></stop>
-            <stop offset="40%" stopColor="#ffffff" stopOpacity="80%"></stop>
-            <stop offset="50%" stopColor="#ffffff" stopOpacity="80%"></stop>
-            <stop offset="100%" stopColor="white" stopOpacity="0%"></stop>
-          </linearGradient>
-        </defs>
-        <rect className={classNames(styles.PromptEffectLine)} pathLength="100" strokeLinecap="round"></rect>
-        <rect className={classNames(styles.PromptShine)} x="48" y="24" width="70" height="1"></rect>
-      </svg>
       <div>
         <ClientOnly>
           {() =>

@@ -8,8 +8,10 @@ export const SendButton = ({ isStreaming, disabled, onClick }: SendButtonProps) 
   return (
     <button
       type="button"
-      className="flex items-center justify-center gap-1.5 h-8 px-3.5 rounded-md text-[13px] font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-      style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}
+      title={isStreaming ? '중단' : '만들기'}
+      aria-label={isStreaming ? '중단' : '만들기'}
+      className="flex items-center justify-center h-11 w-11 rounded-full transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+      style={{ background: '#FF5330', color: '#FBF5EE' }}
       disabled={disabled}
       onClick={(event) => {
         event.preventDefault();
@@ -20,15 +22,9 @@ export const SendButton = ({ isStreaming, disabled, onClick }: SendButtonProps) 
       }}
     >
       {isStreaming ? (
-        <>
-          <div className="i-ph:stop-circle-bold text-base" />
-          중단
-        </>
+        <div className="i-ph:stop-circle-bold text-lg" />
       ) : (
-        <>
-          만들기
-          <div className="i-ph:arrow-right text-base" />
-        </>
+        <div className="i-ph:arrow-right-bold text-lg" />
       )}
     </button>
   );

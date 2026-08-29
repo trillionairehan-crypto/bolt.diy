@@ -24,11 +24,12 @@ describe('실사용 앱 UI 표면들이 var(--accent) 계열 토큰을 쓰고 �
     expect(source).not.toMatch(/#E44A28/i);
   });
 
-  it('ChatBox.tsx PromptEffectLine gradient stops use var(--accent) (isLanding-only inline style block still intentionally hardcodes #FF5330, unrelated to this)', () => {
-    const source = readFileSync(join(__dirname, 'components/chat/ChatBox.tsx'), 'utf-8');
-    expect(source.match(/stopColor:\s*'var\(--accent\)'/g)?.length).toBe(4);
-    expect(source).not.toContain('stopColor="#FF5330"');
-  });
+  /*
+   * ChatBox.tsx's PromptEffectLine/PromptEffectContainer/PromptShine (checked here before) —
+   * the animated dashed gradient-stroke border around the input — was removed entirely per a
+   * later request ("입력창 테두리의 코랄 그라데이션 제거. 단색 테두리로."), replaced with a
+   * plain solid border. Nothing left to check here.
+   */
 
   it('Slider.tsx tab underline uses var(--accent)', () => {
     const source = readFileSync(join(__dirname, 'components/ui/Slider.tsx'), 'utf-8');

@@ -2,7 +2,6 @@ import * as Tooltip from '@radix-ui/react-tooltip';
 import { classNames } from '~/utils/classNames';
 import type { TabVisibilityConfig } from '~/components/@settings/core/types';
 import { TAB_LABELS, TAB_ICONS } from '~/components/@settings/core/constants';
-import { GlowingEffect } from '~/components/ui/GlowingEffect';
 
 interface TabTileProps {
   tab: TabVisibilityConfig;
@@ -32,55 +31,32 @@ export const TabTile: React.FC<TabTileProps> = ({
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
           <div className={classNames('min-h-[160px] list-none', className || '')}>
-            <div className="relative h-full rounded-xl border border-bolt-elements-borderColor p-0.5">
-              <GlowingEffect
-                blur={0}
-                borderWidth={1}
-                spread={20}
-                glow={true}
-                disabled={false}
-                proximity={40}
-                inactiveZone={0.3}
-                movementDuration={0.4}
-              />
+            <div className="relative h-full rounded-xl p-0.5" style={{ border: '1px solid rgba(26, 26, 26, 0.1)' }}>
               <div
                 onClick={onClick}
                 className={classNames(
                   'relative flex flex-col items-center justify-center h-full p-4 rounded-lg',
-                  'bg-bolt-elements-background-depth-2',
                   'group cursor-pointer',
-                  'hover:bg-purple-50 dark:hover:bg-[#1a1a1a]',
                   'transition-colors duration-100 ease-out',
-                  isActive ? 'bg-purple-500/5 dark:bg-purple-500/10' : '',
                   isLoading ? 'cursor-wait opacity-70 pointer-events-none' : '',
                 )}
+                style={{
+                  background: isActive ? 'rgba(255, 83, 48, 0.06)' : 'rgba(26, 26, 26, 0.03)',
+                }}
               >
                 {/* Icon */}
                 <div
-                  className={classNames(
-                    'relative',
-                    'w-14 h-14',
-                    'flex items-center justify-center',
-                    'rounded-xl',
-                    'bg-bolt-elements-background-depth-3',
-                    'ring-1 ring-bolt-elements-borderColor',
-                    'group-hover:bg-purple-100 dark:group-hover:bg-gray-700/80',
-                    'group-hover:ring-purple-200 dark:group-hover:ring-purple-800/30',
-                    'transition-all duration-100 ease-out',
-                    isActive ? 'bg-purple-500/10 dark:bg-purple-500/10 ring-purple-500/30 dark:ring-purple-500/20' : '',
-                  )}
+                  className={classNames('relative', 'w-14 h-14', 'flex items-center justify-center', 'rounded-xl')}
+                  style={{
+                    background: isActive ? 'rgba(255, 83, 48, 0.1)' : '#FBF5EE',
+                    boxShadow: `inset 0 0 0 1px ${isActive ? 'rgba(255, 83, 48, 0.3)' : 'rgba(26, 26, 26, 0.1)'}`,
+                  }}
                 >
                   {(() => {
                     const IconComponent = TAB_ICONS[tab.id];
                     return (
                       <IconComponent
-                        className={classNames(
-                          'w-8 h-8',
-                          'text-bolt-elements-textSecondary',
-                          'group-hover:text-purple-500 dark:group-hover:text-purple-400/80',
-                          'transition-colors duration-100 ease-out',
-                          isActive ? 'text-purple-500 dark:text-purple-400/90' : '',
-                        )}
+                        className={classNames('w-8 h-8', isActive ? 'text-[#FF5330]' : 'text-[#8B7E70]')}
                       />
                     );
                   })()}
@@ -89,28 +65,13 @@ export const TabTile: React.FC<TabTileProps> = ({
                 {/* Label and Description */}
                 <div className="flex flex-col items-center mt-4 w-full">
                   <h3
-                    className={classNames(
-                      'text-[15px] font-medium leading-snug mb-2',
-                      'text-bolt-elements-textPrimary',
-                      'group-hover:text-purple-600 dark:group-hover:text-purple-300/90',
-                      'transition-colors duration-100 ease-out',
-                      isActive ? 'text-purple-500 dark:text-purple-400/90' : '',
-                    )}
+                    className="text-[15px] font-medium leading-snug mb-2"
+                    style={{ color: isActive ? '#FF5330' : '#1A1A1A' }}
                   >
                     {TAB_LABELS[tab.id]}
                   </h3>
                   {description && (
-                    <p
-                      className={classNames(
-                        'text-[13px] leading-relaxed',
-                        'text-bolt-elements-textSecondary',
-                        'max-w-[85%]',
-                        'text-center',
-                        'group-hover:text-purple-500 dark:group-hover:text-purple-400/70',
-                        'transition-colors duration-100 ease-out',
-                        isActive ? 'text-purple-400 dark:text-purple-400/80' : '',
-                      )}
-                    >
+                    <p className="text-[13px] leading-relaxed max-w-[85%] text-center" style={{ color: '#8B7E70' }}>
                       {description}
                     </p>
                   )}
@@ -119,12 +80,15 @@ export const TabTile: React.FC<TabTileProps> = ({
                 {/* Update Indicator with Tooltip */}
                 {hasUpdate && (
                   <>
-                    <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-purple-500 dark:bg-purple-400 animate-pulse" />
+                    <div
+                      className="absolute top-4 right-4 w-2 h-2 rounded-full animate-pulse"
+                      style={{ background: '#FF5330' }}
+                    />
                     <Tooltip.Portal>
                       <Tooltip.Content
                         className={classNames(
                           'px-3 py-1.5 rounded-lg',
-                          'bg-[#18181B] text-white',
+                          'bg-[#1A1A1A] text-white',
                           'text-sm font-medium',
                           'select-none',
                           'z-[100]',
@@ -133,7 +97,7 @@ export const TabTile: React.FC<TabTileProps> = ({
                         sideOffset={5}
                       >
                         {statusMessage}
-                        <Tooltip.Arrow className="fill-[#18181B]" />
+                        <Tooltip.Arrow className="fill-[#1A1A1A]" />
                       </Tooltip.Content>
                     </Tooltip.Portal>
                   </>

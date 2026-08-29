@@ -82,32 +82,34 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
           <DropdownMenu.Item
             className={classNames(
               'flex items-center gap-2 px-4 py-2.5',
-              'text-sm text-bolt-elements-textPrimary',
-              'hover:bg-purple-50 dark:hover:bg-purple-500/10',
-              'hover:text-purple-500 dark:hover:text-purple-400',
+              'text-sm hover:text-[#FF5330]',
               'cursor-pointer transition-all duration-200',
               'outline-none',
               'group',
             )}
+            style={{ color: '#1A1A1A' }}
+            onMouseEnter={(event) => (event.currentTarget.style.background = 'rgba(255, 83, 48, 0.06)')}
+            onMouseLeave={(event) => (event.currentTarget.style.background = 'transparent')}
             onClick={() => onSelectTab('profile')}
           >
-            <div className="i-ph:user-circle w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
+            <div className="i-ph:user-circle w-4 h-4 text-[#8B7E70] group-hover:text-[#FF5330] transition-colors" />
             프로필 수정
           </DropdownMenu.Item>
 
           <DropdownMenu.Item
             className={classNames(
               'flex items-center gap-2 px-4 py-2.5',
-              'text-sm text-bolt-elements-textPrimary',
-              'hover:bg-purple-50 dark:hover:bg-purple-500/10',
-              'hover:text-purple-500 dark:hover:text-purple-400',
+              'text-sm hover:text-[#FF5330]',
               'cursor-pointer transition-all duration-200',
               'outline-none',
               'group',
             )}
+            style={{ color: '#1A1A1A' }}
+            onMouseEnter={(event) => (event.currentTarget.style.background = 'rgba(255, 83, 48, 0.06)')}
+            onMouseLeave={(event) => (event.currentTarget.style.background = 'transparent')}
             onClick={() => onSelectTab('settings')}
           >
-            <div className="i-ph:gear-six w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
+            <div className="i-ph:gear-six w-4 h-4 text-[#8B7E70] group-hover:text-[#FF5330] transition-colors" />
             설정
           </DropdownMenu.Item>
 
@@ -115,16 +117,17 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             <DropdownMenu.Item
               className={classNames(
                 'flex items-center gap-2 px-4 py-2.5',
-                'text-sm text-bolt-elements-textPrimary',
-                'hover:bg-purple-50 dark:hover:bg-purple-500/10',
-                'hover:text-purple-500 dark:hover:text-purple-400',
+                'text-sm hover:text-[#FF5330]',
                 'cursor-pointer transition-all duration-200',
                 'outline-none',
                 'group',
               )}
+              style={{ color: '#1A1A1A' }}
+              onMouseEnter={(event) => (event.currentTarget.style.background = 'rgba(255, 83, 48, 0.06)')}
+              onMouseLeave={(event) => (event.currentTarget.style.background = 'transparent')}
               onClick={() => signOut()}
             >
-              <div className="i-ph:sign-out w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
+              <div className="i-ph:sign-out w-4 h-4 text-[#8B7E70] group-hover:text-[#FF5330] transition-colors" />
               로그아웃
             </DropdownMenu.Item>
           )}
@@ -133,18 +136,19 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             <DropdownMenu.Item
               className={classNames(
                 'flex items-center gap-2 px-4 py-2.5',
-                'text-sm text-bolt-elements-textPrimary',
-                'hover:bg-purple-50 dark:hover:bg-purple-500/10',
-                'hover:text-purple-500 dark:hover:text-purple-400',
+                'text-sm hover:text-[#FF5330]',
                 'cursor-pointer transition-all duration-200',
                 'outline-none',
                 'group',
               )}
+              style={{ color: '#1A1A1A' }}
+              onMouseEnter={(event) => (event.currentTarget.style.background = 'rgba(255, 83, 48, 0.06)')}
+              onMouseLeave={(event) => (event.currentTarget.style.background = 'transparent')}
               onClick={() => {
                 window.location.href = '/login';
               }}
             >
-              <div className="i-ph:sign-in w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
+              <div className="i-ph:sign-in w-4 h-4 text-[#8B7E70] group-hover:text-[#FF5330] transition-colors" />
               로그인
             </DropdownMenu.Item>
           )}
@@ -155,13 +159,14 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             <DropdownMenu.Item
               className={classNames(
                 'flex items-center gap-2 px-4 py-2.5',
-                'text-sm text-bolt-elements-textPrimary',
-                'hover:bg-purple-50 dark:hover:bg-purple-500/10',
-                'hover:text-purple-500 dark:hover:text-purple-400',
+                'text-sm hover:text-[#FF5330]',
                 'cursor-pointer transition-all duration-200',
                 'outline-none',
                 'group',
               )}
+              style={{ color: '#1A1A1A' }}
+              onMouseEnter={(event) => (event.currentTarget.style.background = 'rgba(255, 83, 48, 0.06)')}
+              onMouseLeave={(event) => (event.currentTarget.style.background = 'transparent')}
               onClick={async () => {
                 try {
                   const { downloadDebugLog } = await import('~/utils/debugLogger');
@@ -171,7 +176,7 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
                 }
               }}
             >
-              <div className="i-ph:download w-4 h-4 text-gray-400 group-hover:text-purple-500 dark:group-hover:text-purple-400 transition-colors" />
+              <div className="i-ph:download w-4 h-4 text-[#8B7E70] group-hover:text-[#FF5330] transition-colors" />
               Download Debug Log
             </DropdownMenu.Item>
           )}
