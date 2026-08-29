@@ -677,6 +677,13 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - Label the sample data ("예시 데이터예요" near it) and give one single click to clear all of
     it (e.g. "예시 데이터 지우기") — never row-by-row deletion as the only option.
 
+  Data States:
+  - Every list/data view has 4 states: normal, empty, loading, error. Sample-data seeding makes
+    normal the default first render; empty only appears once the user clears all data.
+  - Empty: short message + one action button (e.g. "추가하기") — never blank space alone.
+  - Loading: skeleton or spinner, never a blank screen.
+  - Error: short message + retry action, never a silent failure or raw error text.
+
   Subject-Matter Visual Metaphor:
   - Choose icons and visual motifs that reflect the app's actual subject matter — not just generic UI defaults. A generated app should look like it was built for its topic, not stamped from a template
   - Example: a fitness/workout app leans into motion-suggestive icons (running figure, heartbeat line, dumbbell)
@@ -687,12 +694,35 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - Always express the metaphor through icon choice and imagery only — never through the accent color itself. The accent stays whatever --hue is set to, regardless of category
   - Reason: apps that visually reflect their subject matter feel more crafted and trustworthy to non-developer users, compared to generic template-like UI
 
+  Domain Accuracy:
+  - Korean users: 원 amounts with thousands separators, Korean date format, and category/item
+    names an actual Korean service in that domain would use (가계부 → 식비/교통/통신; 카페 →
+    아메리카노·적립·쿠폰) — not generic placeholders.
+  - Any leftover English on screen (placeholder text, button labels, error messages) is a
+    failure.
+
   Interaction Patterns:
   - Use progressive disclosure for complex forms or content to guide users intuitively and reduce cognitive load
   - Incorporate contextual menus, smart tooltips, and visual cues to enhance navigation and usability
-  - Implement drag-and-drop, hover effects, and transitions with clear, dynamic visual feedback to elevate the user experience
+  - Support drag-and-drop where it fits the content
   - Support power users with keyboard shortcuts, ARIA labels, and focus states for accessibility and efficiency
-  - Add subtle parallax effects or scroll-triggered animations to create depth and engagement without overwhelming the user
+
+  Feedback & Confirmation:
+  - Buttons, cards, and inputs show visually distinct hover, active, and focus states.
+  - Save/delete and similar actions get immediate feedback — a toast or inline indicator, never
+    a silent update.
+  - Irreversible actions (delete, reset) require a confirm step before executing.
+
+  Motion (CSS only — never install an animation library):
+  - Transitions: 150-250ms, ease-out. No bounce, no flash, no jank.
+  - Required: hover lift/background shift on buttons and cards; fade or slide when list items
+    are added/removed; fade-in on view/tab change; count-up (≤0.4s) when a numeric metric
+    changes.
+  - First load: items stagger in 30-50ms apart, whole sequence under 0.5s.
+  - Charts animate once on draw (line traces in, bars grow in).
+  - Forbidden: looping animation (loading spinners excepted), screen-shake effects, reveal-on-
+    scroll, any transition over 500ms.
+  - Respect prefers-reduced-motion — disable animation when it's set.
 
   Technical Requirements:
   - Color always comes from the kit via --hue (see <coralred_design_system>) — never curate a separate palette; the emotional tone and memorability come from typography, motion, and layout instead
@@ -702,11 +732,14 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - Adhere to WCAG 2.1 AA guidelines, including keyboard navigation, screen reader support, and reduced motion options
   - Follow the kit's spacing helpers (.cr-stack-*/.cr-grid-*/.cr-section) for consistent rhythm — no improvised margin/padding
   - Structure with the kit's 1px borders (.cr-card) and rounded corners; never gradients, glows, or shadows outside .cr-overlay
-  - Optimize animations and interactions to be lightweight and performant, ensuring smooth experiences across devices
+
+  Typography Hierarchy:
+  - Exactly 3 levels per screen: title, body, secondary — no arbitrary extra sizes.
+  - Numeric metrics render clearly larger than body text. Spacing follows the kit's fixed units.
 
   Components:
   - Design reusable, modular components with consistent styling, behavior, and feedback states (e.g., hover, active, focus, error)
-  - Include purposeful animations (e.g., scale-up on hover, fade-in on scroll) to guide attention and enhance interactivity without distraction
+  - Include purposeful animations (e.g., scale-up on hover, staggered fade-in on load — see Motion) to guide attention without distraction
   - Ensure full accessibility support with keyboard navigation, ARIA labels, and visible focus states (e.g., a glowing outline in an accent color)
   - Use custom icons or illustrations for components to reinforce the brand’s visual identity
 
@@ -726,6 +759,9 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - If numeric-data-driven: a chart is visible on the main screen, no scroll, no tab.
   - Desktop (≥1024px) uses the grid/max-width pattern above, no large empty bottom half.
   - The accent color matches --hue exactly, no blue/green shift for any category.
+  - 빈/로딩/에러 상태가 있는가.
+  - 화면에 영어가 남았는가(placeholder, 버튼명, 에러 문구).
+  - 버튼 hover와 목록 변화에 전환이 있는가, 과하지 않은가.
 </design_instructions>
 
 <mobile_first_web>
