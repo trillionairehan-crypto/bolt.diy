@@ -26,7 +26,6 @@ export interface GenerationDirectives {
   hue?: number;
 }
 
-const TRUST_HUE = 222; // calm teal-blue — see hueToRepresentativeHex for the hex this decodes from
 const FRIENDLY_HUE = 33; // brand default (#FF5330), matches paletteToHue.ts's CORALRED_DEFAULT_HUE
 
 const EMPTY: Partial<GenerationDirectives> = {};
@@ -119,7 +118,18 @@ export function mapAnswerToDirectives(questionId: string, value: unknown): Parti
     case 'mood':
       switch (value) {
         case 'trust':
-          return { hue: TRUST_HUE };
+          /*
+           * Used to override --hue to a calm teal-blue (222) for this mood — a real, shipped bug:
+           * it made the brand accent go blue on the one onboarding path a user could hit it from,
+           * directly contradicting new-prompt.ts's own "the accent stays whatever --hue is set to,
+           * regardless of category" rule everywhere else in the app. Same fix as that rule: express
+           * the mood through everything BUT the accent color.
+           */
+          return {
+            promptAdditions: [
+              '차분하고 신뢰감 있는 분위기를 원해요 — 여백, 타이포그래피, 아이콘, 모션으로 그 느낌을 표현하고, 강조색은 브랜드 기본색(코랄) 그대로 유지하세요.',
+            ],
+          };
         case 'friendly':
           return { hue: FRIENDLY_HUE };
         case 'minimal':
@@ -170,16 +180,16 @@ export function mergeDirectives(parts: Array<Partial<GenerationDirectives>>): Ge
 }
 
 /**
- * The only two hue values mapAnswerToDirectives ever produces right now. designSchemeToHue
+ * The only hue value mapAnswerToDirectives ever produces right now. designSchemeToHue
  * (paletteToHue.ts) only reads DesignScheme.palette.primary as a hex color and derives the hue
- * from it — there's no direct "set this hue" entry point — so this is the representative hex
- * for each, verified against the real hexToOklchHue conversion (33 matches the brand default's
- * own documented hex #FF5330; 222 is #0891B2, chosen because it decodes to ~220 as intended).
- * A lookup table (not a general hue->hex inverse) is enough since only these two values exist.
+ * from it — there's no direct "set this hue" entry point — so this is the representative hex,
+ * verified against the real hexToOklchHue conversion (33 matches the brand default's own
+ * documented hex #FF5330). A lookup table (not a general hue->hex inverse) is enough since only
+ * this one value exists — kept as a table rather than inlined so a future mood/hue addition here
+ * doesn't need Chat.client.tsx's hueToRepresentativeHex call site to change at all.
  */
 const HUE_REPRESENTATIVE_HEX: Record<number, string> = {
   [FRIENDLY_HUE]: '#FF5330',
-  [TRUST_HUE]: '#0891B2',
 };
 
 export function hueToRepresentativeHex(hue: number): string | undefined {

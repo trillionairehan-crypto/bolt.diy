@@ -70,10 +70,10 @@ describe('mapAnswerToDirectives — device', () => {
 });
 
 describe('mapAnswerToDirectives — mood', () => {
-  it('trust: sets hue to 222, no prompt addition', () => {
+  it('trust: no hue override (regression: used to force the accent blue) — a prompt addition instead', () => {
     const result = mapAnswerToDirectives('mood', 'trust');
-    expect(result.hue).toBe(222);
-    expect(result.promptAdditions).toBeUndefined();
+    expect(result.hue).toBeUndefined();
+    expect(result.promptAdditions).toHaveLength(1);
   });
 
   it('friendly: sets hue to 33 (brand default)', () => {
@@ -130,9 +130,9 @@ describe('mergeDirectives', () => {
       mapAnswerToDirectives('device', 'mobile'),
       mapAnswerToDirectives('mood', 'trust'),
     ]);
-    expect(merged.promptAdditions).toHaveLength(3);
+    expect(merged.promptAdditions).toHaveLength(4);
     expect(merged.connectSupabase).toBe(false);
-    expect(merged.hue).toBe(222);
+    expect(merged.hue).toBeUndefined();
   });
 });
 
@@ -141,11 +141,8 @@ describe('hueToRepresentativeHex', () => {
     expect(hueToRepresentativeHex(33)).toBe('#FF5330');
   });
 
-  it('returns the trust hex for hue 222', () => {
-    expect(hueToRepresentativeHex(222)).toBe('#0891B2');
-  });
-
-  it('returns undefined for a hue with no representative hex', () => {
+  it('returns undefined for a hue with no representative hex (e.g. the old trust hue, 222, no longer maps to one)', () => {
+    expect(hueToRepresentativeHex(222)).toBeUndefined();
     expect(hueToRepresentativeHex(180)).toBeUndefined();
   });
 });
