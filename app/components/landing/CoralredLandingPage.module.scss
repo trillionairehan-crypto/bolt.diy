@@ -12,42 +12,69 @@ $coral: #ff5330;
 
 // ---------- Section 1 — Hero ----------
 
+// Invisibly grows a small text link/control's tap area to the 44px minimum without touching its
+// own box or nudging surrounding layout — an absolutely-positioned, transparent ::before centered
+// over the element. Used for anything too visually small to just grow (nav links, the "자세히"
+// links); primaryCta is large enough already that it can just set min-height directly instead.
+%tapTargetExpand {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+}
+
 .hero {
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding: 28px clamp(20px, 5vw, 64px) 40px;
+  padding: clamp(20px, 4vw, 28px) clamp(20px, 5vw, 64px) clamp(24px, 5vw, 40px);
   position: relative;
 }
 
+// No hamburger, no hidden links at any width — the 4 nav links and topBar just wrap onto a
+// second line if they run out of room, after shrinking (see .navLink) as far as they fluidly go.
 .topBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 10px;
+  column-gap: 12px;
 }
 
 .logoSmall {
   display: block;
-  width: 28px;
-  height: 28px;
+  width: clamp(22px, 5vw, 28px);
+  height: clamp(22px, 5vw, 28px);
   flex-shrink: 0;
 }
 
 .topLeft {
   display: flex;
   align-items: center;
-  gap: clamp(20px, 3vw, 36px);
+  flex-wrap: wrap;
+  row-gap: 8px;
+  column-gap: clamp(14px, 3vw, 36px);
 }
 
 .navLinks {
   display: flex;
   align-items: center;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: clamp(10px, 2vw, 20px);
 }
 
 .navLink {
-  font-size: 13px;
+  @extend %tapTargetExpand;
+  font-size: clamp(11px, 1.6vw, 13px);
   font-weight: 500;
   color: $ink;
   text-decoration: none;
@@ -63,7 +90,8 @@ $coral: #ff5330;
 .authLinks {
   display: flex;
   align-items: center;
-  gap: 20px;
+  flex-wrap: wrap;
+  gap: clamp(10px, 2vw, 20px);
 }
 
 .heroMiddle {
@@ -74,11 +102,14 @@ $coral: #ff5330;
   padding: 32px 0;
 }
 
-// The cluster (logo + copy) sits slightly left of center, leaving whitespace on the
-// right — a plain translateX on the centered flex container, not a layout hack.
+// The cluster (logo + copy) sits slightly left of center, leaving whitespace on the right — a
+// plain translateX on the centered flex container. Below the shared structural breakpoint (see
+// the media query near the bottom of this file) it switches to a centered column instead — logo
+// above copy, both same order as the markup, nothing hidden or swapped for something else.
 .heroCluster {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: clamp(20px, 3vw, 48px);
   transform: translateX(-7%);
 }
@@ -119,13 +150,17 @@ $coral: #ff5330;
 }
 
 .primaryCta {
-  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  font-size: clamp(14px, 1.6vw, 16px);
   font-weight: 700;
   color: $cream;
   background: $coral;
   border: none;
   border-radius: 999px;
-  padding: 15px 28px;
+  padding: clamp(12px, 2vw, 15px) clamp(22px, 4vw, 28px);
   cursor: pointer;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -137,7 +172,7 @@ $coral: #ff5330;
 }
 
 .trialCaption {
-  font-size: 13px;
+  font-size: clamp(12px, 1.4vw, 13px);
   font-weight: 500;
   color: $ink-soft;
   margin: 10px 0 0;
@@ -158,14 +193,16 @@ $coral: #ff5330;
  * a plain (non-keyframed) transition on a separate element composes cleanly with the nested
  * animations instead of the two trying to drive the same property. ~3-4x the ambient float's
  * 2-3px amplitude, reusing each piece's original scatter direction (see spreadX/spreadY) so it
- * reads as "the same motion, bigger" rather than a new effect.
+ * reads as "the same motion, bigger" rather than a new effect. .tapActive (toggled briefly from
+ * JS on click/tap, see LogoAssembly) mirrors the same rule for touch devices, which have no hover.
  */
 .pieceSpread {
   transform: translate(0, 0);
   transition: transform 0.4s ease-out;
 }
 
-.logoAssembly:hover .pieceSpread {
+.logoAssembly:hover .pieceSpread,
+.logoAssembly.tapActive .pieceSpread {
   transform: translate(var(--spread-x, 0px), var(--spread-y, 0px));
 }
 
@@ -250,10 +287,13 @@ $coral: #ff5330;
   margin: 0 0 clamp(32px, 5vw, 56px);
 }
 
+// auto-fit + a fluid min (never wider than the available space, via min(100%, …)) folds
+// 3 -> 2 -> 1 columns continuously as the container narrows — no column-count breakpoints, no
+// carousel.
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(14px, 2.5vw, 20px);
   max-width: 1080px;
   margin: 0 auto;
 }
@@ -410,6 +450,7 @@ $coral: #ff5330;
 }
 
 .infoBlockLink {
+  @extend %tapTargetExpand;
   font-size: 12px;
   font-weight: 500;
   color: $ink-soft;
@@ -459,8 +500,8 @@ $coral: #ff5330;
   display: flex;
   align-items: flex-end;
   gap: 10px;
-  width: clamp(100px, 14vw, 160px);
-  height: clamp(90px, 12vw, 130px);
+  width: clamp(110px, 14vw, 160px);
+  height: clamp(100px, 12vw, 130px);
 }
 
 .trustBox {
@@ -482,8 +523,8 @@ $coral: #ff5330;
   display: flex;
   align-items: flex-end;
   gap: 8px;
-  width: clamp(100px, 14vw, 160px);
-  height: clamp(90px, 12vw, 130px);
+  width: clamp(110px, 14vw, 160px);
+  height: clamp(100px, 12vw, 130px);
 }
 
 .pricingStep {
@@ -576,64 +617,48 @@ $coral: #ff5330;
   }
 }
 
-// ---------- Mobile fold (390px) ----------
+// ---------- One structural fold, shared by every side-by-side pair ----------
 
-@media (max-width: 640px) {
-  // No room for logo + 4 links + login/회원가입 in one row at this width, and a hamburger menu
-  // wasn't part of the request — drop the nav links, keep logo + login/회원가입.
-  .navLinks {
-    display: none;
-  }
-
+/*
+ * The only viewport-width breakpoint in this stylesheet. Everything else (type, the hero logo,
+ * spacing, the card grid) scales continuously via clamp()/vw/auto-fit and needs no breakpoint at
+ * all. But "side-by-side becomes stacked" is an inherently binary layout switch — flex-direction
+ * can't tween — so both places that are row-on-wide/column-on-narrow (the hero cluster, and the
+ * trust/pricing text+graphic rows) flip together here, at the same width, so the page reads as one
+ * consistent rule rather than a per-section mobile redesign. Element kind/order in the markup is
+ * unchanged; only geometry (direction, alignment) and the graphic's visual order move.
+ */
+@media (max-width: 760px) {
   .heroCluster {
     flex-direction: column;
     transform: none;
     text-align: center;
   }
 
-  .logoColumn {
-    order: 1;
-  }
-
   .heroCopy {
-    order: 2;
     align-items: center;
     max-width: 100%;
   }
 
   .primaryCta {
     width: 100%;
-    text-align: center;
+    max-width: 320px;
   }
 
   .trialCaption {
     text-align: center;
   }
 
-  .hero {
-    padding-bottom: 28px;
-  }
-
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
   .infoBlockRow {
     flex-direction: column;
     align-items: flex-start;
-    gap: clamp(24px, 8vw, 40px);
+    gap: clamp(20px, 6vw, 40px);
   }
 
+  // 도형이 위: visual order only (via `order`), markup order is unchanged.
   .trustGraphic,
   .pricingGraphic {
+    order: -1;
     align-self: center;
-    width: 140px;
-    height: 100px;
-  }
-}
-
-@media (min-width: 641px) and (max-width: 900px) {
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 }

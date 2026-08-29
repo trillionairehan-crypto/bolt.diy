@@ -166,9 +166,35 @@ const LOGO_PIECES: LogoPiece[] = [
   },
 ];
 
+/*
+ * Hover drives the "spread apart" reaction on pointer devices; touch devices have no hover, so a
+ * tap plays the same reaction once and releases it after the transition would have settled.
+ */
 function LogoAssembly({ className }: { className?: string }) {
+  const [tapActive, setTapActive] = useState(false);
+  const tapTimeoutRef = useRef<number | undefined>(undefined);
+
+  useEffect(
+    () => () => {
+      window.clearTimeout(tapTimeoutRef.current);
+    },
+    [],
+  );
+
+  const handleTap = () => {
+    setTapActive(true);
+    window.clearTimeout(tapTimeoutRef.current);
+    tapTimeoutRef.current = window.setTimeout(() => setTapActive(false), 500);
+  };
+
   return (
-    <svg viewBox="0 0 512 512" className={className} role="img" aria-label="코랄레드">
+    <svg
+      viewBox="0 0 512 512"
+      className={classNames(className, { [styles.tapActive]: tapActive })}
+      role="img"
+      aria-label="코랄레드"
+      onClick={handleTap}
+    >
       {LOGO_PIECES.map((piece, index) => (
         <g
           key={index}
