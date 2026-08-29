@@ -189,6 +189,7 @@ export const ChatImpl = memo(
     } = useChat({
       transport: new DefaultChatTransport({
         api: '/api/chat',
+
         /*
          * GEN_STALL_FIX2.md — diagnostic only, no behavior change: HttpChatTransport.sendMessages
          * accepts a custom `fetch` and falls back to it instead of the global one, so this wrapper
@@ -843,9 +844,18 @@ export const ChatImpl = memo(
     /*
      * Auto-retries preview runtime errors by asking Coralred to fix them, up to a small cap.
      * Terminal errors are out of scope here — those keep the existing manual "물어보기" flow.
+     *
+     * GEN_STALL_FIX2.md root cause: the WebContainer preview can throw a runtime error (and fire
+     * actionAlert) while the main generation request is still streaming — e.g. right after the
+     * template-import regenerate() call, before all files are written. sendMessage()'s existing
+     * `if (isLoading) { abort(); return; }` branch exists for the send button doubling as a stop
+     * button, but this effect used to call sendMessage() unconditionally — so an actionAlert
+     * arriving mid-stream silently aborted the in-flight generation instead of queuing the fix.
+     * Waiting for isLoading to clear (and re-running when it does, via the dep array) fixes that
+     * without touching sendMessage's loading/abort semantics that the manual stop button relies on.
      */
     useEffect(() => {
-      if (!actionAlert || actionAlert.source !== 'preview') {
+      if (!actionAlert || actionAlert.source !== 'preview' || isLoading) {
         return;
       }
 
@@ -881,7 +891,7 @@ export const ChatImpl = memo(
       chatStore.setKey('autoFixAttempts', attempts + 1);
       sendMessage({} as any, prompt, modelOverride, true);
       workbenchStore.clearAlert();
-    }, [actionAlert]);
+    }, [actionAlert, isLoading]);
 
     /**
      * Handles the change event for the textarea and updates the input state.

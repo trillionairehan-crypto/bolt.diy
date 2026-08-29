@@ -252,7 +252,9 @@ export default function DeployChatAlert({ alert, clearAlert, postMessage }: Depl
                 ) : (
                   type === 'error' && (
                     <button
-                      onClick={() => postMessage(`*이 배포 오류를 고쳐줘*\n\`\`\`\n${content || description}\n\`\`\`\n`)}
+                      onClick={() =>
+                        postMessage(`*이 배포 오류를 고쳐줘*\n\`\`\`\n${content || description}\n\`\`\`\n`)
+                      }
                       className={classNames(
                         `px-2 py-1.5 rounded-md text-sm font-medium`,
                         'bg-bolt-elements-button-primary-background',
