@@ -676,10 +676,14 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
     (Korean names, 원 amounts with comma formatting,
     plausible dates) through whichever storage the app actually uses (coralred Cloud db.create,
     Supabase inserts, or local state), then render from that seeded state — the very first
-    screen must already show it. Pick the items so every derived number (balance, total,
-    points) computes correctly from them AND lands positive — work backward from a natural
-    positive headline number to the line items, not the other way around. A headline metric
-    that reads 0 or negative on first load is a failure.
+    screen must already show it. Build the items by this exact procedure, not free-form —
+    picking items first and hoping the total lands positive fails often enough to be a real bug:
+    (1) pick a natural positive target for the headline number (balance/total/points) FIRST.
+    (2) work backward: write add/earn items and subtract/spend/refund items that sum to that
+    target — never the other order. (3) subtract-type items' total must not exceed half of
+    add-type items' total. (4) actually add up the items you wrote and confirm the sum equals
+    the target — a mismatch means fixing the items, not the target. A headline metric that reads
+    0 or negative on first load is a failure regardless of how it got there.
   - An "아직 ~이(가) 없어요"-style empty state visible on the first screen is a failure, even if
     a sample-data file exists elsewhere but isn't wired into the initial render — that failure
     mode has shipped before.
@@ -764,8 +768,8 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - Would this design make a top-tier designer from the relevant reference brands stop and admire it?
 
   Pre-Completion Self-Check — before declaring the app finished, verify (fix anything that fails):
-  - Sample data is visible on the first screen (no "아직 ~ 없어요" empty state), and its
-    headline number is positive, not 0 or negative.
+  - Sample data is visible on the first screen (no "아직 ~ 없어요" empty state). Manually add
+    up the sample items and confirm the sum matches the headline number shown AND is positive.
   - A chart only exists if 5+ same-kind sample values back it, and then it's on the main
     screen with no scroll/tab — otherwise no chart (a card/list instead).
   - Desktop (≥1024px) uses .cr-grid-*/.cr-page per Screen Density, no large empty bottom half.
