@@ -43,6 +43,7 @@ import {
   hasV2GenerationsRemaining,
   incrementV2GenerationsUsed,
 } from '~/lib/freeTrial';
+import { createGenerationChargeGate } from '~/lib/generationChargeGate';
 import { authUserStore } from '~/lib/stores/auth';
 import { buildFixPrompt } from '~/utils/buildFixPrompt';
 import { setSidebarOpen } from '~/lib/stores/sidebar';
@@ -177,6 +178,18 @@ export const ChatImpl = memo(
     const networkRetryCountRef = useRef(0);
     const MAX_NETWORK_AUTO_RETRIES = 1;
 
+    /*
+     * METERING_FIX_REPORT.md: sites that used to call recordGenerationUsed() immediately (before
+     * the request was even sent) now just arm() this gate instead — see generationChargeGate.ts.
+     * onFinish() below (called from the useChat onFinish callback) is the single place that
+     * actually charges, and only for a genuine success (not aborted, not errored), so a generation
+     * that never completes successfully never costs the user a free/paid credit. recordGenerationUsed
+     * is declared further down (const, so referencing it here in a closure is fine — this factory
+     * call itself runs at render time, but the closure isn't invoked until a real finish happens,
+     * long after recordGenerationUsed exists).
+     */
+    const generationChargeGateRef = useRef(createGenerationChargeGate(() => recordGenerationUsed()));
+
     const {
       messages,
       status,
@@ -260,7 +273,7 @@ export const ChatImpl = memo(
           setProgressAnnotations((prev) => [...prev, dataPart.data as ProgressAnnotation]);
         }
       },
-      onFinish: ({ message }) => {
+      onFinish: ({ message, isAbort, isError }) => {
         setProgressAnnotations([]);
         networkRetryCountRef.current = 0;
 
@@ -271,6 +284,14 @@ export const ChatImpl = memo(
         void message;
 
         logger.debug('Finished streaming');
+
+        /*
+         * METERING_FIX_REPORT.md: charge only on a genuine successful finish. onFinish fires for
+         * every outcome (success, abort, error) — isAbort/isError (from the `ai` package's own
+         * ChatOnFinishCallback) are how AbstractChat itself distinguishes them, so this doesn't
+         * guess based on status/error state that could be stale or reset by something else.
+         */
+        generationChargeGateRef.current.onFinish({ isAbort, isError });
       },
       messages: initialMessages,
     });
@@ -572,8 +593,13 @@ export const ChatImpl = memo(
         return;
       }
 
-      await recordGenerationUsed();
-
+      /*
+       * METERING_FIX_REPORT.md: recordGenerationUsed() used to run right here — before the
+       * request even fired, so a stall/cancel/error still cost a free credit. The charge is now
+       * armed immediately before each regenerate() call below instead (never here directly) so
+       * an unrelated throw between this point and the actual request (e.g. selectStarterTemplate
+       * rejecting) can't leave a stale armed charge for some later, unrelated onFinish to consume.
+       */
       setFakeLoading(true);
 
       if (autoSelectTemplate) {
@@ -637,9 +663,12 @@ export const ChatImpl = memo(
              * of vanishing.
              */
             logger.info('generateNewApp: template seeded, triggering regenerate()');
+            generationChargeGateRef.current.arm();
             regenerate()
               .then(() => logger.info('generateNewApp: regenerate() settled (template import)'))
               .catch((e) => {
+                // Rejected before onFinish could ever fire (e.g. thrown synchronously) — nothing to charge.
+                generationChargeGateRef.current.disarm();
                 logger.error('generateNewApp: regenerate() rejected after template import', e);
                 handleError(e, 'chat');
               });
@@ -691,9 +720,12 @@ export const ChatImpl = memo(
 
       // GEN_STALL_FIX.md — same reasoning as the template-import branch above.
       logger.info('generateNewApp: baseline seeded, triggering regenerate()');
+      generationChargeGateRef.current.arm();
       regenerate()
         .then(() => logger.info('generateNewApp: regenerate() settled (baseline)'))
         .catch((e) => {
+          // Rejected before onFinish could ever fire (e.g. thrown synchronously) — nothing to charge.
+          generationChargeGateRef.current.disarm();
           logger.error('generateNewApp: regenerate() rejected after baseline seed', e);
           handleError(e, 'chat');
         });
@@ -793,12 +825,16 @@ export const ChatImpl = memo(
        * section). Deliberately left as-is here so flag-off behavior is unchanged; this block only
        * runs under the new metering, and never for auto-fix retries (those aren't a user utterance).
        */
-      if (CORALRED_NEW_METERING && !isAutoFix) {
-        if (!(await checkGenerationsAllowed())) {
-          return;
-        }
+      /*
+       * METERING_FIX_REPORT.md: recordGenerationUsed() used to run right here — before
+       * sendChatMessage() below was even called. Now just remembers "this message should charge
+       * on success"; the charge itself is armed immediately before sendChatMessage() further down
+       * (not here) and onFinish above does the actual increment, only on a real success.
+       */
+      const shouldChargeThisMessage = CORALRED_NEW_METERING && !isAutoFix;
 
-        await recordGenerationUsed();
+      if (shouldChargeThisMessage && !(await checkGenerationsAllowed())) {
+        return;
       }
 
       /*
@@ -825,6 +861,10 @@ export const ChatImpl = memo(
         const userUpdateArtifact = filesToArtifacts(modifiedFiles, `${Date.now()}`);
         const messageText = `[Model: ${taggedModel}]\n\n[Provider: ${taggedProviderName}]\n\n${userUpdateArtifact}${finalMessageContent}`;
 
+        if (shouldChargeThisMessage) {
+          generationChargeGateRef.current.arm();
+        }
+
         sendChatMessage({
           text: messageText,
           files: fileParts.length > 0 ? fileParts : undefined,
@@ -833,6 +873,10 @@ export const ChatImpl = memo(
         workbenchStore.resetAllFileModifications();
       } else {
         const messageText = `[Model: ${taggedModel}]\n\n[Provider: ${taggedProviderName}]\n\n${finalMessageContent}`;
+
+        if (shouldChargeThisMessage) {
+          generationChargeGateRef.current.arm();
+        }
 
         sendChatMessage({
           text: messageText,
