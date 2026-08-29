@@ -123,9 +123,23 @@ function readV2GuestUsage(): V2GuestUsage {
   };
 }
 
-export function hasV2GuestGenerationsRemaining(): boolean {
+/**
+ * The number shown to the user is the more restrictive of the two windows — that's also the one
+ * that actually blocks the next generation (see hasV2GuestGenerationsRemaining below), so showing
+ * anything else (e.g. just the monthly figure) would read as "you have generations left" on a day
+ * the daily cap has already been hit.
+ */
+export function getV2GuestGenerationsRemaining(): number {
   const usage = readV2GuestUsage();
-  return usage.monthCount < V2_FREE_MONTHLY_LIMIT && usage.dayCount < V2_FREE_DAILY_LIMIT;
+
+  return Math.min(
+    Math.max(V2_FREE_MONTHLY_LIMIT - usage.monthCount, 0),
+    Math.max(V2_FREE_DAILY_LIMIT - usage.dayCount, 0),
+  );
+}
+
+export function hasV2GuestGenerationsRemaining(): boolean {
+  return getV2GuestGenerationsRemaining() > 0;
 }
 
 export function incrementV2GuestGenerationsUsed(): void {
@@ -167,6 +181,12 @@ export async function incrementV2AccountGenerationsUsed(): Promise<void> {
   }
 }
 
+/** Same "more restrictive window wins" reasoning as getV2GuestGenerationsRemaining above. */
+export async function getV2AccountGenerationsRemaining(): Promise<number> {
+  const status = await getV2AccountGenerationStatus();
+  return Math.min(status.monthRemaining, status.dayRemaining);
+}
+
 export async function hasV2GenerationsRemaining(): Promise<boolean> {
   if (authUserStore.get()) {
     const status = await getV2AccountGenerationStatus();
@@ -174,6 +194,15 @@ export async function hasV2GenerationsRemaining(): Promise<boolean> {
   }
 
   return hasV2GuestGenerationsRemaining();
+}
+
+/** v2 counterpart of getGenerationsRemaining() above — same guest/account dispatch. */
+export async function getV2GenerationsRemaining(): Promise<number> {
+  if (authUserStore.get()) {
+    return getV2AccountGenerationsRemaining();
+  }
+
+  return getV2GuestGenerationsRemaining();
 }
 
 export async function incrementV2GenerationsUsed(): Promise<void> {

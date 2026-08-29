@@ -7,7 +7,7 @@ import React, { type RefCallback, useEffect, useRef, useState, lazy, Suspense } 
 import { ClientOnly } from 'remix-utils/client-only';
 import { Menu } from '~/components/sidebar/Menu.client';
 import { classNames } from '~/utils/classNames';
-import { PROVIDER_LIST, SHOW_DEV_TOOLS } from '~/utils/constants';
+import { PROVIDER_LIST, SHOW_DEV_TOOLS, CORALRED_NEW_METERING } from '~/utils/constants';
 import { Messages } from './Messages.client';
 import { getApiKeysFromCookies } from './APIKeyManager';
 import Cookies from 'js-cookie';
@@ -31,7 +31,7 @@ import { ChatBox } from './ChatBox';
 import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import LlmErrorAlert from './LLMApiAlert';
-import { getGenerationsRemaining } from '~/lib/freeTrial';
+import { getGenerationsRemaining, getV2GenerationsRemaining } from '~/lib/freeTrial';
 import { createScopedLogger } from '~/utils/logger';
 import { authUserStore } from '~/lib/stores/auth';
 import PromptClarification from './PromptClarification';
@@ -191,7 +191,12 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     useEffect(() => {
       let cancelled = false;
 
-      getGenerationsRemaining()
+      /*
+       * METERING_FIX_REPORT.md: was hardcoded to the v1 call regardless of CORALRED_NEW_METERING,
+       * so flipping the flag would keep showing v1's (wrong-scale, stale) remaining count even
+       * though gating had already switched to v2's rules.
+       */
+      (CORALRED_NEW_METERING ? getV2GenerationsRemaining() : getGenerationsRemaining())
         .then((remaining) => {
           if (!cancelled) {
             setFreeGenerationsRemaining(remaining);
