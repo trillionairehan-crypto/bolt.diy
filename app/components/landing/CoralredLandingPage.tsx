@@ -1,8 +1,49 @@
+import { useEffect, useRef, useState } from 'react';
+import { classNames } from '~/utils/classNames';
 import styles from './CoralredLandingPage.module.scss';
 
 interface CoralredLandingPageProps {
-  /** Called when the visitor clicks any "enter the app" CTA (시작하기 / 앱 만들러 가기). */
+  /** Called when the visitor clicks any "enter the app" CTA (시작하기). */
   onEnter: () => void;
+}
+
+/*
+ * Fires once when the returned ref's element first enters the viewport, then disconnects — so a
+ * section that's already been revealed never re-animates on a later scroll past it. Skips straight
+ * to visible (no animation at all) when the visitor has prefers-reduced-motion set.
+ */
+function useReveal<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+
+    if (!el) {
+      return undefined;
+    }
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setVisible(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 },
+    );
+
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, visible };
 }
 
 interface LogoPiece {
@@ -18,6 +59,8 @@ interface LogoPiece {
   breatheDelayMs: number;
   breatheDurationMs: number;
   floatPx: number;
+  spreadX: number;
+  spreadY: number;
 }
 
 /*
@@ -26,7 +69,10 @@ interface LogoPiece {
  * drive the always-on ambient motion that starts once assembly settles — different durations
  * (5-7s) per piece, not just a fixed initial offset, so they keep drifting in and out of phase
  * over time. floatPx (2-3px, negative = rises then sinks back) varies per piece too, on top of the
- * shared 1-1.5% scale breathing — see .pieceBreathe in the stylesheet.
+ * shared 1-1.5% scale breathing — see .pieceBreathe in the stylesheet. spreadX/spreadY (~9px, unit
+ * vector of dx/dy scaled way down) drive the hover-only "spread apart" reaction — 3-4x the ambient
+ * float's amplitude, reusing each piece's original scatter direction so the hover nudge and the
+ * entrance animation read as the same underlying motion at different scales.
  */
 const LOGO_PIECES: LogoPiece[] = [
   {
@@ -42,6 +88,8 @@ const LOGO_PIECES: LogoPiece[] = [
     breatheDelayMs: 1300,
     breatheDurationMs: 5200,
     floatPx: -2.2,
+    spreadX: -2,
+    spreadY: -9,
   },
   {
     x: 63,
@@ -56,6 +104,8 @@ const LOGO_PIECES: LogoPiece[] = [
     breatheDelayMs: 1450,
     breatheDurationMs: 6400,
     floatPx: -2.8,
+    spreadX: -9,
+    spreadY: 1,
   },
   {
     x: 63,
@@ -70,6 +120,8 @@ const LOGO_PIECES: LogoPiece[] = [
     breatheDelayMs: 1200,
     breatheDurationMs: 5800,
     floatPx: -2.4,
+    spreadX: -7,
+    spreadY: 6,
   },
   {
     x: 153,
@@ -84,6 +136,8 @@ const LOGO_PIECES: LogoPiece[] = [
     breatheDelayMs: 1600,
     breatheDurationMs: 7000,
     floatPx: -3,
+    spreadX: 1,
+    spreadY: 9,
   },
   {
     x: 289,
@@ -98,6 +152,8 @@ const LOGO_PIECES: LogoPiece[] = [
     breatheDelayMs: 1350,
     breatheDurationMs: 6100,
     floatPx: -2.6,
+    spreadX: 7,
+    spreadY: -5,
   },
   {
     x: 289,
@@ -112,6 +168,8 @@ const LOGO_PIECES: LogoPiece[] = [
     breatheDelayMs: 1550,
     breatheDurationMs: 5500,
     floatPx: -2,
+    spreadX: 7,
+    spreadY: 5,
   },
 ];
 
@@ -121,32 +179,42 @@ function LogoAssembly({ className }: { className?: string }) {
       {LOGO_PIECES.map((piece, index) => (
         <g
           key={index}
-          className={styles.pieceBreathe}
+          className={styles.pieceSpread}
           style={
             {
-              '--float': `${piece.floatPx}px`,
-              animationDelay: `${piece.breatheDelayMs}ms`,
-              animationDuration: `${piece.breatheDurationMs}ms`,
+              '--spread-x': `${piece.spreadX}px`,
+              '--spread-y': `${piece.spreadY}px`,
             } as React.CSSProperties
           }
         >
-          <rect
-            x={piece.x}
-            y={piece.y}
-            width={piece.size}
-            height={piece.size}
-            rx={piece.radius}
-            fill={piece.fill}
-            className={styles.piece}
+          <g
+            className={styles.pieceBreathe}
             style={
               {
-                '--dx': `${piece.dx}px`,
-                '--dy': `${piece.dy}px`,
-                '--rot': `${piece.rot}deg`,
-                animationDelay: `${piece.delayMs}ms`,
+                '--float': `${piece.floatPx}px`,
+                animationDelay: `${piece.breatheDelayMs}ms`,
+                animationDuration: `${piece.breatheDurationMs}ms`,
               } as React.CSSProperties
             }
-          />
+          >
+            <rect
+              x={piece.x}
+              y={piece.y}
+              width={piece.size}
+              height={piece.size}
+              rx={piece.radius}
+              fill={piece.fill}
+              className={styles.piece}
+              style={
+                {
+                  '--dx': `${piece.dx}px`,
+                  '--dy': `${piece.dy}px`,
+                  '--rot': `${piece.rot}deg`,
+                  animationDelay: `${piece.delayMs}ms`,
+                } as React.CSSProperties
+              }
+            />
+          </g>
         </g>
       ))}
     </svg>
@@ -245,7 +313,24 @@ const SHOWCASE_APPS: AppMockup[] = [
   },
 ];
 
+const TRUST_LINES = [
+  '앱마다 데이터가 분리돼서 저장돼요',
+  '배포와 결제는 본인 확인을 거친 뒤에만 실행돼요',
+  '만들다 실패하면 횟수를 차감하지 않아요',
+];
+
+const PRICING_LINES = [
+  '무료 0원 · 앱 만들어보기',
+  '라이트 9,900원 · 배포와 주소, 데이터 저장',
+  '프로 29,900원 · 내 도메인, 카카오 로그인',
+];
+
 export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
+  const showcaseReveal = useReveal<HTMLElement>();
+  const trustReveal = useReveal<HTMLElement>();
+  const pricingReveal = useReveal<HTMLElement>();
+  const finalCtaReveal = useReveal<HTMLElement>();
+
   return (
     <div className={styles.page}>
       <section className={styles.hero}>
@@ -261,10 +346,10 @@ export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
             </nav>
           </div>
           <div className={styles.authLinks}>
-            <a href="/login" className={styles.loginSignupLink}>
+            <a href="/login" className={styles.navLink}>
               로그인
             </a>
-            <a href="/signup" className={styles.loginSignupLink}>
+            <a href="/signup" className={styles.navLink}>
               회원가입
             </a>
           </div>
@@ -275,9 +360,6 @@ export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
             <button type="button" className={styles.primaryCta} onClick={onEnter}>
               시작하기
             </button>
-            <a href="#showcase" className={styles.showcaseLink}>
-              만든 앱 구경하기
-            </a>
           </div>
 
           <div className={styles.logoColumn}>
@@ -286,17 +368,21 @@ export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
 
           <div className={styles.taglineColumn}>
             <p className={styles.taglineMain}>아이디어만 가져오세요</p>
-            <p className={styles.taglineSub}>말하면 앱이 되고, 주소가 생겨요</p>
+            <p className={styles.taglineSub}>쓰면 앱이 되고, 주소가 생겨요</p>
           </div>
         </div>
 
         <p className={styles.corner}>가입 없이 첫 앱을 만들어볼 수 있어요</p>
       </section>
 
-      <section id="showcase" className={styles.showcase}>
-        <h2 className={styles.showcaseTitle}>오늘 누군가는 이런 걸 만들었어요</h2>
+      <section
+        id="showcase"
+        ref={showcaseReveal.ref}
+        className={classNames(styles.showcase, styles.reveal, { [styles.revealVisible]: showcaseReveal.visible })}
+      >
+        <h2 className={styles.showcaseTitle}>오늘 다른 사용자는 이런 걸 만들었어요</h2>
 
-        <div className={styles.grid}>
+        <div className={classNames(styles.grid, { [styles.revealVisible]: showcaseReveal.visible })}>
           {SHOWCASE_APPS.map((app) => (
             <div key={app.name} className={styles.card}>
               <div className={styles.browserFrame}>
@@ -336,15 +422,53 @@ export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
             </div>
           ))}
         </div>
+      </section>
 
-        <div className={styles.showcaseFooter}>
-          <button type="button" className={styles.primaryCta} onClick={onEnter}>
-            앱 만들러 가기
-          </button>
-          <p className={styles.footerLegal}>
-            코랄레드 · 대표 한성민 · 사업자등록번호 383-23-02498 · coralred@coralred.kr
-          </p>
+      <section
+        ref={trustReveal.ref}
+        className={classNames(styles.infoBlock, styles.reveal, { [styles.revealVisible]: trustReveal.visible })}
+      >
+        <div className={styles.infoBlockHeader}>
+          <h3 className={styles.infoBlockTitle}>만든 다음이 더 중요하니까</h3>
+          <a href="#" className={styles.showcaseLink}>
+            기술과 보안 자세히
+          </a>
         </div>
+        <ul className={classNames(styles.infoList, { [styles.revealVisible]: trustReveal.visible })}>
+          {TRUST_LINES.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section
+        ref={pricingReveal.ref}
+        className={classNames(styles.infoBlock, styles.reveal, { [styles.revealVisible]: pricingReveal.visible })}
+      >
+        <div className={styles.infoBlockHeader}>
+          <h3 className={styles.infoBlockTitle}>요금제</h3>
+          <a href="/pricing" className={styles.showcaseLink}>
+            요금제 자세히
+          </a>
+        </div>
+        <ul className={classNames(styles.infoList, { [styles.revealVisible]: pricingReveal.visible })}>
+          {PRICING_LINES.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section
+        ref={finalCtaReveal.ref}
+        className={classNames(styles.finalCta, styles.reveal, { [styles.revealVisible]: finalCtaReveal.visible })}
+      >
+        <p className={styles.finalCtaHeadline}>지금 떠오른 그거, 오늘 주소로 만들어요</p>
+        <button type="button" className={styles.primaryCta} onClick={onEnter}>
+          시작하기
+        </button>
+        <p className={styles.footerLegal}>
+          코랄레드 · 대표 한성민 · 사업자등록번호 383-23-02498 · coralred@coralred.kr
+        </p>
       </section>
     </div>
   );

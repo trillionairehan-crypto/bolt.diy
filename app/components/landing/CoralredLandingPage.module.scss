@@ -58,22 +58,12 @@ $coral: #ff5330;
   }
 }
 
+// .navLink is reused here (not a separate class) so this is guaranteed identical to the nav
+// links, not just visually matched — the request was "완전히 동일하게" (completely identical).
 .authLinks {
   display: flex;
   align-items: center;
   gap: 20px;
-}
-
-.loginSignupLink {
-  font-size: 15px;
-  font-weight: 500;
-  color: $ink;
-  text-decoration: none;
-  white-space: nowrap;
-
-  &:hover {
-    opacity: 0.7;
-  }
 }
 
 .heroMiddle {
@@ -143,7 +133,7 @@ $coral: #ff5330;
 .taglineMain {
   font-size: clamp(22px, 2.6vw, 30px);
   font-weight: 700;
-  color: $coral;
+  color: $ink;
   letter-spacing: -0.02em;
   line-height: 1.35;
   margin: 0;
@@ -152,7 +142,7 @@ $coral: #ff5330;
 .taglineSub {
   font-size: clamp(15px, 1.6vw, 18px);
   font-weight: 500;
-  color: $ink-soft;
+  color: $ink;
   letter-spacing: -0.01em;
   line-height: 1.4;
   margin: 0;
@@ -175,6 +165,23 @@ $coral: #ff5330;
   width: clamp(220px, 27vw, 420px);
   height: clamp(220px, 27vw, 420px);
   flex-shrink: 0;
+}
+
+/*
+ * Hover reaction — movement only, no light/glow. Lives on its own outer <g> (one per piece,
+ * wrapping .pieceBreathe) specifically so it doesn't fight the ambient breathing's own transform:
+ * a plain (non-keyframed) transition on a separate element composes cleanly with the nested
+ * animations instead of the two trying to drive the same property. ~3-4x the ambient float's
+ * 2-3px amplitude, reusing each piece's original scatter direction (see spreadX/spreadY) so it
+ * reads as "the same motion, bigger" rather than a new effect.
+ */
+.pieceSpread {
+  transform: translate(0, 0);
+  transition: transform 0.4s ease-out;
+}
+
+.logoAssembly:hover .pieceSpread {
+  transform: translate(var(--spread-x, 0px), var(--spread-y, 0px));
 }
 
 // One-shot entrance (translate/rotate/opacity) — lives on the <rect>, separate from the
@@ -237,6 +244,10 @@ $coral: #ff5330;
 
   .pieceBreathe {
     animation: none;
+  }
+
+  .pieceSpread {
+    transition: none;
   }
 }
 
@@ -372,20 +383,133 @@ $coral: #ff5330;
   margin: 0;
 }
 
-.showcaseFooter {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 40px;
-  padding: clamp(48px, 8vw, 80px) 0 40px;
-}
-
 .footerLegal {
   font-size: 12px;
   font-weight: 400;
   color: $ink-soft;
   text-align: center;
   margin: 0;
+}
+
+// ---------- Trust / pricing info blocks ----------
+
+.infoBlock {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(48px, 7vw, 88px) clamp(20px, 5vw, 64px) 0;
+}
+
+.infoBlockHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: clamp(20px, 3vw, 32px);
+}
+
+.infoBlockTitle {
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.infoList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  li {
+    font-size: clamp(15px, 1.6vw, 17px);
+    font-weight: 500;
+    color: $ink;
+    line-height: 1.5;
+    margin: 0;
+  }
+}
+
+// ---------- Final CTA ----------
+
+.finalCta {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(64px, 10vw, 120px) clamp(20px, 5vw, 64px) clamp(56px, 8vw, 88px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 28px;
+}
+
+.finalCtaHeadline {
+  font-size: clamp(26px, 3.6vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  margin: 0;
+  max-width: 720px;
+}
+
+// ---------- Scroll reveal ----------
+
+/*
+ * One-time reveal on first scroll into view (see useReveal in the component) — a small upward
+ * shift plus fade, never scale/rotate/parallax/horizontal slide per the request. .revealVisible is
+ * added once (IntersectionObserver disconnects after the first trigger), so this never re-plays.
+ * Stagger for repeated children (cards, info-list lines) is nth-child transition-delay below —
+ * driven by the SAME .revealVisible flag as the parent, not a separate observer.
+ */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
+}
+
+.revealVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.grid .card,
+.infoList li {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
+}
+
+.grid.revealVisible .card,
+.infoList.revealVisible li {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@for $i from 1 through 6 {
+  .grid.revealVisible .card:nth-child(#{$i}) {
+    transition-delay: #{($i - 1) * 70}ms;
+  }
+}
+
+@for $i from 1 through 3 {
+  .infoList.revealVisible li:nth-child(#{$i}) {
+    transition-delay: #{($i - 1) * 70}ms;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .grid .card,
+  .infoList li {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 // ---------- Mobile fold (390px) ----------
@@ -395,10 +519,6 @@ $coral: #ff5330;
   // wasn't part of the request — drop the nav links, keep logo + login/회원가입.
   .navLinks {
     display: none;
-  }
-
-  .loginSignupLink {
-    font-size: 13px;
   }
 
   .heroMiddle {
@@ -440,6 +560,12 @@ $coral: #ff5330;
 
   .grid {
     grid-template-columns: 1fr;
+  }
+
+  .infoBlockHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 }
 
