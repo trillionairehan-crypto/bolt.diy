@@ -49,13 +49,19 @@ $coral: #ff5330;
 .navLink {
   font-size: 13px;
   font-weight: 500;
-  color: $ink-soft;
+  color: $ink;
   text-decoration: none;
   white-space: nowrap;
 
   &:hover {
-    color: $ink;
+    opacity: 0.7;
   }
+}
+
+.authLinks {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 
 .loginSignupLink {
@@ -137,6 +143,7 @@ $coral: #ff5330;
 .taglineMain {
   font-size: clamp(22px, 2.6vw, 30px);
   font-weight: 700;
+  color: $coral;
   letter-spacing: -0.02em;
   line-height: 1.35;
   margin: 0;
@@ -168,12 +175,6 @@ $coral: #ff5330;
   width: clamp(220px, 27vw, 420px);
   height: clamp(220px, 27vw, 420px);
   flex-shrink: 0;
-  filter: drop-shadow(0 0 0 rgba(255, 83, 48, 0));
-  transition: filter 0.4s ease;
-
-  &:hover {
-    filter: drop-shadow(0 0 32px rgba(255, 83, 48, 0.35));
-  }
 }
 
 // One-shot entrance (translate/rotate/opacity) — lives on the <rect>, separate from the
@@ -202,10 +203,11 @@ $coral: #ff5330;
 }
 
 /*
- * Always-on ambient motion (핵심 수정) — never settles after assembly. Each piece's <g> wrapper
- * gets its own duration (4.4-5.6s, all within the requested 4-6s) and delay via inline style
- * (see LOGO_PIECES), so the six pieces stay visibly out of phase with each other continuously,
- * not just offset by a fixed amount. Scale-only (1-1.5%) — no rotation, no flashing, no particles.
+ * Always-on ambient motion — never settles after assembly, and carries the "alive" feeling alone
+ * now that the hover glow is gone. Each piece's <g> wrapper gets its own duration (5-7s) and
+ * delay via inline style (see LOGO_PIECES), so the six pieces stay visibly out of phase with each
+ * other continuously, not just offset by a fixed amount. Scale (1-1.5%) plus a small vertical
+ * float (--float, 2-3px, per piece) — no rotation, no flashing, no particles, no light effects.
  */
 .pieceBreathe {
   transform-box: fill-box;
@@ -218,11 +220,11 @@ $coral: #ff5330;
 @keyframes breathePiece {
   0%,
   100% {
-    transform: scale(1);
+    transform: translateY(0) scale(1);
   }
 
   50% {
-    transform: scale(1.015);
+    transform: translateY(var(--float, -2.5px)) scale(1.015);
   }
 }
 

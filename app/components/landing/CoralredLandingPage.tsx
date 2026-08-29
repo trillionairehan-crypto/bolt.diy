@@ -17,14 +17,16 @@ interface LogoPiece {
   delayMs: number;
   breatheDelayMs: number;
   breatheDurationMs: number;
+  floatPx: number;
 }
 
 /*
  * Same 6 pieces as public/logo/coralred-symbol.svg — scattered start position per piece for the
  * one-shot assembly animation, converging on their real coordinates. breatheDelayMs/DurationMs
- * drive the always-on ambient motion that starts once assembly settles — different durations per
- * piece (not just a fixed initial offset) so they keep drifting in and out of phase over time
- * instead of just being a constant offset from each other (see .pieceBreathe in the stylesheet).
+ * drive the always-on ambient motion that starts once assembly settles — different durations
+ * (5-7s) per piece, not just a fixed initial offset, so they keep drifting in and out of phase
+ * over time. floatPx (2-3px, negative = rises then sinks back) varies per piece too, on top of the
+ * shared 1-1.5% scale breathing — see .pieceBreathe in the stylesheet.
  */
 const LOGO_PIECES: LogoPiece[] = [
   {
@@ -38,7 +40,8 @@ const LOGO_PIECES: LogoPiece[] = [
     rot: -25,
     delayMs: 0,
     breatheDelayMs: 1300,
-    breatheDurationMs: 4600,
+    breatheDurationMs: 5200,
+    floatPx: -2.2,
   },
   {
     x: 63,
@@ -51,7 +54,8 @@ const LOGO_PIECES: LogoPiece[] = [
     rot: 20,
     delayMs: 70,
     breatheDelayMs: 1450,
-    breatheDurationMs: 5200,
+    breatheDurationMs: 6400,
+    floatPx: -2.8,
   },
   {
     x: 63,
@@ -64,7 +68,8 @@ const LOGO_PIECES: LogoPiece[] = [
     rot: -15,
     delayMs: 140,
     breatheDelayMs: 1200,
-    breatheDurationMs: 4800,
+    breatheDurationMs: 5800,
+    floatPx: -2.4,
   },
   {
     x: 153,
@@ -77,7 +82,8 @@ const LOGO_PIECES: LogoPiece[] = [
     rot: 25,
     delayMs: 210,
     breatheDelayMs: 1600,
-    breatheDurationMs: 5600,
+    breatheDurationMs: 7000,
+    floatPx: -3,
   },
   {
     x: 289,
@@ -90,7 +96,8 @@ const LOGO_PIECES: LogoPiece[] = [
     rot: -20,
     delayMs: 280,
     breatheDelayMs: 1350,
-    breatheDurationMs: 5000,
+    breatheDurationMs: 6100,
+    floatPx: -2.6,
   },
   {
     x: 289,
@@ -103,7 +110,8 @@ const LOGO_PIECES: LogoPiece[] = [
     rot: 18,
     delayMs: 350,
     breatheDelayMs: 1550,
-    breatheDurationMs: 4400,
+    breatheDurationMs: 5500,
+    floatPx: -2,
   },
 ];
 
@@ -116,6 +124,7 @@ function LogoAssembly({ className }: { className?: string }) {
           className={styles.pieceBreathe}
           style={
             {
+              '--float': `${piece.floatPx}px`,
               animationDelay: `${piece.breatheDelayMs}ms`,
               animationDuration: `${piece.breatheDurationMs}ms`,
             } as React.CSSProperties
@@ -251,9 +260,14 @@ export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
               ))}
             </nav>
           </div>
-          <a href="/login" className={styles.loginSignupLink}>
-            로그인 / 회원가입
-          </a>
+          <div className={styles.authLinks}>
+            <a href="/login" className={styles.loginSignupLink}>
+              로그인
+            </a>
+            <a href="/signup" className={styles.loginSignupLink}>
+              회원가입
+            </a>
+          </div>
         </div>
 
         <div className={styles.heroMiddle}>
