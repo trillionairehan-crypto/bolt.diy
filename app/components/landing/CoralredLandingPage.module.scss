@@ -34,36 +34,39 @@ $coral: #ff5330;
   flex-shrink: 0;
 }
 
-.topRight {
+.topLeft {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 3vw, 36px);
+}
+
+.navLinks {
   display: flex;
   align-items: center;
   gap: 20px;
 }
 
-.loginLink {
+.navLink {
+  font-size: 13px;
+  font-weight: 500;
+  color: $ink-soft;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    color: $ink;
+  }
+}
+
+.loginSignupLink {
   font-size: 15px;
   font-weight: 500;
   color: $ink;
   text-decoration: none;
+  white-space: nowrap;
 
   &:hover {
     opacity: 0.7;
-  }
-}
-
-.startButton {
-  font-size: 15px;
-  font-weight: 700;
-  color: $cream;
-  background: $ink;
-  border: none;
-  border-radius: 999px;
-  padding: 11px 22px;
-  cursor: pointer;
-  letter-spacing: -0.01em;
-
-  &:hover {
-    opacity: 0.85;
   }
 }
 
@@ -128,16 +131,24 @@ $coral: #ff5330;
   justify-self: start;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
-.tagline {
-  font-size: clamp(17px, 1.9vw, 22px);
+.taglineMain {
+  font-size: clamp(22px, 2.6vw, 30px);
   font-weight: 700;
   letter-spacing: -0.02em;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.taglineSub {
+  font-size: clamp(15px, 1.6vw, 18px);
+  font-weight: 500;
+  color: $ink-soft;
+  letter-spacing: -0.01em;
   line-height: 1.4;
   margin: 0;
-  white-space: nowrap;
 }
 
 .corner {
@@ -157,9 +168,17 @@ $coral: #ff5330;
   width: clamp(220px, 27vw, 420px);
   height: clamp(220px, 27vw, 420px);
   flex-shrink: 0;
-  animation: breathe 6s ease-in-out 1.8s infinite;
+  filter: drop-shadow(0 0 0 rgba(255, 83, 48, 0));
+  transition: filter 0.4s ease;
+
+  &:hover {
+    filter: drop-shadow(0 0 32px rgba(255, 83, 48, 0.35));
+  }
 }
 
+// One-shot entrance (translate/rotate/opacity) — lives on the <rect>, separate from the
+// continuous breathing below (which lives on the wrapping <g>) so the two never fight over the
+// same transform.
 .piece {
   transform-box: fill-box;
   transform-origin: center;
@@ -182,7 +201,21 @@ $coral: #ff5330;
   }
 }
 
-@keyframes breathe {
+/*
+ * Always-on ambient motion (핵심 수정) — never settles after assembly. Each piece's <g> wrapper
+ * gets its own duration (4.4-5.6s, all within the requested 4-6s) and delay via inline style
+ * (see LOGO_PIECES), so the six pieces stay visibly out of phase with each other continuously,
+ * not just offset by a fixed amount. Scale-only (1-1.5%) — no rotation, no flashing, no particles.
+ */
+.pieceBreathe {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-name: breathePiece;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes breathePiece {
   0%,
   100% {
     transform: scale(1);
@@ -194,14 +227,14 @@ $coral: #ff5330;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .logoAssembly {
-    animation: none;
-  }
-
   .piece {
     animation: none;
     opacity: 1;
     transform: none;
+  }
+
+  .pieceBreathe {
+    animation: none;
   }
 }
 
@@ -228,12 +261,99 @@ $coral: #ff5330;
 }
 
 .card {
-  border: 1px solid rgba(26, 26, 26, 0.12);
-  border-radius: 16px;
-  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
+}
+
+.browserFrame {
+  border: 1px solid rgba(26, 26, 26, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  background: $cream;
+}
+
+.browserBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(26, 26, 26, 0.04);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+}
+
+.browserDots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(26, 26, 26, 0.18);
+}
+
+.addressBar {
+  flex: 1;
+  font-size: 10px;
+  font-weight: 400;
+  color: $ink-soft;
+  background: rgba(26, 26, 26, 0.05);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-family: 'IBM Plex Mono', 'Pretendard', monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.browserContent {
+  padding: 20px 16px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mockupHeader {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.mockupLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: $ink-soft;
+  margin: 0;
+}
+
+.mockupNumber {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.mockupList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  li {
+    font-size: 12px;
+    font-weight: 500;
+    color: $ink;
+    padding-left: 10px;
+    border-left: 2px solid;
+    line-height: 1.4;
+  }
 }
 
 .cardName {
@@ -248,14 +368,6 @@ $coral: #ff5330;
   font-weight: 500;
   color: $ink-soft;
   margin: 0;
-}
-
-.cardUrl {
-  font-size: 13px;
-  font-weight: 400;
-  color: $ink-soft;
-  margin: 10px 0 0;
-  font-family: 'IBM Plex Mono', 'Pretendard', monospace;
 }
 
 .showcaseFooter {
@@ -277,6 +389,16 @@ $coral: #ff5330;
 // ---------- Mobile fold (390px) ----------
 
 @media (max-width: 640px) {
+  // No room for logo + 4 links + login/회원가입 in one row at this width, and a hamburger menu
+  // wasn't part of the request — drop the nav links, keep logo + login/회원가입.
+  .navLinks {
+    display: none;
+  }
+
+  .loginSignupLink {
+    font-size: 13px;
+  }
+
   .heroMiddle {
     grid-template-columns: 1fr;
     row-gap: 28px;
