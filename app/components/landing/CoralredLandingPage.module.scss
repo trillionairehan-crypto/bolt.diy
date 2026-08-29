@@ -438,6 +438,21 @@ $coral: #ff5330;
   }
 }
 
+// The pricing list's per-row intensity mark — the only place tier hierarchy is shown, since no
+// non-coral colors and no "추천" badge are allowed.
+.pricingListItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pricingTierMark {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
 // Concept-illustrating shapes only — lines/fills, no icons, coral + warm-gray only.
 .trustGraphic {
   flex-shrink: 0;
@@ -461,7 +476,7 @@ $coral: #ff5330;
   background: rgba(255, 83, 48, 0.09);
 }
 
-// Staircase of 3 steps (the 3 plans); coral opacity (set inline per-step) indicates tier.
+// Staircase of 4 steps (the 4 plans); coral opacity (set inline per-step) indicates tier.
 .pricingGraphic {
   flex-shrink: 0;
   display: flex;
@@ -502,11 +517,14 @@ $coral: #ff5330;
 // ---------- Scroll reveal ----------
 
 /*
- * One-time reveal on first scroll into view (see useReveal in the component) — a small upward
- * shift plus fade, never scale/rotate/parallax/horizontal slide per the request. .revealVisible is
- * added once (IntersectionObserver disconnects after the first trigger), so this never re-plays.
- * Stagger for repeated children (cards, info-list lines) is nth-child transition-delay below —
- * driven by the SAME .revealVisible flag as the parent, not a separate observer.
+ * Replays every time a section crosses into/out of the viewport (see useReveal in the component)
+ * — a small upward shift plus fade, never scale/rotate/parallax/horizontal slide per the request.
+ * .revealVisible tracks IntersectionObserver's isIntersecting directly, so it toggles on both
+ * scroll directions instead of firing once. Stagger for repeated children (cards, info-list
+ * lines) is nth-child transition-delay below — driven by the SAME .revealVisible flag as the
+ * parent, not a separate observer. The delay only applies while entering (see the @for loops
+ * below, scoped to `.revealVisible`), so children fan back out together on exit rather than
+ * un-staggering in reverse order.
  */
 .reveal {
   opacity: 0;

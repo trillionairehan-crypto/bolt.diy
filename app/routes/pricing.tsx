@@ -16,7 +16,9 @@ interface PricingPlan {
   carryOver: boolean;
   brandingRemoved: boolean;
   customBrandColor: boolean;
-  recommended?: boolean;
+
+  /** Coral opacity (0-1) — the only signal of plan hierarchy; matches the landing page's tiers. */
+  intensity: number;
 }
 
 const PLANS: PricingPlan[] = [
@@ -27,6 +29,7 @@ const PLANS: PricingPlan[] = [
     carryOver: false,
     brandingRemoved: false,
     customBrandColor: false,
+    intensity: 0.18,
   },
   {
     name: 'Light',
@@ -35,6 +38,7 @@ const PLANS: PricingPlan[] = [
     carryOver: true,
     brandingRemoved: false,
     customBrandColor: false,
+    intensity: 0.4,
   },
   {
     name: 'Pro',
@@ -43,7 +47,7 @@ const PLANS: PricingPlan[] = [
     carryOver: true,
     brandingRemoved: true,
     customBrandColor: true,
-    recommended: true,
+    intensity: 0.65,
   },
   {
     name: 'Max',
@@ -52,6 +56,7 @@ const PLANS: PricingPlan[] = [
     carryOver: true,
     brandingRemoved: true,
     customBrandColor: true,
+    intensity: 1,
   },
 ];
 
@@ -121,12 +126,18 @@ export default function Pricing() {
       <section>
         <div className="cr-grid-4">
           {PLANS.map((plan) => (
-            <div
-              key={plan.name}
-              className="cr-card cr-stack-16"
-              style={plan.recommended ? { borderColor: 'var(--accent)' } : undefined}
-            >
-              {plan.recommended ? <span className="cr-badge">추천</span> : null}
+            <div key={plan.name} className="cr-card cr-stack-16" style={{ position: 'relative', overflow: 'hidden' }}>
+              <span
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 4,
+                  background: `rgba(255, 83, 48, ${plan.intensity})`,
+                }}
+              />
               <div className="cr-stack-4">
                 <span className="cr-eyebrow">{plan.name}</span>
                 <div className="cr-row-8" style={{ alignItems: 'baseline' }}>

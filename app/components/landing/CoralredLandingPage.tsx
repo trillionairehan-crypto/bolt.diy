@@ -8,9 +8,10 @@ interface CoralredLandingPageProps {
 }
 
 /*
- * Fires once when the returned ref's element first enters the viewport, then disconnects — so a
- * section that's already been revealed never re-animates on a later scroll past it. Skips straight
- * to visible (no animation at all) when the visitor has prefers-reduced-motion set.
+ * Toggles on whenever the returned ref's element is in the viewport, off whenever it leaves —
+ * in either scroll direction — so the reveal animation replays every time a section re-enters
+ * view, not just the first time. Skips straight to visible (no animation at all, and no
+ * subsequent toggling) when the visitor has prefers-reduced-motion set.
  */
 function useReveal<T extends HTMLElement>() {
   const ref = useRef<T | null>(null);
@@ -28,15 +29,7 @@ function useReveal<T extends HTMLElement>() {
       return undefined;
     }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 },
-    );
+    const observer = new IntersectionObserver(([entry]) => setVisible(entry.isIntersecting), { threshold: 0.15 });
 
     observer.observe(el);
 
@@ -309,10 +302,20 @@ const SHOWCASE_APPS: AppMockup[] = [
 
 const TRUST_LINES = ['내 앱 데이터는 내 것만', '함부로 배포되지 않아요', '실패하면 돈을 받지 않아요'];
 
-const PRICING_LINES = [
-  '무료 0원 · 앱 만들어보기',
-  '라이트 9,900원 · 배포와 주소, 데이터 저장',
-  '프로 29,900원 · 내 도메인, 카카오 로그인',
+/*
+ * 코랄 한 색의 농도만으로 4단계 위계를 표현 — "추천" 표시 없이 네 플랜을 동등하게 보여준다.
+ * 이 intensity가 요금제 상세 페이지(app/routes/pricing.tsx)의 카드 상단 바에도 그대로 쓰인다.
+ */
+interface PricingTier {
+  label: string;
+  intensity: number;
+}
+
+const PRICING_TIERS: PricingTier[] = [
+  { label: '무료 0원 · 월 메시지 10건', intensity: 0.18 },
+  { label: '라이트 9,900원 · 월 35건, 이월', intensity: 0.4 },
+  { label: '프로 29,900원 · 월 100건, 브랜딩 제거, 커스텀 색상', intensity: 0.65 },
+  { label: '맥스 79,900원 · 월 300건, 브랜딩 제거, 커스텀 색상', intensity: 1 },
 ];
 
 export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
@@ -447,16 +450,24 @@ export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
               </a>
             </div>
             <ul className={classNames(styles.infoList, { [styles.revealVisible]: pricingReveal.visible })}>
-              {PRICING_LINES.map((line) => (
-                <li key={line}>{line}</li>
+              {PRICING_TIERS.map((tier) => (
+                <li key={tier.label} className={styles.pricingListItem}>
+                  <span
+                    className={styles.pricingTierMark}
+                    style={{ background: `rgba(255, 83, 48, ${tier.intensity})` }}
+                    aria-hidden="true"
+                  />
+                  {tier.label}
+                </li>
               ))}
             </ul>
           </div>
 
-          {/* 세 플랜을 나타내는 계단형 도형 — 코랄 농도(투명도)로 단계 표현 */}
+          {/* 네 플랜을 나타내는 계단형 도형 — 코랄 농도(투명도)로 단계 표현 */}
           <div className={styles.pricingGraphic} aria-hidden="true">
-            <span className={styles.pricingStep} style={{ height: '38%', opacity: 0.35 }} />
-            <span className={styles.pricingStep} style={{ height: '68%', opacity: 0.65 }} />
+            <span className={styles.pricingStep} style={{ height: '22%', opacity: 0.18 }} />
+            <span className={styles.pricingStep} style={{ height: '48%', opacity: 0.4 }} />
+            <span className={styles.pricingStep} style={{ height: '74%', opacity: 0.65 }} />
             <span className={styles.pricingStep} style={{ height: '100%', opacity: 1 }} />
           </div>
         </div>
