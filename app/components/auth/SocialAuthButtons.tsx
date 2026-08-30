@@ -50,11 +50,21 @@ export const AUTH_BUTTON_CLASS =
 export function SocialAuthButtons() {
   return (
     <div className="flex flex-col gap-2">
+      {/*
+       * 마무리 수정 4: 카카오 노란색(#FEE500)은 브랜드 규정상 고정이지만, 테두리가 없어서 옆의
+       * 구글 버튼(회갈색 테두리)보다 시각적으로 튀었다 — 두 버튼에 같은 테두리·그림자를 줘서
+       * 무게를 맞춘다. font-weight는 이미 AUTH_BUTTON_CLASS(font-medium) 공유라 손댈 게 없음.
+       */}
       <button
         type="button"
         onClick={() => signInWithKakao()}
         className={AUTH_BUTTON_CLASS}
-        style={{ background: '#FEE500', color: '#191919' }}
+        style={{
+          background: '#FEE500',
+          color: '#191919',
+          border: '1px solid #EFE4D6',
+          boxShadow: '0 1px 2px rgba(26, 26, 26, 0.04)',
+        }}
       >
         <KakaoSymbol />
         카카오로 계속하기
@@ -64,7 +74,7 @@ export function SocialAuthButtons() {
         type="button"
         onClick={() => signInWithGoogle()}
         className={`${AUTH_BUTTON_CLASS} bg-white hover:bg-[#FBF5EE]`}
-        style={{ border: '1px solid #EFE4D6', color: '#1A1A1A' }}
+        style={{ border: '1px solid #EFE4D6', color: '#1A1A1A', boxShadow: '0 1px 2px rgba(26, 26, 26, 0.04)' }}
       >
         <GoogleSymbol />
         구글로 계속하기

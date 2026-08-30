@@ -24,7 +24,10 @@ export default function Login() {
   return (
     <AuthPageShell>
       {/* 3-1: Vercel 로그인 화면 정도의 비중 — 32px/600/잉크/가운데. */}
-      <h1 className="text-center" style={{ fontSize: 32, fontWeight: 600, color: '#1A1A1A', marginBottom: 32 }}>
+      <h1
+        className="text-center"
+        style={{ fontSize: 32, fontWeight: 600, color: '#1A1A1A', marginBottom: 32, wordBreak: 'keep-all' }}
+      >
         다시 오셨네요
       </h1>
 

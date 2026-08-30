@@ -41,12 +41,19 @@ body {
   background-color: var(--muted);
 }
 
+/*
+ * 로그인·회원가입 마무리 수정: 예전엔 --accent-ring(오클치, --hue 의존) 토큰을 썼는데, 이 앱
+ * 자체 화면(생성되는 앱들과 별개)은 이제 전부 리터럴 코랄레드 hex로 통일 중이라 여기도 맞춘다 —
+ * --hue 계산에 기대지 않아 셀렉션 색이 항상 코랄 톤으로 고정된다.
+ */
 ::selection {
-  background-color: var(--accent-ring);
+  background: #ffe4dc;
+  color: #1a1a1a;
 }
 
-:root[data-theme='dark'] ::selection {
-  background-color: oklch(0.4 0.1 var(--hue));
+::-moz-selection {
+  background: #ffe4dc;
+  color: #1a1a1a;
 }
 
 // Applied briefly to <html> by toggleTheme() (theme.ts), then removed — deliberately not an

@@ -23,8 +23,13 @@ export default function Signup() {
 
   return (
     <AuthPageShell>
-      <h1 className="text-center" style={{ fontSize: 32, fontWeight: 600, color: '#1A1A1A', marginBottom: 32 }}>
-        첫 앱까지, 가입 한 번이면 돼요
+      <h1
+        className="text-center"
+        style={{ fontSize: 32, fontWeight: 600, color: '#1A1A1A', marginBottom: 32, wordBreak: 'keep-all' }}
+      >
+        첫 앱까지,
+        <br />
+        가입 한 번이면 돼요
       </h1>
 
       <div className="w-full">

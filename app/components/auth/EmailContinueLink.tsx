@@ -61,7 +61,7 @@ export function EmailContinueLink() {
         type="button"
         onClick={() => setExpanded(true)}
         className="text-sm hover:underline"
-        style={{ color: '#7A7067', minHeight: 44 }}
+        style={{ color: '#7A7067', minHeight: 44, background: 'transparent', border: 'none' }}
       >
         이메일로 계속하기
       </button>
@@ -180,7 +180,7 @@ export function EmailContinueLink() {
             }}
             disabled={loading}
             className="text-sm hover:underline disabled:opacity-50"
-            style={{ color: '#7A7067', minHeight: 44 }}
+            style={{ color: '#7A7067', minHeight: 44, background: 'transparent', border: 'none' }}
           >
             이메일 다시 입력
           </button>
