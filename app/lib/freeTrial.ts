@@ -92,50 +92,41 @@ export async function incrementGenerationsUsed(): Promise<void> {
 }
 
 /*
- * --- overnight3 A5: v2 목표 정의, CORALRED_NEW_METERING 플래그 뒤에 있음 (기본 꺼짐) ---
- * 목표: 1 사용자 발화 = 1 메시지. auto-fix(actionAlert 기원) 트리거는 제외. 무료 티어 = 월 10개 + 일 1개.
+ * --- overnight3 A5, corrected 08-31 against the pricing page --- v2 목표: 1 사용자 발화 = 1
+ * 메시지. auto-fix(actionAlert 기원) 트리거는 제외. 요금제 페이지에 고지된 건 "월 10건"뿐이라
+ * 계정 한도는 일일 상한 없이 월 10건. 게스트(비로그인)는 로그인 유도를 위해 별도로 더 낮은
+ * 월 1건(가입 유도 목적, 요금제 페이지 대상이 아니므로 고지 의무 없음) — 이쪽도 일일 상한 없음.
  * 유료 플랜 이월(다음 달로 최대 월 할당량의 2배까지 누적)은 결제/플랜 스키마에 대한 가시성이 없어서
  * (pricing.tsx가 불가침이라 플랜별 월 할당량을 코드로 확인 못함) 이번 마이그레이션엔 DB 컬럼만 마련해두고
- * 로직은 안 붙임 — supabase/migrations의 마이그레이션 파일 주석 참고, 아침에 실제 플랜 스키마 확인 후 이어서.
+ * 로직은 안 붙임 — supabase/migrations의 마이그레이션 파일 주석 참고.
  */
 
-const V2_FREE_MONTHLY_LIMIT = 10;
-const V2_FREE_DAILY_LIMIT = 1;
+/*
+ * 로그인 계정의 v2 월간 한도(요금제 페이지의 Free 플랜, 월 10건)는 클라이언트에 상수로 두지
+ * 않는다 — get_generation_status_v2 RPC가 유일한 소스이며 서버 쪽 값(10)과 반드시 일치해야
+ * 한다. 여기 있는 건 계정 한도보다 낮게 잡아 로그인을 유도하는 게스트 전용 한도뿐.
+ */
+const V2_GUEST_MONTHLY_LIMIT = 1;
 const V2_GUEST_USAGE_KEY = 'coralred_free_generations_v2';
 
 interface V2GuestUsage {
   month: string;
   monthCount: number;
-  day: string;
-  dayCount: number;
 }
 
 function readV2GuestUsage(): V2GuestUsage {
   const stored = getLocalStorage(V2_GUEST_USAGE_KEY) as Partial<V2GuestUsage> | undefined;
   const month = new Date().toISOString().slice(0, 7);
-  const day = new Date().toISOString().slice(0, 10);
 
   return {
     month,
     monthCount: stored?.month === month ? (stored.monthCount ?? 0) : 0,
-    day,
-    dayCount: stored?.day === day ? (stored.dayCount ?? 0) : 0,
   };
 }
 
-/**
- * The number shown to the user is the more restrictive of the two windows — that's also the one
- * that actually blocks the next generation (see hasV2GuestGenerationsRemaining below), so showing
- * anything else (e.g. just the monthly figure) would read as "you have generations left" on a day
- * the daily cap has already been hit.
- */
 export function getV2GuestGenerationsRemaining(): number {
   const usage = readV2GuestUsage();
-
-  return Math.min(
-    Math.max(V2_FREE_MONTHLY_LIMIT - usage.monthCount, 0),
-    Math.max(V2_FREE_DAILY_LIMIT - usage.dayCount, 0),
-  );
+  return Math.max(V2_GUEST_MONTHLY_LIMIT - usage.monthCount, 0);
 }
 
 export function hasV2GuestGenerationsRemaining(): boolean {
@@ -147,14 +138,12 @@ export function incrementV2GuestGenerationsUsed(): void {
   setLocalStorage(V2_GUEST_USAGE_KEY, {
     month: usage.month,
     monthCount: usage.monthCount + 1,
-    day: usage.day,
-    dayCount: usage.dayCount + 1,
   } satisfies V2GuestUsage);
 }
 
-export async function getV2AccountGenerationStatus(): Promise<{ monthRemaining: number; dayRemaining: number }> {
+export async function getV2AccountGenerationStatus(): Promise<{ monthRemaining: number }> {
   if (!platformSupabase) {
-    return { monthRemaining: 0, dayRemaining: 0 };
+    return { monthRemaining: 0 };
   }
 
   const { data, error } = await platformSupabase.rpc('get_generation_status_v2');
@@ -165,7 +154,6 @@ export async function getV2AccountGenerationStatus(): Promise<{ monthRemaining: 
 
   return {
     monthRemaining: typeof data?.monthRemaining === 'number' ? data.monthRemaining : 0,
-    dayRemaining: typeof data?.dayRemaining === 'number' ? data.dayRemaining : 0,
   };
 }
 
@@ -181,16 +169,15 @@ export async function incrementV2AccountGenerationsUsed(): Promise<void> {
   }
 }
 
-/** Same "more restrictive window wins" reasoning as getV2GuestGenerationsRemaining above. */
 export async function getV2AccountGenerationsRemaining(): Promise<number> {
   const status = await getV2AccountGenerationStatus();
-  return Math.min(status.monthRemaining, status.dayRemaining);
+  return status.monthRemaining;
 }
 
 export async function hasV2GenerationsRemaining(): Promise<boolean> {
   if (authUserStore.get()) {
     const status = await getV2AccountGenerationStatus();
-    return status.monthRemaining > 0 && status.dayRemaining > 0;
+    return status.monthRemaining > 0;
   }
 
   return hasV2GuestGenerationsRemaining();
