@@ -1,32 +1,15 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useStore } from '@nanostores/react';
+import { useEffect, useRef, useState } from 'react';
 import * as RadixDialog from '@radix-ui/react-dialog';
 import { classNames } from '~/utils/classNames';
-import { useFeatures } from '~/lib/hooks/useFeatures';
 import { useNotifications } from '~/lib/hooks/useNotifications';
 import { useConnectionStatus } from '~/lib/hooks/useConnectionStatus';
-import { tabConfigurationStore, resetTabConfiguration } from '~/lib/stores/settings';
-import { profileStore } from '~/lib/stores/profile';
-import { SHOW_DEV_TOOLS } from '~/utils/constants';
-import type { TabType, Profile } from './types';
+import type { TabType } from './types';
 import { TAB_ICONS, TAB_LABELS } from './constants';
 import { DialogTitle } from '~/components/ui/Dialog';
 
-// Import all tab components
 import ProfileTab from '~/components/@settings/tabs/profile/ProfileTab';
-import SettingsTab from '~/components/@settings/tabs/settings/SettingsTab';
 import NotificationsTab from '~/components/@settings/tabs/notifications/NotificationsTab';
-import FeaturesTab from '~/components/@settings/tabs/features/FeaturesTab';
-import { DataTab } from '~/components/@settings/tabs/data/DataTab';
-import { EventLogsTab } from '~/components/@settings/tabs/event-logs/EventLogsTab';
-import GitHubTab from '~/components/@settings/tabs/github/GitHubTab';
-import GitLabTab from '~/components/@settings/tabs/gitlab/GitLabTab';
 import SupabaseTab from '~/components/@settings/tabs/supabase/SupabaseTab';
-import VercelTab from '~/components/@settings/tabs/vercel/VercelTab';
-import NetlifyTab from '~/components/@settings/tabs/netlify/NetlifyTab';
-import CloudProvidersTab from '~/components/@settings/tabs/providers/cloud/CloudProvidersTab';
-import LocalProvidersTab from '~/components/@settings/tabs/providers/local/LocalProvidersTab';
-import McpTab from '~/components/@settings/tabs/mcp/McpTab';
 
 interface ControlPanelProps {
   open: boolean;
@@ -37,92 +20,43 @@ interface ControlPanelProps {
 }
 
 /*
- * Developer-facing tabs (connection/deploy integrations non-developers won't use, plus raw
- * debug tooling) — hidden from the coralred target audience behind SHOW_DEV_TOOLS. Reversible
- * by flipping that one flag; nothing here is deleted.
+ * 0: this panel is always exactly these 3 fixed tabs now — no more tile-grid/reordering feature,
+ * so no more reading the tab list from tabConfigurationStore (localStorage-persisted, seeded from
+ * DEFAULT_TAB_CONFIG — which never included 'profile' in the first place, and wouldn't pick it up
+ * retroactively for a browser with an already-saved config even if it did). Hardcoding here means
+ * the 3 tabs always show correctly regardless of any stale persisted state.
  */
-const DEV_ONLY_TAB_IDS = new Set<TabType>([
-  'github',
-  'gitlab',
-  'netlify',
-  'vercel',
-  'mcp',
-  'event-logs',
-  'local-providers',
-  'cloud-providers',
-
-  /*
-   * 개발자용 UI 정리 (overnight5, DEV_UI_HIDE_REPORT.md 참고): features는 프롬프트/컨텍스트 최적화
-   * 등 개발자 설정 토글, data는 API 키·앱 설정 JSON 내보내기/가져오기 등 비개발자가 쓸 일이 없는
-   * 내용이라 추가.
-   */
-  'features',
-  'data',
-
-  /*
-   * 설정·알림·프로필 라운드: "설정" 탭(SettingsTab.tsx)은 언어 10개 드롭다운·타임존·키보드
-   * 단축키 등 실제 프로필 스토어(profileStore)가 아니라 예전 bolt_user_profile localStorage
-   * 키를 쓰는 등 코랄레드와 무관한 내용이라, 좌측 고정 탭(프로필/저장 기능/알림)에서 뺐다 —
-   * 파일 자체는 지우지 않고 이 플래그로만 숨긴다(SHOW_DEV_TOOLS로 되살릴 수 있음).
-   */
-  'settings',
-]);
+const PANEL_TABS: TabType[] = ['profile', 'supabase', 'notifications'];
 
 export const ControlPanel = ({ open, onClose, initialTab = null }: ControlPanelProps) => {
   const [activeTab, setActiveTab] = useState<TabType | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
 
-  // Store values
-  const tabConfiguration = useStore(tabConfigurationStore);
-  const profile = useStore(profileStore) as Profile;
+  // 9-3: instant, no animation, when the visitor has prefers-reduced-motion set.
+  const [reducedMotion, setReducedMotion] = useState(false);
 
-  // Status hooks
-  const { hasNewFeatures, unviewedFeatures, acknowledgeAllFeatures } = useFeatures();
+  useEffect(() => {
+    setReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }, []);
+
   const { hasUnreadNotifications, unreadNotifications, markAllAsRead } = useNotifications();
   const { hasConnectionIssues, currentIssue, acknowledgeIssue } = useConnectionStatus();
 
-  // Add visibleTabs logic using useMemo with optimized calculations
-  const visibleTabs = useMemo(() => {
-    if (!tabConfiguration?.userTabs || !Array.isArray(tabConfiguration.userTabs)) {
-      console.warn('Invalid tab configuration, resetting to defaults');
-      resetTabConfiguration();
-
-      return [];
-    }
-
-    const notificationsDisabled = profile?.preferences?.notifications === false;
-
-    // Optimize user mode tab filtering
-    return tabConfiguration.userTabs
-      .filter((tab) => {
-        if (!tab?.id) {
-          return false;
-        }
-
-        if (tab.id === 'notifications' && notificationsDisabled) {
-          return false;
-        }
-
-        /*
-         * Developer-facing connection/debug tabs — hidden from the non-developer target
-         * audience, but the flag alone re-reveals them (no data lost, nothing deleted).
-         */
-        if (!SHOW_DEV_TOOLS && DEV_ONLY_TAB_IDS.has(tab.id)) {
-          return false;
-        }
-
-        return tab.visible && tab.window === 'user';
-      })
-      .sort((a, b) => a.order - b.order);
-  }, [tabConfiguration, profile?.preferences?.notifications]);
-
-  // Pick the initial/requested tab (or the first visible one) whenever the panel opens.
+  // Pick the initial/requested tab (or the first one) whenever the panel opens.
   useEffect(() => {
     if (!open) {
       setActiveTab(null);
     } else {
-      setActiveTab(initialTab ?? visibleTabs[0]?.id ?? null);
+      setActiveTab(initialTab ?? PANEL_TABS[0]);
     }
   }, [open]);
+
+  // 10-1: reset the content pane's scroll position on every tab switch.
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0;
+    }
+  }, [activeTab]);
 
   const handleClose = () => {
     setActiveTab(null);
@@ -133,33 +67,10 @@ export const ControlPanel = ({ open, onClose, initialTab = null }: ControlPanelP
     switch (tabId) {
       case 'profile':
         return <ProfileTab />;
-      case 'settings':
-        return <SettingsTab />;
-      case 'notifications':
-        return <NotificationsTab />;
-      case 'features':
-        return <FeaturesTab />;
-      case 'data':
-        return <DataTab />;
-      case 'cloud-providers':
-        return <CloudProvidersTab />;
-      case 'local-providers':
-        return <LocalProvidersTab />;
-      case 'github':
-        return <GitHubTab />;
-      case 'gitlab':
-        return <GitLabTab />;
       case 'supabase':
         return <SupabaseTab />;
-      case 'vercel':
-        return <VercelTab />;
-      case 'netlify':
-        return <NetlifyTab />;
-      case 'event-logs':
-        return <EventLogsTab />;
-      case 'mcp':
-        return <McpTab />;
-
+      case 'notifications':
+        return <NotificationsTab />;
       default:
         return null;
     }
@@ -167,15 +78,9 @@ export const ControlPanel = ({ open, onClose, initialTab = null }: ControlPanelP
 
   const getTabUpdateStatus = (tabId: TabType): boolean => {
     switch (tabId) {
-      case 'features':
-        return hasNewFeatures;
       case 'notifications':
         return hasUnreadNotifications;
-      case 'github':
-      case 'gitlab':
       case 'supabase':
-      case 'vercel':
-      case 'netlify':
         return hasConnectionIssues;
       default:
         return false;
@@ -184,15 +89,9 @@ export const ControlPanel = ({ open, onClose, initialTab = null }: ControlPanelP
 
   const getStatusMessage = (tabId: TabType): string => {
     switch (tabId) {
-      case 'features':
-        return `새 기능 ${unviewedFeatures.length}개`;
       case 'notifications':
         return `읽지 않은 알림 ${unreadNotifications.length}개`;
-      case 'github':
-      case 'gitlab':
       case 'supabase':
-      case 'vercel':
-      case 'netlify':
         return currentIssue === 'disconnected'
           ? '연결이 끊겼어요'
           : currentIssue === 'high-latency'
@@ -206,21 +105,10 @@ export const ControlPanel = ({ open, onClose, initialTab = null }: ControlPanelP
   const handleTabClick = (tabId: TabType) => {
     setActiveTab(tabId);
 
-    // Acknowledge notifications based on tab
-    switch (tabId) {
-      case 'features':
-        acknowledgeAllFeatures();
-        break;
-      case 'notifications':
-        markAllAsRead();
-        break;
-      case 'github':
-      case 'gitlab':
-      case 'supabase':
-      case 'vercel':
-      case 'netlify':
-        acknowledgeIssue();
-        break;
+    if (tabId === 'notifications') {
+      markAllAsRead();
+    } else if (tabId === 'supabase') {
+      acknowledgeIssue();
     }
   };
 
@@ -228,7 +116,11 @@ export const ControlPanel = ({ open, onClose, initialTab = null }: ControlPanelP
     <RadixDialog.Root open={open}>
       <RadixDialog.Portal>
         <div className="fixed inset-0 flex items-center justify-center z-[100] modern-scrollbar">
-          <RadixDialog.Overlay className="absolute inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm transition-opacity duration-200" />
+          {/* 9: 160ms open/close, opacity+scale only (no translate), instant under reduced-motion. */}
+          <RadixDialog.Overlay
+            className="absolute inset-0 bg-black/40 transition-opacity"
+            style={{ transitionDuration: reducedMotion ? '0ms' : '160ms' }}
+          />
 
           <RadixDialog.Content
             aria-describedby={undefined}
@@ -238,25 +130,26 @@ export const ControlPanel = ({ open, onClose, initialTab = null }: ControlPanelP
           >
             <div
               className={classNames(
-                'w-[95vw] sm:w-[90vw] max-w-[1200px] h-[85vh]',
+                'w-[95vw] sm:w-[90vw] max-w-[960px] max-h-[80vh] min-h-[560px]',
                 'rounded-2xl',
                 'flex flex-col overflow-hidden',
                 'relative',
-                'transform transition-all duration-200 ease-out',
-                open ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4',
+                'transform transition-all',
+                open ? 'opacity-100 scale-100' : 'opacity-0 scale-98',
               )}
-              style={{ background: '#FBF5EE', border: '1px solid #EFE4D6' }}
+              style={{
+                background: '#FBF5EE',
+                border: '1px solid #EFE4D6',
+                transitionDuration: reducedMotion ? '0ms' : '160ms',
+              }}
             >
               <div className="relative z-10 flex flex-col h-full">
-                {/* Header */}
+                {/* Header — 0-2: no tab-name title, close (X) only */}
                 <div
-                  className="flex items-center justify-between px-6 py-4 border-b"
+                  className="flex items-center justify-end px-6 py-4 border-b shrink-0"
                   style={{ borderColor: '#EFE4D6' }}
                 >
-                  <DialogTitle className="text-xl font-semibold" style={{ color: '#1A1A1A' }}>
-                    {activeTab ? TAB_LABELS[activeTab] : '설정'}
-                  </DialogTitle>
-
+                  <DialogTitle className="sr-only">설정</DialogTitle>
                   <button
                     onClick={handleClose}
                     className="flex items-center justify-center w-8 h-8 rounded-full bg-transparent hover:bg-[#FF5330]/10 group transition-all duration-200"
@@ -274,26 +167,26 @@ export const ControlPanel = ({ open, onClose, initialTab = null }: ControlPanelP
                     className="w-[200px] shrink-0 border-r overflow-y-auto py-3 px-2 flex flex-col gap-1"
                     style={{ borderColor: '#EFE4D6' }}
                   >
-                    {visibleTabs.map((tab) => {
-                      const Icon = TAB_ICONS[tab.id as TabType];
-                      const isActive = activeTab === tab.id;
-                      const hasUpdate = getTabUpdateStatus(tab.id as TabType);
-                      const statusMessage = hasUpdate ? getStatusMessage(tab.id as TabType) : undefined;
+                    {PANEL_TABS.map((tabId) => {
+                      const Icon = TAB_ICONS[tabId];
+                      const isActive = activeTab === tabId;
+                      const hasUpdate = getTabUpdateStatus(tabId);
+                      const statusMessage = hasUpdate ? getStatusMessage(tabId) : undefined;
 
                       return (
                         <button
-                          key={tab.id}
+                          key={tabId}
                           type="button"
                           title={statusMessage}
-                          onClick={() => handleTabClick(tab.id as TabType)}
+                          onClick={() => handleTabClick(tabId)}
                           className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition-colors duration-150"
                           style={{
-                            background: isActive ? 'rgba(255, 83, 48, 0.08)' : 'transparent',
-                            color: isActive ? '#FF5330' : '#1A1A1A',
+                            background: isActive ? 'rgba(255, 83, 48, 0.1)' : 'transparent',
+                            color: isActive ? '#1A1A1A' : '#7A7067',
                           }}
                         >
                           {Icon && <Icon className="w-4 h-4 shrink-0" />}
-                          <span className="flex-1 truncate">{TAB_LABELS[tab.id as TabType]}</span>
+                          <span className="flex-1 truncate">{TAB_LABELS[tabId]}</span>
                           {hasUpdate && (
                             <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: '#FF5330' }} />
                           )}
@@ -302,7 +195,9 @@ export const ControlPanel = ({ open, onClose, initialTab = null }: ControlPanelP
                     })}
                   </nav>
 
-                  <div className="flex-1 overflow-y-auto p-6">{activeTab && getTabComponent(activeTab)}</div>
+                  <div ref={contentRef} className="flex-1 overflow-y-auto p-6">
+                    {activeTab && getTabComponent(activeTab)}
+                  </div>
                 </div>
               </div>
             </div>

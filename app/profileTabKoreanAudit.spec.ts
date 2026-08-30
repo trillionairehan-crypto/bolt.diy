@@ -22,15 +22,17 @@ describe('ProfileTab — 라벨/placeholder/토스트 문구가 한국어다', (
     expect(source).not.toContain('updated`)');
   });
 
-  it('한국어 라벨/토스트로 번역돼 있다', () => {
+  it('한국어 라벨로 번역돼 있다', () => {
     expect(source).toContain('프로필 사진');
-    expect(source).toContain('사용자 이름');
-    expect(source).toContain('프로필 사진이 업데이트됐어요');
-    expect(source).toContain('프로필 사진을 업데이트하지 못했어요');
+    expect(source).toContain('이름');
   });
 
   /*
    * 설정·알림·프로필 라운드: "소개"(bio) 필드는 SaaS 계정에 불필요하다는 요청으로 완전히
    * 제거됐다(이니셜 아바타 + 이메일 읽기 전용 필드로 대체) — 더 이상 감사할 대상이 아님.
+   *
+   * 설정 패널 재설계 라운드: "사용자 이름" 라벨은 조밀한 행 구조에 맞춰 "이름"으로 짧아졌고,
+   * 프로필 사진/이름 저장 성공·실패 토스트는 전부 제거됐다 — 토스트·알럿 대신 AutoSaveField의
+   * 인라인 "저장됨"/"저장하지 못했어요" 표시로 교체(항목 6, 토스트 금지가 명시적 요구사항).
    */
 });

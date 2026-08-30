@@ -5,6 +5,8 @@ import { useStore } from '@nanostores/react';
 import { classNames } from '~/utils/classNames';
 import { Button } from '~/components/ui/Button';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '~/components/ui/Collapsible';
+import { SettingSection } from '~/components/@settings/shared/components/SettingSection';
+import { SettingRow } from '~/components/@settings/shared/components/SettingRow';
 import { SHOW_DEV_TOOLS } from '~/utils/constants';
 import {
   supabaseConnection,
@@ -608,25 +610,16 @@ export default function SupabaseTab() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-10">
       {/* 5: 코랄레드 Cloud — 기본 경로, 연결 동작 없이 상태 안내만. */}
-      <div className="space-y-2">
-        <h2 className="text-lg font-medium" style={{ color: '#1A1A1A' }}>
-          저장 기능
-        </h2>
-        <p className="text-sm" style={{ color: '#7A7067' }}>
-          앱에 로그인·데이터 저장을 붙일 수 있어요
-        </p>
-        <div
-          className="flex items-center gap-2 p-3 rounded-lg"
-          style={{ background: '#F5EDE3', border: '1px solid #EFE4D6' }}
-        >
-          <span className="i-ph:cloud-check" style={{ color: '#FF5330', fontSize: 18 }} />
-          <span className="text-sm" style={{ color: '#1A1A1A' }}>
-            코랄레드 Cloud로 자동 저장되고 있어요 — 별도 설정 없이 기기 단위로 바로 써요
+      <SettingSection title="저장 기능">
+        <SettingRow label="코랄레드 Cloud" description="앱에 로그인·데이터 저장을 붙일 수 있어요">
+          <span className="flex items-center gap-1.5 text-sm" style={{ color: '#FF5330' }}>
+            <span className="i-ph:cloud-check" style={{ fontSize: 16 }} />
+            자동 저장 중
           </span>
-        </div>
-      </div>
+        </SettingRow>
+      </SettingSection>
 
       <Collapsible>
         <CollapsibleTrigger className="group flex items-center gap-2 text-sm font-medium" style={{ color: '#7A7067' }}>
@@ -751,11 +744,10 @@ export default function SupabaseTab() {
                       disabled={connecting}
                       placeholder="Supabase 액세스 토큰을 입력하세요"
                       className={classNames(
-                        'w-full px-3 py-2 rounded-lg text-sm',
-                        'bg-[#F8F8F8] dark:bg-[#1A1A1A]',
-                        'border border-[#E5E5E5] dark:border-[#333333]',
+                        'w-full px-3 py-2 rounded-lg text-sm bg-transparent',
+                        'border border-[#EFE4D6] focus:border-[#FF5330]',
                         'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-                        'focus:outline-none focus:ring-1 focus:ring-bolt-elements-borderColorActive',
+                        'focus:outline-none',
                         'disabled:opacity-50',
                       )}
                     />

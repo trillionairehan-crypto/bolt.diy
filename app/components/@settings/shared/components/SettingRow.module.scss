@@ -1,0 +1,35 @@
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 52px;
+  padding: 8px 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #efe4d6;
+  }
+}
+
+.labelBlock {
+  flex: 1;
+  min-width: 0;
+}
+
+.label {
+  font-size: 14px;
+  color: #1a1a1a;
+  text-align: left;
+}
+
+.description {
+  font-size: 12px;
+  color: #7a7067;
+  margin-top: 4px;
+}
+
+.valueBlock {
+  flex-shrink: 0;
+  max-width: 320px;
+  text-align: right;
+}

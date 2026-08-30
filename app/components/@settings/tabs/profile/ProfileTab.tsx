@@ -1,24 +1,16 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { classNames } from '~/utils/classNames';
 import { profileStore, updateProfile } from '~/lib/stores/profile';
-import { authUserStore } from '~/lib/stores/auth';
-import { toast } from 'react-toastify';
-import { debounce } from '~/utils/debounce';
+import { authUserStore, signOut } from '~/lib/stores/auth';
+import { SettingSection } from '~/components/@settings/shared/components/SettingSection';
+import { SettingRow, SettingReadOnlyValue } from '~/components/@settings/shared/components/SettingRow';
+import { AutoSaveField } from '~/components/@settings/shared/components/AutoSaveField';
 
 export default function ProfileTab() {
   const profile = useStore(profileStore);
   const authUser = useStore(authUserStore);
   const [isUploading, setIsUploading] = useState(false);
-
-  // Create debounced update functions
-  const debouncedUpdate = useCallback(
-    debounce((field: 'username', value: string) => {
-      updateProfile({ [field]: value });
-      toast.success('사용자 이름이 업데이트됐어요');
-    }, 1000),
-    [],
-  );
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -27,159 +19,86 @@ export default function ProfileTab() {
       return;
     }
 
-    try {
-      setIsUploading(true);
+    setIsUploading(true);
 
-      // Convert the file to base64
-      const reader = new FileReader();
+    const reader = new FileReader();
 
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        updateProfile({ avatar: base64String });
-        setIsUploading(false);
-        toast.success('프로필 사진이 업데이트됐어요');
-      };
-
-      reader.onerror = () => {
-        console.error('Error reading file:', reader.error);
-        setIsUploading(false);
-        toast.error('프로필 사진을 업데이트하지 못했어요');
-      };
-      reader.readAsDataURL(file);
-    } catch (error) {
-      console.error('Error uploading avatar:', error);
+    reader.onloadend = () => {
+      updateProfile({ avatar: reader.result as string });
       setIsUploading(false);
-      toast.error('프로필 사진을 업데이트하지 못했어요');
-    }
-  };
+    };
 
-  const handleProfileUpdate = (field: 'username', value: string) => {
-    // Update the store immediately for UI responsiveness
-    updateProfile({ [field]: value });
-
-    // Debounce the toast notification
-    debouncedUpdate(field, value);
+    reader.onerror = () => {
+      setIsUploading(false);
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="space-y-6">
-        {/* Personal Information Section */}
-        <div>
-          {/* Avatar Upload */}
-          <div className="flex items-start gap-6 mb-8">
-            <div
-              className={classNames(
-                'w-24 h-24 rounded-full overflow-hidden',
-                'bg-bolt-elements-background-depth-3',
-                'flex items-center justify-center',
-                'ring-1 ring-bolt-elements-borderColor',
-                'relative group',
-                'transition-all duration-300 ease-out',
-                'hover:ring-[#FF5330]/30 dark:hover:ring-[#FF5330]/30',
-                'hover:shadow-lg hover:shadow-[#FF5330]/10',
-              )}
-            >
-              {profile.avatar ? (
-                <img
-                  src={profile.avatar}
-                  alt="프로필"
-                  className={classNames(
-                    'w-full h-full object-cover',
-                    'transition-all duration-300 ease-out',
-                    'group-hover:scale-105 group-hover:brightness-90',
-                  )}
-                />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-3xl font-semibold text-white"
-                  style={{ background: '#FF5330' }}
-                >
-                  {(profile.username || authUser?.email || '?').trim().charAt(0).toUpperCase()}
-                </div>
-              )}
-
-              <label
-                className={classNames(
-                  'absolute inset-0',
-                  'flex items-center justify-center',
-                  'bg-black/0 group-hover:bg-black/40',
-                  'cursor-pointer transition-all duration-300 ease-out',
-                  isUploading ? 'cursor-wait' : '',
-                )}
+    <div className="flex flex-col gap-10">
+      <SettingSection title="프로필">
+        {/* 10-3: the circular image itself is the upload trigger — no separate button. */}
+        <SettingRow label="프로필 사진">
+          <label
+            className={classNames(
+              'relative w-12 h-12 rounded-full overflow-hidden inline-flex items-center justify-center cursor-pointer group',
+              isUploading ? 'cursor-wait' : '',
+            )}
+          >
+            {profile.avatar ? (
+              <img src={profile.avatar} alt="프로필" className="w-full h-full object-cover" />
+            ) : (
+              <div
+                className="w-full h-full flex items-center justify-center text-lg font-semibold text-white"
+                style={{ background: '#FF5330' }}
               >
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleAvatarUpload}
-                  disabled={isUploading}
-                />
-                {isUploading ? (
-                  <div className="i-ph:spinner-gap w-6 h-6 text-white animate-spin" />
-                ) : (
-                  <div className="i-ph:camera-plus w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out transform group-hover:scale-110" />
-                )}
-              </label>
-            </div>
-
-            <div className="flex-1 pt-1">
-              <label className="block text-base font-medium text-bolt-elements-textPrimary mb-1">프로필 사진</label>
-              <p className="text-sm text-bolt-elements-textSecondary">프로필 사진이나 아바타를 업로드하세요</p>
-            </div>
-          </div>
-
-          {/* Username Input */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-bolt-elements-textPrimary mb-2">사용자 이름</label>
-            <div className="relative group">
-              <div className="absolute left-3.5 top-1/2 -translate-y-1/2">
-                <div className="i-ph:user-circle-fill w-5 h-5 text-bolt-elements-textTertiary transition-colors group-focus-within:text-[#FF5330]" />
+                {(profile.username || authUser?.email || '?').trim().charAt(0).toUpperCase()}
               </div>
-              <input
-                type="text"
-                value={profile.username}
-                onChange={(e) => handleProfileUpdate('username', e.target.value)}
-                className={classNames(
-                  'w-full pl-11 pr-4 py-2.5 rounded-xl',
-                  'bg-bolt-elements-background-depth-4',
-                  'border border-bolt-elements-borderColor',
-                  'text-bolt-elements-textPrimary',
-                  'placeholder-bolt-elements-textTertiary',
-                  'focus:outline-none focus:ring-2 focus:ring-[#FF5330]/50 focus:border-[#FF5330]/50',
-                  'transition-all duration-300 ease-out',
-                )}
-                placeholder="사용자 이름을 입력하세요"
-              />
+            )}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 transition-colors">
+              {isUploading ? (
+                <div className="i-ph:spinner-gap w-4 h-4 text-white animate-spin" />
+              ) : (
+                <div className="i-ph:camera-plus w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+              )}
             </div>
-          </div>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarUpload}
+              disabled={isUploading}
+            />
+          </label>
+        </SettingRow>
 
-          {/* Email (읽기 전용) */}
-          {authUser?.email && (
-            <div className="mb-8">
-              <label className="block text-sm font-medium text-bolt-elements-textPrimary mb-2">이메일</label>
-              <div className="relative">
-                <div className="absolute left-3.5 top-1/2 -translate-y-1/2">
-                  <div className="i-ph:envelope-simple w-5 h-5 text-bolt-elements-textTertiary" />
-                </div>
-                <input
-                  type="text"
-                  value={authUser.email}
-                  readOnly
-                  disabled
-                  className={classNames(
-                    'w-full pl-11 pr-4 py-2.5 rounded-xl',
-                    'bg-bolt-elements-background-depth-4',
-                    'border border-bolt-elements-borderColor',
-                    'text-bolt-elements-textSecondary',
-                    'cursor-not-allowed',
-                  )}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+        <SettingRow label="이름">
+          <AutoSaveField
+            value={profile.username}
+            placeholder="이름을 입력하세요"
+            onSave={(value) => updateProfile({ username: value })}
+          />
+        </SettingRow>
+
+        {authUser?.email && (
+          <SettingRow label="이메일">
+            <SettingReadOnlyValue>{authUser.email}</SettingReadOnlyValue>
+          </SettingRow>
+        )}
+      </SettingSection>
+
+      <SettingSection title="계정">
+        <SettingRow label="로그아웃">
+          <button
+            type="button"
+            onClick={() => signOut()}
+            className="text-sm font-medium hover:underline"
+            style={{ color: '#1A1A1A' }}
+          >
+            로그아웃
+          </button>
+        </SettingRow>
+      </SettingSection>
     </div>
   );
 }

@@ -178,6 +178,8 @@ const NotificationsTab = () => {
 
   return (
     <div className="flex h-full flex-col gap-6">
+      <h3 style={{ fontSize: 16, fontWeight: 600, color: '#1A1A1A', margin: 0 }}>알림</h3>
+
       <div className="flex items-center justify-between">
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
