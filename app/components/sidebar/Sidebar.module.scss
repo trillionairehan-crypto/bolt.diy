@@ -61,7 +61,7 @@ $coral: #ff5330;
 }
 
 /*
- * 2: 좌상단 세로 스택 — 위 햄버거(토글)/아래 로고(홈), 동일 40x40 히트 영역·같은 왼쪽 정렬축·
+ * 좌상단 세로 스택 — 위 로고(홈)/아래 햄버거(토글), 동일 40x40 히트 영역·같은 왼쪽 정렬축·
  * 12px 간격. 두 요소 모두 독립된 position:fixed라 같은 top 공식을 공유해 정렬을 맞춘다. 햄버거는
  * (TSX에서) z-logo 클래스로 .panel(z-sidebar)보다 위에 남아 사이드바가 펼쳐져도 같은 좌표에
  * 그대로 있고, 로고는 z-index를 안 줘서(기본 stacking) 패널이 펼쳐지면 그 밑에 자연스럽게
@@ -93,12 +93,22 @@ $rail-icon-top: calc((var(--header-height) - #{$rail-icon-size}) / 2);
   }
 }
 
-.railHamburger {
+.railHomeLink {
   top: $rail-icon-top;
 }
 
-.railHomeLink {
+.railHamburger {
   top: calc(#{$rail-icon-top} + #{$rail-icon-size} + #{$rail-icon-gap});
+}
+
+// 8: 로고와 한 세트로 읽히되 "만들기" 버튼(원색 코랄)보다는 약하게 — 60% 농도, hover 시 원색.
+.railHamburgerIcon {
+  color: rgba(255, 83, 48, 0.6);
+  transition: color 0.15s ease-out;
+}
+
+.railHamburger:hover .railHamburgerIcon {
+  color: $coral;
 }
 
 .topRow {
@@ -299,10 +309,37 @@ $rail-icon-top: calc((var(--header-height) - #{$rail-icon-size}) / 2);
   outline: none;
 
   &:hover,
-  &[data-highlighted] {
+  &[data-highlighted],
+  &[data-state='open'] {
     background: rgba(255, 83, 48, 0.08);
     color: $coral;
   }
+}
+
+.accountMenuSubCaret {
+  position: relative;
+  margin-left: auto;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-top: 1.5px solid currentColor;
+    border-right: 1.5px solid currentColor;
+    transform: translate(-65%, -50%) rotate(45deg);
+  }
+}
+
+.accountMenuSeparator {
+  height: 1px;
+  margin: 6px 4px;
+  background: rgba(26, 26, 26, 0.08);
 }
 
 .avatar {

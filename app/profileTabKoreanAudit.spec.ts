@@ -25,8 +25,12 @@ describe('ProfileTab — 라벨/placeholder/토스트 문구가 한국어다', (
   it('한국어 라벨/토스트로 번역돼 있다', () => {
     expect(source).toContain('프로필 사진');
     expect(source).toContain('사용자 이름');
-    expect(source).toContain('소개');
     expect(source).toContain('프로필 사진이 업데이트됐어요');
     expect(source).toContain('프로필 사진을 업데이트하지 못했어요');
   });
+
+  /*
+   * 설정·알림·프로필 라운드: "소개"(bio) 필드는 SaaS 계정에 불필요하다는 요청으로 완전히
+   * 제거됐다(이니셜 아바타 + 이메일 읽기 전용 필드로 대체) — 더 이상 감사할 대상이 아님.
+   */
 });

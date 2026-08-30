@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { logStore } from '~/lib/stores/logs';
 import { useStore } from '@nanostores/react';
 import { formatDistanceToNow } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import { classNames } from '~/utils/classNames';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 
@@ -62,10 +63,16 @@ const NotificationsTab = () => {
     setFilter(newFilter);
   };
 
+  /*
+   * 4: category === 'system'/'performance'는 앱 초기화·테마 전환·디버그 모드 토글·자기 자신의
+   * 마운트 시간 측정 같은 순수 내부 이벤트라(app/root.tsx, useSettings.ts, theme.ts 등), 사용자
+   * 화면에서는 필터와 무관하게 항상 뺀다 — "시스템" 필터 옵션 자체는 남겨두되(명시적으로
+   * 선택했을 때는 보여줌), 기본("전체") 상태에서 노이즈가 안 섞이게 하는 블랙리스트.
+   */
   const filteredLogs = Object.values(logs)
     .filter((log) => {
       if (filter === 'all') {
-        return true;
+        return log.category !== 'system' && log.category !== 'performance';
       }
 
       if (filter === 'update') {
@@ -101,20 +108,20 @@ const NotificationsTab = () => {
       case 'error':
         return {
           icon: 'i-ph:warning-circle',
-          color: 'text-red-500 dark:text-red-400',
-          bg: 'hover:bg-red-500/10 dark:hover:bg-red-500/20',
+          color: 'text-[#FF5330] dark:text-[#FF5330]',
+          bg: 'hover:bg-[#FF5330]/10 dark:hover:bg-[#FF5330]/20',
         };
       case 'warning':
         return {
           icon: 'i-ph:warning',
-          color: 'text-yellow-500 dark:text-yellow-400',
-          bg: 'hover:bg-yellow-500/10 dark:hover:bg-yellow-500/20',
+          color: 'text-[#7A7067] dark:text-[#7A7067]',
+          bg: 'hover:bg-[#7A7067]/10 dark:hover:bg-[#7A7067]/20',
         };
       case 'info':
         return {
           icon: 'i-ph:info',
-          color: 'text-blue-500 dark:text-blue-400',
-          bg: 'hover:bg-blue-500/10 dark:hover:bg-blue-500/20',
+          color: 'text-[#1A1A1A] dark:text-bolt-elements-textPrimary',
+          bg: 'hover:bg-[#1A1A1A]/5 dark:hover:bg-white/5',
         };
       default:
         return {
@@ -131,9 +138,9 @@ const NotificationsTab = () => {
         <div className="flex flex-col gap-2">
           <p className="text-sm text-bolt-elements-textSecondary">{details.message}</p>
           <div className="flex flex-col gap-1 text-xs text-bolt-elements-textTertiary">
-            <p>Current Version: {details.currentVersion}</p>
-            <p>Latest Version: {details.latestVersion}</p>
-            <p>Branch: {details.branch}</p>
+            <p>현재 버전: {details.currentVersion}</p>
+            <p>최신 버전: {details.latestVersion}</p>
+            <p>브랜치: {details.branch}</p>
           </div>
           <button
             onClick={() => details.updateUrl && handleUpdateAction(details.updateUrl)}
@@ -149,7 +156,7 @@ const NotificationsTab = () => {
             )}
           >
             <span className="i-ph:git-branch text-lg" />
-            View Changes
+            변경 사항 보기
           </button>
         </div>
       );
@@ -159,14 +166,14 @@ const NotificationsTab = () => {
   };
 
   const filterOptions: { id: FilterType; label: string; icon: string; color: string }[] = [
-    { id: 'all', label: 'All Notifications', icon: 'i-ph:bell', color: '#9333ea' },
-    { id: 'system', label: 'System', icon: 'i-ph:gear', color: '#6b7280' },
-    { id: 'update', label: 'Updates', icon: 'i-ph:arrow-circle-up', color: '#9333ea' },
-    { id: 'error', label: 'Errors', icon: 'i-ph:warning-circle', color: '#ef4444' },
-    { id: 'warning', label: 'Warnings', icon: 'i-ph:warning', color: '#f59e0b' },
-    { id: 'info', label: 'Information', icon: 'i-ph:info', color: '#3b82f6' },
-    { id: 'provider', label: 'Providers', icon: 'i-ph:robot', color: '#10b981' },
-    { id: 'network', label: 'Network', icon: 'i-ph:wifi-high', color: '#6366f1' },
+    { id: 'all', label: '전체 알림', icon: 'i-ph:bell', color: '#1A1A1A' },
+    { id: 'system', label: '시스템', icon: 'i-ph:gear', color: '#7A7067' },
+    { id: 'update', label: '업데이트', icon: 'i-ph:arrow-circle-up', color: '#FF5330' },
+    { id: 'error', label: '에러', icon: 'i-ph:warning-circle', color: '#FF5330' },
+    { id: 'warning', label: '경고', icon: 'i-ph:warning', color: '#7A7067' },
+    { id: 'info', label: '정보', icon: 'i-ph:info', color: '#1A1A1A' },
+    { id: 'provider', label: 'AI 모델', icon: 'i-ph:robot', color: '#1A1A1A' },
+    { id: 'network', label: '네트워크', icon: 'i-ph:wifi-high', color: '#1A1A1A' },
   ];
 
   return (
@@ -189,7 +196,7 @@ const NotificationsTab = () => {
                 className={classNames('text-lg', filterOptions.find((opt) => opt.id === filter)?.icon || 'i-ph:funnel')}
                 style={{ color: filterOptions.find((opt) => opt.id === filter)?.color }}
               />
-              {filterOptions.find((opt) => opt.id === filter)?.label || 'Filter Notifications'}
+              {filterOptions.find((opt) => opt.id === filter)?.label || '필터'}
               <span className="i-ph:caret-down text-lg text-bolt-elements-textSecondary" />
             </button>
           </DropdownMenu.Trigger>
@@ -233,7 +240,7 @@ const NotificationsTab = () => {
           )}
         >
           <span className="i-ph:trash text-lg text-bolt-elements-textSecondary group-hover:text-[#FF5330] transition-colors" />
-          Clear All
+          모두 지우기
         </button>
       </div>
 
@@ -251,8 +258,8 @@ const NotificationsTab = () => {
           >
             <span className="i-ph:bell-slash text-4xl text-bolt-elements-textTertiary" />
             <div className="flex flex-col gap-1">
-              <h3 className="text-sm font-medium text-bolt-elements-textPrimary">No Notifications</h3>
-              <p className="text-sm text-bolt-elements-textSecondary">You're all caught up!</p>
+              <h3 className="text-sm font-medium text-bolt-elements-textPrimary">알림이 없어요</h3>
+              <p className="text-sm text-bolt-elements-textSecondary">새로운 소식이 오면 여기에 표시돼요</p>
             </div>
           </motion.div>
         ) : (
@@ -279,13 +286,13 @@ const NotificationsTab = () => {
                       <h3 className="text-sm font-medium text-bolt-elements-textPrimary">{log.message}</h3>
                       {log.details && renderNotificationDetails(log.details as NotificationDetails)}
                       <p className="text-xs text-bolt-elements-textSecondary">
-                        Category: {log.category}
+                        카테고리: {log.category}
                         {log.subCategory ? ` > ${log.subCategory}` : ''}
                       </p>
                     </div>
                   </div>
                   <time className="shrink-0 text-xs text-bolt-elements-textSecondary">
-                    {formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(log.timestamp), { addSuffix: true, locale: ko })}
                   </time>
                 </div>
               </motion.div>

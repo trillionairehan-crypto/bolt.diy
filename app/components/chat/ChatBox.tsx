@@ -35,7 +35,7 @@ const LANDING_BORDER = 'rgba(26, 26, 26, 0.12)';
 const LANDING_HOVER = 'rgba(26, 26, 26, 0.06)';
 
 // 채팅 홈·생성 전환 통합 수정 — 입력창 자체(카드)만 쓰는, 크림보다 한 단계 밝은 배경.
-const LANDING_INPUT_BG = '#FFFCF7';
+const LANDING_INPUT_BG = '#FFFFFF';
 
 interface ChatBoxProps {
   isModelSettingsCollapsed: boolean;

@@ -5,6 +5,7 @@ import { useStore } from '@nanostores/react';
 import { classNames } from '~/utils/classNames';
 import { Button } from '~/components/ui/Button';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '~/components/ui/Collapsible';
+import { SHOW_DEV_TOOLS } from '~/utils/constants';
 import {
   supabaseConnection,
   isConnecting,
@@ -254,7 +255,7 @@ export default function SupabaseTab() {
     });
     setConnectionTest(null);
     setSelectedProjectId('');
-    toast.success('Disconnected from Supabase');
+    toast.success('Supabase 연결을 해제했어요');
   };
 
   const handleProjectAction = async (projectId: string, action: ProjectAction) => {
@@ -608,484 +609,534 @@ export default function SupabaseTab() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <motion.div
-        className="flex items-center justify-between gap-2"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-      >
-        <div className="flex items-center gap-2">
-          <div className="text-[#3ECF8E]">
-            <SupabaseLogo />
-          </div>
-          <h2 className="text-lg font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
-            Supabase Integration
-          </h2>
-        </div>
-        <div className="flex items-center gap-2">
-          {connection.user && (
-            <Button
-              onClick={testConnection}
-              disabled={connectionTest?.status === 'testing'}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors"
-            >
-              {connectionTest?.status === 'testing' ? (
-                <>
-                  <div className="i-ph:spinner-gap w-4 h-4 animate-spin" />
-                  Testing...
-                </>
-              ) : (
-                <>
-                  <div className="i-ph:plug-charging w-4 h-4" />
-                  Test Connection
-                </>
-              )}
-            </Button>
-          )}
-        </div>
-      </motion.div>
-
-      <p className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary">
-        Connect and manage your Supabase projects with database access, authentication, and storage controls
-      </p>
-
-      {/* Connection Test Results */}
-      {connectionTest && (
-        <motion.div
-          className={classNames('p-4 rounded-lg border', {
-            'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-700':
-              connectionTest.status === 'success',
-            'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-700': connectionTest.status === 'error',
-            'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-700': connectionTest.status === 'testing',
-          })}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+      {/* 5: 코랄레드 Cloud — 기본 경로, 연결 동작 없이 상태 안내만. */}
+      <div className="space-y-2">
+        <h2 className="text-lg font-medium" style={{ color: '#1A1A1A' }}>
+          저장 기능
+        </h2>
+        <p className="text-sm" style={{ color: '#7A7067' }}>
+          앱에 로그인·데이터 저장을 붙일 수 있어요
+        </p>
+        <div
+          className="flex items-center gap-2 p-3 rounded-lg"
+          style={{ background: '#F5EDE3', border: '1px solid #EFE4D6' }}
         >
-          <div className="flex items-center gap-2">
-            {connectionTest.status === 'success' && (
-              <div className="i-ph:check-circle w-5 h-5 text-green-600 dark:text-green-400" />
-            )}
-            {connectionTest.status === 'error' && (
-              <div className="i-ph:warning-circle w-5 h-5 text-red-600 dark:text-red-400" />
-            )}
-            {connectionTest.status === 'testing' && (
-              <div className="i-ph:spinner-gap w-5 h-5 animate-spin text-blue-600 dark:text-blue-400" />
-            )}
-            <span
-              className={classNames('text-sm font-medium', {
-                'text-green-800 dark:text-green-200': connectionTest.status === 'success',
-                'text-red-800 dark:text-red-200': connectionTest.status === 'error',
-                'text-blue-800 dark:text-blue-200': connectionTest.status === 'testing',
-              })}
-            >
-              {connectionTest.message}
-            </span>
-          </div>
-          {connectionTest.timestamp && (
-            <p className="text-xs text-bolt-elements-textSecondary mt-1">
-              {new Date(connectionTest.timestamp).toLocaleString()}
-            </p>
-          )}
-        </motion.div>
-      )}
+          <span className="i-ph:cloud-check" style={{ color: '#FF5330', fontSize: 18 }} />
+          <span className="text-sm" style={{ color: '#1A1A1A' }}>
+            코랄레드 Cloud로 자동 저장되고 있어요 — 별도 설정 없이 기기 단위로 바로 써요
+          </span>
+        </div>
+      </div>
 
-      {/* Main Connection Component */}
-      <motion.div
-        className="bg-bolt-elements-background dark:bg-bolt-elements-background border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor rounded-lg"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <div className="p-6 space-y-6">
-          {!connection.user ? (
-            <div className="space-y-4">
-              <div className="text-xs text-bolt-elements-textSecondary bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 p-3 rounded-lg mb-4">
-                <p className="flex items-center gap-1 mb-1">
-                  <span className="i-ph:lightbulb w-3.5 h-3.5 text-bolt-elements-icon-success dark:text-bolt-elements-icon-success" />
-                  <span className="font-medium">Tip:</span> You can also set the{' '}
-                  <code className="px-1 py-0.5 bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 rounded">
-                    VITE_SUPABASE_ACCESS_TOKEN
-                  </code>{' '}
-                  environment variable to connect automatically.
-                </p>
+      <Collapsible>
+        <CollapsibleTrigger className="group flex items-center gap-2 text-sm font-medium" style={{ color: '#7A7067' }}>
+          <span className="i-ph:caret-right transition-transform group-data-[state=open]:rotate-90" />내 Supabase
+          연결(고급)
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4 space-y-6">
+          {/* Header */}
+          <motion.div
+            className="flex items-center justify-between gap-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="flex items-center gap-2">
+              <div style={{ color: '#7A7067' }}>
+                <SupabaseLogo />
               </div>
-
-              <div>
-                <label className="block text-sm text-bolt-elements-textSecondary mb-2">Access Token</label>
-                <input
-                  type="password"
-                  value={tokenInput}
-                  onChange={(e) => setTokenInput(e.target.value)}
-                  disabled={connecting}
-                  placeholder="Enter your Supabase access token"
-                  className={classNames(
-                    'w-full px-3 py-2 rounded-lg text-sm',
-                    'bg-[#F8F8F8] dark:bg-[#1A1A1A]',
-                    'border border-[#E5E5E5] dark:border-[#333333]',
-                    'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
-                    'focus:outline-none focus:ring-1 focus:ring-bolt-elements-borderColorActive',
-                    'disabled:opacity-50',
-                  )}
-                />
-                <div className="mt-2 text-sm text-bolt-elements-textSecondary">
-                  <a
-                    href="https://supabase.com/dashboard/account/tokens"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-bolt-elements-borderColorActive hover:underline inline-flex items-center gap-1"
-                  >
-                    Get your token
-                    <div className="i-ph:arrow-square-out w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-
-              <button
-                onClick={handleConnect}
-                disabled={connecting || !tokenInput}
-                className={classNames(
-                  'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
-                  'bg-[#303030] text-white',
-                  'hover:bg-[#5E41D0] hover:text-white',
-                  'disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200',
-                  'transform active:scale-95',
-                )}
-              >
-                {connecting ? (
-                  <>
-                    <div className="i-ph:spinner-gap animate-spin" />
-                    Connecting...
-                  </>
-                ) : (
-                  <>
-                    <div className="i-ph:plug-charging w-4 h-4" />
-                    Connect
-                  </>
-                )}
-              </button>
+              <h3 className="text-base font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">
+                Supabase 연결
+              </h3>
             </div>
-          ) : (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              {connection.user && (
+                <Button
+                  onClick={testConnection}
+                  disabled={connectionTest?.status === 'testing'}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2 hover:bg-bolt-elements-item-backgroundActive/10 hover:text-bolt-elements-textPrimary dark:hover:bg-bolt-elements-item-backgroundActive/10 dark:hover:text-bolt-elements-textPrimary transition-colors"
+                >
+                  {connectionTest?.status === 'testing' ? (
+                    <>
+                      <div className="i-ph:spinner-gap w-4 h-4 animate-spin" />
+                      확인하는 중...
+                    </>
+                  ) : (
+                    <>
+                      <div className="i-ph:plug-charging w-4 h-4" />
+                      연결 테스트
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          </motion.div>
+
+          <p className="text-sm text-bolt-elements-textSecondary dark:text-bolt-elements-textSecondary">
+            여러 기기에서 로그인해서 같은 데이터를 보고 싶으면 내 Supabase 프로젝트를 직접 연결할 수 있어요(고급)
+          </p>
+
+          {/* Connection Test Results */}
+          {connectionTest && (
+            <motion.div
+              className={classNames('p-4 rounded-lg border', {
+                'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-700':
+                  connectionTest.status === 'success',
+                'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-700': connectionTest.status === 'error',
+                'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-700':
+                  connectionTest.status === 'testing',
+              })}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <div className="flex items-center gap-2">
+                {connectionTest.status === 'success' && (
+                  <div className="i-ph:check-circle w-5 h-5 text-green-600 dark:text-green-400" />
+                )}
+                {connectionTest.status === 'error' && (
+                  <div className="i-ph:warning-circle w-5 h-5 text-red-600 dark:text-red-400" />
+                )}
+                {connectionTest.status === 'testing' && (
+                  <div className="i-ph:spinner-gap w-5 h-5 animate-spin text-blue-600 dark:text-blue-400" />
+                )}
+                <span
+                  className={classNames('text-sm font-medium', {
+                    'text-green-800 dark:text-green-200': connectionTest.status === 'success',
+                    'text-red-800 dark:text-red-200': connectionTest.status === 'error',
+                    'text-blue-800 dark:text-blue-200': connectionTest.status === 'testing',
+                  })}
+                >
+                  {connectionTest.message}
+                </span>
+              </div>
+              {connectionTest.timestamp && (
+                <p className="text-xs text-bolt-elements-textSecondary mt-1">
+                  {new Date(connectionTest.timestamp).toLocaleString()}
+                </p>
+              )}
+            </motion.div>
+          )}
+
+          {/* Main Connection Component */}
+          <motion.div
+            className="bg-bolt-elements-background dark:bg-bolt-elements-background border border-bolt-elements-borderColor dark:border-bolt-elements-borderColor rounded-lg"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="p-6 space-y-6">
+              {!connection.user ? (
+                <div className="space-y-4">
+                  {SHOW_DEV_TOOLS && (
+                    <div className="text-xs text-bolt-elements-textSecondary bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 p-3 rounded-lg mb-4">
+                      <p className="flex items-center gap-1 mb-1">
+                        <span className="i-ph:lightbulb w-3.5 h-3.5 text-bolt-elements-icon-success dark:text-bolt-elements-icon-success" />
+                        <span className="font-medium">Tip:</span> You can also set the{' '}
+                        <code className="px-1 py-0.5 bg-bolt-elements-background-depth-2 dark:bg-bolt-elements-background-depth-2 rounded">
+                          VITE_SUPABASE_ACCESS_TOKEN
+                        </code>{' '}
+                        environment variable to connect automatically.
+                      </p>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-sm text-bolt-elements-textSecondary mb-2">액세스 토큰</label>
+                    <input
+                      type="password"
+                      value={tokenInput}
+                      onChange={(e) => setTokenInput(e.target.value)}
+                      disabled={connecting}
+                      placeholder="Supabase 액세스 토큰을 입력하세요"
+                      className={classNames(
+                        'w-full px-3 py-2 rounded-lg text-sm',
+                        'bg-[#F8F8F8] dark:bg-[#1A1A1A]',
+                        'border border-[#E5E5E5] dark:border-[#333333]',
+                        'text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary',
+                        'focus:outline-none focus:ring-1 focus:ring-bolt-elements-borderColorActive',
+                        'disabled:opacity-50',
+                      )}
+                    />
+                    <div className="mt-2 text-sm text-bolt-elements-textSecondary">
+                      <a
+                        href="https://supabase.com/dashboard/account/tokens"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-bolt-elements-borderColorActive hover:underline inline-flex items-center gap-1"
+                      >
+                        토큰 발급받기
+                        <div className="i-ph:arrow-square-out w-4 h-4" />
+                      </a>
+                    </div>
+                  </div>
+
                   <button
-                    onClick={handleDisconnect}
+                    onClick={handleConnect}
+                    disabled={connecting || !tokenInput}
                     className={classNames(
-                      'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
-                      'bg-red-500 text-white',
-                      'hover:bg-red-600',
+                      'px-4 py-2 rounded-lg text-sm flex items-center gap-2 text-white',
+                      'bg-[#FF5330] hover:bg-[#E64B2B]',
+                      'disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200',
+                      'transform active:scale-95',
                     )}
                   >
-                    <div className="i-ph:plug w-4 h-4" />
-                    Disconnect
+                    {connecting ? (
+                      <>
+                        <div className="i-ph:spinner-gap animate-spin" />
+                        연결하는 중...
+                      </>
+                    ) : (
+                      <>
+                        <div className="i-ph:plug-charging w-4 h-4" />
+                        연결하기
+                      </>
+                    )}
                   </button>
-                  <span className="text-sm text-bolt-elements-textSecondary flex items-center gap-1">
-                    <div className="i-ph:check-circle w-4 h-4 text-green-500" />
-                    Connected to Supabase
-                  </span>
                 </div>
-              </div>
-
-              {connection.user && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4 p-4 bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 rounded-lg">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                      <div className="i-ph:user w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-sm font-medium text-bolt-elements-textPrimary">{connection.user.email}</h4>
-                      <p className="text-sm text-bolt-elements-textSecondary">
-                        {connection.user.role} • Member since{' '}
-                        {new Date(connection.user.created_at).toLocaleDateString()}
-                      </p>
-                      <div className="flex items-center gap-4 mt-2 text-xs text-bolt-elements-textSecondary">
-                        <span className="flex items-center gap-1">
-                          <div className="i-ph:buildings w-3 h-3" />
-                          {connection.stats?.totalProjects || 0} Projects
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <div className="i-ph:globe w-3 h-3" />
-                          {new Set(connection.stats?.projects?.map((p: SupabaseProject) => p.region) || []).size}{' '}
-                          Regions
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <div className="i-ph:activity w-3 h-3" />
-                          {connection.stats?.projects?.filter((p: SupabaseProject) => p.status === 'ACTIVE_HEALTHY')
-                            .length || 0}{' '}
-                          Active
-                        </span>
-                      </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={handleDisconnect}
+                        className={classNames(
+                          'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
+                          'bg-red-500 text-white',
+                          'hover:bg-red-600',
+                        )}
+                      >
+                        <div className="i-ph:plug w-4 h-4" />
+                        연결 해제
+                      </button>
+                      <span className="text-sm text-bolt-elements-textSecondary flex items-center gap-1">
+                        <div className="i-ph:check-circle w-4 h-4" style={{ color: '#FF5330' }} />
+                        Supabase에 연결됨
+                      </span>
                     </div>
                   </div>
 
-                  {/* Advanced Analytics */}
-                  <div className="mb-6 space-y-4">
-                    <h4 className="text-sm font-medium text-bolt-elements-textPrimary">Performance Analytics</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="bg-bolt-elements-background-depth-2 p-3 rounded-lg border border-bolt-elements-borderColor">
-                        <h6 className="text-xs font-medium text-bolt-elements-textPrimary flex items-center gap-2 mb-2">
-                          <div className="i-ph:chart-line w-4 h-4 text-bolt-elements-item-contentAccent" />
-                          Database Health
-                        </h6>
-                        <div className="space-y-1">
-                          {(() => {
-                            const totalProjects = connection.stats?.totalProjects || 0;
-                            const activeProjects =
-                              connection.stats?.projects?.filter((p: SupabaseProject) => p.status === 'ACTIVE_HEALTHY')
-                                .length || 0;
-                            const healthRate =
-                              totalProjects > 0 ? Math.round((activeProjects / totalProjects) * 100) : 0;
-                            const avgTablesPerProject =
-                              totalProjects > 0
-                                ? Math.round(
-                                    (connection.stats?.projects?.reduce(
-                                      (sum, p) => sum + (p.stats?.database?.tables || 0),
-                                      0,
-                                    ) || 0) / totalProjects,
-                                  )
-                                : 0;
-
-                            return [
-                              { label: 'Health Rate', value: `${healthRate}%` },
-                              { label: 'Active Projects', value: activeProjects },
-                              { label: 'Avg Tables/Project', value: avgTablesPerProject },
-                            ];
-                          })().map((item, idx) => (
-                            <div key={idx} className="flex justify-between text-xs">
-                              <span className="text-bolt-elements-textSecondary">{item.label}:</span>
-                              <span className="text-bolt-elements-textPrimary font-medium">{item.value}</span>
-                            </div>
-                          ))}
+                  {connection.user && (
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4 p-4 bg-bolt-elements-background-depth-1 dark:bg-bolt-elements-background-depth-1 rounded-lg">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                          <div className="i-ph:user w-6 h-6 text-white" />
                         </div>
-                      </div>
-
-                      <div className="bg-bolt-elements-background-depth-2 p-3 rounded-lg border border-bolt-elements-borderColor">
-                        <h6 className="text-xs font-medium text-bolt-elements-textPrimary flex items-center gap-2 mb-2">
-                          <div className="i-ph:shield-check w-4 h-4 text-bolt-elements-item-contentAccent" />
-                          Auth & Security
-                        </h6>
-                        <div className="space-y-1">
-                          {(() => {
-                            const totalProjects = connection.stats?.totalProjects || 0;
-                            const projectsWithAuth =
-                              connection.stats?.projects?.filter((p) => p.stats?.auth?.users !== undefined).length || 0;
-                            const authEnabledRate =
-                              totalProjects > 0 ? Math.round((projectsWithAuth / totalProjects) * 100) : 0;
-                            const totalUsers =
-                              connection.stats?.projects?.reduce((sum, p) => sum + (p.stats?.auth?.users || 0), 0) || 0;
-
-                            return [
-                              { label: 'Auth Enabled', value: `${authEnabledRate}%` },
-                              { label: 'Total Users', value: totalUsers },
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium text-bolt-elements-textPrimary">
+                            {connection.user.email}
+                          </h4>
+                          <p className="text-sm text-bolt-elements-textSecondary">
+                            {connection.user.role} • Member since{' '}
+                            {new Date(connection.user.created_at).toLocaleDateString()}
+                          </p>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-bolt-elements-textSecondary">
+                            <span className="flex items-center gap-1">
+                              <div className="i-ph:buildings w-3 h-3" />
+                              {connection.stats?.totalProjects || 0} Projects
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <div className="i-ph:globe w-3 h-3" />
                               {
-                                label: 'Avg Users/Project',
-                                value: totalProjects > 0 ? Math.round(totalUsers / totalProjects) : 0,
-                              },
-                            ];
-                          })().map((item, idx) => (
-                            <div key={idx} className="flex justify-between text-xs">
-                              <span className="text-bolt-elements-textSecondary">{item.label}:</span>
-                              <span className="text-bolt-elements-textPrimary font-medium">{item.value}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="bg-bolt-elements-background-depth-2 p-3 rounded-lg border border-bolt-elements-borderColor">
-                        <h6 className="text-xs font-medium text-bolt-elements-textPrimary flex items-center gap-2 mb-2">
-                          <div className="i-ph:globe w-4 h-4 text-bolt-elements-item-contentAccent" />
-                          Regional Distribution
-                        </h6>
-                        <div className="space-y-1">
-                          {(() => {
-                            const regions =
-                              connection.stats?.projects?.reduce(
-                                (acc, p: SupabaseProject) => {
-                                  acc[p.region] = (acc[p.region] || 0) + 1;
-                                  return acc;
-                                },
-                                {} as Record<string, number>,
-                              ) || {};
-
-                            return Object.entries(regions)
-                              .sort(([, a], [, b]) => b - a)
-                              .slice(0, 3)
-                              .map(([region, count]) => ({ label: region.toUpperCase(), value: count }));
-                          })().map((item, idx) => (
-                            <div key={idx} className="flex justify-between text-xs">
-                              <span className="text-bolt-elements-textSecondary">{item.label}:</span>
-                              <span className="text-bolt-elements-textPrimary font-medium">{item.value}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Resource Utilization */}
-                  <div className="mb-6">
-                    <h4 className="text-sm font-medium text-bolt-elements-textPrimary mb-2">Resource Overview</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                      {(() => {
-                        const totalDatabase =
-                          connection.stats?.projects?.reduce((sum, p) => sum + (p.stats?.database?.size_mb || 0), 0) ||
-                          0;
-                        const totalStorage =
-                          connection.stats?.projects?.reduce((sum, p) => sum + (p.stats?.storage?.used_gb || 0), 0) ||
-                          0;
-                        const totalFunctions =
-                          connection.stats?.projects?.reduce(
-                            (sum, p) => sum + (p.stats?.functions?.deployed || 0),
-                            0,
-                          ) || 0;
-                        const totalTables =
-                          connection.stats?.projects?.reduce((sum, p) => sum + (p.stats?.database?.tables || 0), 0) ||
-                          0;
-                        const totalBuckets =
-                          connection.stats?.projects?.reduce((sum, p) => sum + (p.stats?.storage?.buckets || 0), 0) ||
-                          0;
-
-                        return [
-                          {
-                            label: 'Database',
-                            value: totalDatabase > 0 ? `${totalDatabase} MB` : '--',
-                            icon: 'i-ph:database',
-                            color: 'text-blue-500',
-                            bgColor: 'bg-blue-100 dark:bg-blue-900/20',
-                            textColor: 'text-blue-800 dark:text-blue-400',
-                          },
-                          {
-                            label: 'Storage',
-                            value: totalStorage > 0 ? `${totalStorage} GB` : '--',
-                            icon: 'i-ph:folder',
-                            color: 'text-green-500',
-                            bgColor: 'bg-green-100 dark:bg-green-900/20',
-                            textColor: 'text-green-800 dark:text-green-400',
-                          },
-                          {
-                            label: 'Functions',
-                            value: totalFunctions,
-                            icon: 'i-ph:code',
-                            color: 'text-[#8B7E70]',
-                            bgColor: 'bg-[#8B7E70]/10',
-                            textColor: 'text-[#8B7E70]',
-                          },
-                          {
-                            label: 'Tables',
-                            value: totalTables,
-                            icon: 'i-ph:table',
-                            color: 'text-orange-500',
-                            bgColor: 'bg-orange-100 dark:bg-orange-900/20',
-                            textColor: 'text-orange-800 dark:text-orange-400',
-                          },
-                          {
-                            label: 'Buckets',
-                            value: totalBuckets,
-                            icon: 'i-ph:archive',
-                            color: 'text-teal-500',
-                            bgColor: 'bg-teal-100 dark:bg-teal-900/20',
-                            textColor: 'text-teal-800 dark:text-teal-400',
-                          },
-                        ];
-                      })().map((metric, index) => (
-                        <div
-                          key={index}
-                          className={`flex flex-col p-3 rounded-lg border border-bolt-elements-borderColor ${metric.bgColor}`}
-                        >
-                          <div className="flex items-center gap-2 mb-1">
-                            <div className={`${metric.icon} w-4 h-4 ${metric.color}`} />
-                            <span className="text-xs text-bolt-elements-textSecondary">{metric.label}</span>
+                                new Set(connection.stats?.projects?.map((p: SupabaseProject) => p.region) || []).size
+                              }{' '}
+                              Regions
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <div className="i-ph:activity w-3 h-3" />
+                              {connection.stats?.projects?.filter((p: SupabaseProject) => p.status === 'ACTIVE_HEALTHY')
+                                .length || 0}{' '}
+                              Active
+                            </span>
                           </div>
-                          <span className={`text-lg font-medium ${metric.textColor}`}>{metric.value}</span>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Usage Metrics */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="p-3 bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="i-ph:database w-4 h-4 text-bolt-elements-item-contentAccent" />
-                        <span className="text-xs font-medium text-bolt-elements-textPrimary">Database</span>
                       </div>
-                      <div className="text-sm text-bolt-elements-textSecondary">
-                        <div>
-                          Tables:{' '}
-                          {connection.stats?.projects?.reduce((sum, p) => sum + (p.stats?.database?.tables || 0), 0) ||
-                            '--'}
+
+                      {/* Advanced Analytics */}
+                      <div className="mb-6 space-y-4">
+                        <h4 className="text-sm font-medium text-bolt-elements-textPrimary">Performance Analytics</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="bg-bolt-elements-background-depth-2 p-3 rounded-lg border border-bolt-elements-borderColor">
+                            <h6 className="text-xs font-medium text-bolt-elements-textPrimary flex items-center gap-2 mb-2">
+                              <div className="i-ph:chart-line w-4 h-4 text-bolt-elements-item-contentAccent" />
+                              Database Health
+                            </h6>
+                            <div className="space-y-1">
+                              {(() => {
+                                const totalProjects = connection.stats?.totalProjects || 0;
+                                const activeProjects =
+                                  connection.stats?.projects?.filter(
+                                    (p: SupabaseProject) => p.status === 'ACTIVE_HEALTHY',
+                                  ).length || 0;
+                                const healthRate =
+                                  totalProjects > 0 ? Math.round((activeProjects / totalProjects) * 100) : 0;
+                                const avgTablesPerProject =
+                                  totalProjects > 0
+                                    ? Math.round(
+                                        (connection.stats?.projects?.reduce(
+                                          (sum, p) => sum + (p.stats?.database?.tables || 0),
+                                          0,
+                                        ) || 0) / totalProjects,
+                                      )
+                                    : 0;
+
+                                return [
+                                  { label: 'Health Rate', value: `${healthRate}%` },
+                                  { label: 'Active Projects', value: activeProjects },
+                                  { label: 'Avg Tables/Project', value: avgTablesPerProject },
+                                ];
+                              })().map((item, idx) => (
+                                <div key={idx} className="flex justify-between text-xs">
+                                  <span className="text-bolt-elements-textSecondary">{item.label}:</span>
+                                  <span className="text-bolt-elements-textPrimary font-medium">{item.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="bg-bolt-elements-background-depth-2 p-3 rounded-lg border border-bolt-elements-borderColor">
+                            <h6 className="text-xs font-medium text-bolt-elements-textPrimary flex items-center gap-2 mb-2">
+                              <div className="i-ph:shield-check w-4 h-4 text-bolt-elements-item-contentAccent" />
+                              Auth & Security
+                            </h6>
+                            <div className="space-y-1">
+                              {(() => {
+                                const totalProjects = connection.stats?.totalProjects || 0;
+                                const projectsWithAuth =
+                                  connection.stats?.projects?.filter((p) => p.stats?.auth?.users !== undefined)
+                                    .length || 0;
+                                const authEnabledRate =
+                                  totalProjects > 0 ? Math.round((projectsWithAuth / totalProjects) * 100) : 0;
+                                const totalUsers =
+                                  connection.stats?.projects?.reduce(
+                                    (sum, p) => sum + (p.stats?.auth?.users || 0),
+                                    0,
+                                  ) || 0;
+
+                                return [
+                                  { label: 'Auth Enabled', value: `${authEnabledRate}%` },
+                                  { label: 'Total Users', value: totalUsers },
+                                  {
+                                    label: 'Avg Users/Project',
+                                    value: totalProjects > 0 ? Math.round(totalUsers / totalProjects) : 0,
+                                  },
+                                ];
+                              })().map((item, idx) => (
+                                <div key={idx} className="flex justify-between text-xs">
+                                  <span className="text-bolt-elements-textSecondary">{item.label}:</span>
+                                  <span className="text-bolt-elements-textPrimary font-medium">{item.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="bg-bolt-elements-background-depth-2 p-3 rounded-lg border border-bolt-elements-borderColor">
+                            <h6 className="text-xs font-medium text-bolt-elements-textPrimary flex items-center gap-2 mb-2">
+                              <div className="i-ph:globe w-4 h-4 text-bolt-elements-item-contentAccent" />
+                              Regional Distribution
+                            </h6>
+                            <div className="space-y-1">
+                              {(() => {
+                                const regions =
+                                  connection.stats?.projects?.reduce(
+                                    (acc, p: SupabaseProject) => {
+                                      acc[p.region] = (acc[p.region] || 0) + 1;
+                                      return acc;
+                                    },
+                                    {} as Record<string, number>,
+                                  ) || {};
+
+                                return Object.entries(regions)
+                                  .sort(([, a], [, b]) => b - a)
+                                  .slice(0, 3)
+                                  .map(([region, count]) => ({ label: region.toUpperCase(), value: count }));
+                              })().map((item, idx) => (
+                                <div key={idx} className="flex justify-between text-xs">
+                                  <span className="text-bolt-elements-textSecondary">{item.label}:</span>
+                                  <span className="text-bolt-elements-textPrimary font-medium">{item.value}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          Size:{' '}
+                      </div>
+
+                      {/* Resource Utilization */}
+                      <div className="mb-6">
+                        <h4 className="text-sm font-medium text-bolt-elements-textPrimary mb-2">Resource Overview</h4>
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                           {(() => {
-                            const totalSize =
+                            const totalDatabase =
                               connection.stats?.projects?.reduce(
                                 (sum, p) => sum + (p.stats?.database?.size_mb || 0),
                                 0,
                               ) || 0;
-                            return totalSize > 0 ? `${totalSize} MB` : '--';
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="p-3 bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="i-ph:folder w-4 h-4 text-bolt-elements-item-contentAccent" />
-                        <span className="text-xs font-medium text-bolt-elements-textPrimary">Storage</span>
-                      </div>
-                      <div className="text-sm text-bolt-elements-textSecondary">
-                        <div>
-                          Buckets:{' '}
-                          {connection.stats?.projects?.reduce((sum, p) => sum + (p.stats?.storage?.buckets || 0), 0) ||
-                            '--'}
-                        </div>
-                        <div>
-                          Used:{' '}
-                          {(() => {
-                            const totalUsed =
+                            const totalStorage =
                               connection.stats?.projects?.reduce(
                                 (sum, p) => sum + (p.stats?.storage?.used_gb || 0),
                                 0,
                               ) || 0;
-                            return totalUsed > 0 ? `${totalUsed} GB` : '--';
-                          })()}
+                            const totalFunctions =
+                              connection.stats?.projects?.reduce(
+                                (sum, p) => sum + (p.stats?.functions?.deployed || 0),
+                                0,
+                              ) || 0;
+                            const totalTables =
+                              connection.stats?.projects?.reduce(
+                                (sum, p) => sum + (p.stats?.database?.tables || 0),
+                                0,
+                              ) || 0;
+                            const totalBuckets =
+                              connection.stats?.projects?.reduce(
+                                (sum, p) => sum + (p.stats?.storage?.buckets || 0),
+                                0,
+                              ) || 0;
+
+                            return [
+                              {
+                                label: 'Database',
+                                value: totalDatabase > 0 ? `${totalDatabase} MB` : '--',
+                                icon: 'i-ph:database',
+                                color: 'text-blue-500',
+                                bgColor: 'bg-blue-100 dark:bg-blue-900/20',
+                                textColor: 'text-blue-800 dark:text-blue-400',
+                              },
+                              {
+                                label: 'Storage',
+                                value: totalStorage > 0 ? `${totalStorage} GB` : '--',
+                                icon: 'i-ph:folder',
+                                color: 'text-green-500',
+                                bgColor: 'bg-green-100 dark:bg-green-900/20',
+                                textColor: 'text-green-800 dark:text-green-400',
+                              },
+                              {
+                                label: 'Functions',
+                                value: totalFunctions,
+                                icon: 'i-ph:code',
+                                color: 'text-[#8B7E70]',
+                                bgColor: 'bg-[#8B7E70]/10',
+                                textColor: 'text-[#8B7E70]',
+                              },
+                              {
+                                label: 'Tables',
+                                value: totalTables,
+                                icon: 'i-ph:table',
+                                color: 'text-orange-500',
+                                bgColor: 'bg-orange-100 dark:bg-orange-900/20',
+                                textColor: 'text-orange-800 dark:text-orange-400',
+                              },
+                              {
+                                label: 'Buckets',
+                                value: totalBuckets,
+                                icon: 'i-ph:archive',
+                                color: 'text-teal-500',
+                                bgColor: 'bg-teal-100 dark:bg-teal-900/20',
+                                textColor: 'text-teal-800 dark:text-teal-400',
+                              },
+                            ];
+                          })().map((metric, index) => (
+                            <div
+                              key={index}
+                              className={`flex flex-col p-3 rounded-lg border border-bolt-elements-borderColor ${metric.bgColor}`}
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <div className={`${metric.icon} w-4 h-4 ${metric.color}`} />
+                                <span className="text-xs text-bolt-elements-textSecondary">{metric.label}</span>
+                              </div>
+                              <span className={`text-lg font-medium ${metric.textColor}`}>{metric.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Usage Metrics */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="p-3 bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="i-ph:database w-4 h-4 text-bolt-elements-item-contentAccent" />
+                            <span className="text-xs font-medium text-bolt-elements-textPrimary">Database</span>
+                          </div>
+                          <div className="text-sm text-bolt-elements-textSecondary">
+                            <div>
+                              Tables:{' '}
+                              {connection.stats?.projects?.reduce(
+                                (sum, p) => sum + (p.stats?.database?.tables || 0),
+                                0,
+                              ) || '--'}
+                            </div>
+                            <div>
+                              Size:{' '}
+                              {(() => {
+                                const totalSize =
+                                  connection.stats?.projects?.reduce(
+                                    (sum, p) => sum + (p.stats?.database?.size_mb || 0),
+                                    0,
+                                  ) || 0;
+                                return totalSize > 0 ? `${totalSize} MB` : '--';
+                              })()}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-3 bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="i-ph:folder w-4 h-4 text-bolt-elements-item-contentAccent" />
+                            <span className="text-xs font-medium text-bolt-elements-textPrimary">Storage</span>
+                          </div>
+                          <div className="text-sm text-bolt-elements-textSecondary">
+                            <div>
+                              Buckets:{' '}
+                              {connection.stats?.projects?.reduce(
+                                (sum, p) => sum + (p.stats?.storage?.buckets || 0),
+                                0,
+                              ) || '--'}
+                            </div>
+                            <div>
+                              Used:{' '}
+                              {(() => {
+                                const totalUsed =
+                                  connection.stats?.projects?.reduce(
+                                    (sum, p) => sum + (p.stats?.storage?.used_gb || 0),
+                                    0,
+                                  ) || 0;
+                                return totalUsed > 0 ? `${totalUsed} GB` : '--';
+                              })()}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="p-3 bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="i-ph:code w-4 h-4 text-bolt-elements-item-contentAccent" />
+                            <span className="text-xs font-medium text-bolt-elements-textPrimary">Functions</span>
+                          </div>
+                          <div className="text-sm text-bolt-elements-textSecondary">
+                            <div>
+                              Deployed:{' '}
+                              {connection.stats?.projects?.reduce(
+                                (sum, p) => sum + (p.stats?.functions?.deployed || 0),
+                                0,
+                              ) || '--'}
+                            </div>
+                            <div>
+                              Invocations:{' '}
+                              {connection.stats?.projects?.reduce(
+                                (sum, p) => sum + (p.stats?.functions?.invocations || 0),
+                                0,
+                              ) || '--'}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div className="p-3 bg-bolt-elements-background-depth-1 rounded-lg border border-bolt-elements-borderColor">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="i-ph:code w-4 h-4 text-bolt-elements-item-contentAccent" />
-                        <span className="text-xs font-medium text-bolt-elements-textPrimary">Functions</span>
-                      </div>
-                      <div className="text-sm text-bolt-elements-textSecondary">
-                        <div>
-                          Deployed:{' '}
-                          {connection.stats?.projects?.reduce(
-                            (sum, p) => sum + (p.stats?.functions?.deployed || 0),
-                            0,
-                          ) || '--'}
-                        </div>
-                        <div>
-                          Invocations:{' '}
-                          {connection.stats?.projects?.reduce(
-                            (sum, p) => sum + (p.stats?.functions?.invocations || 0),
-                            0,
-                          ) || '--'}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  )}
+
+                  {renderProjects()}
                 </div>
               )}
-
-              {renderProjects()}
             </div>
-          )}
-        </div>
-      </motion.div>
+          </motion.div>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 }

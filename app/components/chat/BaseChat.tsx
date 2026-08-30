@@ -567,6 +567,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       <div className={homeStyles.stageBlock}>
                         <div className="w-full mx-auto flex flex-col items-center" style={{ maxWidth: 760 }}>
                           <p className={homeStyles.greeting}>오늘은 뭘 만들어볼까요?</p>
+                          <p className={homeStyles.subGreeting}>만들고 싶은 걸 한 문장으로 적으면 돼요</p>
                           <StickToBottom className="relative w-full" resize="smooth" initial="smooth">
                             {chatBoxSection}
                           </StickToBottom>

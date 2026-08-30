@@ -2,18 +2,20 @@ import { useState, useCallback } from 'react';
 import { useStore } from '@nanostores/react';
 import { classNames } from '~/utils/classNames';
 import { profileStore, updateProfile } from '~/lib/stores/profile';
+import { authUserStore } from '~/lib/stores/auth';
 import { toast } from 'react-toastify';
 import { debounce } from '~/utils/debounce';
 
 export default function ProfileTab() {
   const profile = useStore(profileStore);
+  const authUser = useStore(authUserStore);
   const [isUploading, setIsUploading] = useState(false);
 
   // Create debounced update functions
   const debouncedUpdate = useCallback(
-    debounce((field: 'username' | 'bio', value: string) => {
+    debounce((field: 'username', value: string) => {
       updateProfile({ [field]: value });
-      toast.success(field === 'username' ? '사용자 이름이 업데이트됐어요' : '소개가 업데이트됐어요');
+      toast.success('사용자 이름이 업데이트됐어요');
     }, 1000),
     [],
   );
@@ -51,7 +53,7 @@ export default function ProfileTab() {
     }
   };
 
-  const handleProfileUpdate = (field: 'username' | 'bio', value: string) => {
+  const handleProfileUpdate = (field: 'username', value: string) => {
     // Update the store immediately for UI responsiveness
     updateProfile({ [field]: value });
 
@@ -89,7 +91,12 @@ export default function ProfileTab() {
                   )}
                 />
               ) : (
-                <div className="i-ph:robot-fill w-16 h-16 text-bolt-elements-textTertiary transition-colors group-hover:text-[#FF5330]/70 transform -translate-y-1" />
+                <div
+                  className="w-full h-full flex items-center justify-center text-3xl font-semibold text-white"
+                  style={{ background: '#FF5330' }}
+                >
+                  {(profile.username || authUser?.email || '?').trim().charAt(0).toUpperCase()}
+                </div>
               )}
 
               <label
@@ -147,31 +154,30 @@ export default function ProfileTab() {
             </div>
           </div>
 
-          {/* Bio Input */}
-          <div className="mb-8">
-            <label className="block text-sm font-medium text-bolt-elements-textPrimary mb-2">소개</label>
-            <div className="relative group">
-              <div className="absolute left-3.5 top-3">
-                <div className="i-ph:text-aa w-5 h-5 text-bolt-elements-textTertiary transition-colors group-focus-within:text-[#FF5330]" />
+          {/* Email (읽기 전용) */}
+          {authUser?.email && (
+            <div className="mb-8">
+              <label className="block text-sm font-medium text-bolt-elements-textPrimary mb-2">이메일</label>
+              <div className="relative">
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2">
+                  <div className="i-ph:envelope-simple w-5 h-5 text-bolt-elements-textTertiary" />
+                </div>
+                <input
+                  type="text"
+                  value={authUser.email}
+                  readOnly
+                  disabled
+                  className={classNames(
+                    'w-full pl-11 pr-4 py-2.5 rounded-xl',
+                    'bg-bolt-elements-background-depth-4',
+                    'border border-bolt-elements-borderColor',
+                    'text-bolt-elements-textSecondary',
+                    'cursor-not-allowed',
+                  )}
+                />
               </div>
-              <textarea
-                value={profile.bio}
-                onChange={(e) => handleProfileUpdate('bio', e.target.value)}
-                className={classNames(
-                  'w-full pl-11 pr-4 py-2.5 rounded-xl',
-                  'bg-bolt-elements-background-depth-4',
-                  'border border-bolt-elements-borderColor',
-                  'text-bolt-elements-textPrimary',
-                  'placeholder-bolt-elements-textTertiary',
-                  'focus:outline-none focus:ring-2 focus:ring-[#FF5330]/50 focus:border-[#FF5330]/50',
-                  'transition-all duration-300 ease-out',
-                  'resize-none',
-                  'h-32',
-                )}
-                placeholder="자신에 대해 소개해주세요"
-              />
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>

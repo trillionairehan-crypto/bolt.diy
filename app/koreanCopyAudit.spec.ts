@@ -21,12 +21,11 @@ describe('한국어 문구 감사 — 사이클 8', () => {
 });
 
 describe('한국어 문구 감사 — 사이클 47', () => {
-  it('AvatarDropdown.tsx: 프로필/설정 메뉴 항목이 영어("Edit Profile"/"Settings")가 아니라 한국어다', () => {
-    const source = readFileSync(join(__dirname, 'components/@settings/core/AvatarDropdown.tsx'), 'utf-8');
-    expect(source).not.toContain('Edit Profile');
-    expect(source).not.toContain('>Settings<');
-    expect(source).toContain('프로필 수정');
-  });
+  /*
+   * AvatarDropdown.tsx는 설정·알림·프로필 라운드에서 완전히 제거됐다 — ControlPanel.tsx 헤더의
+   * 중복 계정 메뉴(사이드바 AccountMenu.tsx와 항목이 겹침)였고, 좌측 고정 탭 레이아웃으로 바뀌며
+   * 더 이상 쓰이지 않아 파일째 삭제. 이 테스트가 감사하던 대상이 더 이상 존재하지 않음.
+   */
 
   it('pricing.tsx: 메시지 개수 뒤에 단위 없이 숫자와 "메시지"가 바로 붙지 않고 "건" 단위가 있다', () => {
     const source = readFileSync(join(__dirname, 'routes/pricing.tsx'), 'utf-8');

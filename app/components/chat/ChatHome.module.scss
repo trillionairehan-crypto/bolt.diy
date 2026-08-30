@@ -7,7 +7,15 @@ $cream: #fbf5ee;
   font-size: 32px;
   font-weight: 600;
   color: $ink;
-  margin: 0 0 28px;
+  margin: 0;
+}
+
+// 7: 헤드라인 아래 12px에 붙는 보조 한 줄.
+.subGreeting {
+  text-align: center;
+  font-size: 15px;
+  color: #7a7067;
+  margin: 12px 0 28px;
 }
 
 /*

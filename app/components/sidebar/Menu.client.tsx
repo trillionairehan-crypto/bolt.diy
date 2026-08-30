@@ -255,7 +255,7 @@ export const Menu = () => {
         />
       )}
       {/*
-        2: 좌상단 순서 = 위 햄버거(토글) / 아래 로고(홈), 40x40 동일 히트 영역·같은 왼쪽 정렬축.
+        좌상단 순서 = 위 로고(홈) / 아래 햄버거(토글), 40x40 동일 히트 영역·같은 왼쪽 정렬축.
         햄버거는 별도의 position:fixed 요소로 분리해 z-logo(998, .panel의 z-sidebar=997보다 위)를
         줘서 사이드바가 펼쳐져도 같은 좌표·같은 아이콘으로 그 위에 남는다 — "같은 자리 같은
         아이콘 = 토글"을 몸으로 알 수 있게. 로고는 항상 낮은 z-index로 남아 패널이 펼쳐지면 그
@@ -264,6 +264,9 @@ export const Menu = () => {
       */}
       {!isSmallViewport && (
         <>
+          <a href="/" title="홈" aria-label="홈" className={styles.railHomeLink}>
+            <Logo height={24} showWordmark={false} />
+          </a>
           <button
             ref={hamburgerRef}
             type="button"
@@ -272,11 +275,8 @@ export const Menu = () => {
             className={classNames(styles.railHamburger, 'z-logo')}
             onClick={toggleSidebar}
           >
-            <div className="i-ph:list" style={{ fontSize: 20, color: '#1A1A1A' }} />
+            <div className={classNames('i-ph:list', styles.railHamburgerIcon)} style={{ fontSize: 20 }} />
           </button>
-          <a href="/" title="홈" aria-label="홈" className={styles.railHomeLink}>
-            <Logo height={24} showWordmark={false} />
-          </a>
         </>
       )}
       <motion.div
