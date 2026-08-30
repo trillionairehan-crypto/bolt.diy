@@ -8,6 +8,7 @@ import { CodeBlock } from './CodeBlock';
 import styles from './Markdown.module.scss';
 import ThoughtBox from './ThoughtBox';
 import type { ProviderInfo } from '~/types/model';
+import { classNames } from '~/utils/classNames';
 
 const logger = createScopedLogger('MarkdownComponent');
 
@@ -23,10 +24,26 @@ interface MarkdownProps {
   setChatMode?: (mode: 'discuss' | 'build') => void;
   model?: string;
   provider?: ProviderInfo;
+
+  /*
+   * 채팅 화면 재설계 — 말풍선 제거: 사용자 지시/AI 응답이 이제 폰트 크기·행간·최대 폭이 서로
+   * 다른 평문이라(14px vs 15px/1.7, 480px vs 640px) 그 값을 여기 modifier 클래스로 확정한다.
+   * 지정하지 않으면 기존 동작(상속된 크기, 모바일에서만 14px) 그대로.
+   */
+  variant?: 'user' | 'assistant';
 }
 
 export const Markdown = memo(
-  ({ children, html = false, limitedMarkdown = false, append, setChatMode, model, provider }: MarkdownProps) => {
+  ({
+    children,
+    html = false,
+    limitedMarkdown = false,
+    append,
+    setChatMode,
+    model,
+    provider,
+    variant,
+  }: MarkdownProps) => {
     logger.trace('Render');
 
     /*
@@ -205,7 +222,10 @@ export const Markdown = memo(
     return (
       <ReactMarkdown
         allowedElements={allowedHTMLElements}
-        className={styles.MarkdownContent}
+        className={classNames(styles.MarkdownContent, {
+          [styles.userVariant]: variant === 'user',
+          [styles.assistantVariant]: variant === 'assistant',
+        })}
         components={components}
         remarkPlugins={remarkPlugins(limitedMarkdown)}
         rehypePlugins={rehypePlugins(html)}

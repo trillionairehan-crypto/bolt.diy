@@ -413,12 +413,18 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
             <StickToBottom.Content className="flex flex-col gap-4 relative ">
               <ClientOnly>
                 {() => {
+                  /*
+                   * 채팅 화면 재설계 — 말풍선 시절의 max-w-chat(528px)은 AI 응답의 새 640px
+                   * 상한보다 좁아서 그 값이 절대 안 걸린다. 턴 선의 16px padding까지 감안해 이
+                   * 칼럼만 별도로 넓힌다(입력창 등 다른 max-w-chat 소비처는 그대로 둠).
+                   */
                   return chatStarted ? (
                     <Messages
-                      className="flex flex-col w-full flex-1 max-w-chat pb-4 mx-auto z-1"
+                      className="flex flex-col w-full flex-1 max-w-[680px] pb-4 mx-auto z-1"
                       messages={messages}
                       parsedMessages={parsedMessages}
                       isStreaming={isStreaming}
+                      hasError={!!llmErrorAlert}
                       append={append}
                       chatMode={chatMode}
                       setChatMode={setChatMode}

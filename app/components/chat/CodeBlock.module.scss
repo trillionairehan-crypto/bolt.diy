@@ -8,3 +8,13 @@
     height: 30px;
   }
 }
+
+/*
+ * 채팅 화면 재설계 — Shiki가 `pre`에 테마 배경색을 인라인 style로 직접 굽기 때문에(light-plus는
+ * 거의 흰색) CSS로 덮으려면 !important가 필요하다. 순수 회색 금지 → 따뜻한 중립 배경 하나로.
+ * .wrapper 밑으로 스코프해서 Artifact.tsx의 별도 ShellCodeBlock(dark-plus 유지, 개발자 도구
+ * 전용 셸 로그 표시)처럼 이 컴포넌트 밖의 다른 <pre>까지 건드리지 않게 한다.
+ */
+.wrapper :global(pre) {
+  background-color: #f5ede3 !important;
+}

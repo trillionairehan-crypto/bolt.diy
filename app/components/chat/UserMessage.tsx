@@ -44,28 +44,29 @@ export function UserMessage({ parts }: UserMessageProps) {
   const { text: textContent, additionsCount } = splitDisplayText(parts);
 
   return (
-    <div className="flex flex-col bg-[var(--accent-soft)] backdrop-blur-sm px-3.5 py-2.5 lg:px-5 lg:p-3.5 w-auto rounded-lg ml-auto">
-      <div className="flex gap-3.5 mb-4">
-        {images.map((item, index) => (
-          <div className="relative flex rounded-lg border border-bolt-elements-borderColor overflow-hidden">
-            <div className="h-16 w-16 bg-transparent outline-none">
-              <img
-                key={index}
-                src={item.url}
-                alt={`Image ${index + 1}`}
-                className="h-full w-full rounded-lg"
-                style={{ objectFit: 'fill' }}
-              />
+    <div className="flex flex-col" style={{ color: '#1A1A1A' }}>
+      {images.length > 0 && (
+        <div className="flex gap-3.5 mb-4 justify-end">
+          {images.map((item, index) => (
+            <div className="relative flex rounded-lg border border-bolt-elements-borderColor overflow-hidden">
+              <div className="h-16 w-16 bg-transparent outline-none">
+                <img
+                  key={index}
+                  src={item.url}
+                  alt={`Image ${index + 1}`}
+                  className="h-full w-full rounded-lg"
+                  style={{ objectFit: 'fill' }}
+                />
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-      <Markdown html>{textContent}</Markdown>
+          ))}
+        </div>
+      )}
+      <Markdown html variant="user">
+        {textContent}
+      </Markdown>
       {additionsCount > 0 && (
-        <span
-          className="mt-2 self-start text-xs font-medium px-2 py-0.5 rounded-full"
-          style={{ background: 'var(--accent-ring)', color: 'var(--accent-text)' }}
-        >
+        <span className="mt-2 self-end text-xs font-medium" style={{ color: '#8B7E70' }}>
           답변 {additionsCount}개 반영됨
         </span>
       )}

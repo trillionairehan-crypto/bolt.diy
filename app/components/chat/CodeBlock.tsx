@@ -16,7 +16,7 @@ interface CodeBlockProps {
 }
 
 export const CodeBlock = memo(
-  ({ className, code, language = 'plaintext', theme = 'dark-plus', disableCopy = false }: CodeBlockProps) => {
+  ({ className, code, language = 'plaintext', theme = 'light-plus', disableCopy = false }: CodeBlockProps) => {
     const [html, setHTML] = useState<string | undefined>(undefined);
     const [copied, setCopied] = useState(false);
 
@@ -52,7 +52,7 @@ export const CodeBlock = memo(
     }, [code, language, theme]);
 
     return (
-      <div className={classNames('relative group text-left', className)}>
+      <div className={classNames(styles.wrapper, 'relative group text-left', className)}>
         <div
           className={classNames(
             styles.CopyButtonContainer,
