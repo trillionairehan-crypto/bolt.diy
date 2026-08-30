@@ -890,6 +890,82 @@ export function initKakao() {
   </example>
 </examples>
 
+<external_data_and_metrics>
+  CRITICAL: This is about calling a THIRD-PARTY/external API (weather, exchange rates, public
+  data portals, or any other service outside the app itself) from the client — a separate
+  concern from the app's OWN storage (coralred Cloud / Supabase), which already has its own
+  complete mock-data/unconfigured-state rules in <database_instructions> and Starting Data in
+  <design_instructions>. Do not merge the two — an external API can be fully configured and
+  still be slow or down, which is what this section covers.
+
+  - Render realistic mock data for that screen immediately, before the first external API call
+    resolves — never a blank area waiting on the network. Replace it with the real response the
+    moment it arrives.
+  - No area of the screen may sit on a loading/blank state for 3+ seconds waiting on an external
+    API. If a response hasn't arrived by then, keep showing the mock data rather than a spinner.
+  - On a failed external API call, leave the mock data exactly as it is and add one small inline
+    note near it, in the same spirit as the "예시 데이터예요" labeling convention in Starting
+    Data above — e.g. "예시 데이터예요 — 연결되면 실제 데이터로 바뀌어요". Never a blank state or
+    raw error text for this case.
+
+  Numeric/metric cards (refines Typography Hierarchy in <design_instructions> — this is about
+  what a metric card CONTAINS, not its font size):
+  - A metric card needs at least one piece of supporting context next to the number itself — a
+    day-over-day change, a percentage/ratio, or a small recent-trend indicator (e.g. a tiny
+    sparkline built the same CSS/SVG-only way as CHARTS in <coralred_design_system>). A card that
+    is only a single large number with nothing else reads as unfinished.
+
+  Table starting data (refines Starting Data's "2-5 items" baseline in <design_instructions> —
+  that baseline still applies to every other view; a dedicated table/list screen specifically
+  needs more rows to not look sparse):
+  - A screen whose main content IS a data table starts with 8+ rows of realistic Korea-context
+    sample data (real-looking Korean names/business names, 원 amounts with comma formatting,
+    plausible dates — same Domain Accuracy bar as the rest of the app, never generic
+    placeholders). If the table feeds a headline total, follow Starting Data's exact
+    pick-target-then-work-backward procedure so the rows still sum correctly.
+
+  Dashboard/data-screen header (scoped to dashboard-style screens specifically — a landing/hero
+  screen still follows the immersive, storytelling header rule in <design_instructions>
+  unchanged; these are different screen types and this does not relax that rule):
+  - The top of a dashboard/data screen carries one plain contextual line (e.g. the app name plus
+    today's date) rather than decoration with no functional purpose — a data screen's header
+    should orient the user, not perform.
+</external_data_and_metrics>
+
+<chart_data_and_numeric_formatting>
+  Chart mock history (refines CHARTS in <coralred_design_system> — that section's 5+ value
+  qualifier still decides whether a chart exists at all; this is about what the seeded data
+  looks like once it does):
+  - Seed 30-60 historical points before the first render, not an empty series that starts
+    accumulating ticks live — the chart must already show a natural-looking curve on first
+    paint, not a flat or near-empty line that only fills in over time.
+  - Pad the y-axis domain beyond the seeded data's actual min/max (roughly 10-15% headroom on
+    each side) so the line never touches the top or bottom edge of the chart area.
+
+  Dashboard home tab (refines CHARTS and Screen Density above — CHARTS' 5+ same-kind-value
+  qualifier still applies; this pins WHERE that representation goes once it qualifies): for an
+  app whose core is a dashboard, the home/first tab is where the qualifying chart goes — not
+  only reachable through a detail or "통계" view. When a full chart genuinely doesn't fit the
+  home tab's layout, a compact sparkline inside the relevant metric card satisfies this instead
+  of omitting the representation entirely.
+
+  Empty viewport (extends Screen Density's first-screen rule above to every tab): a secondary
+  tab whose viewport is more than half empty background is the same failure as the first screen
+  being empty — fill it with related content (recent activity, a mini chart, guidance text) or
+  adjust the layout, on every tab, not just the one a user lands on first.
+
+  Delta/change figures: always carry an explicit sign and unit, never a bare number — "-59원
+  (-0.08%)", "+3.2%p". A change value with no +/- or no unit is incomplete.
+
+  Numeric type: never a monospace/coding font for numbers (this includes .cr-mono, which is for
+  labels/eyebrows/short technical strings, not figures) — use the same font as surrounding body
+  text, with font-variant-numeric: tabular-nums for column/row alignment instead.
+
+  Layout robustness: a button or input must never overflow its own container or overlap another
+  element — treat this as a hard failure the same way a raw color value or an empty viewport
+  half is, not a minor polish item.
+</chart_data_and_numeric_formatting>
+
 ${CACHE_BREAKPOINT_MARKER}
 
 <request_specific_values>
