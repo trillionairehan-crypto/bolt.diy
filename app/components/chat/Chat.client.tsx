@@ -570,8 +570,18 @@ export const ChatImpl = memo(
      * v2/legacy split lives in exactly one place. See CORALRED_NEW_METERING's own doc comment.
      */
     const recordGenerationUsed = async () => {
+      /*
+       * Double-charge investigation (2026-08-31): temporary instrumentation, remove once the
+       * production report of "1 follow-up = 2 credits deducted" is root-caused. Logs every actual
+       * charge (not every arm() — only calls that got past the gate and are about to hit the RPC/
+       * localStorage counter) with a timestamp, so a repro's console can show whether recordGenerationUsed
+       * itself is invoked twice for one user action.
+       */
+      logger.info('recordGenerationUsed: charging now', { at: Date.now() });
+
       try {
         await (CORALRED_NEW_METERING ? incrementV2GenerationsUsed() : incrementGenerationsUsed());
+        logger.info('recordGenerationUsed: charge succeeded');
       } catch (error) {
         logger.error('Failed to record generation usage', error);
       }
@@ -833,6 +843,9 @@ export const ChatImpl = memo(
        */
       const shouldChargeThisMessage = CORALRED_NEW_METERING && !isAutoFix;
 
+      // Double-charge investigation (2026-08-31): temporary, see recordGenerationUsed's own note.
+      logger.info('sendMessage: dispatching', { isAutoFix, shouldChargeThisMessage, at: Date.now() });
+
       if (shouldChargeThisMessage && !(await checkGenerationsAllowed())) {
         return;
       }
@@ -918,6 +931,9 @@ export const ChatImpl = memo(
       if (attempts >= 2) {
         return;
       }
+
+      // Double-charge investigation (2026-08-31): temporary, see recordGenerationUsed's own note.
+      logger.info('auto-fix effect: firing', { attempts, alertTitle: actionAlert.title, at: Date.now() });
 
       const prompt = buildFixPrompt(true, actionAlert.content);
 
