@@ -43,11 +43,21 @@ $coral: #ff5330;
  * Two full-size layers cross-fade inside .panel while its own width animates (framer-motion) —
  * avoids remounting content on every collapse/expand. .panel itself spans the full viewport
  * height (top:0) so an EXPANDED panel can legitimately overlay Header.tsx's own top bar, same as
- * before this redesign — but both layers' own content starts below the header height, so neither
- * the collapsed rail's toggle nor the expanded content's top row visually doubles up with the
- * header's own logo/toggle icons sitting in that same top strip.
+ * before this redesign.
+ *
+ * railLayer 자체는 padding-top을 안 준다 — 채팅·미리보기 화면 수정: 접힌 띠의 로고(railToggle)를
+ * 헤더와 같은 세로 중심선에 맞춰야 해서, 오히려 띠 상단에 딱 붙여야 한다. Header.tsx는 더 이상
+ * 자기 로고를 안 그리므로(이전 라운드에서 제거) 겹칠 대상 자체가 없다 — contentLayer(펼친 상태)는
+ * 자기 안에 별도의 "새 앱 만들기" 로고/collapse 버튼이 있어 여전히 header-height만큼 밀어야 한다.
  */
-.railLayer,
+.railLayer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.15s ease-out;
+}
+
 .contentLayer {
   position: absolute;
   inset: 0;
@@ -69,7 +79,8 @@ $coral: #ff5330;
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 56px;
+  // 헤더와 같은 높이(--header-height)로 맞춰서 로고가 헤더 오른쪽 버튼들과 같은 세로 중심선에 온다.
+  height: var(--header-height);
   background: none;
   border: none;
   cursor: pointer;

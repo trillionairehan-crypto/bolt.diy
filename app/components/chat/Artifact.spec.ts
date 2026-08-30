@@ -35,9 +35,9 @@ describe('getGenerationPhaseLabel', () => {
     expect(label).not.toContain('/');
   });
 
-  it('shell/start 액션이 진행 중이면 "마무리하고 있어요"를 반환한다', () => {
+  it('shell/start 액션이 진행 중이면 "앱을 준비하고 있어요"를 반환한다', () => {
     const actions = [action({ type: 'shell', status: 'running' })];
-    expect(getGenerationPhaseLabel(actions)).toBe('마무리하고 있어요');
+    expect(getGenerationPhaseLabel(actions)).toBe('앱을 준비하고 있어요');
   });
 
   it('가장 최근 진행 중인 파일 액션을 우선한다', () => {

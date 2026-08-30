@@ -510,6 +510,15 @@ export const Workbench = memo(
     return (
       chatStarted && (
         <>
+          {/*
+            채팅·미리보기 화면 수정 — 예전엔 이 폭-애니메이션 motion.div는 flex 레이아웃 안에서
+            공간만 예약하고, 실제로 보이는 카드는 position:fixed + left(--workbench-left)로 따로
+            떠 있었다. --workbench-left는 뷰포트 폭 기준 100%에서 역산한 값이라 .ChatArea의
+            사이드바 레일 padding-left(64px)를 몰랐고, 그만큼 항상 왼쪽으로 더 파고들어 대화
+            카드/스크롤바를 가렸다. 이제 폭-애니메이션 motion.div 자체가 실제 카드를 담아 flex
+            형제(.Chat)로서 자연스럽게 자리를 잡는다 — 뷰포트 기준 좌표 계산이 아예 없어져서
+            같은 종류의 어긋남이 구조적으로 재발할 수 없다.
+          */}
           <motion.div
             initial="closed"
             animate={showWorkbench ? 'open' : 'closed'}
@@ -519,20 +528,11 @@ export const Workbench = memo(
                 ? { duration: 0 }
                 : { duration: panelTransitionDurationSec, ease: panelTransitionEasing }
             }
-            className="z-workbench"
+            className="z-workbench h-full overflow-hidden"
           >
-            <div
-              className={classNames(
-                'fixed top-[calc(var(--header-height)+1.2rem)] bottom-6 w-[var(--workbench-inner-width)] z-0 transition-[left,width]',
-                prefersReducedMotion ? 'duration-0' : 'duration-[360ms] ease-[cubic-bezier(0.32,0.72,0,1)]',
-                {
-                  'left-[var(--workbench-left)]': showWorkbench,
-                  'left-[100%]': !showWorkbench,
-                },
-              )}
-            >
-              <div className="absolute inset-0 px-2 lg:px-4">
-                <div className="h-full flex flex-col bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor shadow-sm rounded-lg overflow-hidden">
+            <div className="h-full w-[var(--workbench-inner-width)] pt-[1.2rem] pb-6 px-2 lg:px-4">
+              <div className="h-full flex flex-col bg-bolt-elements-background-depth-2 border border-bolt-elements-borderColor shadow-sm rounded-lg overflow-hidden">
+                {SHOW_DEV_TOOLS && (
                   <div
                     className="flex items-center px-3 py-2 border-b border-bolt-elements-borderColor gap-1.5"
                     style={{
@@ -660,67 +660,59 @@ export const Workbench = memo(
                     {effectiveView === 'diff' && (
                       <FileModifiedDropdown fileHistory={fileHistory} onSelectFile={handleSelectFile} />
                     )}
-                    <IconButton
-                      icon="i-ph:x-circle"
-                      className="-mr-1"
-                      size="xl"
-                      onClick={() => {
-                        workbenchStore.showWorkbench.set(false);
-                      }}
-                    />
                   </div>
-                  <div className="relative flex-1 overflow-hidden">
-                    <View initial={{ x: '0%' }} animate={{ x: effectiveView === 'code' ? '0%' : '-100%' }}>
-                      <EditorPanel
-                        editorDocument={currentDocument}
-                        isStreaming={isStreaming}
-                        selectedFile={selectedFile}
-                        files={files}
-                        unsavedFiles={unsavedFiles}
-                        fileHistory={fileHistory}
-                        onFileSelect={onFileSelect}
-                        onEditorScroll={onEditorScroll}
-                        onEditorChange={onEditorChange}
-                        onFileSave={onFileSave}
-                        onFileReset={onFileReset}
-                      />
-                    </View>
-                    {effectiveView === 'diff' && (
-                      <div className="absolute inset-0">
-                        <DiffViewErrorBoundary>
-                          <Suspense fallback={null}>
-                            <DiffView fileHistory={fileHistory} setFileHistory={setFileHistory} />
-                          </Suspense>
-                        </DiffViewErrorBoundary>
-                      </div>
-                    )}
-                    {/*
+                )}
+                <div className="relative flex-1 overflow-hidden">
+                  <View initial={{ x: '0%' }} animate={{ x: effectiveView === 'code' ? '0%' : '-100%' }}>
+                    <EditorPanel
+                      editorDocument={currentDocument}
+                      isStreaming={isStreaming}
+                      selectedFile={selectedFile}
+                      files={files}
+                      unsavedFiles={unsavedFiles}
+                      fileHistory={fileHistory}
+                      onFileSelect={onFileSelect}
+                      onEditorScroll={onEditorScroll}
+                      onEditorChange={onEditorChange}
+                      onFileSave={onFileSave}
+                      onFileReset={onFileReset}
+                    />
+                  </View>
+                  {effectiveView === 'diff' && (
+                    <div className="absolute inset-0">
+                      <DiffViewErrorBoundary>
+                        <Suspense fallback={null}>
+                          <DiffView fileHistory={fileHistory} setFileHistory={setFileHistory} />
+                        </Suspense>
+                      </DiffViewErrorBoundary>
+                    </div>
+                  )}
+                  {/*
                       채팅 홈·생성 전환 통합 수정 — 첫 렌더 시 데스크톱 2단 전환: 미리보기가
                       워크벤치 폭 애니메이션과 동시에(순차 아님) 옅은 스케일(0.985→1)과 함께
                       페이드인된다. x축 슬라이드(코드/차이점/미리보기 내부 탭 전환, SHOW_DEV_TOOLS
                       전용)는 기존 viewTransition 타이밍 그대로 — opacity/scale만 새 패널 전환
                       타이밍(panelTransitionDurationSec/panelTransitionEasing)을 쓴다.
                     */}
-                    <View
-                      initial={{ x: '100%' }}
-                      animate={{
-                        x: effectiveView === 'preview' ? '0%' : '100%',
-                        opacity: showWorkbench ? 1 : 0,
-                        scale: !showWorkbench && !prefersReducedMotion ? 0.985 : 1,
-                      }}
-                      transition={{
-                        x: viewTransition,
-                        opacity: prefersReducedMotion
-                          ? { duration: 0.15 }
-                          : { duration: panelTransitionDurationSec, ease: panelTransitionEasing },
-                        scale: prefersReducedMotion
-                          ? { duration: 0 }
-                          : { duration: panelTransitionDurationSec, ease: panelTransitionEasing },
-                      }}
-                    >
-                      <Preview setSelectedElement={setSelectedElement} />
-                    </View>
-                  </div>
+                  <View
+                    initial={{ x: '100%' }}
+                    animate={{
+                      x: effectiveView === 'preview' ? '0%' : '100%',
+                      opacity: showWorkbench ? 1 : 0,
+                      scale: !showWorkbench && !prefersReducedMotion ? 0.985 : 1,
+                    }}
+                    transition={{
+                      x: viewTransition,
+                      opacity: prefersReducedMotion
+                        ? { duration: 0.15 }
+                        : { duration: panelTransitionDurationSec, ease: panelTransitionEasing },
+                      scale: prefersReducedMotion
+                        ? { duration: 0 }
+                        : { duration: panelTransitionDurationSec, ease: panelTransitionEasing },
+                    }}
+                  >
+                    <Preview setSelectedElement={setSelectedElement} />
+                  </View>
                 </div>
               </div>
             </div>

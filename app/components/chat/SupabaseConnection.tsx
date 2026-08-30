@@ -221,7 +221,9 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
             { '!px-2': !showLabel },
           )}
         >
-          <div className="i-ph:database w-4 h-4 shrink-0" />
+          {/* 채팅·미리보기 화면 수정 — 라벨이 보일 때(데스크톱)는 "배포하기"와 같은 텍스트 전용
+              형태로. 아이콘은 라벨을 뺄 공간이 없는 모바일 아이콘 전용 모드에서만 남긴다. */}
+          {!showLabel && <div className="i-ph:database w-4 h-4 shrink-0" />}
           {showLabel && <span>{isStorageOn ? '저장 기능 켜짐' : '저장 기능 켜기'}</span>}
         </button>
       </div>
