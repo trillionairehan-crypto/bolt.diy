@@ -306,6 +306,14 @@
  */
 :root {
   --header-height: 54px;
+  /*
+   * 채팅·미리보기 화면 수정 — 사이드바가 접혔을 때 왼쪽에 남는 로고/메뉴 아이콘 두 개가 차지하는
+   * 폭. 예전엔 접힌 사이드바 자체가 64px 폭의 "띠"였고 콘텐츠도 그 값을 그대로 썼는데, 이제
+   * 접힌 사이드바는 폭 0(진짜 안 보임)이고 이 두 아이콘이 대신 그 자리를 차지한다 — 콘텐츠
+   * 예약 폭도 아이콘 쪽 값을 그대로 따라가도록 하나의 변수로 묶는다(Sidebar.module.scss의
+   * .railIcons, BaseChat.module.scss의 .ChatArea 둘 다 참조).
+   */
+  --rail-reserved-width: 48px;
   --chat-max-width: 33rem;
   --chat-min-width: 533px;
   --workbench-width: min(calc(100% - var(--chat-min-width)), 2536px);

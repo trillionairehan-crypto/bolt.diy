@@ -19,17 +19,18 @@
 }
 
 /*
- * The collapsed sidebar rail (Sidebar.module.scss's .panel, width:64px on desktop) is
- * position:fixed, so it doesn't push document flow on its own — without this, its 64px strip sat
- * on top of the chat content's left edge, clipping text. Reserves exactly the rail's width, only
- * at the same >=1024px breakpoint the rail itself uses (useViewport(1024) elsewhere in the app) —
- * on mobile the sidebar is fully off-canvas when collapsed, so no space needs reserving there.
- * The EXPANDED sidebar (320px) is intentionally still an overlay on top of this, not pushing
- * further — only the persistent collapsed rail gets permanent space.
+ * The collapsed sidebar's stand-in (Menu.client.tsx's home-logo/menu-icon pair, rendered at
+ * Sidebar.module.scss's --rail-reserved-width) is position:fixed, so it doesn't push document
+ * flow on its own — without this, it sat on top of the chat content's left edge, clipping text.
+ * Reserves exactly that width, only at the same >=1024px breakpoint the pair itself uses
+ * (useViewport(1024) elsewhere in the app) — on mobile the sidebar is fully off-canvas when
+ * collapsed and this pair isn't shown, so no space needs reserving there. The EXPANDED sidebar
+ * (320px) is intentionally still an overlay on top of this, not pushing further — only the
+ * persistent collapsed-state icons get permanent space.
  */
 .ChatArea {
   @media (min-width: 1024px) {
-    padding-left: 64px;
+    padding-left: var(--rail-reserved-width);
   }
 }
 

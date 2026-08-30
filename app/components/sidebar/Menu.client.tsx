@@ -56,12 +56,12 @@ const mobileVariants = {
 } satisfies Variants;
 
 /*
- * Desktop: always visible, pinned at left:0 — only its own width animates between a thin
- * collapsed rail and the full expanded panel. Content inside cross-fades via CSS (see
- * .railLayer/.contentLayer in Sidebar.module.scss) rather than remounting.
+ * Desktop: always visible, pinned at left:0 — only its own width animates between fully collapsed
+ * (0 — no visible box at all, see Menu's .railIcons for what stands in for it) and the full
+ * expanded panel.
  */
 const desktopVariants = {
-  collapsed: { width: 64, transition: { duration: 0.2, ease: cubicEasingFn } },
+  collapsed: { width: 0, transition: { duration: 0.2, ease: cubicEasingFn } },
   expanded: { width: 320, transition: { duration: 0.2, ease: cubicEasingFn } },
 } satisfies Variants;
 
@@ -204,12 +204,6 @@ export const Menu = () => {
 
   const groups = groupChatsByApp(list);
 
-  /*
-   * Desktop: thin rail when collapsed, full panel when expanded. Mobile: fully off-canvas when
-   * closed (no rail — no room), full-width overlay when open.
-   */
-  const showRail = !isSmallViewport && !open;
-
   return (
     <>
       {open && isSmallViewport && (
@@ -222,27 +216,44 @@ export const Menu = () => {
           onClick={() => setSidebarOpen(false)}
         />
       )}
+      {/*
+        채팅·미리보기 화면 수정 — 접힌 사이드바를 대신하는 로고(홈)/메뉴 아이콘. .panel과 별개로
+        항상 렌더되고(펼쳐졌든 아니든), z-index가 .panel(z-sidebar/z-40)보다 낮아서 사이드바가
+        펼쳐지면 그 밑에 자연스럽게 가려진다 — DOM 순서와 무관하게 명시적 z-index로 결정되므로
+        여기 어디에 둬도 상관없다. 데스크톱 전용(모바일은 이 대체 UI 자체가 필요 없음 — 접혔을 때
+        화면 밖으로 완전히 사라지는 기존 동작 그대로).
+      */}
+      {!isSmallViewport && (
+        <div className={styles.railIcons}>
+          <a href="/" title="홈" aria-label="홈" className={styles.railHomeLink}>
+            <Logo height={24} showWordmark={false} />
+          </a>
+          <button
+            type="button"
+            title="메뉴"
+            aria-label="메뉴"
+            className={styles.railMenuButton}
+            onClick={() => setSidebarOpen(true)}
+          >
+            <div className="i-ph:list" style={{ fontSize: 20, color: '#1A1A1A' }} />
+          </button>
+        </div>
+      )}
       <motion.div
         ref={menuRef}
         initial={isSmallViewport ? 'closed' : 'collapsed'}
         animate={isSmallViewport ? (open ? 'open' : 'closed') : open ? 'expanded' : 'collapsed'}
         variants={isSmallViewport ? mobileVariants : desktopVariants}
         style={isSmallViewport ? { width: 'min(340px, calc(100vw - 40px))' } : undefined}
-        className={classNames(styles.panel, 'selection-accent', isSettingsOpen ? 'z-40' : 'z-sidebar')}
+        className={classNames(
+          styles.panel,
+          { [styles.panelExpanded]: open },
+          'selection-accent',
+          isSettingsOpen ? 'z-40' : 'z-sidebar',
+        )}
       >
-        <div className={classNames(styles.railLayer, { [styles.railLayerHidden]: !showRail })}>
-          <button
-            type="button"
-            className={styles.railToggle}
-            onClick={() => setSidebarOpen(true)}
-            aria-label="사이드바 펼치기"
-          >
-            <Logo height={24} showWordmark={false} />
-          </button>
-        </div>
-
-        <div className={classNames(styles.contentLayer, { [styles.contentLayerHidden]: showRail })}>
-          {/* 1. 새 앱 만들기 — 접기는 이 로고를 다시 누르는 것으로 (얇은 띠의 로고와 같은 아이콘/동작). */}
+        <div className={styles.contentLayer}>
+          {/* 1. 새 앱 만들기 — 접기는 이 로고를 누르는 것으로. */}
           <div className={styles.topRow}>
             {!isSmallViewport && (
               <button
