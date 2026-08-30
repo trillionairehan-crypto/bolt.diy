@@ -4,8 +4,17 @@ import { platformSupabase } from '~/lib/supabase/platform-client';
 
 export const authUserStore = atom<User | null>(null);
 
+/*
+ * 1-2: authUserStore alone can't distinguish "confirmed logged out" from "haven't checked yet" —
+ * both are the same `null`. Routes that must not flash the wrong UI before the session check
+ * resolves (the landing page) read this instead.
+ */
+export const authResolvedStore = atom<boolean>(false);
+
 export function initAuthListener() {
   if (!platformSupabase) {
+    authResolvedStore.set(true);
+
     /*
      * No-op cleanup — matches the shape of the real unsubscribe function returned below, so
      * callers can treat the return value uniformly regardless of whether auth is configured.
@@ -15,12 +24,14 @@ export function initAuthListener() {
 
   platformSupabase.auth.getSession().then(({ data }) => {
     authUserStore.set(data.session?.user ?? null);
+    authResolvedStore.set(true);
   });
 
   const {
     data: { subscription },
   } = platformSupabase.auth.onAuthStateChange((_event, session) => {
     authUserStore.set(session?.user ?? null);
+    authResolvedStore.set(true);
   });
 
   return () => {

@@ -5,6 +5,13 @@ import styles from './CoralredLandingPage.module.scss';
 interface CoralredLandingPageProps {
   /** Called when the visitor clicks any "enter the app" CTA (시작하기). */
   onEnter: () => void;
+
+  /**
+   * 1-3: true only when a logged-in visitor forced this page via ?home=1 (dev/확인용) — the
+   * 로그인/회원가입 links make no sense for them, so the top-right shows a single "내 앱 만들기"
+   * coral button instead.
+   */
+  loggedInPreview?: boolean;
 }
 
 /*
@@ -344,7 +351,7 @@ const PRICING_TIERS: PricingTier[] = [
   { label: '맥스 79,900원 · 월 300건, 브랜딩 제거, 커스텀 색상', intensity: 1 },
 ];
 
-export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
+export function CoralredLandingPage({ onEnter, loggedInPreview = false }: CoralredLandingPageProps) {
   const showcaseReveal = useReveal<HTMLElement>();
   const trustReveal = useReveal<HTMLElement>();
   const pricingReveal = useReveal<HTMLElement>();
@@ -365,12 +372,20 @@ export function CoralredLandingPage({ onEnter }: CoralredLandingPageProps) {
             </nav>
           </div>
           <div className={styles.authLinks}>
-            <a href="/login" className={styles.navLink}>
-              로그인
-            </a>
-            <a href="/signup" className={styles.navLink}>
-              회원가입
-            </a>
+            {loggedInPreview ? (
+              <button type="button" className={styles.primaryCta} style={{ marginTop: 0 }} onClick={onEnter}>
+                내 앱 만들기
+              </button>
+            ) : (
+              <>
+                <a href="/login" className={styles.navLink}>
+                  로그인
+                </a>
+                <a href="/signup" className={styles.navLink}>
+                  회원가입
+                </a>
+              </>
+            )}
           </div>
         </div>
 

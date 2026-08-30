@@ -12,6 +12,7 @@ import { ClientOnly } from 'remix-utils/client-only';
 import { cssTransition, ToastContainer } from 'react-toastify';
 import { createScopedLogger } from './utils/logger';
 import { initGlobalErrorRecovery } from './utils/globalErrorRecovery';
+import { initAuthListener } from './lib/stores/auth';
 import { Logo } from './components/ui/Logo';
 import { DARK_MODE_ENABLED } from './utils/featureFlags';
 
@@ -147,6 +148,17 @@ export default function App() {
 
   useEffect(() => {
     initGlobalErrorRecovery();
+  }, []);
+
+  /*
+   * 1-1/1-2/1-6: this used to only run inside Menu.client.tsx (the sidebar), which never mounts
+   * on the landing page or on /login,/signup — so authUserStore stayed at its initial null on
+   * those routes even for an already-logged-in visitor with a real session in localStorage.
+   * Runs once here at the true app root instead, so every route gets a live, correct authUser.
+   */
+  useEffect(() => {
+    const unsubscribe = initAuthListener();
+    return unsubscribe;
   }, []);
 
   useEffect(() => {

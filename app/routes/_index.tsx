@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useStore } from '@nanostores/react';
+import { useSearchParams } from '@remix-run/react';
 import { json, type MetaFunction } from '@remix-run/cloudflare';
 import { ChatShell } from '~/components/chat/ChatShell';
 import { CoralredLandingPage } from '~/components/landing/CoralredLandingPage';
-import { authUserStore } from '~/lib/stores/auth';
+import { authUserStore, authResolvedStore } from '~/lib/stores/auth';
 
 export const meta: MetaFunction = () => {
   return [
@@ -22,19 +23,32 @@ export const loader = () => json({});
  */
 export default function Index() {
   const authUser = useStore(authUserStore);
+  const authResolved = useStore(authResolvedStore);
+  const [searchParams] = useSearchParams();
+
+  // 1-3: ?home=1 lets a logged-in visitor preview the landing on purpose (dev/확인용).
+  const forceHome = searchParams.get('home') === '1';
 
   /*
    * Marketing landing (CoralredLandingPage) shows only for a logged-out, first-time visit to
-   * this page load — once they click through (or once auth resolves to a real user) it stays
-   * dismissed for the rest of this page's lifetime. Both sides start from the same nanostore
-   * initial value (null before the session check resolves), so there's no SSR/hydration
-   * mismatch from gating on authUser here.
+   * this page load — once they click through it stays dismissed for the rest of this page's
+   * lifetime. A logged-in visitor never sees it at all (unless ?home=1) — 1-1.
    */
   const [dismissed, setDismissed] = useState(false);
-  const showMarketingLanding = !authUser && !dismissed;
+
+  /*
+   * 1-2: authResolvedStore is false for a brief instant on first load, before the session check
+   * (now running app-wide from root.tsx) resolves — render a blank cream field, no spinner, no
+   * landing flash, until it does.
+   */
+  if (!authResolved) {
+    return <div style={{ width: '100%', height: '100%', minHeight: '100dvh', background: '#FBF5EE' }} />;
+  }
+
+  const showMarketingLanding = authUser ? forceHome : !dismissed;
 
   if (showMarketingLanding) {
-    return <CoralredLandingPage onEnter={() => setDismissed(true)} />;
+    return <CoralredLandingPage onEnter={() => setDismissed(true)} loggedInPreview={!!authUser && forceHome} />;
   }
 
   return <ChatShell />;

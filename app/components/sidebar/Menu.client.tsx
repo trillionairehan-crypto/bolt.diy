@@ -22,7 +22,7 @@ import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { profileStore } from '~/lib/stores/profile';
 import { sidebarOpenStore, setSidebarOpen, toggleSidebar } from '~/lib/stores/sidebar';
-import { authUserStore, initAuthListener } from '~/lib/stores/auth';
+import { authUserStore } from '~/lib/stores/auth';
 import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
 import { Skeleton } from '~/components/ui/Skeleton';
 import useViewport from '~/lib/hooks';
@@ -180,11 +180,6 @@ export const Menu = () => {
       loadEntries();
     }
   }, [open, loadEntries]);
-
-  useEffect(() => {
-    const unsubscribe = initAuthListener();
-    return unsubscribe;
-  }, []);
 
   /*
    * 3: 바깥(포인터다운) 또는 ESC로 닫힌다 — preventDefault/stopPropagation을 쓰지 않아서 클릭
