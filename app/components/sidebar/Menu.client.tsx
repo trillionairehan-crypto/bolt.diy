@@ -21,7 +21,7 @@ import type { TabType } from '~/components/@settings/core/types';
 import { classNames } from '~/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { profileStore } from '~/lib/stores/profile';
-import { sidebarOpenStore, setSidebarOpen } from '~/lib/stores/sidebar';
+import { sidebarOpenStore, setSidebarOpen, toggleSidebar } from '~/lib/stores/sidebar';
 import { authUserStore, initAuthListener } from '~/lib/stores/auth';
 import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
 import { Skeleton } from '~/components/ui/Skeleton';
@@ -57,7 +57,7 @@ const mobileVariants = {
 
 /*
  * Desktop: always visible, pinned at left:0 — only its own width animates between fully collapsed
- * (0 — no visible box at all, see Menu's .railIcons for what stands in for it) and the full
+ * (0 — no visible box at all, see Menu's .railHamburger/.railHomeLink for what stands in for it) and the full
  * expanded panel.
  */
 const desktopVariants = {
@@ -74,6 +74,7 @@ export const Menu = () => {
   const { duplicateCurrentChat, exportChat } = useChatHistory();
   const { id: currentUrlId } = useParams();
   const menuRef = useRef<HTMLDivElement>(null);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
   const [list, setList] = useState<ChatHistoryItem[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(true);
   const open = useStore(sidebarOpenStore);
@@ -185,6 +186,44 @@ export const Menu = () => {
     return unsubscribe;
   }, []);
 
+  /*
+   * 3: 바깥(포인터다운) 또는 ESC로 닫힌다 — preventDefault/stopPropagation을 쓰지 않아서 클릭
+   * 이벤트가 원래 타겟(예: 입력창)에도 그대로 도달한다. 그래서 사이드바가 열린 채로 입력창을
+   * 누르면 "사이드바 닫힘"과 "입력창 포커스"가 같은 클릭에서 동시에 일어난다(두 번 클릭 불필요).
+   * menuRef(패널) 안 클릭과 hamburgerRef(토글 버튼) 클릭은 제외 — 패널 안 클릭(앱 선택/삭제)은
+   * 원래 닫힘을 유발하면 안 되고, 햄버거는 자체 onClick으로 이미 토글하므로 이 리스너가 같은
+   * 클릭에서 또 닫아버리면(=순서상 열자마자 닫힘) 안 된다. 데스크톱/모바일 오버레이 공용.
+   */
+  useEffect(() => {
+    if (!open) {
+      return undefined;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+
+      if (menuRef.current?.contains(target) || hamburgerRef.current?.contains(target)) {
+        return;
+      }
+
+      setSidebarOpen(false);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSidebarOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
+
   const handleDuplicate = async (id: string) => {
     await duplicateCurrentChat(id);
     loadEntries();
@@ -213,31 +252,32 @@ export const Menu = () => {
           animate="open"
           exit="closed"
           variants={dialogBackdropVariants}
-          onClick={() => setSidebarOpen(false)}
         />
       )}
       {/*
-        채팅·미리보기 화면 수정 — 접힌 사이드바를 대신하는 로고(홈)/메뉴 아이콘. .panel과 별개로
-        항상 렌더되고(펼쳐졌든 아니든), z-index가 .panel(z-sidebar/z-40)보다 낮아서 사이드바가
-        펼쳐지면 그 밑에 자연스럽게 가려진다 — DOM 순서와 무관하게 명시적 z-index로 결정되므로
-        여기 어디에 둬도 상관없다. 데스크톱 전용(모바일은 이 대체 UI 자체가 필요 없음 — 접혔을 때
-        화면 밖으로 완전히 사라지는 기존 동작 그대로).
+        2: 좌상단 순서 = 위 햄버거(토글) / 아래 로고(홈), 40x40 동일 히트 영역·같은 왼쪽 정렬축.
+        햄버거는 별도의 position:fixed 요소로 분리해 z-logo(998, .panel의 z-sidebar=997보다 위)를
+        줘서 사이드바가 펼쳐져도 같은 좌표·같은 아이콘으로 그 위에 남는다 — "같은 자리 같은
+        아이콘 = 토글"을 몸으로 알 수 있게. 로고는 항상 낮은 z-index로 남아 패널이 펼쳐지면 그
+        아래 자연스럽게 가려진다(패널 내부에 중복으로 두지 않음). 데스크톱 전용(모바일은 이 대체
+        UI 자체가 필요 없음 — 접혔을 때 화면 밖으로 완전히 사라지는 기존 동작 그대로).
       */}
       {!isSmallViewport && (
-        <div className={styles.railIcons}>
-          <a href="/" title="홈" aria-label="홈" className={styles.railHomeLink}>
-            <Logo height={24} showWordmark={false} />
-          </a>
+        <>
           <button
+            ref={hamburgerRef}
             type="button"
             title="메뉴"
             aria-label="메뉴"
-            className={styles.railMenuButton}
-            onClick={() => setSidebarOpen(true)}
+            className={classNames(styles.railHamburger, 'z-logo')}
+            onClick={toggleSidebar}
           >
             <div className="i-ph:list" style={{ fontSize: 20, color: '#1A1A1A' }} />
           </button>
-        </div>
+          <a href="/" title="홈" aria-label="홈" className={styles.railHomeLink}>
+            <Logo height={24} showWordmark={false} />
+          </a>
+        </>
       )}
       <motion.div
         ref={menuRef}
@@ -253,18 +293,8 @@ export const Menu = () => {
         )}
       >
         <div className={styles.contentLayer}>
-          {/* 1. 새 앱 만들기 — 접기는 이 로고를 누르는 것으로. */}
+          {/* 1. 새 앱 만들기 — 로고는 좌상단 고정 아이콘 하나로 통일, 패널 내부엔 중복으로 두지 않는다. */}
           <div className={styles.topRow}>
-            {!isSmallViewport && (
-              <button
-                type="button"
-                className={styles.collapseButton}
-                onClick={() => setSidebarOpen(false)}
-                aria-label="사이드바 접기"
-              >
-                <Logo height={20} showWordmark={false} />
-              </button>
-            )}
             <a href="/" className={styles.newAppButton}>
               <span className="i-ph:plus-circle" />새 앱 만들기
             </a>

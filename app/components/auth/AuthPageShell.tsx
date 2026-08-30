@@ -21,7 +21,7 @@ export function AuthPageShell({ children, topRight }: AuthPageShellProps) {
       {topRight && <div className="absolute top-6 right-6">{topRight}</div>}
 
       <a href="/" className="mb-8" aria-label="코랄레드 홈으로">
-        <Logo height={28} />
+        <Logo height={28} showWordmark={false} />
       </a>
 
       <div

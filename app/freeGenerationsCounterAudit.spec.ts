@@ -28,11 +28,11 @@ describe('요금제/결제 — 무료 생성 카운터 로딩 실패 처리', ()
     expect(quotaBarSource).toContain('useState<number | null>(null)');
   });
 
-  it('remaining이 null(아직 모름)이면 "무료 체험을 다 썼어요" 안내를 렌더링하지 않는다', () => {
+  it('remaining이 null(아직 모름)이면 "요금제 보기" 소진 링크를 렌더링하지 않는다', () => {
     const guardIndex = quotaBarSource.indexOf('if (remaining === null)');
-    const exhaustedIndex = quotaBarSource.indexOf('무료 체험을 다 썼어요');
+    const pricingLinkIndex = quotaBarSource.indexOf('요금제 보기');
 
     expect(guardIndex).toBeGreaterThan(-1);
-    expect(exhaustedIndex).toBeGreaterThan(guardIndex);
+    expect(pricingLinkIndex).toBeGreaterThan(guardIndex);
   });
 });

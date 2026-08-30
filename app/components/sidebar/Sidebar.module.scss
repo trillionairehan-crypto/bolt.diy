@@ -61,27 +61,23 @@ $coral: #ff5330;
 }
 
 /*
- * 로고(홈 링크)+메뉴 버튼 — 접힌 상태를 대신하는 두 아이콘. .panel과 별개로 항상 렌더되고(펼침
- * 여부와 무관), .panel보다 z-index가 낮아서 사이드바가 펼쳐지면 그 밑에 자연스럽게 가려진다
- * (닫히면 .panel이 폭 0이 되어 다시 드러난다 — 별도의 표시/숨김 로직이 필요 없다).
+ * 2: 좌상단 세로 스택 — 위 햄버거(토글)/아래 로고(홈), 동일 40x40 히트 영역·같은 왼쪽 정렬축·
+ * 12px 간격. 두 요소 모두 독립된 position:fixed라 같은 top 공식을 공유해 정렬을 맞춘다. 햄버거는
+ * (TSX에서) z-logo 클래스로 .panel(z-sidebar)보다 위에 남아 사이드바가 펼쳐져도 같은 좌표에
+ * 그대로 있고, 로고는 z-index를 안 줘서(기본 stacking) 패널이 펼쳐지면 그 밑에 자연스럽게
+ * 가려진다 — 닫히면 .panel이 폭 0이 되어 다시 드러난다.
  */
-.railIcons {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1;
-  width: var(--rail-reserved-width);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  // 24px 로고를 헤더와 같은 세로 중심선(--header-height의 정중앙)에 놓기 위한 상단 여백.
-  padding-top: calc((var(--header-height) - 24px) / 2);
-}
+$rail-icon-size: 40px;
+$rail-icon-gap: 12px;
+// 40px 히트박스를 헤더와 같은 세로 중심선에 놓기 위한 공통 top 기준값.
+$rail-icon-top: calc((var(--header-height) - #{$rail-icon-size}) / 2);
 
-.railHomeLink,
-.railMenuButton {
-  @extend %tapTargetExpand;
+.railHamburger,
+.railHomeLink {
+  position: fixed;
+  left: 0;
+  width: var(--rail-reserved-width);
+  height: $rail-icon-size;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,32 +93,20 @@ $coral: #ff5330;
   }
 }
 
+.railHamburger {
+  top: $rail-icon-top;
+}
+
+.railHomeLink {
+  top: calc(#{$rail-icon-top} + #{$rail-icon-size} + #{$rail-icon-gap});
+}
+
 .topRow {
   flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 12px;
-}
-
-.collapseButton {
-  @extend %tapTargetExpand;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  background: none;
-  border: none;
-  border-radius: 8px;
-  color: $ink-soft;
-  cursor: pointer;
-
-  &:hover {
-    background: rgba(26, 26, 26, 0.06);
-    color: $ink;
-  }
 }
 
 .newAppButton {

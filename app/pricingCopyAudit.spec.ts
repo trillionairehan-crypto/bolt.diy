@@ -14,13 +14,12 @@ import { describe, expect, it } from 'vitest';
 describe('요금제/결제 — 무료 생성 잔여 안내 문구', () => {
   const quotaBarSource = readFileSync(join(__dirname, 'components/sidebar/QuotaBar.tsx'), 'utf-8');
 
-  it('QuotaBar.tsx 잔여 횟수 안내가 로그인 계정과 게스트를 구분한다', () => {
-    expect(quotaBarSource).toContain("{authUser ? '무료 생성' : '무료 체험'} {remaining}회 남았어요");
+  it('QuotaBar.tsx 사용량 안내(OO회 중 OO회 사용)가 로그인 계정과 게스트를 구분한다', () => {
+    expect(quotaBarSource).toContain("{authUser ? '무료 생성' : '무료 체험'} {limit}회 중 {used}회 사용");
   });
 
-  it('QuotaBar.tsx 소진 안내가 로그인 계정과 게스트를 구분한다 (Chat.client.tsx 토스트 문구와 동일)', () => {
-    expect(quotaBarSource).toContain(
-      "{authUser ? '무료 생성 횟수를 모두 사용했어요' : '무료 체험을 다 썼어요'}. 계속하려면",
-    );
+  it('QuotaBar.tsx 소진 시 "요금제 보기" 링크는 문장에 섞이지 않고 별도로 붙는다', () => {
+    expect(quotaBarSource).toContain('exhausted ? (');
+    expect(quotaBarSource).toContain('요금제 보기');
   });
 });

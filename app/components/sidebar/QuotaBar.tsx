@@ -41,31 +41,41 @@ export function QuotaBar() {
   }
 
   const limit = CORALRED_NEW_METERING ? null : authUser ? FREE_GENERATION_LIMIT : GUEST_FREE_LIMIT;
+  const exhausted = remaining <= 0;
+  const used = limit === null ? null : Math.max(limit - remaining, 0);
 
   /*
-   * 계정/게스트 구분 문구는 freeGenerationsCounterAudit.spec.ts/pricingCopyAudit.spec.ts가 지킴
-   * (예전엔 BaseChat.tsx에 있었고, 이 위젯으로 옮겨왔다).
+   * 7-2: v1 카운터는 평생 누적(월별 리셋 없음, freeTrial.ts 참고)이라 "이번 달" 같은 기간
+   * 표현은 쓰지 않는다 — "OO회 중 OO회 사용" 형태만. "요금제 보기" 링크는 소진 시에만 별도로
+   * 붙이고 문장 안에 섞지 않는다(강조하지 않음). 문구는 freeGenerationsCounterAudit.spec.ts/
+   * pricingCopyAudit.spec.ts가 지킴.
    */
   const label =
-    remaining > 0 ? (
+    limit === null || used === null ? (
       <>
         {authUser ? '무료 생성' : '무료 체험'} {remaining}회 남았어요
       </>
     ) : (
       <>
-        {authUser ? '무료 생성 횟수를 모두 사용했어요' : '무료 체험을 다 썼어요'}. 계속하려면{' '}
-        <a href="/pricing" className={styles.pricingLink}>
-          요금제
-        </a>
-        를 확인해주세요
+        {authUser ? '무료 생성' : '무료 체험'} {limit}회 중 {used}회 사용
       </>
     );
 
-  if (limit === null) {
-    return <p className={styles.quotaLabel}>{label}</p>;
+  const pricingLink = exhausted ? (
+    <a href="/pricing" className={styles.pricingLink}>
+      요금제 보기
+    </a>
+  ) : null;
+
+  if (limit === null || used === null) {
+    return (
+      <div className={styles.quotaBar}>
+        <p className={styles.quotaLabel}>{label}</p>
+        {pricingLink}
+      </div>
+    );
   }
 
-  const used = Math.max(limit - remaining, 0);
   const percent = limit > 0 ? Math.min((used / limit) * 100, 100) : 100;
 
   return (
@@ -74,6 +84,7 @@ export function QuotaBar() {
         <div className={styles.quotaFill} style={{ width: `${percent}%` }} />
       </div>
       <p className={styles.quotaLabel}>{label}</p>
+      {pricingLink}
     </div>
   );
 }

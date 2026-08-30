@@ -78,7 +78,7 @@ export default function Apps() {
   return (
     <div className="cr-page" style={{ paddingTop: 24, paddingBottom: 48 }}>
       <a href="/" className="cr-row-8" style={{ width: 'fit-content' }}>
-        <Logo height={24} />
+        <Logo height={24} showWordmark={false} />
       </a>
 
       <section className="cr-section cr-stack-16" style={{ paddingBottom: 32 }}>

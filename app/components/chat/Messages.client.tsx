@@ -19,7 +19,6 @@ interface MessagesProps {
   id?: string;
   className?: string;
   isStreaming?: boolean;
-  hasError?: boolean;
   messages?: UIMessage[];
   parsedMessages?: { [key: number]: string };
   append?: (message: { text: string }) => void;
@@ -64,7 +63,7 @@ function groupIntoTurns(messages: UIMessage[]): Turn[] {
 
 export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
   (props: MessagesProps, ref: ForwardedRef<HTMLDivElement> | undefined) => {
-    const { id, isStreaming = false, hasError = false, messages = [], parsedMessages = {} } = props;
+    const { id, isStreaming = false, messages = [], parsedMessages = {} } = props;
     const location = useLocation();
 
     const handleRewind = (messageId: string) => {
@@ -113,24 +112,8 @@ export const Messages = forwardRef<HTMLDivElement, MessagesProps>(
         {turns.map((turn, turnIndex) => {
           const isLastTurn = turnIndex === turns.length - 1;
 
-          /*
-           * 3-2/3-4: 진행 중인 마지막 턴은 100% 불투명, 에러로 끝난 마지막 턴은 회갈색, 그 외
-           * (정상 종료)는 코랄 25%로 가라앉는다. var(--accent)는 oklch 값이라 rgba()로 직접
-           * 옅게 만들 수 없어 color-mix를 쓴다(Header.tsx의 backdrop 배경과 같은 기존 패턴).
-           */
-          const lineColor =
-            isLastTurn && hasError
-              ? 'rgba(122, 112, 103, 0.25)'
-              : isLastTurn && isStreaming
-                ? 'var(--accent)'
-                : 'color-mix(in oklch, var(--accent) 25%, transparent)';
-
           return (
-            <div
-              key={turn.key}
-              className={classNames('w-full', { 'mt-8': turnIndex > 0 })}
-              style={{ borderLeft: `2px solid ${lineColor}`, paddingLeft: 16 }}
-            >
+            <div key={turn.key} className={classNames('w-full', { 'mt-8': turnIndex > 0 })}>
               {turn.entries.map(({ message, index }, entryIndex) => {
                 const { role, id: messageId, parts } = message;
                 const isUserMessage = role === 'user';

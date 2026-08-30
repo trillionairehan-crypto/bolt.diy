@@ -84,7 +84,7 @@ const parseSelectedTemplate = (llmOutput: string): { template: string; title: st
       return null;
     }
 
-    return { template: templateNameMatch[1].trim(), title: titleMatch?.[1].trim() || 'Untitled Project' };
+    return { template: templateNameMatch[1].trim(), title: titleMatch?.[1].trim() || '새 앱' };
   } catch (error) {
     console.error('Error parsing template selection:', error);
     return null;
@@ -216,7 +216,7 @@ export async function getTemplates(templateName: string, title?: string, hue: nu
 
   const assistantMessage = `
 코랄레드가 ${template.name} 템플릿으로 필요한 파일을 준비해서 프로젝트를 초기화하고 있어요.
-<boltArtifact id="imported-files" title="${title || 'Create initial files'}" type="bundled">
+<boltArtifact id="imported-files" title="${title || '새 앱'}" type="bundled">
 ${filesToImport.files
   .map(
     (file) =>
@@ -368,7 +368,7 @@ export function getBaselineTemplate(hue: number) {
 
   const assistantMessage = `
 코랄레드가 기본 브랜드 킷으로 프로젝트를 초기화하고 있어요.
-<boltArtifact id="coralred-baseline" title="Create initial files" type="bundled">
+<boltArtifact id="coralred-baseline" title="새 앱" type="bundled">
 ${files
   .map(
     (file) =>

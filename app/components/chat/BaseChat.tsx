@@ -424,7 +424,6 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       messages={messages}
                       parsedMessages={parsedMessages}
                       isStreaming={isStreaming}
-                      hasError={!!llmErrorAlert}
                       append={append}
                       chatMode={chatMode}
                       setChatMode={setChatMode}

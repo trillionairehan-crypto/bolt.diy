@@ -135,7 +135,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
         isLanding
           ? ({
               background: LANDING_INPUT_BG,
-              minHeight: 160,
+              minHeight: 120,
               '--bolt-elements-textPrimary': LANDING_INK,
               '--bolt-elements-textSecondary': LANDING_MUTED,
               '--bolt-elements-textTertiary': LANDING_MUTED,
@@ -232,6 +232,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           data-gramm_editor="false"
           data-enable-grammarly="false"
           aria-label={isLanding ? '만들고 싶은 것을 설명해주세요' : undefined}
+          rows={isLanding ? 1 : undefined}
           className={classNames(
             'w-full pl-4 pt-4 pr-16 outline-none resize-none text-bolt-elements-textPrimary placeholder-bolt-elements-textTertiary bg-transparent text-sm',
             'transition-all duration-200',
@@ -294,7 +295,12 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           }}
           onPaste={props.handlePaste}
           style={{
-            minHeight: isLanding ? Math.max(props.TEXTAREA_MIN_HEIGHT, 88) : props.TEXTAREA_MIN_HEIGHT,
+            /*
+             * 6: 랜딩 입력창은 BaseChat.tsx의 공유 TEXTAREA_MIN_HEIGHT(76, 도킹된 채팅 입력창
+             * 전용 값)을 그대로 물려받지 않는다 — Math.max(76, X)는 X가 76 이하인 한 항상 76을
+             * 반환해 카드 전체 minHeight(120)를 무의미하게 만들었다. 랜딩만의 독립된 낮은 값.
+             */
+            minHeight: isLanding ? 44 : props.TEXTAREA_MIN_HEIGHT,
             maxHeight: props.TEXTAREA_MAX_HEIGHT,
           }}
           placeholder={isLanding ? '' : props.chatMode === 'build' ? '어떤 걸 만들고 싶으세요?' : '무엇이든 물어보세요'}

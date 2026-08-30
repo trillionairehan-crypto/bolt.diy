@@ -12,7 +12,7 @@ export function LegalPageLayout({ title, effectiveDate, children }: LegalPageLay
     <div className="min-h-full w-full bg-bolt-elements-background-depth-1">
       <header className="flex items-center px-4 border-b border-bolt-elements-borderColor h-[var(--header-height)]">
         <a href="/" className="flex items-center gap-2">
-          <Logo height={24} />
+          <Logo height={24} showWordmark={false} />
         </a>
       </header>
 

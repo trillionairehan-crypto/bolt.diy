@@ -67,7 +67,9 @@ function planFeatures(plan: PricingPlan): string[] {
     features.push(`이월 (다음 달 최대 메시지 ${plan.messagesPerMonth * 2}건까지 누적)`);
   }
 
-  features.push(plan.brandingRemoved ? '코랄레드 브랜딩 완전 제거' : '코랄레드 브랜딩 표시');
+  if (plan.brandingRemoved) {
+    features.push('코랄레드 브랜딩 완전 제거');
+  }
 
   if (plan.customBrandColor) {
     features.push('커스텀 브랜드 색상');
@@ -104,37 +106,49 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
   },
 ];
 
+const COLUMN_DIVIDER = '1px solid #EFE4D6';
+
 export default function Pricing() {
   return (
     <div className="cr-page" style={{ paddingTop: 24, paddingBottom: 24 }}>
       <style>{`
         @media (max-width: 760px) {
           .cr-grid-4 { grid-template-columns: 1fr; }
+          .cr-grid-4 > div { border-left: none !important; border-top: ${COLUMN_DIVIDER}; padding-top: 24px; }
+          .cr-grid-4 > div:first-child { border-top: none; padding-top: 0; }
         }
       `}</style>
 
       <a href="/" className="cr-row-8" style={{ width: 'fit-content' }}>
-        <Logo height={24} />
+        <Logo height={24} showWordmark={false} />
       </a>
 
       <section className="cr-section cr-stack-16" style={{ paddingBottom: 48 }}>
-        <span className="cr-eyebrow">PRICING</span>
         <h1 className="cr-display">코랄레드 요금제</h1>
         <p className="cr-body">필요한 만큼만, 부담 없이 시작하세요.</p>
       </section>
 
       <section>
         <div className="cr-grid-4">
-          {PLANS.map((plan) => (
-            <div key={plan.name} className="cr-card cr-stack-16" style={{ position: 'relative', overflow: 'hidden' }}>
+          {PLANS.map((plan, index) => (
+            <div
+              key={plan.name}
+              className="cr-stack-16"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                paddingLeft: index > 0 ? 24 : 0,
+                paddingRight: 24,
+                borderLeft: index > 0 ? COLUMN_DIVIDER : 'none',
+              }}
+            >
               <span
                 aria-hidden="true"
                 style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 4,
+                  display: 'block',
+                  width: 28,
+                  height: 6,
+                  borderRadius: 999,
                   background: `rgba(255, 83, 48, ${plan.intensity})`,
                 }}
               />
@@ -147,15 +161,20 @@ export default function Pricing() {
                   {plan.priceMonthly > 0 ? <span className="cr-caption">/ 월</span> : null}
                 </div>
               </div>
-              <ul className="cr-stack-8" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              <ul className="cr-stack-8" style={{ listStyle: 'none', padding: 0, margin: 0, flex: 1 }}>
                 {planFeatures(plan).map((feature) => (
                   <li key={feature} className="cr-body cr-row-8">
                     <Check size={16} style={{ color: 'var(--accent)', flexShrink: 0 }} />
                     {feature}
                   </li>
                 ))}
+                {!plan.brandingRemoved && (
+                  <li className="cr-caption" style={{ color: '#7A7067', marginTop: 8 }}>
+                    코랄레드 브랜딩 표시
+                  </li>
+                )}
               </ul>
-              <a href="/" className="cr-btn outline" style={{ justifyContent: 'center' }}>
+              <a href="/" className="cr-btn outline" style={{ justifyContent: 'center', marginTop: 'auto' }}>
                 시작하기
               </a>
             </div>
@@ -188,6 +207,9 @@ export default function Pricing() {
         className="cr-stack-8"
         style={{ borderTop: '1px solid var(--border)', paddingTop: 24, paddingBottom: 48 }}
       >
+        <p className="cr-caption">
+          결제일로부터 7일 이내 미사용 시 전액 환불되며, 그 외에도 관련 법령에 따라 환불받을 수 있어요.
+        </p>
         <p className="cr-caption">코랄레드 · 대표자 한성민 · 사업자등록번호 383-23-02498</p>
         <p className="cr-caption">경기도 여주시 가남읍 심석2길 50-6 · coralred.kr</p>
         <p className="cr-caption">

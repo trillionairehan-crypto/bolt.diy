@@ -311,13 +311,30 @@
    * 폭. 예전엔 접힌 사이드바 자체가 64px 폭의 "띠"였고 콘텐츠도 그 값을 그대로 썼는데, 이제
    * 접힌 사이드바는 폭 0(진짜 안 보임)이고 이 두 아이콘이 대신 그 자리를 차지한다 — 콘텐츠
    * 예약 폭도 아이콘 쪽 값을 그대로 따라가도록 하나의 변수로 묶는다(Sidebar.module.scss의
-   * .railIcons, BaseChat.module.scss의 .ChatArea 둘 다 참조).
+   * .railHamburger/.railHomeLink, BaseChat.module.scss의 .ChatArea 둘 다 참조).
    */
   --rail-reserved-width: 48px;
   --chat-max-width: 33rem;
-  --chat-min-width: 533px;
+  /*
+   * 5-1/5-2: BaseChat.tsx pins .Chat to exactly this width (flex-none, not just a minimum) once
+   * the workbench is open, and the workbench panel itself has default flex-shrink — so it's
+   * *this* value, not --workbench-width's own formula, that actually decides how much room the
+   * preview gets (workbench = whatever's left after .Chat's fixed share). A flat 533px left too
+   * little on ~1024-1280px viewports (preview fell under 55%) — capped at 40% of the row so the
+   * preview keeps its ≥55% floor everywhere, while still settling at the original 533px once
+   * there's enough room (>= ~1330px) for that not to matter.
+   */
+  --chat-min-width: min(533px, 40%);
+  /*
+   * --workbench-inner-width used to copy the unresolved --workbench-width calc() expression, so
+   * `100%` inside it re-resolved against the *inner* element's own (already workbench-sized)
+   * container instead of the original one — subtracting --chat-min-width a second time and
+   * shrinking the visible preview to roughly a third of its real width. It must always be 100%
+   * of its immediate parent (the already-correctly-sized workbench panel), matching what
+   * BaseChat.module.scss's data-chat-visible=false override already does.
+   */
   --workbench-width: min(calc(100% - var(--chat-min-width)), 2536px);
-  --workbench-inner-width: var(--workbench-width);
+  --workbench-inner-width: 100%;
   --workbench-left: calc(100% - var(--workbench-width));
 
   /* Toasts */
