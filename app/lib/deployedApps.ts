@@ -46,6 +46,17 @@ function isMissingStorageColumnsError(error: unknown): boolean {
   return code === MISSING_STORAGE_COLUMNS_CODE && /storage_mode|storage_expires_at/.test(message);
 }
 
+/*
+ * The migration adding storage_mode/storage_expires_at is still not applied on the platform
+ * Supabase project (confirmed live 2026-08-30, no DDL access from this environment to fix it
+ * directly — see the block comment above). Every insert/select was retrying-after-failing on
+ * *every single call*, which meant a guaranteed-to-fail network request (and its console error)
+ * on every deploy record and every /apps or CompletionCard load — pure noise once the outcome is
+ * known. Skip straight to the no-storage-columns query while this stays false; flip it to true
+ * (and this whole flag can go away) once the migration is actually applied.
+ */
+const PLATFORM_HAS_STORAGE_COLUMNS = false;
+
 /**
  * Records a successful deploy for the "내 앱" (/apps) dashboard. Best-effort only — a failure
  * here must never surface to the user or interrupt the deploy flow they just watched succeed
@@ -102,6 +113,17 @@ export async function recordDeployedApp(params: {
       storage_expires_at: params.storageExpiresAt ?? null,
     };
 
+    if (!PLATFORM_HAS_STORAGE_COLUMNS) {
+      const { storage_mode: _storageMode, storage_expires_at: _storageExpiresAt, ...rowWithoutStorage } = row;
+      const { error: fallbackError } = await platformSupabase.from('deployed_apps').insert(rowWithoutStorage);
+
+      if (fallbackError) {
+        throw fallbackError;
+      }
+
+      return;
+    }
+
     const { error } = await platformSupabase.from('deployed_apps').insert(row);
 
     if (error && isMissingStorageColumnsError(error)) {
@@ -129,6 +151,24 @@ const FALLBACK_SELECT = 'id, chat_id, app_name, url, provider, project_name, dep
 export async function getDeployedApps(): Promise<DeployedAppRecord[]> {
   if (!authUserStore.get() || !platformSupabase) {
     return [];
+  }
+
+  if (!PLATFORM_HAS_STORAGE_COLUMNS) {
+    const { data: fallbackData, error: fallbackError } = await platformSupabase
+      .from('deployed_apps')
+      .select(FALLBACK_SELECT)
+      .order('deployed_at', { ascending: false });
+
+    if (fallbackError) {
+      logger.warn('Failed to load deployed apps', fallbackError);
+      return [];
+    }
+
+    return (fallbackData ?? []).map((row) => ({
+      ...row,
+      storage_mode: 'sample' as StorageMode,
+      storage_expires_at: null,
+    })) as DeployedAppRecord[];
   }
 
   const { data, error } = await platformSupabase
