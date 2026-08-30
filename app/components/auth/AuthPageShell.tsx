@@ -7,32 +7,24 @@ interface AuthPageShellProps {
 }
 
 /**
- * Shared frame for /login and /signup — cream page backdrop in light mode (falls back to the
- * normal --bg in dark, see --auth-page-bg in variables.scss), centered card, Coralred logo.
- * Kept as one component since the two pages' chrome is otherwise byte-for-byte identical and
- * would just drift out of sync if copy-pasted.
+ * Shared frame for /login and /signup — cream backdrop, no card, logo mark top-center, content
+ * anchored around the viewport's 40% vertical mark (same top:40%/translateY(-50%) pattern as the
+ * chat-home headline block in ChatHome.module.scss, so the anchor holds steady as the email
+ * step expands/collapses the content's height).
  */
 export function AuthPageShell({ children, topRight }: AuthPageShellProps) {
   return (
-    <div
-      className="min-h-screen w-full flex flex-col items-center justify-center px-4 py-12 relative"
-      style={{ background: 'var(--auth-page-bg)' }}
-    >
+    <div className="relative w-full min-h-screen" style={{ background: '#FBF5EE' }}>
       {topRight && <div className="absolute top-6 right-6">{topRight}</div>}
 
-      <a href="/" className="mb-8" aria-label="코랄레드 홈으로">
-        <Logo height={28} showWordmark={false} />
-      </a>
+      <div className="absolute left-0 right-0" style={{ top: '40%', transform: 'translateY(-50%)' }}>
+        <div className="w-full max-w-[360px] mx-auto px-6 flex flex-col items-center">
+          <a href="/" aria-label="코랄레드 홈으로" style={{ marginBottom: 56 }}>
+            <Logo height={28} showWordmark={false} />
+          </a>
 
-      <div
-        className="w-full max-w-[400px] rounded-2xl p-8"
-        style={{
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          boxShadow: 'var(--shadow-overlay, 0 20px 50px rgba(23, 16, 14, 0.12))',
-        }}
-      >
-        {children}
+          {children}
+        </div>
       </div>
     </div>
   );

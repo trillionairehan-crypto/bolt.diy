@@ -43,13 +43,17 @@ function GoogleSymbol() {
  * fills (#FEE500 Kakao yellow, and each brand's own mark colors) are fixed third-party brand
  * colors, not theme tokens, same as everywhere else this button appears.
  */
+// 4-1/4-5: shared sizing so all auth buttons (social + the email submit button) line up exactly.
+export const AUTH_BUTTON_CLASS =
+  'w-full h-[52px] flex items-center justify-center gap-2 rounded-[10px] text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bolt-elements-focus';
+
 export function SocialAuthButtons() {
   return (
     <div className="flex flex-col gap-2">
       <button
         type="button"
         onClick={() => signInWithKakao()}
-        className="w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-opacity duration-150 ease-out hover:opacity-90 active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bolt-elements-focus"
+        className={AUTH_BUTTON_CLASS}
         style={{ background: '#FEE500', color: '#191919' }}
       >
         <KakaoSymbol />
@@ -59,7 +63,8 @@ export function SocialAuthButtons() {
       <button
         type="button"
         onClick={() => signInWithGoogle()}
-        className="w-full flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium bg-[var(--surface)] text-[var(--text)] border border-[var(--border-strong)] hover:bg-[var(--surface-2)] active:bg-[var(--border)] transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bolt-elements-focus"
+        className={`${AUTH_BUTTON_CLASS} bg-white hover:bg-[#FBF5EE]`}
+        style={{ border: '1px solid #EFE4D6', color: '#1A1A1A' }}
       >
         <GoogleSymbol />
         구글로 계속하기

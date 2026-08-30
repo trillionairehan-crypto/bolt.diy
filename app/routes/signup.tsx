@@ -4,6 +4,7 @@ import { useNavigate } from '@remix-run/react';
 import { useStore } from '@nanostores/react';
 import { AuthPageShell } from '~/components/auth/AuthPageShell';
 import { SocialAuthButtons } from '~/components/auth/SocialAuthButtons';
+import { EmailContinueLink } from '~/components/auth/EmailContinueLink';
 import { authUserStore } from '~/lib/stores/auth';
 
 export const meta: MetaFunction = () => {
@@ -21,39 +22,37 @@ export default function Signup() {
   }, [authUser, navigate]);
 
   return (
-    <AuthPageShell
-      topRight={
-        <a
-          href="/login"
-          className="text-sm font-medium rounded-full px-4 py-1.5 hover:bg-[var(--surface-2)] transition-colors"
-          style={{ color: 'var(--text)' }}
-        >
-          로그인
-        </a>
-      }
-    >
-      <h1 className="text-xl font-semibold text-bolt-elements-textPrimary text-center mb-6">
+    <AuthPageShell>
+      <h1 className="text-center" style={{ fontSize: 32, fontWeight: 600, color: '#1A1A1A', marginBottom: 32 }}>
         첫 앱까지, 가입 한 번이면 돼요
       </h1>
 
-      <SocialAuthButtons />
-
-      <div className="text-center mt-4">
-        <a href="/login" className="text-sm font-medium" style={{ color: 'var(--accent)' }}>
-          이메일로 계속하기 →
-        </a>
+      <div className="w-full">
+        <SocialAuthButtons />
       </div>
 
-      <p className="text-xs text-bolt-elements-textTertiary text-center mt-6">
+      <div style={{ marginTop: 24 }}>
+        <EmailContinueLink />
+      </div>
+
+      {/* 5-3: 약관 문구는 회원가입에만 — 12px 회갈색, 링크는 밑줄만(코랄 아님). */}
+      <p className="text-center" style={{ fontSize: 12, color: '#7A7067', marginTop: 24 }}>
         가입하면{' '}
-        <a href="/terms" className="underline" style={{ color: 'var(--text)' }}>
+        <a href="/terms" className="underline" style={{ color: '#7A7067' }}>
           이용약관
         </a>
         과{' '}
-        <a href="/privacy" className="underline" style={{ color: 'var(--text)' }}>
+        <a href="/privacy" className="underline" style={{ color: '#7A7067' }}>
           개인정보처리방침
         </a>
         에 동의하는 거예요
+      </p>
+
+      <p className="text-sm text-center" style={{ color: '#7A7067', marginTop: 24 }}>
+        이미 계정이 있으신가요?{' '}
+        <a href="/login" className="font-medium" style={{ color: '#FF5330' }}>
+          로그인
+        </a>
       </p>
     </AuthPageShell>
   );
