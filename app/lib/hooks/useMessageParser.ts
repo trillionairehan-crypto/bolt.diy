@@ -11,7 +11,13 @@ const messageParser = new EnhancedStreamingMessageParser({
     onArtifactOpen: (data) => {
       logger.trace('onArtifactOpen', data);
 
-      workbenchStore.showWorkbench.set(true);
+      /*
+       * 채팅 홈·생성 전환 통합 수정 — 예전엔 여기서 showWorkbench를 즉시 열었다(LLM이 첫 토큰을
+       * 스트리밍하는 순간, 파일도 서버도 없는 상태). 이제 패널을 여는 유일한 트리거는
+       * workbenchStore.previewReady(Preview.tsx가 첫 컴파일 성공 시 세팅) — Workbench.client.tsx가
+       * 그 신호를 구독해서 연다. addArtifact는 그대로 즉시 호출 — 실제 파일 작성/셸 실행
+       * 파이프라인은 패널이 보이든 안 보이든 항상 동작해야 한다.
+       */
       workbenchStore.addArtifact(data);
     },
     onArtifactClose: (data) => {

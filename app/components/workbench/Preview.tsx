@@ -524,6 +524,18 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
     return () => clearTimeout(timeoutId);
   }, [iframeUrl, hasRenderedOnce]);
 
+  /*
+   * 채팅 홈·생성 전환 통합 수정 — hasRenderedOnce는 이 컴포넌트 로컬 상태라 바깥(데스크톱 2단
+   * 전환/모바일 탭 표시)에서 볼 수 없다. workbenchStore.previewReady로 그대로 미러링해서, 이
+   * 컴포넌트가 데스크톱처럼 상시 마운트돼 있든(폭 0으로 접힘) 모바일처럼 숨겨진 채 마운트돼
+   * 있든(className="hidden") 똑같이 "첫 렌더 가능 시점" 신호를 밖으로 흘려보낸다.
+   */
+  useEffect(() => {
+    if (hasRenderedOnce) {
+      workbenchStore.previewReady.set(true);
+    }
+  }, [hasRenderedOnce]);
+
   return (
     <div ref={containerRef} className={`w-full h-full flex flex-col relative`}>
       <div className="flex-1 border-t border-bolt-elements-borderColor flex justify-center items-center overflow-auto">

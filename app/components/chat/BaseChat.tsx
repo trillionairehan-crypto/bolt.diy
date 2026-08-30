@@ -25,6 +25,7 @@ import ProgressCompilation from './ProgressCompilation';
 import type { ProgressAnnotation } from '~/types/context';
 import { SupabaseChatAlert } from '~/components/chat/SupabaseAlert';
 import { expoUrlAtom } from '~/lib/stores/qrCodeStore';
+import { chatStore } from '~/lib/stores/chat';
 import { useStore } from '@nanostores/react';
 import { StickToBottom, useStickToBottomContext } from '~/lib/hooks';
 import { ChatBox } from './ChatBox';
@@ -99,6 +100,7 @@ interface BaseChatProps {
   clearDeployAlert?: () => void;
   llmErrorAlert?: LlmErrorAlertType;
   clearLlmErrorAlert?: () => void;
+  onRetryLlmError?: () => void;
   data?: JSONValue[] | undefined;
   chatMode?: 'discuss' | 'build';
   setChatMode?: (mode: 'discuss' | 'build') => void;
@@ -156,6 +158,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       clearSupabaseAlert,
       llmErrorAlert,
       clearLlmErrorAlert,
+      onRetryLlmError,
       data,
       chatMode,
       setChatMode,
@@ -184,6 +187,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const [progressAnnotations, setProgressAnnotations] = useState<ProgressAnnotation[]>([]);
     const expoUrl = useStore(expoUrlAtom);
     const [qrModalOpen, setQrModalOpen] = useState(false);
+    const { workbenchOpen } = useStore(chatStore);
 
     useEffect(() => {
       if (expoUrl) {
@@ -468,7 +472,13 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       }}
                     />
                   )}
-                  {llmErrorAlert && <LlmErrorAlert alert={llmErrorAlert} clearAlert={() => clearLlmErrorAlert?.()} />}
+                  {llmErrorAlert && (
+                    <LlmErrorAlert
+                      alert={llmErrorAlert}
+                      clearAlert={() => clearLlmErrorAlert?.()}
+                      onRetry={onRetryLlmError}
+                    />
+                  )}
                 </div>
                 {progressAnnotations && <ProgressCompilation data={progressAnnotations} />}
                 <ChatBox
@@ -534,11 +544,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 'flex flex-col items-center px-4 pb-16': !chatStarted,
                 'h-full flex flex-col min-h-0': chatStarted,
               })}
-              style={
-                !chatStarted
-                  ? { background: '#FBF5EE', minHeight: '88vh', paddingTop: 'clamp(32px, 19vh, 220px)' }
-                  : undefined
-              }
+              style={!chatStarted ? { background: '#FBF5EE', minHeight: '88vh' } : undefined}
             >
               <div
                 className={classNames('flex flex-col min-w-0 relative z-10 w-full', {
@@ -546,11 +552,17 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 })}
               >
                 {!chatStarted ? (
-                  <div className="w-full mx-auto flex flex-col items-center" style={{ maxWidth: 760 }}>
-                    <p className={homeStyles.greeting}>오늘은 뭘 만들어볼까요?</p>
-                    <StickToBottom className="relative w-full" resize="smooth" initial="smooth">
-                      {chatBoxSection}
-                    </StickToBottom>
+                  <div className="w-full flex flex-col items-center">
+                    <div className={homeStyles.stage}>
+                      <div className={homeStyles.stageBlock}>
+                        <div className="w-full mx-auto flex flex-col items-center" style={{ maxWidth: 760 }}>
+                          <p className={homeStyles.greeting}>오늘은 뭘 만들어볼까요?</p>
+                          <StickToBottom className="relative w-full" resize="smooth" initial="smooth">
+                            {chatBoxSection}
+                          </StickToBottom>
+                        </div>
+                      </div>
+                    </div>
                     <ClientOnly>{() => <DeployedAppCards />}</ClientOnly>
                   </div>
                 ) : (
@@ -613,7 +625,19 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
           </ClientOnly>
         ) : (
           <div className={classNames(styles.ChatArea, 'flex flex-col lg:flex-row overflow-y-auto w-full h-full')}>
-            <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
+            {/*
+              채팅 홈·생성 전환 통합 수정 — 워크벤치가 열리는 순간(workbenchOpen) flex-grow를 즉시
+              끄고 최종 폭(--chat-min-width)으로 고정한다. flex-grow를 계속 켜둔 채로 형제
+              워크벤치가 폭 0→--workbench-width로 애니메이션되면 매 프레임 flexbox가 이 칼럼의
+              폭을 다시 계산해서 대화 텍스트가 리플로우로 계속 튄다 — 폭을 먼저 고정해두면
+              워크벤치만 움직이고 이 칼럼은 그대로라 리플로우가 없다.
+            */}
+            <div
+              className={classNames(styles.Chat, 'flex flex-col h-full', {
+                'flex-grow lg:min-w-[var(--chat-min-width)]': !workbenchOpen,
+                'flex-none lg:w-[var(--chat-min-width)]': workbenchOpen,
+              })}
+            >
               {chatColumnContent}
             </div>
             <ClientOnly>

@@ -27,7 +27,7 @@ import { Slider, type SliderOptions } from '~/components/ui/Slider';
 import { workbenchStore, type WorkbenchViewType } from '~/lib/stores/workbench';
 import { classNames } from '~/utils/classNames';
 import { SHOW_DEV_TOOLS } from '~/utils/featureFlags';
-import { cubicEasingFn } from '~/utils/easings';
+import { cubicEasingFn, panelTransitionDurationSec, panelTransitionEasing } from '~/utils/easings';
 import { createScopedLogger, renderLogger } from '~/utils/logger';
 import { EditorPanel } from './EditorPanel';
 import { Preview } from './Preview';
@@ -71,20 +71,16 @@ const sliderOptions: SliderOptions<WorkbenchViewType> = {
   },
 };
 
+/*
+ * 채팅 홈·생성 전환 통합 수정 — 전환 시간/이징은 컴포넌트 안에서 prefers-reduced-motion에 따라
+ * 갈리므로(motion.div의 transition prop으로 넘김) 여기서는 폭 키프레임만 정의한다.
+ */
 const workbenchVariants = {
   closed: {
     width: 0,
-    transition: {
-      duration: 0.2,
-      ease: cubicEasingFn,
-    },
   },
   open: {
     width: 'var(--workbench-width)',
-    transition: {
-      duration: 0.2,
-      ease: cubicEasingFn,
-    },
   },
 } satisfies Variants;
 
@@ -376,6 +372,40 @@ export const Workbench = memo(
 
     const hasPreview = useStore(computed(workbenchStore.previews, (previews) => previews.length > 0));
     const showWorkbench = useStore(workbenchStore.showWorkbench);
+    const previewReady = useStore(workbenchStore.previewReady);
+
+    /*
+     * 채팅 홈·생성 전환 통합 수정 — showWorkbench를 여는 유일한 트리거. previewReady는
+     * Preview.tsx가 첫 컴파일 성공(또는 15초 타임아웃 폴백) 시에만 세팅하므로, 컴파일이 끝내
+     * 성공하지 못한 채 생성이 에러로 끝나면 이 effect가 아예 실행되지 않아 패널이 자동으로
+     * 열리지 않는다. 이미 열려 있으면(다음 메시지에서 재실행돼도) set(true)는 멱등이라 안전하다.
+     */
+    useEffect(() => {
+      if (previewReady) {
+        workbenchStore.setShowWorkbench(true);
+      }
+    }, [previewReady]);
+
+    /*
+     * chatStore.workbenchOpen 미러링 — BaseChat.tsx는 workbenchStore를 직접 구독하지 않고(무거운
+     * 지연 로딩 그래프를 끌어오지 않으려고) 이 값만 보고 .Chat 칼럼 폭을 즉시 고정한다.
+     */
+    useEffect(() => {
+      chatStore.setKey('workbenchOpen', showWorkbench);
+    }, [showWorkbench]);
+
+    // 채팅 홈·생성 전환 통합 수정 — 2단 전환/미리보기 페이드의 모션 감소 분기 (PromptClarification.tsx와 동일 패턴).
+    const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+    useEffect(() => {
+      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setPrefersReducedMotion(mq.matches);
+
+      const handler = (event: MediaQueryListEvent) => setPrefersReducedMotion(event.matches);
+      mq.addEventListener('change', handler);
+
+      return () => mq.removeEventListener('change', handler);
+    }, []);
 
     /*
      * Sidebar auto-collapses the moment the workbench/preview opens, so attention goes to the
@@ -484,11 +514,17 @@ export const Workbench = memo(
             initial="closed"
             animate={showWorkbench ? 'open' : 'closed'}
             variants={workbenchVariants}
+            transition={
+              prefersReducedMotion
+                ? { duration: 0 }
+                : { duration: panelTransitionDurationSec, ease: panelTransitionEasing }
+            }
             className="z-workbench"
           >
             <div
               className={classNames(
-                'fixed top-[calc(var(--header-height)+1.2rem)] bottom-6 w-[var(--workbench-inner-width)] z-0 transition-[left,width] duration-200 bolt-ease-cubic-bezier',
+                'fixed top-[calc(var(--header-height)+1.2rem)] bottom-6 w-[var(--workbench-inner-width)] z-0 transition-[left,width]',
+                prefersReducedMotion ? 'duration-0' : 'duration-[360ms] ease-[cubic-bezier(0.32,0.72,0,1)]',
                 {
                   'left-[var(--workbench-left)]': showWorkbench,
                   'left-[100%]': !showWorkbench,
@@ -658,7 +694,30 @@ export const Workbench = memo(
                         </DiffViewErrorBoundary>
                       </div>
                     )}
-                    <View initial={{ x: '100%' }} animate={{ x: effectiveView === 'preview' ? '0%' : '100%' }}>
+                    {/*
+                      채팅 홈·생성 전환 통합 수정 — 첫 렌더 시 데스크톱 2단 전환: 미리보기가
+                      워크벤치 폭 애니메이션과 동시에(순차 아님) 옅은 스케일(0.985→1)과 함께
+                      페이드인된다. x축 슬라이드(코드/차이점/미리보기 내부 탭 전환, SHOW_DEV_TOOLS
+                      전용)는 기존 viewTransition 타이밍 그대로 — opacity/scale만 새 패널 전환
+                      타이밍(panelTransitionDurationSec/panelTransitionEasing)을 쓴다.
+                    */}
+                    <View
+                      initial={{ x: '100%' }}
+                      animate={{
+                        x: effectiveView === 'preview' ? '0%' : '100%',
+                        opacity: showWorkbench ? 1 : 0,
+                        scale: !showWorkbench && !prefersReducedMotion ? 0.985 : 1,
+                      }}
+                      transition={{
+                        x: viewTransition,
+                        opacity: prefersReducedMotion
+                          ? { duration: 0.15 }
+                          : { duration: panelTransitionDurationSec, ease: panelTransitionEasing },
+                        scale: prefersReducedMotion
+                          ? { duration: 0 }
+                          : { duration: panelTransitionDurationSec, ease: panelTransitionEasing },
+                      }}
+                    >
                       <Preview setSelectedElement={setSelectedElement} />
                     </View>
                   </div>

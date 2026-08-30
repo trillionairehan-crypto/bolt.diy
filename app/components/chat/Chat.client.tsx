@@ -1054,6 +1054,10 @@ export const ChatImpl = memo(
         clearDeployAlert={() => workbenchStore.clearDeployAlert()}
         llmErrorAlert={llmErrorAlert}
         clearLlmErrorAlert={clearApiErrorAlert}
+        onRetryLlmError={() => {
+          clearApiErrorAlert();
+          regenerate().catch((error) => logger.error('LlmErrorAlert 다시 시도: regenerate() 실패', error));
+        }}
         data={progressAnnotations}
         chatMode={chatMode}
         setChatMode={setChatMode}

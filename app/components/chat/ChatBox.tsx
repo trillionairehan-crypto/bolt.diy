@@ -15,7 +15,6 @@ import type { ProviderInfo } from '~/types/model';
 import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import { WebSearch } from './WebSearch.client';
-import { RotatingPlaceholder } from './RotatingPlaceholder';
 
 const SHOW_ENHANCE_BUTTON = false;
 
@@ -34,6 +33,9 @@ const LANDING_INK = '#1A1A1A';
 const LANDING_MUTED = '#8B7E70';
 const LANDING_BORDER = 'rgba(26, 26, 26, 0.12)';
 const LANDING_HOVER = 'rgba(26, 26, 26, 0.06)';
+
+// 채팅 홈·생성 전환 통합 수정 — 입력창 자체(카드)만 쓰는, 크림보다 한 단계 밝은 배경.
+const LANDING_INPUT_BG = '#FFFCF7';
 
 interface ChatBoxProps {
   isModelSettingsCollapsed: boolean;
@@ -111,18 +113,17 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
   return (
     <div
       className={classNames(
-        'relative backdrop-blur p-3 relative w-full max-w-chat mx-auto z-prompt',
+        'relative backdrop-blur p-3 relative w-full mx-auto z-prompt',
         isLanding
           ? [
+              'max-w-[720px]',
               'rounded-[20px]',
               'border',
-              'shadow-[0_1px_2px_rgba(23,16,14,0.10),0_12px_40px_rgba(23,16,14,0.18)]',
-              'focus-within:shadow-[0_1px_2px_rgba(23,16,14,0.10),0_20px_54px_rgba(23,16,14,0.24)]',
-              'focus-within:border-[#FF5330]/40',
-              'focus-within:-translate-y-px',
-              'transition-[box-shadow,transform,border-color] duration-150 ease-[cubic-bezier(.2,.6,.3,1)]',
+              'border-[#EFE4D6]',
+              'focus-within:border-[#FF5330]',
+              'transition-[border-color] duration-150 ease-out',
             ].join(' ')
-          : 'bg-bolt-elements-background-depth-2 rounded-lg border border-bolt-elements-borderColor',
+          : 'max-w-chat bg-bolt-elements-background-depth-2 rounded-lg border border-bolt-elements-borderColor',
 
         /*
          * {
@@ -133,8 +134,8 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
       style={
         isLanding
           ? ({
-              background: LANDING_CARD_BG,
-              borderColor: LANDING_BORDER,
+              background: LANDING_INPUT_BG,
+              minHeight: 160,
               '--bolt-elements-textPrimary': LANDING_INK,
               '--bolt-elements-textSecondary': LANDING_MUTED,
               '--bolt-elements-textTertiary': LANDING_MUTED,
@@ -225,9 +226,6 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           isLanding ? '' : 'shadow-xs border border-bolt-elements-borderColor',
         )}
       >
-        <ClientOnly>
-          {() => <RotatingPlaceholder visible={isLanding && props.input.length === 0} color={LANDING_MUTED} />}
-        </ClientOnly>
         <textarea
           ref={props.textareaRef}
           data-gramm="false"
@@ -318,7 +316,10 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
               <div ref={attachMenuRef} className="relative">
                 <IconButton
                   title="첨부"
-                  className="flex items-center h-8 gap-1.5 px-2 shrink-0 whitespace-nowrap !text-bolt-elements-textSecondary"
+                  className={classNames(
+                    'flex items-center h-8 gap-1.5 px-2 shrink-0 whitespace-nowrap',
+                    isLanding ? '!text-[#7A7067]' : '!text-bolt-elements-textSecondary',
+                  )}
                   onClick={() => setAttachMenuOpen((open) => !open)}
                 >
                   <div className="i-ph:plus text-lg" />

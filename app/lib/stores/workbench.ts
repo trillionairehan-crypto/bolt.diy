@@ -56,6 +56,16 @@ export class WorkbenchStore {
   showWorkbench: WritableAtom<boolean> = import.meta.hot?.data.showWorkbench ?? atom(false);
 
   /*
+   * 채팅 홈·생성 전환 통합 수정 — "미리보기가 실제로 뜰 준비가 됐다"는 신호. Preview.tsx의
+   * hasRenderedOnce(첫 컴파일 성공 또는 15초 타임아웃 폴백)가 true가 되는 순간 여기도 true로
+   * 세팅된다. showWorkbench를 여는 유일한 트리거이자(desktop), MobileWorkspace가 "미리보기" 탭
+   * 버튼 자체를 렌더할지 결정하는 신호(mobile)로 재사용된다 — 컴파일 성공 없이는 절대 true가 될
+   * 수 없으므로, 생성이 에러로 끝나면 패널/탭이 자동으로 안 열린다(별도 에러 처리 코드 불필요).
+   * hasRenderedOnce와 마찬가지로 한 번 true가 되면 되돌아가지 않는다.
+   */
+  previewReady: WritableAtom<boolean> = import.meta.hot?.data.previewReady ?? atom(false);
+
+  /*
    * 개발자용 UI 정리 (overnight5) — SHOW_DEV_TOOLS가 꺼져 있으면(기본값) 코드/차이점 탭 자체가
    * Workbench.client.tsx에서 화면에 안 보이게 클램프되므로, 첫 기본값이 'code'면 미리보기가
    * 뜨기 전까지 잠깐이라도 빈 코드 화면이 보일 수 있다 — 아예 'preview'로 시작한다. 개발자 모드를
@@ -97,6 +107,7 @@ export class WorkbenchStore {
       import.meta.hot.data.artifacts = this.artifacts;
       import.meta.hot.data.unsavedFiles = this.unsavedFiles;
       import.meta.hot.data.showWorkbench = this.showWorkbench;
+      import.meta.hot.data.previewReady = this.previewReady;
       import.meta.hot.data.currentView = this.currentView;
       import.meta.hot.data.webcontainerBootFailed = this.webcontainerBootFailed;
       import.meta.hot.data.actionAlert = this.actionAlert;

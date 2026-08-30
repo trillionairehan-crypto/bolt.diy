@@ -28,6 +28,36 @@ interface ArtifactProps {
   artifactId: string;
 }
 
+/*
+ * 채팅 홈·생성 전환 통합 수정 — "화면을 만들고 있어요"/"저장 기능을 붙이고 있어요"/
+ * "마무리하고 있어요" 3단계 문구를 실제 액션 파이프라인(파일 경로/타입)에서 휴리스틱으로
+ * 뽑아낸다. 파일 경로는 이 판단에만 쓰고 화면엔 절대 노출하지 않는다 — 노출되는 건 아래 세 문구
+ * 중 하나뿐이다.
+ */
+const STORAGE_PATH_HINT = /\b(data|lib\/db|store|supabase|api|hook)/i;
+
+export function getGenerationPhaseLabel(actions: (ActionState & { id: string })[]): string {
+  const runningFileAction = [...actions]
+    .reverse()
+    .find((action): action is Extract<ActionState, { type: 'file' }> & { id: string } => {
+      return action.type === 'file' && action.status === 'running';
+    });
+
+  if (runningFileAction?.filePath) {
+    return STORAGE_PATH_HINT.test(runningFileAction.filePath) ? '저장 기능을 붙이고 있어요' : '화면을 만들고 있어요';
+  }
+
+  const runningSetupAction = actions.find(
+    (action) => (action.type === 'shell' || action.type === 'start') && action.status === 'running',
+  );
+
+  if (runningSetupAction) {
+    return '마무리하고 있어요';
+  }
+
+  return '만들고 있어요';
+}
+
 export const Artifact = memo(({ artifactId }: ArtifactProps) => {
   const userToggledActions = useRef(false);
   const [showActions, setShowActions] = useState(false);
@@ -136,7 +166,7 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
           </AnimatePresence>
         </div>
         {artifact.type === 'bundled' && (
-          <div className="flex items-center gap-1.5 p-5 bg-bolt-elements-actions-background border-t border-bolt-elements-artifacts-borderColor">
+          <div className="flex items-center gap-2 p-5 bg-bolt-elements-actions-background border-t border-bolt-elements-artifacts-borderColor">
             <div className={classNames('text-lg', getIconColor(allActionFinished ? 'complete' : 'running'))}>
               {allActionFinished ? (
                 <motion.div
@@ -146,16 +176,18 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
                   className="i-ph:check"
                 ></motion.div>
               ) : (
-                <div className="i-svg-spinners:90-ring-with-bg"></div>
+                <div
+                  className="w-2 h-2 rounded-full bg-[var(--accent)] animate-[cr-dot-pulse_1.2s_ease-in-out_infinite]"
+                  aria-hidden="true"
+                />
               )}
             </div>
             <div className="text-bolt-elements-textPrimary font-medium leading-5 text-sm">
-              {/* This status text remains the same */}
               {allActionFinished
                 ? artifact.id === 'restored-project-setup'
                   ? '저장된 파일을 불러왔어요'
                   : '기본 파일을 만들었어요'
-                : '기본 파일을 만드는 중이에요'}
+                : getGenerationPhaseLabel(actions)}
             </div>
           </div>
         )}

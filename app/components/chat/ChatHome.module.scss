@@ -4,10 +4,30 @@ $cream: #fbf5ee;
 
 .greeting {
   text-align: center;
-  font-size: clamp(15px, 1.8vw, 17px);
-  font-weight: 500;
-  color: $ink-soft;
-  margin: 0 0 16px;
+  font-size: 32px;
+  font-weight: 600;
+  color: $ink;
+  margin: 0 0 28px;
+}
+
+/*
+ * 채팅 홈·생성 전환 통합 수정 — 헤드라인+입력창 블록 전체를 뷰포트 세로 40% 지점에 고정한다.
+ * 블록 높이가 바뀌어도(입력창이 늘어나거나 예시 placeholder가 사라지거나) 항상 블록의 세로
+ * 중심이 40% 지점에 오도록 top+translateY 조합을 쓴다 — padding-top 방식은 블록 높이가 바뀔
+ * 때마다 실제 중심 위치가 같이 흔들린다.
+ */
+.stage {
+  position: relative;
+  width: 100%;
+  min-height: 88vh;
+}
+
+.stageBlock {
+  position: absolute;
+  top: 40%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
 }
 
 // ---------- Deployed app cards — same mini-browser-frame shape as the landing showcase ----------
