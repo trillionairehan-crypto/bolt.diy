@@ -306,7 +306,12 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           placeholder={isLanding ? '' : props.chatMode === 'build' ? '어떤 걸 만들고 싶으세요?' : '무엇이든 물어보세요'}
           translate="no"
         />
-        <div className="flex flex-nowrap justify-between items-center text-sm p-4 pt-3 w-full">
+        <div
+          className={classNames(
+            'flex flex-nowrap justify-between items-center text-sm w-full',
+            isLanding ? 'px-4 py-1' : 'p-4 pt-3',
+          )}
+        >
           <div className="flex flex-nowrap gap-3 items-center min-w-0">
             {props.isListening ? (
               <button
@@ -430,6 +435,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
                 <div className="shrink-0">
                   <SendButton
                     isStreaming={props.isStreaming}
+                    size={isLanding ? 'sm' : 'default'}
                     disabled={
                       !props.providerList ||
                       props.providerList.length === 0 ||
