@@ -441,9 +441,14 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
           const inputSection = (
             <>
               <div
-                className={classNames('flex flex-col gap-2 w-full max-w-chat mx-auto z-prompt mb-6', {
-                  'my-auto': !chatStarted,
-                  'flex-shrink-0 mt-2': chatStarted,
+                className={classNames('flex flex-col gap-2 w-full mx-auto z-prompt mb-6', {
+                  /*
+                   * 채팅 홈/랜딩 카드는 ChatBox.tsx 내부에서 이미 720px로 정해뒀는데, 이 부모의
+                   * max-w-chat(528px, --chat-max-width)이 그보다 좁아서 카드가 528px로
+                   * 눌려 있었다 — 도킹된(chatStarted) 입력줄만 528px로 좁게 유지한다.
+                   */
+                  'my-auto max-w-[720px]': !chatStarted,
+                  'flex-shrink-0 mt-2 max-w-chat': chatStarted,
                 })}
               >
                 <div className="flex flex-col gap-2">
