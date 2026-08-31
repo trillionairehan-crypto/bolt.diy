@@ -92,8 +92,8 @@ export const REVIEW_CHECKLIST: ReviewCheckItem[] = [
     kind: 'text',
     enabled: true,
     description:
-      '상태 배지(완료/진행중/주의 등)가 전부 같은 색인가. 완료·긍정은 --success, 경고·위험은 ' +
-      '--danger, 나머지는 --text-muted로 구분한다.',
+      '상태 배지(완료/진행중/주의 등)가 전부 같은 색인가. 완료·긍정은 --ok, 경고는 --warn, ' +
+      '위험·실패는 --err, 나머지는 --muted로 구분한다.',
   },
   {
     id: 'number-format',
