@@ -1,5 +1,11 @@
 import { convertToModelMessages, streamText as _streamText, type UIMessage } from 'ai';
-import { MAX_TOKENS, PROVIDER_COMPLETION_LIMITS, isReasoningModel, type FileMap } from './constants';
+import {
+  MAX_TOKENS,
+  PROVIDER_COMPLETION_LIMITS,
+  isReasoningModel,
+  isAnthropicNoThinkingModel,
+  type FileMap,
+} from './constants';
 import { getSystemPrompt } from '~/lib/common/prompts/prompts';
 import { DEFAULT_MODEL, DEFAULT_PROVIDER, MODIFICATIONS_TAG_NAME, PROVIDER_LIST, WORK_DIR } from '~/utils/constants';
 import type { IProviderSetting } from '~/types/model';
@@ -26,18 +32,6 @@ export interface StreamingOptions extends Omit<Parameters<typeof _streamText>[0]
 }
 
 const logger = createScopedLogger('stream-text');
-
-/*
- * Sonnet 5 / Opus 5 think adaptively by default even with no `thinking` param sent at all —
- * confirmed live via coralred.kr repro (2026-08-22): Anthropic opens a `content_block_start`
- * type "thinking" unprompted, and the silent thinking phase can run 45s+ with zero stream
- * output, tripping stream-recovery's stall timeout. Capping effort to 'medium' (still adaptive)
- * did NOT bound this reliably — an A/B test the same day (short prompt, fresh chat, effort:
- * medium) still hit a full 45s stall on attempt 1, while the exact same prompt against Sonnet
- * 4.5 (no thinking at all) had zero stall and a ~4s time-to-first-token. So thinking is
- * disabled outright here rather than capped.
- */
-const NO_THINKING_MODELS = ['claude-sonnet-5', 'claude-opus-5'];
 
 function getCompletionTokenLimit(modelDetails: any): number {
   // 1. If model specifies completion tokens, use that
@@ -311,8 +305,7 @@ export async function streamText(props: {
     ),
   );
 
-  const isAnthropicNoThinkingModel =
-    provider.name === 'Anthropic' && NO_THINKING_MODELS.some((name) => modelDetails.name.includes(name));
+  const isNoThinkingModel = isAnthropicNoThinkingModel(provider.name, modelDetails.name);
 
   const streamParams = {
     model: provider.getModelInstance({
@@ -329,7 +322,7 @@ export async function streamText(props: {
     // Set temperature to 1 for reasoning models (required by OpenAI API)
     ...(isReasoning ? { temperature: 1 } : {}),
 
-    ...(isAnthropicNoThinkingModel
+    ...(isNoThinkingModel
       ? {
           providerOptions: {
             ...(filteredOptions as any).providerOptions,

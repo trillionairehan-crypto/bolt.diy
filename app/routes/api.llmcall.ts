@@ -3,7 +3,12 @@ import { streamText } from '~/lib/.server/llm/stream-text';
 import type { IProviderSetting, ProviderInfo } from '~/types/model';
 import { generateText } from 'ai';
 import { PROVIDER_LIST } from '~/utils/constants';
-import { MAX_TOKENS, PROVIDER_COMPLETION_LIMITS, isReasoningModel } from '~/lib/.server/llm/constants';
+import {
+  MAX_TOKENS,
+  PROVIDER_COMPLETION_LIMITS,
+  isReasoningModel,
+  isAnthropicNoThinkingModel,
+} from '~/lib/.server/llm/constants';
 import { LLMManager } from '~/lib/modules/llm/manager';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/cookies';
@@ -65,12 +70,15 @@ function validateTokenLimits(modelDetails: ModelInfo, requestedTokens: number): 
 }
 
 async function llmCallAction({ context, request }: ActionFunctionArgs) {
-  const { system, message, model, provider, streamOutput } = await request.json<{
+  const { system, message, model, provider, streamOutput, image } = await request.json<{
     system: string;
     message: string;
     model: string;
     provider: ProviderInfo;
     streamOutput?: boolean;
+
+    /** 생성물 자동 검토(시각 항목)용 — base64 data URL. 있으면 non-streaming 경로에서만 멀티모달 메시지로 보낸다. */
+    image?: string;
   }>();
 
   const { name: providerName } = provider;
@@ -191,7 +199,12 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
         messages: [
           {
             role: 'user' as const,
-            content: `${message}`,
+            content: image
+              ? [
+                  { type: 'text' as const, text: `${message}` },
+                  { type: 'image' as const, image },
+                ]
+              : `${message}`,
           },
         ],
         model: providerInfo.getModelInstance({
@@ -204,10 +217,13 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
         toolChoice: 'none' as const,
       };
 
+      const isNoThinkingModel = isAnthropicNoThinkingModel(providerName, modelDetails.name);
+
       // For reasoning models, set temperature to 1 (required by OpenAI API)
       const finalParams = {
         ...baseParams,
         ...(isReasoning ? { temperature: 1 } : {}),
+        ...(isNoThinkingModel ? { providerOptions: { anthropic: { thinking: { type: 'disabled' } } } } : {}),
       };
 
       // DEBUG: Log final parameters

@@ -46,6 +46,23 @@ export function isReasoningModel(modelName: string): boolean {
 // limits the number of model responses that can be returned in a single request
 export const MAX_RESPONSE_SEGMENTS = 2;
 
+/*
+ * Sonnet 5 / Opus 5 think adaptively by default even with no `thinking` param sent at all —
+ * confirmed live via coralred.kr repro (2026-08-22): Anthropic opens a `content_block_start`
+ * type "thinking" unprompted, and the silent thinking phase can run 45s+ with zero stream
+ * output, tripping stream-recovery's stall timeout. Capping effort to 'medium' (still adaptive)
+ * did NOT bound this reliably — an A/B test the same day (short prompt, fresh chat, effort:
+ * medium) still hit a full 45s stall on attempt 1, while the exact same prompt against Sonnet
+ * 4.5 (no thinking at all) had zero stall and a ~4s time-to-first-token. So thinking is
+ * disabled outright here rather than capped. Shared between stream-text.ts (main generation)
+ * and api.llmcall.ts (single-shot calls like auto-review) so both stay in sync.
+ */
+export const NO_THINKING_MODELS = ['claude-sonnet-5', 'claude-opus-5'];
+
+export function isAnthropicNoThinkingModel(providerName: string, modelName: string): boolean {
+  return providerName === 'Anthropic' && NO_THINKING_MODELS.some((name) => modelName.includes(name));
+}
+
 export interface File {
   type: 'file';
   content: string;

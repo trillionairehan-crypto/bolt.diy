@@ -285,10 +285,112 @@
     if (event.data.type === 'INSPECTOR_ACTIVATE') {
       setInspectorActive(event.data.active);
     }
+    if (event.data.type === 'CAPTURE_SCREENSHOT') {
+      captureScreenshot(event.data.requestId);
+    }
   });
 
   // Auto-inject if inspector is already active
   window.parent.postMessage({ type: 'INSPECTOR_READY' }, '*');
+
+  // --- 생성물 자동 검토 2단계: 시각 검토용 스크린샷 캡처 ---
+  // 부모(Preview.tsx)가 CAPTURE_SCREENSHOT을 보내기 전에 이미 iframe을 1280x800으로 리사이즈해둔
+  // 상태라고 가정한다 — 그래서 window.innerWidth/innerHeight를 그대로 쓴다(하드코딩 안 함). 라이브러리는
+  // 이 메시지를 처음 받을 때만 지연 로드한다 — 검토를 안 받는 대다수 미리보기는 이 비용을 전혀 안 씀.
+  var htmlToImageLoadPromise = null;
+
+  function loadHtmlToImage() {
+    if (htmlToImageLoadPromise) {
+      return htmlToImageLoadPromise;
+    }
+
+    htmlToImageLoadPromise = new Promise(function (resolve, reject) {
+      if (window.htmlToImage) {
+        resolve(window.htmlToImage);
+        return;
+      }
+
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js';
+      script.onload = function () {
+        if (window.htmlToImage) {
+          resolve(window.htmlToImage);
+        } else {
+          reject(new Error('html-to-image loaded but window.htmlToImage missing'));
+        }
+      };
+      script.onerror = function () {
+        reject(new Error('failed to load html-to-image from CDN'));
+      };
+      document.head.appendChild(script);
+    });
+
+    return htmlToImageLoadPromise;
+  }
+
+  /*
+   * 레이아웃(겹침/간격/기준선 등)만 보면 되고 이미지 내용은 검토 대상이 아니다 — 그래서 캡처 전에
+   * 모든 <img>의 src를 같은 크기의 회색 placeholder로 바꿔서, placehold.co 같은 외부 이미지를 절대
+   * fetch하지 않는다(캔버스 오염 방지, 방법 2/3 조사에서 확인한 문제). 성공/실패 관계없이 원래 src로
+   * 반드시 복원한다.
+   */
+  function withBlankedImages(fn) {
+    var imgs = Array.prototype.slice.call(document.querySelectorAll('img'));
+    var originalSrcs = imgs.map(function (img) {
+      return img.getAttribute('src');
+    });
+    var blank =
+      'data:image/svg+xml;charset=utf-8,' +
+      encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect width="100" height="100" fill="#E5DED3"/></svg>');
+
+    imgs.forEach(function (img) {
+      img.setAttribute('src', blank);
+    });
+
+    var restore = function () {
+      imgs.forEach(function (img, i) {
+        if (originalSrcs[i] === null) {
+          img.removeAttribute('src');
+        } else {
+          img.setAttribute('src', originalSrcs[i]);
+        }
+      });
+    };
+
+    return fn().then(
+      function (result) {
+        restore();
+        return result;
+      },
+      function (err) {
+        restore();
+        throw err;
+      },
+    );
+  }
+
+  function captureScreenshot(requestId) {
+    loadHtmlToImage()
+      .then(function (htmlToImage) {
+        return withBlankedImages(function () {
+          return htmlToImage.toJpeg(document.body, {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            quality: 0.7,
+            backgroundColor: '#ffffff',
+          });
+        });
+      })
+      .then(function (dataUrl) {
+        window.parent.postMessage({ type: 'SCREENSHOT_CAPTURED', requestId: requestId, dataUrl: dataUrl }, '*');
+      })
+      .catch(function (err) {
+        window.parent.postMessage(
+          { type: 'SCREENSHOT_FAILED', requestId: requestId, reason: (err && err.message) || String(err) },
+          '*',
+        );
+      });
+  }
 
   // --- Vite compile-error / first-successful-render detection ---
   // Vite has no explicit "compiled OK" signal — it only speaks up when something breaks

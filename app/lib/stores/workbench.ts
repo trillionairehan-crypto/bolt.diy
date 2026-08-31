@@ -102,6 +102,14 @@ export class WorkbenchStore {
   #lastPreviewAlertAt = 0;
   #PREVIEW_ALERT_COOLDOWN_MS = 8000;
 
+  /*
+   * 생성물 자동 검토 2단계 — Preview.tsx가 iframeRef를 쥐고 있어서 실제 캡처(리사이즈 →
+   * postMessage → 응답 대기 → 복원)는 거기서 구현하고, 이 store는 그 함수 하나만 등록받아
+   * reviewGeneratedApp.ts 같은 React 바깥 코드가 호출할 수 있는 진입점 역할만 한다. Preview.tsx가
+   * 마운트 해제되면 등록도 풀어서(null) 죽은 iframeRef를 참조하지 않게 한다.
+   */
+  #previewScreenshotRequester: (() => Promise<string | null>) | null = null;
+
   constructor() {
     if (import.meta.hot) {
       import.meta.hot.data.artifacts = this.artifacts;
@@ -459,6 +467,19 @@ export class WorkbenchStore {
    */
   async writeFileDirect(filePath: string, content: string) {
     await this.#filesStore.saveFile(filePath, content);
+  }
+
+  registerPreviewScreenshotRequester(fn: (() => Promise<string | null>) | null) {
+    this.#previewScreenshotRequester = fn;
+  }
+
+  /** Returns a base64 JPEG data URL of the preview's current first-viewport render, or null if unavailable. */
+  async requestPreviewScreenshot(): Promise<string | null> {
+    if (!this.#previewScreenshotRequester) {
+      return null;
+    }
+
+    return this.#previewScreenshotRequester();
   }
 
   /**

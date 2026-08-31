@@ -57,9 +57,20 @@ const WINDOW_SIZES: WindowSize[] = [
   { name: '4K Display', width: 3840, height: 2160, icon: 'i-ph:monitor', hasFrame: true, frameType: 'desktop' },
 ];
 
+/*
+ * 생성물 자동 검토 2단계 — "뷰포트 첫 화면"을 실제 데스크톱처럼 담아내려면 캡처 순간만 이 크기로
+ * 리사이즈해야 한다(축소된 좁은 레이아웃을 다시 늘려서 찍으면 반응형 브레이크포인트 자체가 달라짐).
+ */
+const SCREENSHOT_CAPTURE_WIDTH = 1280;
+const SCREENSHOT_CAPTURE_HEIGHT = 800;
+const SCREENSHOT_CAPTURE_TIMEOUT_MS = 5000;
+
 export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const pendingScreenshotRequestsRef = useRef(
+    new Map<string, (result: { dataUrl: string } | { error: string }) => void>(),
+  );
   const [activePreviewIndex, setActivePreviewIndex] = useState(0);
   const hasSelectedPreview = useRef(false);
   const previews = useStore(workbenchStore.previews);
@@ -492,6 +503,15 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
         });
       } else if (event.data.type === 'VITE_COMPILE_OK') {
         setHasRenderedOnce(true);
+      } else if (event.data.type === 'SCREENSHOT_CAPTURED' || event.data.type === 'SCREENSHOT_FAILED') {
+        const resolver = pendingScreenshotRequestsRef.current.get(event.data.requestId);
+
+        if (resolver) {
+          pendingScreenshotRequestsRef.current.delete(event.data.requestId);
+          resolver(
+            event.data.type === 'SCREENSHOT_CAPTURED' ? { dataUrl: event.data.dataUrl } : { error: event.data.reason },
+          );
+        }
       }
     };
 
@@ -499,6 +519,69 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
 
     return () => window.removeEventListener('message', handleMessage);
   }, [isInspectorMode]);
+
+  /*
+   * 생성물 자동 검토 2단계 — reviewGeneratedApp.ts(React 바깥)가 workbenchStore를 통해 호출할 수
+   * 있게 등록해두는 진입점. iframe을 캡처 순간만 1280x800으로 리사이즈했다가 원래대로 되돌린다 —
+   * 사용자가 지금 미리보기 패널을 보고 있다면 짧은 리사이즈가 보일 수 있지만("마무리하고 있어요"
+   * 인디케이터가 이미 뜬 상태라 맥락 없는 변화는 아님), inspector-script.js 쪽에서 iframe 안의
+   * html-to-image 캡처가 끝나는 즉시 원상복구한다.
+   */
+  const requestPreviewScreenshotImpl = useCallback((): Promise<string | null> => {
+    const iframe = iframeRef.current;
+
+    if (!iframe || !iframe.contentWindow) {
+      return Promise.resolve(null);
+    }
+
+    const requestId = `shot-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const originalWidth = iframe.style.width;
+    const originalHeight = iframe.style.height;
+
+    const restore = () => {
+      iframe.style.width = originalWidth;
+      iframe.style.height = originalHeight;
+    };
+
+    iframe.style.width = `${SCREENSHOT_CAPTURE_WIDTH}px`;
+    iframe.style.height = `${SCREENSHOT_CAPTURE_HEIGHT}px`;
+
+    return new Promise<string | null>((resolve) => {
+      let settled = false;
+
+      const finish = (value: string | null) => {
+        if (settled) {
+          return;
+        }
+
+        settled = true;
+        pendingScreenshotRequestsRef.current.delete(requestId);
+        restore();
+        resolve(value);
+      };
+
+      const timeoutId = setTimeout(() => finish(null), SCREENSHOT_CAPTURE_TIMEOUT_MS);
+
+      pendingScreenshotRequestsRef.current.set(requestId, (result) => {
+        clearTimeout(timeoutId);
+        finish('dataUrl' in result ? result.dataUrl : null);
+      });
+
+      /*
+       * Give the resize a moment to actually reflow inside the (cross-origin, independently
+       * rendered) iframe before asking it to capture — otherwise the capture can race the resize.
+       */
+      setTimeout(() => {
+        iframe.contentWindow?.postMessage({ type: 'CAPTURE_SCREENSHOT', requestId }, '*');
+      }, 100);
+    });
+  }, []);
+
+  useEffect(() => {
+    workbenchStore.registerPreviewScreenshotRequester(requestPreviewScreenshotImpl);
+
+    return () => workbenchStore.registerPreviewScreenshotRequester(null);
+  }, [requestPreviewScreenshotImpl]);
 
   /*
    * Gates the preview iframe behind a loading state until the very first successful compile —

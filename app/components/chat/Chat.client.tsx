@@ -1097,7 +1097,12 @@ export const ChatImpl = memo(
           const result = await reviewGeneratedApp();
 
           if (result) {
-            logger.info('auto-review: finished', { issues: result.issues, filesWritten: result.filesWritten });
+            logger.info('auto-review: finished', {
+              textIssues: result.textIssues,
+              visualIssues: result.visualIssues,
+              filesWritten: result.filesWritten,
+              screenshotCaptured: result.screenshotCaptured,
+            });
           }
         } finally {
           setAutoReviewing(false);
