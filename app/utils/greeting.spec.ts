@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildHeadline, getGreetingPeriod, resolveDisplayName } from './greeting';
+import { buildHeadline, buildLoginHeadline, getGreetingPeriod, resolveDisplayName } from './greeting';
 import type { User } from '@supabase/supabase-js';
 
 function fakeUser(overrides: Partial<User> = {}): User {
@@ -122,5 +122,29 @@ describe('buildHeadline', () => {
     expect(buildHeadline({ isLoggedIn: true, hasHistory: true, name: '홍길동', period: 'night' })).toBe(
       '조용한 시간이네요',
     );
+  });
+});
+
+describe('buildLoginHeadline', () => {
+  it('05-11 reads "다시 오셨네요"', () => {
+    expect(buildLoginHeadline('morning')).toBe('다시 오셨네요');
+  });
+
+  it('11-18 reads "기다리고 있었어요"', () => {
+    expect(buildLoginHeadline('day')).toBe('기다리고 있었어요');
+  });
+
+  it('18-23 reads "오늘도 오셨네요"', () => {
+    expect(buildLoginHeadline('evening')).toBe('오늘도 오셨네요');
+  });
+
+  it('23-05 reads "조용한 밤이네요"', () => {
+    expect(buildLoginHeadline('night')).toBe('조용한 밤이네요');
+  });
+
+  it('never mentions a name (not logged in yet)', () => {
+    for (const period of ['morning', 'day', 'evening', 'night'] as const) {
+      expect(buildLoginHeadline(period)).not.toContain('님');
+    }
   });
 });

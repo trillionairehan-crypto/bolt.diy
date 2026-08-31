@@ -1,0 +1,104 @@
+/*
+ * CoralredLandingPage.module.scss에서 그대로 옮겨온 조립 애니메이션 — 값(1.3s/cubic-bezier 등)은
+ * 여기 기본값으로 남기고, 컴포넌트가 필요하면 인라인 스타일로 override한다(랜딩은 그대로, 로그인은
+ * duration/delay/easing만 바뀜 — 인라인 longhand가 이 파일의 shorthand를 개별적으로 덮어써서 동작).
+ */
+
+.logoAssembly {
+  display: block;
+}
+
+/*
+ * Hover 반응 — 움직임만, 빛 효과 없음. 앰비언트 숨쉬기(.pieceBreathe)와 서로 다른 <g>에 있어서
+ * transform이 안 부딪힌다. ~3-4배 앰비언트 float 진폭, 각 조각의 원래 흩어짐 방향(spreadX/spreadY)을
+ * 그대로 써서 "같은 움직임의 확대판"처럼 읽힌다. .tapActive는 hover가 없는 터치 기기용.
+ */
+.pieceSpread {
+  transform: translate(0, 0);
+  transition: transform 0.4s ease-out;
+}
+
+.logoAssembly:hover .pieceSpread,
+.logoAssembly.tapActive .pieceSpread {
+  transform: translate(var(--spread-x, 0px), var(--spread-y, 0px));
+}
+
+// 진입(translate/rotate/opacity) — <rect>에 위치, 앰비언트 숨쉬기(바깥 <g>)와 분리해 서로 안 부딪힘.
+.piece {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-name: assemblePiece;
+  animation-fill-mode: both;
+}
+
+@keyframes assemblePiece {
+  0% {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.55);
+    opacity: 0;
+  }
+
+  65% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+// 항상 켜져 있는 미세한 숨쉬기 — 조립 후에도 안 멈춤. 조각마다 duration/delay가 달라 서로 어긋난다.
+.pieceBreathe {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-name: breathePiece;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes breathePiece {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(var(--float, -2.5px)) scale(1.015);
+  }
+}
+
+// 2: OAuth 이동 직전 로고 전체가 한 번 튀는 반응 — 조각별 transform과 안 부딪히게 <svg> 전체에 건다.
+.pulse {
+  animation: logoPulse 250ms ease-out;
+}
+
+@keyframes logoPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .piece {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .pieceBreathe {
+    animation: none;
+  }
+
+  .pieceSpread {
+    transition: none;
+  }
+
+  .pulse {
+    animation: none;
+  }
+}

@@ -1,16 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from '@remix-run/react';
-import { sendEmailOtp, verifyEmailOtp } from '~/lib/stores/auth';
+import { sendEmailOtp, verifyEmailOtp, getLastLoginMethod, type LoginMethod } from '~/lib/stores/auth';
 import { classNames } from '~/utils/classNames';
-import { AUTH_BUTTON_CLASS } from './SocialAuthButtons';
+import { AUTH_BUTTON_CLASS, RecentLoginBadge } from './SocialAuthButtons';
+
+interface EmailContinueLinkProps {
+  /** 로그인 화면에서만 true — 회원가입에는 최근 로그인 배지를 안 보여준다. */
+  showRecentBadge?: boolean;
+}
 
 /**
  * 4-3: "이메일로 계속하기" starts as a plain text link; clicking it expands the email/code OTP
  * form inline, in the same spot, no page navigation. Shared by /login and /signup so the OTP
  * state machine (ported from the old login.tsx) only exists once.
  */
-export function EmailContinueLink() {
+export function EmailContinueLink({ showRecentBadge = false }: EmailContinueLinkProps) {
   const navigate = useNavigate();
+  const [lastMethod, setLastMethod] = useState<LoginMethod | null>(null);
+
+  useEffect(() => {
+    if (showRecentBadge) {
+      setLastMethod(getLastLoginMethod());
+    }
+  }, [showRecentBadge]);
 
   const [expanded, setExpanded] = useState(false);
   const [step, setStep] = useState<'email' | 'code'>('email');
@@ -60,10 +72,11 @@ export function EmailContinueLink() {
       <button
         type="button"
         onClick={() => setExpanded(true)}
-        className="text-sm hover:underline"
+        className="relative text-sm hover:underline"
         style={{ color: '#7A7067', minHeight: 44, background: 'transparent', border: 'none' }}
       >
         이메일로 계속하기
+        {lastMethod === 'email' && <RecentLoginBadge />}
       </button>
     );
   }

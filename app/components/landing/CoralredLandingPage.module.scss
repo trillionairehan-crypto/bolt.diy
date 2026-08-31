@@ -179,98 +179,13 @@ $coral: #ff5330;
 }
 
 // ---------- Logo assembly ----------
+// 조립 애니메이션 자체(조각 keyframe·hover 반응)는 app/components/ui/LogoAssembly.module.scss로 뺐다
+// (로그인 화면과 공용). 여기 남는 건 랜딩 히어로 전용 반응형 크기뿐.
 
 .logoAssembly {
-  display: block;
   width: clamp(220px, 27vw, 420px);
   height: clamp(220px, 27vw, 420px);
   flex-shrink: 0;
-}
-
-/*
- * Hover reaction — movement only, no light/glow. Lives on its own outer <g> (one per piece,
- * wrapping .pieceBreathe) specifically so it doesn't fight the ambient breathing's own transform:
- * a plain (non-keyframed) transition on a separate element composes cleanly with the nested
- * animations instead of the two trying to drive the same property. ~3-4x the ambient float's
- * 2-3px amplitude, reusing each piece's original scatter direction (see spreadX/spreadY) so it
- * reads as "the same motion, bigger" rather than a new effect. .tapActive (toggled briefly from
- * JS on click/tap, see LogoAssembly) mirrors the same rule for touch devices, which have no hover.
- */
-.pieceSpread {
-  transform: translate(0, 0);
-  transition: transform 0.4s ease-out;
-}
-
-.logoAssembly:hover .pieceSpread,
-.logoAssembly.tapActive .pieceSpread {
-  transform: translate(var(--spread-x, 0px), var(--spread-y, 0px));
-}
-
-// One-shot entrance (translate/rotate/opacity) — lives on the <rect>, separate from the
-// continuous breathing below (which lives on the wrapping <g>) so the two never fight over the
-// same transform.
-.piece {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: assemblePiece 1.3s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes assemblePiece {
-  0% {
-    transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.55);
-    opacity: 0;
-  }
-
-  65% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-    opacity: 1;
-  }
-}
-
-/*
- * Always-on ambient motion — never settles after assembly, and carries the "alive" feeling alone
- * now that the hover glow is gone. Each piece's <g> wrapper gets its own duration (5-7s) and
- * delay via inline style (see LOGO_PIECES), so the six pieces stay visibly out of phase with each
- * other continuously, not just offset by a fixed amount. Scale (1-1.5%) plus a small vertical
- * float (--float, 2-3px, per piece) — no rotation, no flashing, no particles, no light effects.
- */
-.pieceBreathe {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation-name: breathePiece;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-
-@keyframes breathePiece {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-
-  50% {
-    transform: translateY(var(--float, -2.5px)) scale(1.015);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .piece {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-
-  .pieceBreathe {
-    animation: none;
-  }
-
-  .pieceSpread {
-    transition: none;
-  }
 }
 
 // ---------- Section 2 — Showcase ----------

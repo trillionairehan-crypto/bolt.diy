@@ -1,4 +1,11 @@
-import { signInWithGoogle, signInWithKakao } from '~/lib/stores/auth';
+import { useEffect, useState } from 'react';
+import {
+  signInWithGoogle,
+  signInWithKakao,
+  authLogoPulseStore,
+  getLastLoginMethod,
+  type LoginMethod,
+} from '~/lib/stores/auth';
 
 /** KakaoTalk's speech-bubble symbol (not the full square app icon, which reads as a muddy blob at button size). */
 function KakaoSymbol() {
@@ -45,9 +52,54 @@ function GoogleSymbol() {
  */
 // 4-1/4-5: shared sizing so all auth buttons (social + the email submit button) line up exactly.
 export const AUTH_BUTTON_CLASS =
-  'w-full h-[52px] flex items-center justify-center gap-2 rounded-[10px] text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bolt-elements-focus';
+  'relative w-full h-[52px] flex items-center justify-center gap-2 rounded-[10px] text-sm font-medium transition-colors duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bolt-elements-focus';
 
-export function SocialAuthButtons() {
+/*
+ * 4: "최근 로그인" 배지 — 12px, 코랄 배경, 흰 글자, 버튼 우상단. 로그인 화면에서만 쓰고
+ * (showRecentBadge prop) 회원가입 화면엔 안 준다. EmailContinueLink도 같은 배지를 쓴다.
+ */
+export function RecentLoginBadge() {
+  return (
+    <span
+      className="absolute -top-2 -right-2 rounded-full px-2 py-0.5 pointer-events-none"
+      style={{ background: '#FF5330', color: '#FFFFFF', fontSize: 12, fontWeight: 600, lineHeight: '16px' }}
+    >
+      최근 로그인
+    </span>
+  );
+}
+
+/** OAuth 리다이렉트 직전(2): 로고가 한 번 튀는 애니메이션(250ms)이 다 보이도록 그만큼 미루고 이동. */
+const LOGO_PULSE_MS = 250;
+
+function startSocialSignIn(signIn: () => Promise<void>) {
+  authLogoPulseStore.set(true);
+  window.setTimeout(() => {
+    signIn();
+
+    /*
+     * 리다이렉트가 보통 이 시점에 이미 페이지를 떠나지만, 팝업 차단·사용자 취소 등으로 로그인
+     * 화면에 남는 경우도 있다 — false로 되돌려둬야 다음 클릭에서 CSS 애니메이션이 다시 재생된다
+     * (같은 값으로 유지되면 클래스가 이미 적용된 상태라 재트리거가 안 됨).
+     */
+    authLogoPulseStore.set(false);
+  }, LOGO_PULSE_MS);
+}
+
+interface SocialAuthButtonsProps {
+  /** 로그인 화면에서만 true — 회원가입에는 최근 로그인 배지를 안 보여준다. */
+  showRecentBadge?: boolean;
+}
+
+export function SocialAuthButtons({ showRecentBadge = false }: SocialAuthButtonsProps) {
+  const [lastMethod, setLastMethod] = useState<LoginMethod | null>(null);
+
+  useEffect(() => {
+    if (showRecentBadge) {
+      setLastMethod(getLastLoginMethod());
+    }
+  }, [showRecentBadge]);
+
   return (
     <div className="flex flex-col gap-2">
       {/*
@@ -57,7 +109,7 @@ export function SocialAuthButtons() {
        */}
       <button
         type="button"
-        onClick={() => signInWithKakao()}
+        onClick={() => startSocialSignIn(signInWithKakao)}
         className={AUTH_BUTTON_CLASS}
         style={{
           background: '#FEE500',
@@ -68,16 +120,18 @@ export function SocialAuthButtons() {
       >
         <KakaoSymbol />
         카카오로 계속하기
+        {lastMethod === 'kakao' && <RecentLoginBadge />}
       </button>
 
       <button
         type="button"
-        onClick={() => signInWithGoogle()}
+        onClick={() => startSocialSignIn(signInWithGoogle)}
         className={`${AUTH_BUTTON_CLASS} bg-white hover:bg-[#FBF5EE]`}
         style={{ border: '1px solid #EFE4D6', color: '#1A1A1A', boxShadow: '0 1px 2px rgba(26, 26, 26, 0.04)' }}
       >
         <GoogleSymbol />
         구글로 계속하기
+        {lastMethod === 'google' && <RecentLoginBadge />}
       </button>
     </div>
   );

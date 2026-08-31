@@ -82,3 +82,21 @@ export function buildHeadline({ isLoggedIn, hasHistory, name, period }: Headline
       return '조용한 시간이네요';
   }
 }
+
+/**
+ * 로그인 화면 전용 헤드라인(3) — 채팅 홈과 시간대 경계(05/11/18/23)는 같지만 문구는 다르다.
+ * 아직 로그인 전이라 이름은 안 쓴다. 회원가입 헤드라인은 이 함수를 안 쓰고 고정 문구를 그대로 둔다.
+ */
+export function buildLoginHeadline(period: GreetingPeriod = getGreetingPeriod()): string {
+  switch (period) {
+    case 'morning':
+      return '다시 오셨네요';
+    case 'day':
+      return '기다리고 있었어요';
+    case 'evening':
+      return '오늘도 오셨네요';
+    case 'night':
+    default:
+      return '조용한 밤이네요';
+  }
+}
