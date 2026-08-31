@@ -452,6 +452,16 @@ export class WorkbenchStore {
   }
 
   /**
+   * Writes a file's full content directly, bypassing the editor entirely — unlike saveFile(filePath)
+   * above (which reads from the currently-open editor document), this is for programmatic writes from
+   * outside the chat/editor flow (auto-review). Only overwrites files that already exist — FilesStore's
+   * saveFile throws if the path isn't already in the file map, so this can't create new files.
+   */
+  async writeFileDirect(filePath: string, content: string) {
+    await this.#filesStore.saveFile(filePath, content);
+  }
+
+  /**
    * Lock a file to prevent edits
    * @param filePath Path to the file to lock
    * @returns True if the file was successfully locked

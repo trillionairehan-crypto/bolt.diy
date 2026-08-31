@@ -46,6 +46,7 @@ import {
 import { createGenerationChargeGate } from '~/lib/generationChargeGate';
 import { authUserStore } from '~/lib/stores/auth';
 import { buildFixPrompt } from '~/utils/buildFixPrompt';
+import { reviewGeneratedApp } from '~/utils/reviewGeneratedApp';
 import { setSidebarOpen } from '~/lib/stores/sidebar';
 import type { ProgressAnnotation } from '~/types/context';
 
@@ -134,6 +135,8 @@ export const ChatImpl = memo(
      */
     const [designScheme, setDesignScheme] = useState<DesignScheme | undefined>(undefined);
     const actionAlert = useStore(workbenchStore.alert);
+    const previewReady = useStore(workbenchStore.previewReady);
+    const [autoReviewing, setAutoReviewing] = useState(false);
     const deployAlert = useStore(workbenchStore.deployAlert);
     const supabaseConn = useStore(supabaseConnection);
     const supabaseAlert = useStore(workbenchStore.supabaseAlert);
@@ -217,6 +220,14 @@ export const ChatImpl = memo(
      * (no await in between), so a second call arriving in the same window sees it immediately.
      */
     const sendMessageDispatchingRef = useRef(false);
+
+    /*
+     * AUTO_REVIEW: armed once per generateNewApp() call only (never inside sendMessage()'s
+     * follow-up path) — this is what guarantees the checklist review runs exactly once per first
+     * generation and never again for regenerations/follow-ups. The watching effect below disarms
+     * it immediately (before starting the review call) so a re-render mid-review can't re-enter.
+     */
+    const autoReviewArmedRef = useRef(false);
 
     const {
       messages,
@@ -728,6 +739,7 @@ export const ChatImpl = memo(
             logger.info('generateNewApp: template seeded, triggering regenerate()');
             chargeEligibleRef.current = true;
             networkRetryCountRef.current = 0;
+            autoReviewArmedRef.current = true;
             generationChargeGateRef.current.arm();
             regenerate()
               .then(() => logger.info('generateNewApp: regenerate() settled (template import)'))
@@ -787,6 +799,7 @@ export const ChatImpl = memo(
       logger.info('generateNewApp: baseline seeded, triggering regenerate()');
       chargeEligibleRef.current = true;
       networkRetryCountRef.current = 0;
+      autoReviewArmedRef.current = true;
       generationChargeGateRef.current.arm();
       regenerate()
         .then(() => logger.info('generateNewApp: regenerate() settled (baseline)'))
@@ -1061,6 +1074,37 @@ export const ChatImpl = memo(
       runAutoFix();
     }, [runAutoFix]);
 
+    /*
+     * AUTO_REVIEW: fires once the first generation's preview has actually rendered — reuses the
+     * exact same "settled" signal auto-fix relies on (!isLoading && !actionAlert), plus
+     * previewReady as a floor (previewReady never resets once true for this component's lifetime,
+     * so autoReviewArmedRef — reset fresh only inside generateNewApp() — is what actually gates
+     * "is this a NEW first generation", not previewReady's stale value). If actionAlert is still
+     * set (auto-fix mid-retry, or gave up entirely), this stays false and review never runs on a
+     * broken app — no extra coordination with the auto-fix effect needed.
+     */
+    useEffect(() => {
+      if (!previewReady || isLoading || actionAlert || !autoReviewArmedRef.current) {
+        return;
+      }
+
+      autoReviewArmedRef.current = false;
+
+      (async () => {
+        setAutoReviewing(true);
+
+        try {
+          const result = await reviewGeneratedApp();
+
+          if (result) {
+            logger.info('auto-review: finished', { issues: result.issues, filesWritten: result.filesWritten });
+          }
+        } finally {
+          setAutoReviewing(false);
+        }
+      })();
+    }, [previewReady, isLoading, actionAlert]);
+
     /**
      * Handles the change event for the textarea and updates the input state.
      * @param event - The change event from the textarea.
@@ -1164,6 +1208,7 @@ export const ChatImpl = memo(
         clearAlert={() => workbenchStore.clearAlert()}
         previewAlert={previewAlert}
         onRetryAutoFix={retryAutoFix}
+        autoReviewing={autoReviewing}
         supabaseAlert={supabaseAlert}
         clearSupabaseAlert={() => workbenchStore.clearSupabaseAlert()}
         deployAlert={deployAlert}

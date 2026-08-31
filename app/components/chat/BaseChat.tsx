@@ -21,6 +21,7 @@ import type { ActionAlert, SupabaseAlert, DeployAlert, LlmErrorAlertType } from 
 import DeployChatAlert from '~/components/deploy/DeployAlert';
 import ChatAlert from './ChatAlert';
 import { AutoFixStatus } from './AutoFixStatus';
+import { AutoReviewStatus } from './AutoReviewStatus';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import ProgressCompilation from './ProgressCompilation';
 import type { ProgressAnnotation } from '~/types/context';
@@ -97,6 +98,7 @@ interface BaseChatProps {
   clearAlert?: () => void;
   previewAlert?: ActionAlert;
   onRetryAutoFix?: () => void;
+  autoReviewing?: boolean;
   supabaseAlert?: SupabaseAlert;
   clearSupabaseAlert?: () => void;
   deployAlert?: DeployAlert;
@@ -157,6 +159,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       clearAlert,
       previewAlert,
       onRetryAutoFix,
+      autoReviewing,
       deployAlert,
       clearDeployAlert,
       supabaseAlert,
@@ -488,6 +491,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                     />
                   )}
                   {previewAlert && <AutoFixStatus attempts={autoFixAttempts} onRetry={() => onRetryAutoFix?.()} />}
+                  {autoReviewing && <AutoReviewStatus />}
                   {llmErrorAlert && (
                     <LlmErrorAlert
                       alert={llmErrorAlert}
