@@ -1098,6 +1098,7 @@ export const ChatImpl = memo(
 
           if (result) {
             logger.info('auto-review: finished', {
+              mechanicalFindings: result.mechanicalFindings,
               textIssues: result.textIssues,
               visualIssues: result.visualIssues,
               filesWritten: result.filesWritten,
