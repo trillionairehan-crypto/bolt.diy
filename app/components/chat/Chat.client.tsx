@@ -190,6 +190,34 @@ export const ChatImpl = memo(
      */
     const generationChargeGateRef = useRef(createGenerationChargeGate(() => recordGenerationUsed()));
 
+    /*
+     * DOUBLE_CHARGE_FIX.md: tracks whether the CURRENTLY in-flight generation was armed for a real
+     * charge (true for every generateNewApp() call, and for sendMessage() follow-ups gated by
+     * shouldChargeThisMessage — i.e. false for auto-fix). handleError's network auto-retry (below)
+     * reads this to decide whether the retry it's about to fire should stay charge-eligible too.
+     */
+    const chargeEligibleRef = useRef(false);
+
+    /*
+     * DOUBLE_CHARGE_FIX.md: set by handleError right before it fires a network-retry regenerate()
+     * for a charge-eligible request. The failed attempt's own onFinish (which runs right after
+     * handleError returns, in the SDK's finally block) checks this and — if true — skips consuming
+     * generationChargeGateRef instead of clearing it on a failure that's about to be retried. This
+     * is what lets the eventual retry's own onFinish be the one that decides whether to charge
+     * (success -> charges once; a second failure -> doesn't, same as before).
+     */
+    const willRetryChargedFailureRef = useRef(false);
+
+    /*
+     * DOUBLE_CHARGE_FIX.md: closes the race where a rapid double-click/double-Enter (or a click on
+     * ChatAlert's manual retry button landing in the same instant the auto-fix effect already
+     * fired) dispatches sendMessage() a second time before React has re-rendered isLoading=true —
+     * sendMessage()'s own `if (isLoading) { abort(); return; }` guard reads a stale render-closure
+     * value during that exact window, so it alone can't catch this. This ref is set synchronously
+     * (no await in between), so a second call arriving in the same window sees it immediately.
+     */
+    const sendMessageDispatchingRef = useRef(false);
+
     const {
       messages,
       status,
@@ -275,7 +303,6 @@ export const ChatImpl = memo(
       },
       onFinish: ({ message, isAbort, isError }) => {
         setProgressAnnotations([]);
-        networkRetryCountRef.current = 0;
 
         /*
          * Token usage logging was read from the v4 onFinish `response.usage` argument, which
@@ -284,6 +311,18 @@ export const ChatImpl = memo(
         void message;
 
         logger.debug('Finished streaming');
+
+        /*
+         * DOUBLE_CHARGE_FIX.md: this failed attempt is about to be auto-retried by handleError
+         * (which already ran synchronously, before this — `ai`'s AbstractChat calls onError inside
+         * the catch block, then onFinish in the enclosing finally). Leave the gate armed instead of
+         * letting this failure consume it, so the retry's own onFinish is what actually decides
+         * whether to charge.
+         */
+        if (isError && willRetryChargedFailureRef.current) {
+          willRetryChargedFailureRef.current = false;
+          return;
+        }
 
         /*
          * METERING_FIX_REPORT.md: charge only on a genuine successful finish. onFinish fires for
@@ -305,8 +344,16 @@ export const ChatImpl = memo(
      * since it auto-clears as soon as isLoading flips false. Terminal-source alerts keep showing
      * immediately; they were never part of the silent auto-fix path.
      */
-    const visibleActionAlert =
-      actionAlert && (actionAlert.source !== 'preview' || !isLoading) ? actionAlert : undefined;
+    /*
+     * 에러 노출 정리 1: preview-source alerts (the silent auto-fix flow) no longer go through the
+     * generic ChatAlert banner at all — BaseChat renders a dedicated AutoFixStatus for those
+     * instead (see previewAlert below), gated on autoFixAttempts so the banner never races with
+     * the automatic retry. ChatAlert now only ever shows a non-preview (terminal) alert.
+     */
+    const visibleActionAlert = actionAlert && actionAlert.source !== 'preview' ? actionAlert : undefined;
+
+    // Same isLoading timing the auto-fix effect itself waits on — no need for a duplicate indicator mid-stream.
+    const previewAlert = actionAlert && actionAlert.source === 'preview' && !isLoading ? actionAlert : undefined;
 
     const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       setInput(event.target.value);
@@ -411,6 +458,9 @@ export const ChatImpl = memo(
           }
         }
 
+        // DOUBLE_CHARGE_FIX.md: default to false; only the network-retry branch below sets it.
+        willRetryChargedFailureRef.current = false;
+
         let errorType: LlmErrorAlertType['errorType'] = 'unknown';
         let title = '요청 실패';
 
@@ -431,6 +481,9 @@ export const ChatImpl = memo(
         if (context === 'chat' && errorType === 'network' && networkRetryCountRef.current < MAX_NETWORK_AUTO_RETRIES) {
           networkRetryCountRef.current += 1;
           toast.warning('네트워크 연결이 끊겨서 다시 시도할게요...');
+
+          // DOUBLE_CHARGE_FIX.md: only a request that was itself charge-eligible stays charge-eligible on retry.
+          willRetryChargedFailureRef.current = chargeEligibleRef.current;
           regenerate();
 
           return;
@@ -673,6 +726,8 @@ export const ChatImpl = memo(
              * of vanishing.
              */
             logger.info('generateNewApp: template seeded, triggering regenerate()');
+            chargeEligibleRef.current = true;
+            networkRetryCountRef.current = 0;
             generationChargeGateRef.current.arm();
             regenerate()
               .then(() => logger.info('generateNewApp: regenerate() settled (template import)'))
@@ -730,6 +785,8 @@ export const ChatImpl = memo(
 
       // GEN_STALL_FIX.md — same reasoning as the template-import branch above.
       logger.info('generateNewApp: baseline seeded, triggering regenerate()');
+      chargeEligibleRef.current = true;
+      networkRetryCountRef.current = 0;
       generationChargeGateRef.current.arm();
       regenerate()
         .then(() => logger.info('generateNewApp: regenerate() settled (baseline)'))
@@ -810,102 +867,127 @@ export const ChatImpl = memo(
         return;
       }
 
-      let finalMessageContent = messageContent;
-
-      if (selectedElement) {
-        logger.debug('Selected Element:', selectedElement);
-
-        const elementInfo = `<div class=\"__boltSelectedElement__\" data-element='${JSON.stringify(selectedElement)}'>${JSON.stringify(`${selectedElement.displayText}`)}</div>`;
-        finalMessageContent = messageContent + elementInfo;
+      /*
+       * DOUBLE_CHARGE_FIX.md: the isLoading check above reads a React render-closure value that
+       * can still be stale (false) for a brief window after the first click already dispatched —
+       * this ref is set synchronously below, with no await before it, so a second call arriving in
+       * that exact window (double-click, Enter racing a click, or the ChatAlert manual button
+       * firing moments after the auto-fix effect already did) is ignored instead of sending twice.
+       */
+      if (sendMessageDispatchingRef.current) {
+        return;
       }
 
-      if (!chatStarted) {
-        if (!(await checkGenerationsAllowed())) {
+      sendMessageDispatchingRef.current = true;
+
+      try {
+        let finalMessageContent = messageContent;
+
+        if (selectedElement) {
+          logger.debug('Selected Element:', selectedElement);
+
+          const elementInfo = `<div class=\"__boltSelectedElement__\" data-element='${JSON.stringify(selectedElement)}'>${JSON.stringify(`${selectedElement.displayText}`)}</div>`;
+          finalMessageContent = messageContent + elementInfo;
+        }
+
+        if (!chatStarted) {
+          if (!(await checkGenerationsAllowed())) {
+            return;
+          }
+
+          setClarifyingPrompt(finalMessageContent);
+
           return;
         }
 
-        setClarifyingPrompt(finalMessageContent);
+        /*
+         * overnight3 A5: under the OLD (flag-off) metering, follow-up messages after the first one
+         * were never counted at all — a real, currently-shipped gap (see OVERNIGHT-REPORT-3.md's A5
+         * section). Deliberately left as-is here so flag-off behavior is unchanged; this block only
+         * runs under the new metering, and never for auto-fix retries (those aren't a user utterance).
+         */
+        /*
+         * METERING_FIX_REPORT.md: recordGenerationUsed() used to run right here — before
+         * sendChatMessage() below was even called. Now just remembers "this message should charge
+         * on success"; the charge itself is armed immediately before sendChatMessage() further down
+         * (not here) and onFinish above does the actual increment, only on a real success.
+         */
+        const shouldChargeThisMessage = CORALRED_NEW_METERING && !isAutoFix;
 
-        return;
-      }
+        chargeEligibleRef.current = shouldChargeThisMessage;
+        networkRetryCountRef.current = 0;
 
-      /*
-       * overnight3 A5: under the OLD (flag-off) metering, follow-up messages after the first one
-       * were never counted at all — a real, currently-shipped gap (see OVERNIGHT-REPORT-3.md's A5
-       * section). Deliberately left as-is here so flag-off behavior is unchanged; this block only
-       * runs under the new metering, and never for auto-fix retries (those aren't a user utterance).
-       */
-      /*
-       * METERING_FIX_REPORT.md: recordGenerationUsed() used to run right here — before
-       * sendChatMessage() below was even called. Now just remembers "this message should charge
-       * on success"; the charge itself is armed immediately before sendChatMessage() further down
-       * (not here) and onFinish above does the actual increment, only on a real success.
-       */
-      const shouldChargeThisMessage = CORALRED_NEW_METERING && !isAutoFix;
+        // Double-charge investigation (2026-08-31): temporary, see recordGenerationUsed's own note.
+        logger.info('sendMessage: dispatching', { isAutoFix, shouldChargeThisMessage, at: Date.now() });
 
-      // Double-charge investigation (2026-08-31): temporary, see recordGenerationUsed's own note.
-      logger.info('sendMessage: dispatching', { isAutoFix, shouldChargeThisMessage, at: Date.now() });
-
-      if (shouldChargeThisMessage && !(await checkGenerationsAllowed())) {
-        return;
-      }
-
-      /*
-       * Only drop the trailing message if it's the failed/incomplete assistant turn — not
-       * unconditionally. Without the role check, every retry while `error` is still set (e.g.
-       * repeated clicks after a failure that keeps failing) chops one more message off the end
-       * each time, eventually emptying the whole array and making every subsequent send fail
-       * instantly with "messages must not be empty".
-       */
-      if (error != null && messages[messages.length - 1]?.role === 'assistant') {
-        setMessages(messages.slice(0, -1));
-      }
-
-      const modifiedFiles = workbenchStore.getModifiedFiles();
-
-      chatStore.setKey('aborted', false);
-
-      const taggedModel = modelOverride?.model ?? model;
-      const taggedProviderName = modelOverride?.providerName ?? provider.name;
-
-      const fileParts = [...imagesToFileParts(imageDataList), ...(await filesToFileParts(uploadedFiles))];
-
-      if (modifiedFiles !== undefined) {
-        const userUpdateArtifact = filesToArtifacts(modifiedFiles, `${Date.now()}`);
-        const messageText = `[Model: ${taggedModel}]\n\n[Provider: ${taggedProviderName}]\n\n${userUpdateArtifact}${finalMessageContent}`;
-
-        if (shouldChargeThisMessage) {
-          generationChargeGateRef.current.arm();
+        if (shouldChargeThisMessage && !(await checkGenerationsAllowed())) {
+          return;
         }
 
-        sendChatMessage({
-          text: messageText,
-          files: fileParts.length > 0 ? fileParts : undefined,
-        });
-
-        workbenchStore.resetAllFileModifications();
-      } else {
-        const messageText = `[Model: ${taggedModel}]\n\n[Provider: ${taggedProviderName}]\n\n${finalMessageContent}`;
-
-        if (shouldChargeThisMessage) {
-          generationChargeGateRef.current.arm();
+        /*
+         * Only drop the trailing message if it's the failed/incomplete assistant turn — not
+         * unconditionally. Without the role check, every retry while `error` is still set (e.g.
+         * repeated clicks after a failure that keeps failing) chops one more message off the end
+         * each time, eventually emptying the whole array and making every subsequent send fail
+         * instantly with "messages must not be empty".
+         */
+        if (error != null && messages[messages.length - 1]?.role === 'assistant') {
+          setMessages(messages.slice(0, -1));
         }
 
-        sendChatMessage({
-          text: messageText,
-          files: fileParts.length > 0 ? fileParts : undefined,
-        });
+        const modifiedFiles = workbenchStore.getModifiedFiles();
+
+        chatStore.setKey('aborted', false);
+
+        const taggedModel = modelOverride?.model ?? model;
+        const taggedProviderName = modelOverride?.providerName ?? provider.name;
+
+        const fileParts = [...imagesToFileParts(imageDataList), ...(await filesToFileParts(uploadedFiles))];
+
+        // 에러 노출 정리 3-1/3-4: auto-fix's own instruction + raw error content never renders in the transcript.
+        const metadata = isAutoFix ? { hidden: true } : undefined;
+
+        if (modifiedFiles !== undefined) {
+          const userUpdateArtifact = filesToArtifacts(modifiedFiles, `${Date.now()}`);
+          const messageText = `[Model: ${taggedModel}]\n\n[Provider: ${taggedProviderName}]\n\n${userUpdateArtifact}${finalMessageContent}`;
+
+          if (shouldChargeThisMessage) {
+            generationChargeGateRef.current.arm();
+          }
+
+          sendChatMessage({
+            text: messageText,
+            files: fileParts.length > 0 ? fileParts : undefined,
+            metadata,
+          });
+
+          workbenchStore.resetAllFileModifications();
+        } else {
+          const messageText = `[Model: ${taggedModel}]\n\n[Provider: ${taggedProviderName}]\n\n${finalMessageContent}`;
+
+          if (shouldChargeThisMessage) {
+            generationChargeGateRef.current.arm();
+          }
+
+          sendChatMessage({
+            text: messageText,
+            files: fileParts.length > 0 ? fileParts : undefined,
+            metadata,
+          });
+        }
+
+        setInput('');
+        Cookies.remove(PROMPT_COOKIE_KEY);
+
+        setUploadedFiles([]);
+        setImageDataList([]);
+
+        resetEnhancer();
+
+        textareaRef.current?.blur();
+      } finally {
+        sendMessageDispatchingRef.current = false;
       }
-
-      setInput('');
-      Cookies.remove(PROMPT_COOKIE_KEY);
-
-      setUploadedFiles([]);
-      setImageDataList([]);
-
-      resetEnhancer();
-
-      textareaRef.current?.blur();
     };
 
     /*
@@ -921,7 +1003,7 @@ export const ChatImpl = memo(
      * Waiting for isLoading to clear (and re-running when it does, via the dep array) fixes that
      * without touching sendMessage's loading/abort semantics that the manual stop button relies on.
      */
-    useEffect(() => {
+    const runAutoFix = useCallback(() => {
       if (!actionAlert || actionAlert.source !== 'preview' || isLoading) {
         return;
       }
@@ -962,6 +1044,22 @@ export const ChatImpl = memo(
       sendMessage({} as any, prompt, modelOverride, true);
       workbenchStore.clearAlert();
     }, [actionAlert, isLoading]);
+
+    useEffect(() => {
+      runAutoFix();
+    }, [runAutoFix]);
+
+    /*
+     * 에러 노출 정리 1-2/3-3: user-facing "다시 시도" after 2 silent auto-fix attempts have both
+     * failed — resets the attempt counter and re-invokes the exact same auto-fix path (still
+     * isAutoFix=true, still uncharged) instead of exposing the raw retry as a new, charged manual
+     * message. runAutoFix reads actionAlert/isLoading fresh from this render's closure, which is
+     * current as of the click (the button that triggers this only renders while both are set).
+     */
+    const retryAutoFix = useCallback(() => {
+      chatStore.setKey('autoFixAttempts', 0);
+      runAutoFix();
+    }, [runAutoFix]);
 
     /**
      * Handles the change event for the textarea and updates the input state.
@@ -1064,6 +1162,8 @@ export const ChatImpl = memo(
         setImageDataList={setImageDataList}
         actionAlert={visibleActionAlert}
         clearAlert={() => workbenchStore.clearAlert()}
+        previewAlert={previewAlert}
+        onRetryAutoFix={retryAutoFix}
         supabaseAlert={supabaseAlert}
         clearSupabaseAlert={() => workbenchStore.clearSupabaseAlert()}
         deployAlert={deployAlert}

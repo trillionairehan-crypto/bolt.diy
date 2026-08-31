@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type { ActionAlert } from '~/types/actions';
 import { classNames } from '~/utils/classNames';
 import { buildFixPrompt } from '~/utils/buildFixPrompt';
+import { SHOW_DEV_TOOLS } from '~/utils/constants';
 
 interface Props {
   alert: ActionAlert;
@@ -54,7 +55,8 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
               className={`mt-2 text-sm text-bolt-elements-textSecondary`}
             >
               <p>{message}</p>
-              {description && (
+              {/* 에러 노출 정리 3-1: 원본 에러 문구는 개발자 도구가 켜져 있을 때만 — 일반 사용자에게는 노출 안 함. */}
+              {SHOW_DEV_TOOLS && description && (
                 <div className="text-xs text-bolt-elements-textSecondary p-2 bg-bolt-elements-background-depth-3 rounded mt-4 mb-4">
                   오류: {description}
                 </div>

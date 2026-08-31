@@ -20,6 +20,7 @@ import StarterTemplates from './StarterTemplates';
 import type { ActionAlert, SupabaseAlert, DeployAlert, LlmErrorAlertType } from '~/types/actions';
 import DeployChatAlert from '~/components/deploy/DeployAlert';
 import ChatAlert from './ChatAlert';
+import { AutoFixStatus } from './AutoFixStatus';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import ProgressCompilation from './ProgressCompilation';
 import type { ProgressAnnotation } from '~/types/context';
@@ -94,6 +95,8 @@ interface BaseChatProps {
   setImageDataList?: (dataList: string[]) => void;
   actionAlert?: ActionAlert;
   clearAlert?: () => void;
+  previewAlert?: ActionAlert;
+  onRetryAutoFix?: () => void;
   supabaseAlert?: SupabaseAlert;
   clearSupabaseAlert?: () => void;
   deployAlert?: DeployAlert;
@@ -152,6 +155,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       parsedMessages,
       actionAlert,
       clearAlert,
+      previewAlert,
+      onRetryAutoFix,
       deployAlert,
       clearDeployAlert,
       supabaseAlert,
@@ -187,7 +192,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const [progressAnnotations, setProgressAnnotations] = useState<ProgressAnnotation[]>([]);
     const expoUrl = useStore(expoUrlAtom);
     const [qrModalOpen, setQrModalOpen] = useState(false);
-    const { workbenchOpen } = useStore(chatStore);
+    const { workbenchOpen, autoFixAttempts } = useStore(chatStore);
 
     useEffect(() => {
       if (expoUrl) {
@@ -482,6 +487,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       }}
                     />
                   )}
+                  {previewAlert && <AutoFixStatus attempts={autoFixAttempts} onRetry={() => onRetryAutoFix?.()} />}
                   {llmErrorAlert && (
                     <LlmErrorAlert
                       alert={llmErrorAlert}
