@@ -45,15 +45,23 @@ export interface Palette {
   err: string;
 }
 
-// 상태색 공통값 — Tailwind green-500/amber-500/red-500. 예외는 팔레트별로 아래에서 덮어쓴다.
-const OK = '#22c55e';
-const WARN = '#f59e0b';
-const ERR = '#ef4444';
+/*
+ * 상태색 공통값 — 원래 500 램프(green-500/amber-500/red-500)였으나 대비 테스트 실측 결과
+ * bgBase 대부분(거의 흰색·파스텔)과 3:1을 못 넘어(1.96~2.28) 600으로 내렸다. green-600/
+ * red-600은 전 팔레트에서 3:1을 넘지만, amber-600은 coral·purple·pink의 bgBase에서 여전히
+ * 2.90~2.94로 미달이라 그 세 팔레트만 WARN_HIGH(amber-700)로 한 단계 더 내린다(brown 팔레트는
+ * 액센트 자체가 amber-700이라 warn도 700으로 올리면 같은 팔레트 안에서 액센트=warn이 돼버려
+ * 제외 — brown은 amber-600 그대로 둬도 3.05:1로 통과한다).
+ */
+const OK = '#16a34a'; // green-600
+const WARN = '#d97706'; // amber-600
+const WARN_HIGH = '#b45309'; // amber-700 — coral/purple/pink 전용
+const ERR = '#dc2626'; // red-600
 
-// red·pink는 액센트 자체가 red/rose 계열이라 공통 err(red-500)와 구분이 잘 안 됨 — red-700으로.
+// red·pink는 액센트 자체가 red/rose 계열이라 공통 err와 구분이 잘 안 됨 — red-700으로.
 const ERR_ON_RED_FAMILY = '#b91c1c';
 
-// dark는 어두운 배경 위라 500 램프가 상대적으로 어둡게 보여 400 램프를 쓴다.
+// dark는 어두운 배경 위라 밝은 램프가 필요해 400을 쓴다 — 이미 전부 3:1을 넉넉히 넘어 그대로 둔다.
 const OK_ON_DARK = '#4ade80';
 const WARN_ON_DARK = '#fbbf24';
 const ERR_ON_DARK = '#f87171';
@@ -63,22 +71,24 @@ export const PALETTES: Palette[] = [
     id: 'coral',
     name: '코랄',
     accent: '#FF5330',
-    accentTextOverride: null,
+
+    // 흰 텍스트로는 4.5:1이 안 나와(3.21:1) 어두운 잉크로 — 브랜드 색이라 accent 자체는 안 바꿈.
+    accentTextOverride: '#1A1A1A',
     bgBase: '#FBF5EE',
     bgSurface: '#FFFFFF',
     textMain: '#1A1A1A',
-    textSub: '#7A7067',
+    textSub: '#6E645B', // 기존 #7A7067은 bgBase와 4.47:1로 미달 — 5.33:1로 통과하는 값으로 조정
     border: '#EFE4D6',
     targets: [],
     dark: false,
     ok: OK,
-    warn: WARN,
+    warn: WARN_HIGH, // amber-600(2.94:1)은 미달이라 amber-700
     err: ERR,
   },
   {
     id: 'red',
     name: '레드',
-    accent: '#ef4444', // red-500
+    accent: '#dc2626', // red-600 — red-500(3.76:1)은 흰 버튼 텍스트 대비 미달이라 한 단계 하향
     accentTextOverride: null,
     bgBase: '#f8fafc', // slate-50
     bgSurface: '#FFFFFF',
@@ -94,8 +104,12 @@ export const PALETTES: Palette[] = [
   {
     id: 'orange',
     name: '오렌지',
-    accent: '#f97316', // orange-500
-    accentTextOverride: null,
+    accent: '#ea580c', // orange-600
+    /*
+     * orange-600은 흰 텍스트로 3.56:1(미달) — 한 단계 더(orange-700) 내리면 accent가 너무 어두워져,
+     * 대신 어두운 잉크로 바꿔 4.89:1로 통과시킨다.
+     */
+    accentTextOverride: '#1A1A1A',
     bgBase: '#fafafa', // zinc-50
     bgSurface: '#FFFFFF',
     textMain: '#18181b', // zinc-900
@@ -126,8 +140,12 @@ export const PALETTES: Palette[] = [
   {
     id: 'green',
     name: '그린',
-    accent: '#10b981', // emerald-500
-    accentTextOverride: null,
+    accent: '#059669', // emerald-600
+    /*
+     * emerald-600은 흰 텍스트로 3.77:1(미달) — emerald-700로 더 내리면 이 팔레트의 textSub와
+     * 값이 겹쳐서(둘 다 emerald-700) 대신 어두운 잉크로 바꿔 4.62:1로 통과시킨다.
+     */
+    accentTextOverride: '#1A1A1A',
     bgBase: '#ecfdf5', // emerald-50
     bgSurface: '#FFFFFF',
     textMain: '#022c22', // emerald-950
@@ -158,7 +176,7 @@ export const PALETTES: Palette[] = [
   {
     id: 'indigo',
     name: '인디고',
-    accent: '#6366f1', // indigo-500
+    accent: '#4f46e5', // indigo-600 — indigo-500(4.47:1)은 흰 버튼 텍스트 4.5:1 기준 아슬아슬하게 미달
     accentTextOverride: null,
     bgBase: '#f8fafc', // slate-50
     bgSurface: '#FFFFFF',
@@ -174,7 +192,7 @@ export const PALETTES: Palette[] = [
   {
     id: 'purple',
     name: '퍼플',
-    accent: '#8b5cf6', // violet-500
+    accent: '#7c3aed', // violet-600 — violet-500(4.23:1)은 흰 버튼 텍스트 4.5:1 기준 미달
     accentTextOverride: null,
     bgBase: '#f5f3ff', // violet-50
     bgSurface: '#FFFFFF',
@@ -184,13 +202,13 @@ export const PALETTES: Palette[] = [
     targets: ['AI', '엔터', '아트', '멤버십'],
     dark: false,
     ok: OK,
-    warn: WARN,
+    warn: WARN_HIGH, // amber-600(2.90:1)은 미달이라 amber-700
     err: ERR,
   },
   {
     id: 'pink',
     name: '핑크',
-    accent: '#f43f5e', // rose-500
+    accent: '#db2777', // rose-600 — rose-500(3.67:1)은 흰 버튼 텍스트 4.5:1 기준 미달
     accentTextOverride: null,
     bgBase: '#fff1f2', // rose-50
     bgSurface: '#FFFFFF',
@@ -200,7 +218,7 @@ export const PALETTES: Palette[] = [
     targets: ['데이팅', '뷰티', '쇼핑몰'],
     dark: false,
     ok: OK,
-    warn: WARN,
+    warn: WARN_HIGH, // amber-600(2.90:1)은 미달이라 amber-700
     err: ERR_ON_RED_FAMILY,
   },
   {
@@ -222,7 +240,7 @@ export const PALETTES: Palette[] = [
   {
     id: 'teal',
     name: '틸',
-    accent: '#0d9488', // teal-600
+    accent: '#0f766e', // teal-700 — teal-600(3.74:1)은 흰 버튼 텍스트 4.5:1 기준 미달
     accentTextOverride: null,
     bgBase: '#f0fdfa', // teal-50
     bgSurface: '#FFFFFF',
@@ -238,8 +256,9 @@ export const PALETTES: Palette[] = [
   {
     id: 'dark',
     name: '다크',
-    accent: '#FF5A36', // 코랄레드 브랜드 액센트(다크 변형), Tailwind 아님
-    accentTextOverride: '#FFFFFF',
+    accent: '#FF5A36', // 코랄레드 브랜드 액센트(다크 변형), Tailwind 아님 — 값 안 바꿈
+    // 흰 텍스트로는 4.5:1이 안 나와(3.10:1) 어두운 잉크로.
+    accentTextOverride: '#1A1A1A',
     bgBase: '#09090b', // zinc-950
     bgSurface: '#18181b', // zinc-900
     textMain: '#f4f4f5', // zinc-100
