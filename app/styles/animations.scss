@@ -111,3 +111,20 @@
     opacity: 0.4;
   }
 }
+
+// 채팅 홈 전송 버튼 호흡(SendButton.client.tsx의 breathe prop) — 입력창에 텍스트가 있을 때만.
+@keyframes cr-send-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[cr-send-breathe_2s_ease-in-out_infinite\] {
+    animation: none;
+  }
+}

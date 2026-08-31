@@ -1,53 +1,28 @@
-import { useEffect, useState } from 'react';
-import { useStore } from '@nanostores/react';
-import { authUserStore } from '~/lib/stores/auth';
-import { getDeployedApps, type DeployedAppRecord } from '~/lib/deployedApps';
+import type { DeployedAppRecord } from '~/lib/deployedApps';
+import { formatRelativeTime } from '~/utils/relativeTime';
 import styles from './ChatHome.module.scss';
 
-function formatDeployedAt(iso: string): string {
-  return new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric' }).format(new Date(iso));
+interface DeployedAppCardsProps {
+  apps: DeployedAppRecord[];
 }
 
 /**
  * Home-screen "내가 만든 앱" cards — same mini-browser-frame shape as the landing page's showcase
- * (dots + address bar), reusing the real deployed-apps data source the /apps route already uses
- * (app/lib/deployedApps.ts). Nothing rendered at all when there's nothing deployed yet — no empty
- * state copy, per the request.
+ * (dots + address bar). Data comes from useChatHomeSections.ts (shared with RecentChatsCards for
+ * the dedup rule) instead of fetching independently. Nothing rendered at all when there's nothing
+ * deployed yet — no empty state copy, per the request.
  */
-export function DeployedAppCards() {
-  const authUser = useStore(authUserStore);
-  const [apps, setApps] = useState<DeployedAppRecord[]>([]);
-
-  useEffect(() => {
-    if (!authUser) {
-      setApps([]);
-      return undefined;
-    }
-
-    let cancelled = false;
-
-    getDeployedApps().then((records) => {
-      if (!cancelled) {
-        setApps(records);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [authUser]);
-
+export function DeployedAppCards({ apps }: DeployedAppCardsProps) {
   if (apps.length === 0) {
     return null;
   }
 
-  const recent = apps.slice(0, 4);
-
   return (
-    <>
+    <div className={styles.section}>
+      <p className={styles.sectionTitle}>내가 만든 앱</p>
       <div className={styles.cardsWrap}>
-        {recent.map((app) => (
-          <a key={app.id} href={`/chat/${app.chat_id}`} className={styles.card}>
+        {apps.map((app) => (
+          <a key={app.id} href={app.url} target="_blank" rel="noopener noreferrer" className={styles.card}>
             <div className={styles.browserFrame}>
               <div className={styles.browserBar}>
                 <span className={styles.browserDots}>
@@ -59,9 +34,9 @@ export function DeployedAppCards() {
               </div>
               <div className={styles.browserContent}>
                 <p className={styles.appName}>{app.app_name}</p>
-                <p className={styles.deployedAt}>{formatDeployedAt(app.deployed_at)} 배포</p>
               </div>
             </div>
+            <p className={styles.deployedAt}>{formatRelativeTime(app.deployed_at)} 배포</p>
           </a>
         ))}
       </div>
@@ -70,6 +45,6 @@ export function DeployedAppCards() {
           전체 보기
         </a>
       </div>
-    </>
+    </div>
   );
 }

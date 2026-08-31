@@ -19,31 +19,110 @@ $cream: #fbf5ee;
 }
 
 /*
- * 채팅 홈·생성 전환 통합 수정 — 헤드라인+입력창 블록 전체를 뷰포트 세로 40% 지점에 고정한다.
- * 블록 높이가 바뀌어도(입력창이 늘어나거나 예시 placeholder가 사라지거나) 항상 블록의 세로
- * 중심이 40% 지점에 오도록 top+translateY 조합을 쓴다 — padding-top 방식은 블록 높이가 바뀔
- * 때마다 실제 중심 위치가 같이 흔들린다.
+ * 헤드라인+서브헤드만 감싸는 래퍼 — 입력창 포커스 시 이 블록만 8px 위로 이동 + 투명도 0.4
+ * (transform/opacity만 써서 문서 흐름에 영향 없음 — 아래 섹션이 절대 안 흔들린다). reduced-motion
+ * 이면 transition 자체를 꺼서 애니메이션 없이 즉시 최종 상태로 표시한다.
+ */
+.headlineWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition:
+    transform 0.2s ease-out,
+    opacity 0.2s ease-out;
+}
+
+.headlineWrapNoTransition {
+  transition: none;
+}
+
+.headlineWrapFocused {
+  transform: translateY(-8px);
+  opacity: 0.4;
+}
+
+/*
+ * 채팅 홈·생성 전환 통합 수정 → 0번 조사(레이아웃 버그) 재수정 — 예전 position:absolute +
+ * min-height:88vh 조합은 절대 위치 자식이 부모 높이에 반영되지 않아, 아래 섹션(이어서 만들기/내가
+ * 만든 앱)이 항상 88vh 아래로 밀려 스크롤 없인 안 보였다. flex + padding-top으로 바꿔서 .stage
+ * 높이가 실제 콘텐츠(헤드라인+입력창+섹션들)를 따라가게 한다. 트레이드오프: 입력창이 늘어나면
+ * 블록의 "시각적 중심"이 더는 정확히 40%에 고정되지 않고 살짝 아래로 밀린다 — 예전 top+translateY
+ * 방식이 이걸 막았지만, 그러려면 아래 섹션을 이 블록 안에 넣을 수 없었다(있으면 전체가 같이 이동).
+ * padding-top 값은 뷰포트 40% 근처를 근사한 고정값 — 데스크톱/모바일 실측 후 조정.
  */
 .stage {
-  position: relative;
   width: 100%;
-  min-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: clamp(32px, 30vh, 220px);
+  padding-bottom: 48px;
 }
 
 .stageBlock {
-  position: absolute;
-  top: 40%;
-  left: 0;
-  right: 0;
-  transform: translateY(-50%);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-// ---------- Deployed app cards — same mini-browser-frame shape as the landing showcase ----------
+// ---------- 이어서 만들기 / 내가 만든 앱 공용 섹션 래퍼 ----------
 
-.cardsWrap {
+.section {
   width: 100%;
   max-width: 760px;
   margin: 32px auto 0;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: $ink-soft;
+  margin: 0 0 12px;
+}
+
+// ---------- 이어서 만들기 ----------
+
+.recentCardsWrap {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+}
+
+.recentCard {
+  display: block;
+  padding: 14px 16px;
+  border: 1px solid rgba(26, 26, 26, 0.12);
+  border-radius: 12px;
+  background: $cream;
+  text-decoration: none;
+  transition: border-color 0.15s ease-out;
+
+  &:hover {
+    border-color: rgba(26, 26, 26, 0.24);
+  }
+}
+
+.recentCardTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: $ink;
+  margin: 0 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recentCardStatus {
+  font-size: 11px;
+  font-weight: 500;
+  color: $ink-soft;
+  margin: 0;
+}
+
+// ---------- 내가 만든 앱 — same mini-browser-frame shape as the landing showcase ----------
+
+.cardsWrap {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: 16px;
@@ -51,7 +130,6 @@ $cream: #fbf5ee;
 
 .viewAllRow {
   width: 100%;
-  max-width: 760px;
   margin: 10px auto 0;
   text-align: right;
 }
@@ -148,8 +226,9 @@ $cream: #fbf5ee;
   white-space: nowrap;
 }
 
+// 3-1: 프레임 "아래"(바깥) 배포일 — .card가 flex-column gap:8px라 자연스럽게 프레임과 8px 간격.
 .deployedAt {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: $ink-soft;
   margin: 0;

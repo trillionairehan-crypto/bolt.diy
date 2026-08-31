@@ -303,7 +303,13 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
             minHeight: isLanding ? 44 : props.TEXTAREA_MIN_HEIGHT,
             maxHeight: props.TEXTAREA_MAX_HEIGHT,
           }}
-          placeholder={isLanding ? '' : props.chatMode === 'build' ? '어떤 걸 만들고 싶으세요?' : '무엇이든 물어보세요'}
+          placeholder={
+            isLanding
+              ? '만들고 싶은 앱을 적어주세요'
+              : props.chatMode === 'build'
+                ? '어떤 걸 만들고 싶으세요?'
+                : '무엇이든 물어보세요'
+          }
           translate="no"
         />
         <div
@@ -436,6 +442,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
                   <SendButton
                     isStreaming={props.isStreaming}
                     size={isLanding ? 'sm' : 'default'}
+                    breathe={isLanding && !props.isStreaming && props.input.trim().length > 0}
                     disabled={
                       !props.providerList ||
                       props.providerList.length === 0 ||

@@ -16,6 +16,7 @@ import {
 } from '~/lib/onboarding/answer-directives';
 import { generateAppQuestions } from '~/utils/generateAppQuestions';
 import { ONBOARDING_ADDITIONS_MARKER } from '~/utils/constants';
+import { useReducedMotion } from '~/lib/hooks';
 
 interface PromptClarificationProps {
   initialPrompt: string;
@@ -100,20 +101,10 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
   const [finalPrompt, setFinalPrompt] = useState(initialPrompt);
   const [directives, setDirectives] = useState<GenerationDirectives>(EMPTY_DIRECTIVES);
   const [pendingOptionId, setPendingOptionId] = useState<string | null>(null);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const reducedMotion = useReducedMotion();
 
   /** onComplete unmounts this component; guards against a double-tap firing it (and generateNewApp) twice. */
   const completedRef = useRef(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReducedMotion(mq.matches);
-
-    const handler = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
-    mq.addEventListener('change', handler);
-
-    return () => mq.removeEventListener('change', handler);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;

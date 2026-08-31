@@ -29,7 +29,7 @@ import { SupabaseChatAlert } from '~/components/chat/SupabaseAlert';
 import { expoUrlAtom } from '~/lib/stores/qrCodeStore';
 import { chatStore } from '~/lib/stores/chat';
 import { useStore } from '@nanostores/react';
-import { StickToBottom, useStickToBottomContext } from '~/lib/hooks';
+import { StickToBottom, useStickToBottomContext, useReducedMotion } from '~/lib/hooks';
 import { ChatBox } from './ChatBox';
 import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
@@ -37,8 +37,12 @@ import LlmErrorAlert from './LLMApiAlert';
 import PromptClarification from './PromptClarification';
 import type { GenerationDirectives } from '~/lib/onboarding/answer-directives';
 import { DeployedAppCards } from './DeployedAppCards';
+import { RecentChatsCards } from './RecentChatsCards';
+import { useChatHomeSections } from './useChatHomeSections';
 import useViewport from '~/lib/hooks';
 import homeStyles from './ChatHome.module.scss';
+import { authUserStore } from '~/lib/stores/auth';
+import { buildHeadline, resolveDisplayName } from '~/utils/greeting';
 
 /*
  * Lazy-loaded: Workbench.client.tsx pulls in the workbenchStore singleton (ActionRunner,
@@ -196,6 +200,37 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const expoUrl = useStore(expoUrlAtom);
     const [qrModalOpen, setQrModalOpen] = useState(false);
     const { workbenchOpen, autoFixAttempts } = useStore(chatStore);
+
+    // 채팅 홈 디테일 라운드 — 헤드라인 개인화 + 이어서 만들기/내가 만든 앱 데이터 + 포커스 모션.
+    const authUser = useStore(authUserStore);
+    const reducedMotion = useReducedMotion();
+    const [inputFocused, setInputFocused] = useState(false);
+    const { recentChats, deployedApps, hasHistory } = useChatHomeSections();
+
+    useEffect(() => {
+      const el = textareaRef?.current;
+
+      if (!el) {
+        return undefined;
+      }
+
+      const handleFocus = () => setInputFocused(true);
+      const handleBlur = () => setInputFocused(false);
+
+      el.addEventListener('focus', handleFocus);
+      el.addEventListener('blur', handleBlur);
+
+      return () => {
+        el.removeEventListener('focus', handleFocus);
+        el.removeEventListener('blur', handleBlur);
+      };
+    }, [textareaRef]);
+
+    const homeHeadline = buildHeadline({
+      isLoggedIn: !!authUser,
+      hasHistory,
+      name: resolveDisplayName(authUser),
+    });
 
     useEffect(() => {
       if (expoUrl) {
@@ -564,7 +599,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 'flex flex-col items-center px-4 pb-16': !chatStarted,
                 'h-full flex flex-col min-h-0': chatStarted,
               })}
-              style={!chatStarted ? { background: '#FBF5EE', minHeight: '88vh' } : undefined}
+              style={!chatStarted ? { background: '#FBF5EE' } : undefined}
             >
               <div
                 className={classNames('flex flex-col min-w-0 relative z-10 w-full', {
@@ -576,15 +611,34 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                     <div className={homeStyles.stage}>
                       <div className={homeStyles.stageBlock}>
                         <div className="w-full mx-auto flex flex-col items-center" style={{ maxWidth: 760 }}>
-                          <p className={homeStyles.greeting}>오늘은 뭘 만들어볼까요?</p>
-                          <p className={homeStyles.subGreeting}>만들고 싶은 걸 한 문장으로 적으면 돼요</p>
+                          <div
+                            className={classNames(homeStyles.headlineWrap, {
+                              [homeStyles.headlineWrapFocused]: inputFocused && !reducedMotion,
+                              [homeStyles.headlineWrapNoTransition]: reducedMotion,
+                            })}
+                            style={
+                              reducedMotion && inputFocused
+                                ? { transform: 'translateY(-8px)', opacity: 0.4 }
+                                : undefined
+                            }
+                          >
+                            <p className={homeStyles.greeting}>{homeHeadline}</p>
+                            <p className={homeStyles.subGreeting}>만들고 싶은 걸 한 문장으로 적으면 돼요</p>
+                          </div>
                           <StickToBottom className="relative w-full" resize="smooth" initial="smooth">
                             {chatBoxSection}
                           </StickToBottom>
                         </div>
                       </div>
+                      <ClientOnly>
+                        {() => (
+                          <>
+                            <RecentChatsCards chats={recentChats} />
+                            <DeployedAppCards apps={deployedApps} />
+                          </>
+                        )}
+                      </ClientOnly>
                     </div>
-                    <ClientOnly>{() => <DeployedAppCards />}</ClientOnly>
                   </div>
                 ) : (
                   <div className="relative h-full flex flex-col min-h-0">
