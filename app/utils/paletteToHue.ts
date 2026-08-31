@@ -1,3 +1,5 @@
+import { getActivePalette } from '~/lib/palettes';
+
 /**
  * Converts a hex color to its OKLCH hue (0-359 integer) using the CSS Color 4 OKLab matrices.
  * Used to derive the design kit's single `--hue` token from a user-picked palette color,
@@ -39,21 +41,24 @@ export function hexToOklchHue(hex: string): number | null {
   return Math.round((hueDeg + 360) % 360);
 }
 
-const CORALRED_DEFAULT_HUE = 33; // measured OKLCH hue of #FF5330 (Coralred's actual brand accent)
+const CORALRED_DEFAULT_HUE = 33; // measured OKLCH hue of #FF5330 (Coralred's actual brand accent) — last-resort fallback if getActivePalette()'s accent ever fails to parse
 
 /**
- * Derives the design kit's --hue value from a DesignScheme palette's primary color.
- * Falls back to the Coralred brand default (33) when no palette/primary color is present
- * or the color can't be parsed — this is also the free-tier default.
+ * Derives the design kit's --hue value from a DesignScheme palette's primary color. Falls back to
+ * the active palette's own accent (app/lib/palettes.ts — the single source of truth for generated-
+ * app colors; getActivePalette() always returns coral for now, so this is CORALRED_DEFAULT_HUE's
+ * #FF5330 computed dynamically instead of hardcoded, with the literal constant kept only as a
+ * last-resort fallback) when no palette/primary color is present or the color can't be parsed.
  */
 export function designSchemeToHue(palette?: { [key: string]: string }): number {
   const primary = palette?.primary;
+  const fallback = hexToOklchHue(getActivePalette().accent) ?? CORALRED_DEFAULT_HUE;
 
   if (!primary) {
-    return CORALRED_DEFAULT_HUE;
+    return fallback;
   }
 
   const hue = hexToOklchHue(primary);
 
-  return hue ?? CORALRED_DEFAULT_HUE;
+  return hue ?? fallback;
 }

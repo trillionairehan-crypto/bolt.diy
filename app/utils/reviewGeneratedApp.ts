@@ -9,6 +9,7 @@ import {
   type MechanicalFinding,
 } from '~/lib/review/mechanical-checks';
 import { workbenchStore } from '~/lib/stores/workbench';
+import { getActivePalette } from '~/lib/palettes';
 import { createScopedLogger } from './logger';
 
 /**
@@ -346,11 +347,21 @@ async function runVisualReview(
   const timeoutId = setTimeout(() => controller.abort(), AUTO_REVIEW_VISUAL_TIMEOUT_MS);
 
   try {
+    /*
+     * PALETTE_SYSTEM(item 5): 활성 팔레트 id·accent를 힌트로 넘겨둔다 — 지금은 buildVisualReviewSystemPrompt()의
+     * "강조색 과다 반복" 체크리스트 문구가 이 값을 참조하지 않아 동작 변화가 없다(coral 고정이라 값도 항상
+     * 동일). 팔레트가 실제로 켜지는 다음 라운드에서 dark/minimal처럼 액센트가 무채색에 가깝거나 어두운
+     * 배경 위인 팔레트에서 "강조색 반복" 체크가 오탐하지 않도록 체크리스트 쪽에서 이 값을 쓰게 배선만
+     * 미리 해두는 것.
+     */
+    const activePalette = getActivePalette();
+    const message = `아래는 방금 생성된 앱의 미리보기 스크린샷입니다(데스크톱 1280×800, 첫 화면).\n활성 팔레트: ${activePalette.id} (accent ${activePalette.accent})`;
+
     const response = await fetch('/api/llmcall', {
       method: 'POST',
       signal: controller.signal,
       body: JSON.stringify({
-        message: '아래는 방금 생성된 앱의 미리보기 스크린샷입니다(데스크톱 1280×800, 첫 화면).',
+        message,
         model,
         provider,
         system: buildVisualReviewSystemPrompt(),
