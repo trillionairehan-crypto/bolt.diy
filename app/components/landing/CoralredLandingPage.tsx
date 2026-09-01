@@ -100,7 +100,9 @@ interface FinanceApp {
   revenue: string;
   cost: string;
   net: string;
-  donutSegments: [number, number];
+
+  /** 도넛의 코랄 비율(0~100) — 카드 3의 유일한 코랄 접점. 순이익 숫자는 잉크로 둔다. */
+  donutHighlight: number;
 }
 
 interface ListingApp {
@@ -162,7 +164,7 @@ const SHOWCASE_APPS: ShowcaseApp[] = [
     revenue: '2,480,000원',
     cost: '1,100,000원',
     net: '1,380,000원',
-    donutSegments: [45, 35],
+    donutHighlight: 45,
   },
   {
     kind: 'listing',
@@ -225,36 +227,25 @@ function Sparkline({ values }: { values: number[] }) {
   );
 }
 
-/** 카드 3(우리 가게 매출)의 카테고리 도넛 — 잉크/회갈색 두 톤만, 코랄은 순이익 숫자 쪽에 준다. */
-function DonutChart({ segments }: { segments: [number, number] }) {
+/** 카드 3(우리 가게 매출)의 카테고리 도넛 — 이 카드의 유일한 코랄 접점(순이익 숫자는 잉크). */
+function DonutChart({ highlight }: { highlight: number }) {
   const radius = 15;
   const circumference = 2 * Math.PI * radius;
-  const colors = ['#8b7e70', '#1a1a1a'];
-  let cumulativePercent = 0;
+  const length = (highlight / 100) * circumference;
 
   return (
     <svg viewBox="0 0 40 40" className={styles.donutChart} aria-hidden="true">
       <circle cx="20" cy="20" r={radius} fill="none" stroke="rgba(26, 26, 26, 0.1)" strokeWidth="7" />
-      {segments.map((percent, index) => {
-        const length = (percent / 100) * circumference;
-        const offset = -((cumulativePercent / 100) * circumference);
-        cumulativePercent += percent;
-
-        return (
-          <circle
-            key={index}
-            cx="20"
-            cy="20"
-            r={radius}
-            fill="none"
-            stroke={colors[index]}
-            strokeWidth="7"
-            strokeDasharray={`${length} ${circumference - length}`}
-            strokeDashoffset={offset}
-            transform="rotate(-90 20 20)"
-          />
-        );
-      })}
+      <circle
+        cx="20"
+        cy="20"
+        r={radius}
+        fill="none"
+        stroke="#FF5330"
+        strokeWidth="7"
+        strokeDasharray={`${length} ${circumference - length}`}
+        transform="rotate(-90 20 20)"
+      />
     </svg>
   );
 }
@@ -327,12 +318,10 @@ function ShowcaseCardContent({ app }: { app: ShowcaseApp }) {
             </p>
             <p className={styles.rowLine}>
               <span className={styles.rowMeta}>순이익</span>
-              <span className={classNames(styles.statValue, styles.statValueAccent, styles.statValueInline)}>
-                {app.net}
-              </span>
+              <span className={classNames(styles.statValue, styles.statValueInline)}>{app.net}</span>
             </p>
           </div>
-          <DonutChart segments={app.donutSegments} />
+          <DonutChart highlight={app.donutHighlight} />
         </div>
       );
 
