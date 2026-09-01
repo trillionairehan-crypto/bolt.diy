@@ -1,0 +1,274 @@
+$ink: #1a1a1a;
+$ink-soft: #8b7e70;
+$cream: #fbf5ee;
+$border: #efe4d6;
+$coral: #ff5330;
+
+/*
+ * 채팅 홈과 같은 디자인 언어로 다시 짠 /apps — 이전엔 design-handoff/coralred-ui.css의 cr-* 유틸
+ * 클래스(생성물용 킷)를 그대로 갖다 써서 채팅 홈과 다른 화면처럼 보였다. 이제 ChatHome.module.scss와
+ * 같은 방식(하드코딩 토큰, 자체 CSS 모듈)으로 맞춘다.
+ *
+ * app/routes/ 안에는 두지 않는다 — Remix가 app/routes/ 아래 파일을 라우트 모듈 규칙으로 취급해
+ * export-stripping babel 변환을 시도하다 scss를 못 파싱해 500을 낸다(실측 확인).
+ */
+.page {
+  min-height: 100vh;
+  background: $cream;
+  padding: 24px 24px 64px;
+}
+
+.topRow {
+  max-width: 880px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.logoLink {
+  display: inline-flex;
+}
+
+.backLink {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: $ink-soft;
+  text-decoration: none;
+
+  &:hover {
+    color: $ink;
+  }
+}
+
+.header {
+  max-width: 880px;
+  margin: 32px auto 32px;
+}
+
+.headline {
+  font-size: 32px;
+  font-weight: 600;
+  color: $ink;
+  margin: 0;
+}
+
+.subheadline {
+  font-size: 15px;
+  color: #7a7067;
+  margin: 8px 0 0;
+}
+
+.grid {
+  max-width: 880px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+
+  @media (max-width: 680px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  border: 1px solid $border;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+// 미니 브라우저 프레임 — ChatHome.module.scss(.browserFrame 등)와 같은 모양 재사용.
+.browserFrame {
+  border: 1px solid rgba(26, 26, 26, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  background: $cream;
+}
+
+.browserBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(26, 26, 26, 0.04);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+}
+
+.browserDots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(26, 26, 26, 0.18);
+}
+
+.addressBar {
+  flex: 1;
+  font-size: 10px;
+  color: $ink-soft;
+  background: rgba(26, 26, 26, 0.05);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-family: 'IBM Plex Mono', 'Pretendard', monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.browserContent {
+  padding: 14px 16px;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+}
+
+.appName {
+  font-size: 15px;
+  font-weight: 700;
+  color: $ink;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.deployedMeta {
+  font-size: 12px;
+  font-weight: 500;
+  color: $ink-soft;
+  margin: 0;
+}
+
+.expiryWarning {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--warn);
+  margin: 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: $ink;
+  border: 1px solid $ink-soft;
+  border-radius: 999px;
+  padding: 2px 8px 2px 6px;
+  flex-shrink: 0;
+}
+
+.badgeDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: $coral;
+  flex-shrink: 0;
+}
+
+.addressLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: $ink;
+  text-decoration: none;
+  min-width: 0;
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.redeployBtn {
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 500;
+  color: $ink;
+  background: transparent;
+  border: 1px solid $ink-soft;
+  border-radius: 8px;
+  padding: 7px 14px;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.emptyState {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.emptyText {
+  font-size: 15px;
+  color: $ink-soft;
+  margin: 0 0 16px;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: $coral;
+  color: $cream;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    opacity: 0.85;
+  }
+}
+
+.loadingText {
+  max-width: 880px;
+  margin: 0 auto;
+  font-size: 14px;
+  color: $ink-soft;
+}
+
+.loginPrompt {
+  max-width: 880px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.loginText {
+  font-size: 15px;
+  color: $ink-soft;
+  margin: 0;
+}

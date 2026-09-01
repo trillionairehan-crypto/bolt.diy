@@ -1,16 +1,13 @@
-import type { LinksFunction, MetaFunction } from '@remix-run/cloudflare';
+import type { MetaFunction } from '@remix-run/cloudflare';
 import { useEffect, useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { Logo } from '~/components/ui/Logo';
 import { authUserStore } from '~/lib/stores/auth';
 import { getDeployedApps, type DeployedAppRecord } from '~/lib/deployedApps';
-import { CustomDomainConnect } from '~/components/deploy/CustomDomainConnect';
-import coralredUiCssUrl from '~design-handoff/coralred-ui.css?url';
-
-export const links: LinksFunction = () => [{ rel: 'stylesheet', href: coralredUiCssUrl }];
+import styles from '~/components/apps/AppsPage.module.scss';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '내 앱 | 코랄레드' }, { name: 'description', content: '배포한 앱을 한곳에서 확인해요' }];
+  return [{ title: '내가 만든 앱 | 코랄레드' }, { name: 'description', content: '배포한 앱을 한곳에서 확인해요' }];
 };
 
 const PROVIDER_LABEL: Record<string, string> = {
@@ -25,9 +22,9 @@ const STORAGE_MODE_LABEL: Record<DeployedAppRecord['storage_mode'], string> = {
   supabase: '내 Supabase 연결',
 };
 
+/** "9월 1일 오전 1:30" — 연도 없이 월/일 + 시:분(오전/오후)만. */
 function formatDeployedAt(iso: string): string {
   return new Intl.DateTimeFormat('ko-KR', {
-    year: 'numeric',
     month: 'long',
     day: 'numeric',
     hour: 'numeric',
@@ -50,6 +47,52 @@ function expiresSoon(storageExpiresAt: string | null): boolean {
 
 function formatExpiresAt(iso: string): string {
   return new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric' }).format(new Date(iso));
+}
+
+function AppCard({ app }: { app: DeployedAppRecord }) {
+  const providerLabel = PROVIDER_LABEL[app.provider] ?? app.provider;
+  const isCloudflare = app.provider === 'cloudflare';
+
+  return (
+    <div className={styles.card}>
+      <div className={styles.browserFrame}>
+        <div className={styles.browserBar}>
+          <span className={styles.browserDots}>
+            <span className={styles.dot} />
+            <span className={styles.dot} />
+            <span className={styles.dot} />
+          </span>
+          <span className={styles.addressBar}>{app.url.replace(/^https?:\/\//, '')}</span>
+        </div>
+        <div className={styles.browserContent}>
+          <p className={styles.appName}>{app.app_name}</p>
+        </div>
+      </div>
+
+      <div className={styles.metaRow}>
+        <p className={styles.deployedMeta}>
+          {formatDeployedAt(app.deployed_at)} 배포 · {providerLabel}
+        </p>
+        <span className={styles.badge}>
+          <span className={styles.badgeDot} />
+          {STORAGE_MODE_LABEL[app.storage_mode]}
+        </span>
+      </div>
+
+      {expiresSoon(app.storage_expires_at) && (
+        <p className={styles.expiryWarning}>{formatExpiresAt(app.storage_expires_at as string)}에 데이터가 정리돼요</p>
+      )}
+
+      <a href={app.url} target="_blank" rel="noreferrer" className={styles.addressLink}>
+        <span>{app.url}</span>
+        <div className="i-ph:arrow-square-out" />
+      </a>
+
+      <a href={`/chat/${app.chat_id}`} className={styles.redeployBtn}>
+        {isCloudflare ? '다시 배포하기' : '채팅으로 돌아가기'}
+      </a>
+    </div>
+  );
 }
 
 export default function Apps() {
@@ -76,70 +119,47 @@ export default function Apps() {
   }, [authUser]);
 
   return (
-    <div className="cr-page" style={{ paddingTop: 24, paddingBottom: 48 }}>
-      <a href="/" className="cr-row-8" style={{ width: 'fit-content' }}>
-        <Logo height={24} showWordmark={false} />
-      </a>
+    <div className={styles.page}>
+      <div className={styles.topRow}>
+        <a href="/" className={styles.logoLink}>
+          <Logo height={24} showWordmark={false} />
+        </a>
+        <a href="/" className={styles.backLink}>
+          ← 채팅으로
+        </a>
+      </div>
 
-      <section className="cr-section cr-stack-16" style={{ paddingBottom: 32 }}>
-        <span className="cr-eyebrow">MY APPS</span>
-        <h1 className="cr-display">내 앱</h1>
-        <p className="cr-body">배포한 앱을 한곳에서 확인해요.</p>
-      </section>
+      <div className={styles.header}>
+        <h1 className={styles.headline}>내가 만든 앱</h1>
+        <p className={styles.subheadline}>배포한 앱을 한곳에서 확인해요</p>
+      </div>
 
       {!authUser && (
-        <section className="cr-card cr-stack-16" style={{ maxWidth: 420 }}>
-          <p className="cr-body">로그인하면 배포한 앱을 여기서 확인할 수 있어요.</p>
-          <a href="/login" className="cr-btn" style={{ width: 'fit-content' }}>
+        <div className={styles.loginPrompt}>
+          <p className={styles.loginText}>로그인하면 배포한 앱을 여기서 확인할 수 있어요.</p>
+          <a href="/login" className={styles.redeployBtn}>
             로그인
           </a>
-        </section>
+        </div>
       )}
 
-      {authUser && apps === null && <p className="cr-caption">불러오는 중...</p>}
+      {authUser && apps === null && <p className={styles.loadingText}>불러오는 중...</p>}
 
       {authUser && apps !== null && apps.length === 0 && (
-        <section className="cr-card cr-stack-8" style={{ maxWidth: 420 }}>
-          <p className="cr-body">다음 배포부터 여기 쌓여요.</p>
-          <p className="cr-caption">작업 화면 위쪽의 "배포하기" 버튼으로 앱을 공개하면 여기에 나타나요.</p>
-        </section>
+        <div className={styles.emptyState}>
+          <p className={styles.emptyText}>아직 배포한 앱이 없어요</p>
+          <a href="/" className={styles.primaryBtn}>
+            첫 앱 만들기
+          </a>
+        </div>
       )}
 
       {authUser && apps !== null && apps.length > 0 && (
-        <section className="cr-stack-16">
+        <div className={styles.grid}>
           {apps.map((app) => (
-            <div key={app.id} className="cr-stack-8">
-              <div className="cr-card cr-row-16" style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
-                <div className="cr-stack-8" style={{ minWidth: 0 }}>
-                  <div className="cr-row-8">
-                    <h2 className="cr-h2">{app.app_name}</h2>
-                    <span className="cr-badge">{PROVIDER_LABEL[app.provider] ?? app.provider}</span>
-                    <span className="cr-badge">{STORAGE_MODE_LABEL[app.storage_mode]}</span>
-                    {expiresSoon(app.storage_expires_at) && (
-                      <span className="cr-badge warn">
-                        {formatExpiresAt(app.storage_expires_at as string)}에 데이터가 정리돼요
-                      </span>
-                    )}
-                  </div>
-                  <a href={app.url} target="_blank" rel="noreferrer" className="cr-mono">
-                    {app.url}
-                  </a>
-                  <p className="cr-caption">{formatDeployedAt(app.deployed_at)}에 배포됨</p>
-                  {app.provider === 'cloudflare' && (
-                    <p className="cr-caption">채팅에서 배포하기를 다시 누르면 같은 주소로 업데이트돼요.</p>
-                  )}
-                </div>
-                <a href={`/chat/${app.chat_id}`} className="cr-btn outline" style={{ flexShrink: 0 }}>
-                  {app.provider === 'cloudflare' ? '다시 배포하기' : '채팅으로 돌아가기'}
-                </a>
-              </div>
-
-              {app.provider === 'cloudflare' && app.project_name && (
-                <CustomDomainConnect projectName={app.project_name} />
-              )}
-            </div>
+            <AppCard key={app.id} app={app} />
           ))}
-        </section>
+        </div>
       )}
     </div>
   );
