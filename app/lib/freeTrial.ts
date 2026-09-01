@@ -159,11 +159,26 @@ export async function getV2AccountGenerationStatus(): Promise<{ monthRemaining: 
    */
   const { data: sessionData } = await platformSupabase.auth.getSession();
 
+  // TEMP DIAG (미터링 재로그인 원인 확정용, 원인 확정 후 제거) — SHOW_DEV_TOOLS 무관하게 항상 출력.
+  console.log('[DIAG-METERING] getSession', {
+    at: new Date().toISOString(),
+    userId: sessionData.session?.user?.id ?? null,
+    hasSession: Boolean(sessionData.session),
+  });
+
   if (!sessionData.session) {
     throw new Error('세션이 아직 준비되지 않았습니다.');
   }
 
   const { data, error } = await platformSupabase.rpc('get_generation_status_v2');
+
+  // TEMP DIAG (미터링 재로그인 원인 확정용, 원인 확정 후 제거).
+  console.log('[DIAG-METERING] rpc get_generation_status_v2', {
+    at: new Date().toISOString(),
+    userId: sessionData.session.user.id,
+    error: error ?? null,
+    data,
+  });
 
   if (error) {
     throw error;
