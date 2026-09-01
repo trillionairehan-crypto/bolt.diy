@@ -4,6 +4,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useStore } from '@nanostores/react';
 import { authUserStore, signOut } from '~/lib/stores/auth';
 import { LogoutConfirmDialog } from '~/components/ui/LogoutConfirmDialog';
+import { AccountUsageBlock } from '~/components/sidebar/AccountUsageBlock';
 import type { TabType } from '~/components/@settings/core/types';
 import styles from './Sidebar.module.scss';
 
@@ -34,6 +35,13 @@ export function AccountMenu({ onOpenSettings, children }: AccountMenuProps) {
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content className={styles.accountMenuContent} side="top" align="start" sideOffset={8}>
+          {authUser && (
+            <>
+              <AccountUsageBlock />
+              <div className={styles.usageDivider} />
+              {authUser.email && <p className={styles.accountEmail}>{authUser.email}</p>}
+            </>
+          )}
           <DropdownMenu.Item className={styles.accountMenuItem} onSelect={() => onOpenSettings('profile')}>
             <span className="i-ph:user-circle" />
             프로필 설정

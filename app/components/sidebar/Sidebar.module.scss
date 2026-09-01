@@ -1,7 +1,9 @@
 $ink: #1a1a1a;
-$ink-soft: #8b7e70;
+$ink-soft: #6e645b;
 $cream: #fbf5ee;
 $coral: #ff5330;
+$border: #efe4d6;
+$usage-bg: #f5ede3;
 
 // Invisibly grows a small control's tap area to the 44px minimum — same pattern as the landing
 // page's %tapTargetExpand, kept here (not shared) since SCSS modules don't share placeholders
@@ -340,6 +342,88 @@ $rail-icon-top: calc((var(--header-height) - #{$rail-icon-size}) / 2);
   height: 1px;
   margin: 6px 4px;
   background: rgba(26, 26, 26, 0.08);
+}
+
+// ---------- 계정 메뉴 최상단 사용량 블록 (D) ----------
+// 예전엔 사이드바 하단에 QuotaBar로 상시 노출됐다 — 이제 계정 메뉴 안, "프로필 설정" 위로 옮겼다.
+
+.usageBlock {
+  background: $usage-bg;
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.usageTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: $ink-soft;
+  margin: 0;
+}
+
+.usageReset {
+  font-size: 12px;
+  color: $ink-soft;
+  margin: 0 0 4px;
+}
+
+.usageRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.usageRowLabel,
+.usageRowValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: $ink;
+}
+
+.usageTrack {
+  height: 4px;
+  border-radius: 2px;
+  background: $border;
+  overflow: hidden;
+}
+
+.usageFill {
+  height: 100%;
+  background: $coral;
+  border-radius: 2px;
+  transition: width 0.2s ease-out;
+}
+
+.usagePricingLink {
+  @extend %tapTargetExpand;
+  font-size: 12px;
+  font-weight: 500;
+  color: $coral;
+  text-decoration: none;
+  width: fit-content;
+  margin-top: 2px;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.usageDivider {
+  height: 1px;
+  margin: 4px 4px 8px;
+  background: $border;
+}
+
+.accountEmail {
+  font-size: 12px;
+  color: $ink-soft;
+  margin: 0 4px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .avatar {

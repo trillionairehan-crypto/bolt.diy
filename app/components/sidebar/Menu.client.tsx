@@ -354,17 +354,20 @@ export const Menu = () => {
                 <span className={styles.accountName}>
                   {authUser.user_metadata?.full_name || authUser.email || profile?.username || '내 계정'}
                 </span>
-                <span className="i-ph:caret-up-down" style={{ color: '#8B7E70', flexShrink: 0 }} />
+                <span className="i-ph:caret-up-down" style={{ color: '#6E645B', flexShrink: 0 }} />
               </AccountMenu>
             ) : (
-              isPlatformSupabaseConfigured && (
-                <a href="/login" className={styles.loginLink}>
-                  로그인
-                </a>
-              )
+              <>
+                {isPlatformSupabaseConfigured && (
+                  <a href="/login" className={styles.loginLink}>
+                    로그인
+                  </a>
+                )}
+                {/* D-1: 로그인 계정의 사용량 텍스트는 계정 메뉴로 옮겼다(AccountUsageBlock) — 게스트는
+                    계정 메뉴 자체가 없어 QuotaBar를 그대로 둔다. */}
+                <QuotaBar />
+              </>
             )}
-            {/* 게스트도 무료 체험 횟수는 봐야 해서 authUser 분기 밖(둘 다 표시) — QuotaBar 자체가 문구를 구분한다. */}
-            <QuotaBar />
           </div>
         </div>
 
