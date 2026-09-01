@@ -44,10 +44,13 @@ describe('freeTrial v2 guest remaining count', () => {
 });
 
 /*
- * 미터링 재로그인 초기화 버그 — getV2AccountGenerationStatus()가 RPC 앞에 getSession()을 강제로
- * 끼워 넣어(재로그인 직후 세션 동기화 대기) 세션이 아직 없으면 던지는지, 있으면 RPC를 실제로
- * 호출하는지를 확인한다. platformSupabase는 모듈 top-level에서 한 번 생성되는 싱글턴이라(있으면)
- * vi.mock으로 아예 갈아끼운다 — 이 스펙에서만 쓰는 로컬 모킹, 다른 파일에 영향 없음.
+ * 미터링 재로그인 초기화 버그, 원인 확정 후 수정 — 재로그인 직후 platformSupabase.rpc()가 서버에
+ * auth.uid() = null(익명 취급)로 도착했다(진단 로그 실측: getSession()은 새 유저를 정확히
+ * 돌려주는데 RPC 요청의 Authorization 헤더가 그걸 못 따라갔다). 그래서 getV2AccountGenerationStatus/
+ * incrementV2AccountGenerationsUsed는 이제 platformSupabase.rpc()가 아니라 callPlatformRpc()로
+ * 방금 읽은 access_token을 직접 Authorization 헤더에 실어 fetch한다 — 아래 테스트는 그 access_token이
+ * 실제로 전달되는지를 확인한다. platformSupabase/callPlatformRpc는 모듈 top-level에서 생성되는
+ * 싱글턴/함수라 vi.mock으로 갈아끼운다 — 이 스펙에서만 쓰는 로컬 모킹, 다른 파일에 영향 없음.
  */
 describe('freeTrial v2 account status — 세션 동기화 가드', () => {
   afterEach(() => {
@@ -56,34 +59,56 @@ describe('freeTrial v2 account status — 세션 동기화 가드', () => {
   });
 
   it('세션이 아직 없으면(동기화 안 끝남) RPC를 부르지 않고 던진다', async () => {
-    const rpc = vi.fn();
+    const callPlatformRpc = vi.fn();
     const getSession = vi.fn().mockResolvedValue({ data: { session: null } });
 
     vi.resetModules();
     vi.doMock('~/lib/supabase/platform-client', () => ({
-      platformSupabase: { auth: { getSession }, rpc },
+      platformSupabase: { auth: { getSession } },
+      callPlatformRpc,
     }));
 
     const { getV2AccountGenerationStatus } = await import('./freeTrial');
 
     await expect(getV2AccountGenerationStatus()).rejects.toThrow();
-    expect(rpc).not.toHaveBeenCalled();
+    expect(callPlatformRpc).not.toHaveBeenCalled();
   });
 
-  it('세션이 있으면 getSession으로 먼저 확인한 뒤 RPC를 불러 실제 값을 돌려준다', async () => {
-    const rpc = vi.fn().mockResolvedValue({ data: { monthRemaining: 2 }, error: null });
-    const getSession = vi.fn().mockResolvedValue({ data: { session: { user: { id: 'u1' } } } });
+  it('세션이 있으면 getSession으로 받은 access_token을 그대로 실어 RPC를 직접 fetch로 부른다', async () => {
+    const callPlatformRpc = vi.fn().mockResolvedValue({ data: { monthRemaining: 2 }, error: null });
+    const getSession = vi
+      .fn()
+      .mockResolvedValue({ data: { session: { user: { id: 'u1' }, access_token: 'token-abc' } } });
 
     vi.resetModules();
     vi.doMock('~/lib/supabase/platform-client', () => ({
-      platformSupabase: { auth: { getSession }, rpc },
+      platformSupabase: { auth: { getSession } },
+      callPlatformRpc,
     }));
 
     const { getV2AccountGenerationStatus } = await import('./freeTrial');
     const result = await getV2AccountGenerationStatus();
 
     expect(getSession).toHaveBeenCalled();
-    expect(rpc).toHaveBeenCalledWith('get_generation_status_v2');
+    expect(callPlatformRpc).toHaveBeenCalledWith('get_generation_status_v2', 'token-abc');
     expect(result).toEqual({ monthRemaining: 2 });
+  });
+
+  it('증가 RPC도 같은 방식으로 access_token을 실어 보낸다', async () => {
+    const callPlatformRpc = vi.fn().mockResolvedValue({ data: null, error: null });
+    const getSession = vi
+      .fn()
+      .mockResolvedValue({ data: { session: { user: { id: 'u1' }, access_token: 'token-xyz' } } });
+
+    vi.resetModules();
+    vi.doMock('~/lib/supabase/platform-client', () => ({
+      platformSupabase: { auth: { getSession } },
+      callPlatformRpc,
+    }));
+
+    const { incrementV2AccountGenerationsUsed } = await import('./freeTrial');
+    await incrementV2AccountGenerationsUsed();
+
+    expect(callPlatformRpc).toHaveBeenCalledWith('increment_generation_count_v2', 'token-xyz');
   });
 });

@@ -1,6 +1,6 @@
 import { getLocalStorage, setLocalStorage } from '~/lib/persistence/localStorage';
 import { authUserStore } from '~/lib/stores/auth';
-import { platformSupabase } from '~/lib/supabase/platform-client';
+import { callPlatformRpc, platformSupabase } from '~/lib/supabase/platform-client';
 
 /** 로그인한 계정의 무료 생성 한도 (Supabase RPC로 서버에서 집계). */
 export const FREE_GENERATION_LIMIT = 3;
@@ -147,41 +147,27 @@ export async function getV2AccountGenerationStatus(): Promise<{ monthRemaining: 
   }
 
   /*
-   * 미터링 재로그인 초기화 버그 — 같은 탭에서 로그아웃→재로그인을 반복하면(풀 리로드 없음),
-   * onAuthStateChange가 authUserStore를 갱신하는 시점과 supabase-js 내부에서 이후 .rpc() 호출에
-   * 실제로 실리는 Authorization 헤더(세션 토큰)가 완전히 동기화되는 시점이 미세하게 어긋날 수
-   * 있다. 그 틈에 RPC가 나가면 서버의 auth.uid()가 세션을 못 읽어 "이번 달 기록 없음"으로 보고
-   * get_generation_status_v2가 월 한도 그대로(10)를 돌려준다 — RPC 정의 자체는 정상, 요청에
-   * 실린 인증 컨텍스트가 문제. getSession()은 내부적으로 진행 중인 세션 동기화를 기다렸다가
-   * 반환하므로 RPC 앞에 강제로 끼워 세션이 실제로 잡혀 있는지 먼저 확인한다. 세션이 아직 없으면
-   * (동기화가 덜 끝났거나 정말 로그아웃 상태) 여기서 던져서 호출부(QuotaBar)가 그 어떤 숫자도
-   * 표시하지 않게 한다 — 틀린 값을 보여주는 것보다 잠깐 안 보여주는 쪽이 안전하다.
+   * 미터링 재로그인 초기화 버그, 원인 확정(진단 로그 실측) — platformSupabase.rpc()가 재로그인
+   * 직후 서버에 auth.uid() = null(익명 취급)로 도착했다: 클라이언트의 getSession()은 새 유저를
+   * 정확히 돌려주는데(hasSession true, 올바른 uid), RPC 요청에 실제로 실리는 Authorization
+   * 헤더가 그걸 못 따라갔다 — supabase-js의 공유 클라이언트 인스턴스가 내부적으로 언제 헤더를
+   * 다시 계산하는지에 기대지 않기 위해, 방금 읽은 access_token을 callPlatformRpc()로 직접
+   * Authorization 헤더에 박아 fetch한다(platform-client.ts 참고) — 어떤 내부 캐시/타이밍
+   * 상태와도 무관해서 이 경로 자체가 통째로 안전하다.
    */
   const { data: sessionData } = await platformSupabase.auth.getSession();
-
-  // TEMP DIAG (미터링 재로그인 원인 확정용, 원인 확정 후 제거) — SHOW_DEV_TOOLS 무관하게 항상 출력.
-  console.log('[DIAG-METERING] getSession', {
-    at: new Date().toISOString(),
-    userId: sessionData.session?.user?.id ?? null,
-    hasSession: Boolean(sessionData.session),
-  });
 
   if (!sessionData.session) {
     throw new Error('세션이 아직 준비되지 않았습니다.');
   }
 
-  const { data, error } = await platformSupabase.rpc('get_generation_status_v2');
-
-  // TEMP DIAG (미터링 재로그인 원인 확정용, 원인 확정 후 제거).
-  console.log('[DIAG-METERING] rpc get_generation_status_v2', {
-    at: new Date().toISOString(),
-    userId: sessionData.session.user.id,
-    error: error ?? null,
-    data,
-  });
+  const { data, error } = await callPlatformRpc<{ monthRemaining: number }>(
+    'get_generation_status_v2',
+    sessionData.session.access_token,
+  );
 
   if (error) {
-    throw error;
+    throw new Error(error.message);
   }
 
   return {
@@ -194,10 +180,17 @@ export async function incrementV2AccountGenerationsUsed(): Promise<void> {
     throw new Error('Supabase가 설정되어 있지 않습니다.');
   }
 
-  const { error } = await platformSupabase.rpc('increment_generation_count_v2');
+  // get_generation_status_v2와 같은 이유로 같은 방식(callPlatformRpc) 사용 — 위 주석 참고.
+  const { data: sessionData } = await platformSupabase.auth.getSession();
+
+  if (!sessionData.session) {
+    throw new Error('세션이 아직 준비되지 않았습니다.');
+  }
+
+  const { error } = await callPlatformRpc('increment_generation_count_v2', sessionData.session.access_token);
 
   if (error) {
-    throw error;
+    throw new Error(error.message);
   }
 }
 
