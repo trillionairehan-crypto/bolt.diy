@@ -1,0 +1,47 @@
+$ink: #1a1a1a;
+$muted: #6e645b;
+$border: #efe4d6;
+$coral: #ff5330;
+
+// 카드로 감싸지 않는다(B-2) — 제목 + 본문 + 항목 사이 구분선만으로 위계를 표현한다.
+.articleList {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  > * + * {
+    margin-top: 40px;
+    padding-top: 40px;
+    border-top: 1px solid $border;
+  }
+}
+
+.articleTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: $ink;
+  margin: 0 0 16px;
+}
+
+.articleBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.paragraph {
+  font-size: 15px;
+  color: $ink;
+  line-height: 1.7;
+  margin: 0;
+}
+
+// 밑줄 없음, 호버 시에만(B-3).
+.link {
+  color: $coral;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
