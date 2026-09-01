@@ -1,0 +1,99 @@
+$ink: #1a1a1a;
+$muted: #6e645b;
+$cream: #fbf5ee;
+$border: #efe4d6;
+$coral: #ff5330;
+
+/*
+ * 공통 페이지 셸 — 채팅 홈이 아닌 정보성 페이지(/apps, /guide 등)가 전부 이 다섯 색만 쓰고,
+ * 같은 최대 폭·여백·헤드라인 위계를 공유하게 한다. 생성물 킷(coralred-ui.css)의 cr-* 클래스는
+ * 여기서 쓰지 않는다 — 플랫폼 UI와 생성물 프리뷰의 스타일 계통을 분리해 유지한다.
+ */
+.page {
+  min-height: 100vh;
+  background: $cream;
+  padding: 24px 0 0;
+}
+
+.topBar {
+  padding: 0 32px;
+
+  @media (max-width: 640px) {
+    padding: 0 24px;
+  }
+}
+
+.logoLink {
+  display: inline-flex;
+}
+
+.container {
+  box-sizing: border-box;
+  max-width: 960px;
+  margin: 64px auto 0;
+  padding: 0 32px 64px;
+
+  @media (max-width: 640px) {
+    padding: 0 24px 48px;
+  }
+}
+
+.backLink {
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  color: $muted;
+  text-decoration: none;
+  margin-bottom: 16px;
+
+  &:hover {
+    color: $ink;
+  }
+}
+
+.headline {
+  font-size: 32px;
+  font-weight: 600;
+  color: $ink;
+  margin: 0 0 8px;
+}
+
+.subheadline {
+  font-size: 15px;
+  color: $muted;
+  margin: 0 0 40px;
+}
+
+.body {
+  width: 100%;
+}
+
+.footer {
+  box-sizing: border-box;
+  max-width: 960px;
+  margin: 48px auto 0;
+  padding: 24px 32px 48px;
+  border-top: 1px solid $border;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  @media (max-width: 640px) {
+    padding: 24px 24px 48px;
+  }
+}
+
+.footerLine {
+  font-size: 12px;
+  color: $muted;
+  margin: 0;
+}
+
+.footerLink {
+  color: $coral;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
