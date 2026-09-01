@@ -1,5 +1,5 @@
 $ink: #1a1a1a;
-$ink-soft: #8b7e70;
+$ink-soft: #6e645b;
 $cream: #fbf5ee;
 $border: #efe4d6;
 $coral: #ff5330;
@@ -11,62 +11,15 @@ $coral: #ff5330;
  *
  * app/routes/ 안에는 두지 않는다 — Remix가 app/routes/ 아래 파일을 라우트 모듈 규칙으로 취급해
  * export-stripping babel 변환을 시도하다 scss를 못 파싱해 500을 낸다(실측 확인).
+ *
+ * 로고·"← 채팅으로"·헤드라인/서브헤드·푸터는 PageShell(app/components/ui/PageShell)이 맡는다 —
+ * 이 파일은 셸의 body 안에 들어가는 그리드/카드만 정의한다.
  */
-.page {
-  min-height: 100vh;
-  background: $cream;
-  padding: 24px 24px 64px;
-}
-
-.topRow {
-  max-width: 880px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.logoLink {
-  display: inline-flex;
-}
-
-.backLink {
-  display: inline-block;
-  margin-top: 10px;
-  font-size: 13px;
-  font-weight: 500;
-  color: $ink-soft;
-  text-decoration: none;
-
-  &:hover {
-    color: $ink;
-  }
-}
-
-.header {
-  max-width: 880px;
-  margin: 32px auto 32px;
-}
-
-.headline {
-  font-size: 32px;
-  font-weight: 600;
-  color: $ink;
-  margin: 0;
-}
-
-.subheadline {
-  font-size: 15px;
-  color: #7a7067;
-  margin: 8px 0 0;
-}
-
 .grid {
-  max-width: 880px;
-  margin: 0 auto;
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 20px;
 
   @media (max-width: 680px) {
     grid-template-columns: 1fr;
@@ -76,10 +29,10 @@ $coral: #ff5330;
 .card {
   border: 1px solid $border;
   border-radius: 14px;
-  padding: 16px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 // 미니 브라우저 프레임 — ChatHome.module.scss(.browserFrame 등)와 같은 모양 재사용.
@@ -223,8 +176,7 @@ $coral: #ff5330;
 }
 
 .emptyState {
-  max-width: 880px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .emptyText {
@@ -252,15 +204,13 @@ $coral: #ff5330;
 }
 
 .loadingText {
-  max-width: 880px;
-  margin: 0 auto;
+  width: 100%;
   font-size: 14px;
   color: $ink-soft;
 }
 
 .loginPrompt {
-  max-width: 880px;
-  margin: 0 auto;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

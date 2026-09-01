@@ -1,7 +1,7 @@
 import type { MetaFunction } from '@remix-run/cloudflare';
 import { useEffect, useState } from 'react';
 import { useStore } from '@nanostores/react';
-import { Logo } from '~/components/ui/Logo';
+import { PageShell } from '~/components/ui/PageShell';
 import { authUserStore } from '~/lib/stores/auth';
 import { getDeployedApps, type DeployedAppRecord } from '~/lib/deployedApps';
 import styles from '~/components/apps/AppsPage.module.scss';
@@ -119,21 +119,7 @@ export default function Apps() {
   }, [authUser]);
 
   return (
-    <div className={styles.page}>
-      <div className={styles.topRow}>
-        <a href="/" className={styles.logoLink}>
-          <Logo height={24} showWordmark={false} />
-        </a>
-        <a href="/" className={styles.backLink}>
-          ← 채팅으로
-        </a>
-      </div>
-
-      <div className={styles.header}>
-        <h1 className={styles.headline}>내가 만든 앱</h1>
-        <p className={styles.subheadline}>배포한 앱을 한곳에서 확인해요</p>
-      </div>
-
+    <PageShell headline="내가 만든 앱" subheadline="배포한 앱을 한곳에서 확인해요">
       {!authUser && (
         <div className={styles.loginPrompt}>
           <p className={styles.loginText}>로그인하면 배포한 앱을 여기서 확인할 수 있어요.</p>
@@ -161,6 +147,6 @@ export default function Apps() {
           ))}
         </div>
       )}
-    </div>
+    </PageShell>
   );
 }
