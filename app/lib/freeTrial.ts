@@ -146,6 +146,23 @@ export async function getV2AccountGenerationStatus(): Promise<{ monthRemaining: 
     return { monthRemaining: 0 };
   }
 
+  /*
+   * 미터링 재로그인 초기화 버그 — 같은 탭에서 로그아웃→재로그인을 반복하면(풀 리로드 없음),
+   * onAuthStateChange가 authUserStore를 갱신하는 시점과 supabase-js 내부에서 이후 .rpc() 호출에
+   * 실제로 실리는 Authorization 헤더(세션 토큰)가 완전히 동기화되는 시점이 미세하게 어긋날 수
+   * 있다. 그 틈에 RPC가 나가면 서버의 auth.uid()가 세션을 못 읽어 "이번 달 기록 없음"으로 보고
+   * get_generation_status_v2가 월 한도 그대로(10)를 돌려준다 — RPC 정의 자체는 정상, 요청에
+   * 실린 인증 컨텍스트가 문제. getSession()은 내부적으로 진행 중인 세션 동기화를 기다렸다가
+   * 반환하므로 RPC 앞에 강제로 끼워 세션이 실제로 잡혀 있는지 먼저 확인한다. 세션이 아직 없으면
+   * (동기화가 덜 끝났거나 정말 로그아웃 상태) 여기서 던져서 호출부(QuotaBar)가 그 어떤 숫자도
+   * 표시하지 않게 한다 — 틀린 값을 보여주는 것보다 잠깐 안 보여주는 쪽이 안전하다.
+   */
+  const { data: sessionData } = await platformSupabase.auth.getSession();
+
+  if (!sessionData.session) {
+    throw new Error('세션이 아직 준비되지 않았습니다.');
+  }
+
   const { data, error } = await platformSupabase.rpc('get_generation_status_v2');
 
   if (error) {

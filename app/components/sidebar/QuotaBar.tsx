@@ -16,23 +16,36 @@ import styles from './Sidebar.module.scss';
  * possible. v2's account RPC only ever returns a remaining count with no limit — if that flag is
  * ever flipped on for logged-in users, this degrades to a plain count instead of a bar.
  */
+// 재로그인 직후 세션 동기화 레이스(freeTrial.ts의 getV2AccountGenerationStatus 주석 참고) 대비 1회 재시도.
+const RETRY_DELAY_MS = 400;
+
 export function QuotaBar() {
   const authUser = useStore(authUserStore);
   const [remaining, setRemaining] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
+    let retryTimeoutId: number | undefined;
 
-    (CORALRED_NEW_METERING ? getV2GenerationsRemaining() : getGenerationsRemaining())
-      .then((value) => {
-        if (!cancelled) {
-          setRemaining(value);
-        }
-      })
-      .catch(() => {});
+    const fetchRemaining = (attempt: number) => {
+      (CORALRED_NEW_METERING ? getV2GenerationsRemaining() : getGenerationsRemaining())
+        .then((value) => {
+          if (!cancelled) {
+            setRemaining(value);
+          }
+        })
+        .catch(() => {
+          if (!cancelled && attempt === 0) {
+            retryTimeoutId = window.setTimeout(() => fetchRemaining(1), RETRY_DELAY_MS);
+          }
+        });
+    };
+
+    fetchRemaining(0);
 
     return () => {
       cancelled = true;
+      window.clearTimeout(retryTimeoutId);
     };
   }, [authUser]);
 
