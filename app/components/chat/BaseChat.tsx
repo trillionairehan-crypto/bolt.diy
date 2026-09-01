@@ -593,11 +593,19 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
             </>
           );
 
+          /*
+           * E: !chatStarted(채팅 홈)는 overflow-hidden을 주지 않는다 — 이 박스가 h-full 없이 자기
+           * 콘텐츠 높이만큼 자라야, 조상 .ChatArea의 overflow-y-auto가 실제로 스크롤을 맡을 수
+           * 있다. overflow-hidden이 여기 걸려 있으면 이 박스 자신이 넘치는 콘텐츠를 그냥
+           * 잘라버려서(자신의 높이가 뷰포트에 맞게 이미 정해진 상태가 아닌데도) 조상까지 넘침이
+           * 전달되지 않아 "이어서 만들기" 3번째 카드 아래가 스크롤 없이 잘렸다(실측 확인).
+           * chatStarted 쪽은 내부 StickToBottom이 자체적으로 스크롤을 맡아 이 규칙이 필요 없다.
+           */
           return (
             <div
-              className={classNames('relative overflow-hidden', {
+              className={classNames('relative', {
                 'flex flex-col items-center px-4 pb-16': !chatStarted,
-                'h-full flex flex-col min-h-0': chatStarted,
+                'h-full flex flex-col min-h-0 overflow-hidden': chatStarted,
               })}
               style={!chatStarted ? { background: '#FBF5EE' } : undefined}
             >
