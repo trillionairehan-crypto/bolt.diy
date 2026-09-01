@@ -85,7 +85,19 @@ export const Menu = () => {
   const isSmallViewport = useViewport(1024);
   const [settingsInitialTab, setSettingsInitialTab] = useState<TabType | null>(null);
 
+  /*
+   * 게스트 상태에서는 대화 목록을 아예 렌더하지 않는다(로그인 여부 조건) — 공용 PC에서 로그아웃한
+   * 다음 사용자가 이전 계정의 목록을 보는 걸 막기 위한 개인정보 조치. IndexedDB 자체는 로컬
+   * 전용이라 계정으로 구분되지 않으므로, 로그인 여부로 화면 노출을 막는 게 지금 유일한 방어선.
+   */
   const loadEntries = useCallback(() => {
+    if (!authUser) {
+      setList([]);
+      setIsLoadingList(false);
+
+      return;
+    }
+
     if (db) {
       setIsLoadingList(true);
       getAll(db)
@@ -96,7 +108,7 @@ export const Menu = () => {
     } else {
       setIsLoadingList(false);
     }
-  }, []);
+  }, [authUser]);
 
   const deleteChat = useCallback(async (id: string): Promise<void> => {
     if (!db) {
@@ -176,10 +188,10 @@ export const Menu = () => {
   const closeDialog = () => setDialogContent(null);
 
   useEffect(() => {
-    if (open) {
+    if (open || !authUser) {
       loadEntries();
     }
-  }, [open, loadEntries]);
+  }, [open, authUser, loadEntries]);
 
   /*
    * 3: 바깥(포인터다운) 또는 ESC로 닫힌다 — preventDefault/stopPropagation을 쓰지 않아서 클릭

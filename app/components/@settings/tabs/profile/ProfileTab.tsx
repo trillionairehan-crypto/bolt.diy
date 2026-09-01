@@ -6,11 +6,19 @@ import { authUserStore, signOut } from '~/lib/stores/auth';
 import { SettingSection } from '~/components/@settings/shared/components/SettingSection';
 import { SettingRow, SettingReadOnlyValue } from '~/components/@settings/shared/components/SettingRow';
 import { AutoSaveField } from '~/components/@settings/shared/components/AutoSaveField';
+import { LogoutConfirmDialog } from '~/components/ui/LogoutConfirmDialog';
 
 export default function ProfileTab() {
   const profile = useStore(profileStore);
   const authUser = useStore(authUserStore);
   const [isUploading, setIsUploading] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const handleConfirmLogout = async () => {
+    setShowLogoutConfirm(false);
+    await signOut();
+    window.location.href = '/';
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -91,7 +99,7 @@ export default function ProfileTab() {
         <SettingRow label="로그아웃">
           <button
             type="button"
-            onClick={() => signOut()}
+            onClick={() => setShowLogoutConfirm(true)}
             className="text-sm font-medium hover:underline"
             style={{ color: '#1A1A1A' }}
           >
@@ -99,6 +107,12 @@ export default function ProfileTab() {
           </button>
         </SettingRow>
       </SettingSection>
+
+      <LogoutConfirmDialog
+        open={showLogoutConfirm}
+        onCancel={() => setShowLogoutConfirm(false)}
+        onConfirm={handleConfirmLogout}
+      />
     </div>
   );
 }

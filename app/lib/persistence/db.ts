@@ -175,6 +175,26 @@ export async function deleteById(db: IDBDatabase, id: string): Promise<void> {
   });
 }
 
+/**
+ * 로그아웃 시 이 기기에 저장된 대화 기록을 전부 지운다 — 서버에 없는 로컬 전용 데이터라 삭제가
+ * 곧 소실이다(공용 PC에서 다음 사용자가 이전 사용자의 대화를 보는 걸 막기 위한 개인정보 조치).
+ * deleteById와 마찬가지로 chats·snapshots 두 스토어를 함께 비운다 — snapshots만 남으면 파일
+ * 내용이 로컬에 그대로 남는다.
+ */
+export async function clearAllChats(db: IDBDatabase): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['chats', 'snapshots'], 'readwrite');
+    const chatStore = transaction.objectStore('chats');
+    const snapshotStore = transaction.objectStore('snapshots');
+
+    chatStore.clear();
+    snapshotStore.clear();
+
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error);
+  });
+}
+
 export async function getNextId(db: IDBDatabase): Promise<string> {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction('chats', 'readonly');

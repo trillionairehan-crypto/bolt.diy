@@ -34,8 +34,12 @@ export function useChatHomeSections(): ChatHomeSections {
     let cancelled = false;
 
     (async () => {
+      /*
+       * 게스트 상태에서는 "이어서 만들기"도 렌더되지 않아야 한다(로그인 여부 조건, 공용 PC 개인정보
+       * 조치) — IndexedDB 자체가 계정으로 구분되지 않아 로그인 여부가 유일한 방어선.
+       */
       const [chats, deployed] = await Promise.all([
-        db ? getAll(db) : Promise.resolve([]),
+        authUser && db ? getAll(db) : Promise.resolve([]),
         authUser ? getDeployedApps() : Promise.resolve([]),
       ]);
 
