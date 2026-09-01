@@ -172,7 +172,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                 className={classNames(
                   `px-3 py-2 rounded-md text-sm font-medium`,
                   'bg-[var(--accent)]',
-                  'hover:bg-[var(--accent-hover)]',
+                  'hover:opacity-[0.85]',
                   'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)]',
                   'text-[var(--on-accent)]',
                   'flex items-center gap-1.5',
@@ -187,7 +187,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                 className={classNames(
                   `px-3 py-2 rounded-md text-sm font-medium`,
                   'bg-[var(--accent)]',
-                  'hover:bg-[var(--accent-hover)]',
+                  'hover:opacity-[0.85]',
                   'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)]',
                   'text-[var(--on-accent)]',
                   'flex items-center gap-1.5',
@@ -210,7 +210,7 @@ export function SupabaseChatAlert({ alert, clearAlert, postMessage }: Props) {
                   className={classNames(
                     `px-3 py-2 rounded-md text-sm font-medium`,
                     'bg-[var(--accent)]',
-                    'hover:bg-[var(--accent-hover)]',
+                    'hover:opacity-[0.85]',
                     'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent)]',
                     'text-[var(--on-accent)]',
                     'flex items-center gap-1.5',

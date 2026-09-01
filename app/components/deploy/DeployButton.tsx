@@ -162,7 +162,7 @@ export const DeployButton = ({
           onClick={handleCloudflareDeployClick}
           disabled={isDeploying || !activePreview || isStreaming}
           title={isDeploying && deployingTo ? `${deployingTo}에 배포하고 있어요` : undefined}
-          className="items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:bg-[var(--accent-hover)] outline-[var(--accent)] flex gap-1.5"
+          className="items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:opacity-[0.85] outline-[var(--accent)] flex gap-1.5"
         >
           {isDeploying && deployingTo === 'cloudflare' ? '배포 중...' : '배포하기'}
         </button>
@@ -174,7 +174,7 @@ export const DeployButton = ({
             <DropdownMenu.Trigger
               disabled={isDeploying || !activePreview || isStreaming}
               aria-label="다른 방법으로 내보내기"
-              className="border-l border-[var(--on-accent)]/20 items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-2 py-1.5 bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:bg-[var(--accent-hover)] outline-[var(--accent)] flex"
+              className="border-l border-[var(--on-accent)]/20 items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-2 py-1.5 bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:opacity-[0.85] outline-[var(--accent)] flex"
             >
               <span className={classNames('i-ph:caret-down transition-transform')} />
             </DropdownMenu.Trigger>

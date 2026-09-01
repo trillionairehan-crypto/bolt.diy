@@ -769,7 +769,7 @@ export default function SupabaseTab() {
                     disabled={connecting || !tokenInput}
                     className={classNames(
                       'px-4 py-2 rounded-lg text-sm flex items-center gap-2 text-white',
-                      'bg-[#FF5330] hover:bg-[#E64B2B]',
+                      'bg-[#FF5330] hover:opacity-[0.85]',
                       'disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200',
                       'transform active:scale-95',
                     )}

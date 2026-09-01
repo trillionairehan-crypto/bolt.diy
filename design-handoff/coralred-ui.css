@@ -25,9 +25,9 @@
   --muted: oklch(0.55 0.01 var(--hue));
   --text: oklch(0.2 0.008 var(--hue));
   /* 코랄 톤 재보정 — app/styles/variables.scss와 동일 값(그 파일의 주석에 계산 근거 있음),
-     이 파일 자체 규칙("이 파일과 값이 같아야 함")대로 계속 동기화. */
+     이 파일 자체 규칙("이 파일과 값이 같아야 함")대로 계속 동기화.
+     어두운 코랄 삭제(overnight5): --accent-hover 변수 삭제 — .cr-btn:hover는 opacity로 표현. */
   --accent: oklch(0.69 0.22 var(--hue));
-  --accent-hover: oklch(0.64 0.22 var(--hue));
   --accent-soft: oklch(0.97 0.015 var(--hue));
   --accent-ring: oklch(0.9 0.06 var(--hue));
   /* 텍스트로 쓰는 액센트 — 밝은 hue(노랑/라임)에서도 읽히도록 L을 0.5로 클램프 */
@@ -52,7 +52,6 @@
   --muted: oklch(0.66 0.015 var(--hue));
   --text: oklch(0.95 0.008 var(--hue));
   --accent: oklch(0.68 0.19 var(--hue));
-  --accent-hover: oklch(0.73 0.19 var(--hue));
   --accent-soft: oklch(0.235 0.05 var(--hue));
   --accent-ring: oklch(0.45 0.09 var(--hue));
   --accent-text: oklch(0.72 0.17 var(--hue));
@@ -99,7 +98,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   background: var(--accent); color: var(--on-accent);
 }
 [data-theme="dark"] .cr-btn { font-weight: 600; }
-.cr-btn:hover { background: var(--accent-hover); }
+.cr-btn:hover { opacity: 0.85; }
 .cr-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--accent-ring); }
 .cr-btn:disabled { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
 .cr-btn.outline { background: var(--surface); color: var(--text); border: 1px solid var(--border-strong); }

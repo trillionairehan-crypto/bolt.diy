@@ -437,7 +437,7 @@ export function SelectionDialog({
             <Button
               onClick={handleConfirm}
               disabled={selectedItems.length === 0}
-              className="bg-[var(--accent)] text-[var(--on-accent)] hover:bg-[var(--accent-hover)] disabled:opacity-50 disabled:pointer-events-none"
+              className="bg-[var(--accent)] text-[var(--on-accent)] hover:opacity-[0.85] disabled:opacity-50 disabled:pointer-events-none"
             >
               {confirmLabel}
             </Button>

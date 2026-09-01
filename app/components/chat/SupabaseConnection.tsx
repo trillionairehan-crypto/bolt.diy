@@ -217,7 +217,7 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
           onClick={() => setIsDialogOpen(!isDialogOpen)}
           title={isStorageOn ? '저장 기능이 켜졌어요' : '앱에 로그인과 저장 기능을 쓰려면 연결이 필요해요'}
           className={classNames(
-            'items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:bg-[var(--accent-hover)] outline-[var(--accent)] flex gap-1.5',
+            'items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:opacity-[0.85] outline-[var(--accent)] flex gap-1.5',
             { '!px-2': !showLabel },
           )}
         >
@@ -440,7 +440,7 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                     className={classNames(
                       'px-4 py-2 rounded-lg text-sm flex items-center gap-2',
                       'bg-[var(--accent)] text-[var(--on-accent)]',
-                      'hover:bg-[var(--accent-hover)]',
+                      'hover:opacity-[0.85]',
                       'disabled:opacity-50 disabled:cursor-not-allowed',
                     )}
                   >
@@ -532,7 +532,7 @@ export function SupabaseConnection({ showLabel = true }: SupabaseConnectionProps
                         </button>
                         <button
                           onClick={() => handleCreateProject()}
-                          className="px-2 py-1 rounded-md text-xs bg-[var(--accent)] text-[var(--on-accent)] hover:bg-[var(--accent-hover)] flex items-center gap-1"
+                          className="px-2 py-1 rounded-md text-xs bg-[var(--accent)] text-[var(--on-accent)] hover:opacity-[0.85] flex items-center gap-1"
                         >
                           <div className="i-ph:plus w-3 h-3" />새 프로젝트
                         </button>

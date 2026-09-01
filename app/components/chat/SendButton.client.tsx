@@ -20,7 +20,7 @@ export const SendButton = ({ isStreaming, disabled, onClick, size = 'default', b
       type="button"
       title={isStreaming ? '중단' : '만들기'}
       aria-label={isStreaming ? '중단' : '만들기'}
-      className={`flex items-center justify-center ${size === 'sm' ? 'h-9 w-9' : 'h-11 w-11'} rounded-full transition-colors bg-[#FF5330] hover:bg-[#E64B2B] text-[#FBF5EE] disabled:opacity-40 disabled:cursor-not-allowed ${breathe ? 'animate-[cr-send-breathe_2s_ease-in-out_infinite]' : ''}`}
+      className={`flex items-center justify-center ${size === 'sm' ? 'h-9 w-9' : 'h-11 w-11'} rounded-full transition-colors bg-[#FF5330] hover:opacity-[0.85] text-[#FBF5EE] disabled:opacity-40 disabled:cursor-not-allowed ${breathe ? 'animate-[cr-send-breathe_2s_ease-in-out_infinite]' : ''}`}
       disabled={disabled}
       onClick={(event) => {
         event.preventDefault();

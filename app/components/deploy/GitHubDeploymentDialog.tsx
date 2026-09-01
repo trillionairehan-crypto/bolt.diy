@@ -649,7 +649,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       href={createdRepoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-lg bg-[var(--accent)] text-[var(--on-accent)] hover:bg-[var(--accent-hover)] text-sm inline-flex items-center gap-2"
+                      className="px-4 py-2 rounded-lg bg-[var(--accent)] text-[var(--on-accent)] hover:opacity-[0.85] text-sm inline-flex items-center gap-2"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -740,7 +740,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                     </motion.button>
                     <motion.button
                       onClick={() => setShowAuthDialog(true)}
-                      className="px-4 py-2 rounded-lg bg-[var(--accent)] text-[var(--on-accent)] text-sm hover:bg-[var(--accent-hover)] inline-flex items-center gap-2"
+                      className="px-4 py-2 rounded-lg bg-[var(--accent)] text-[var(--on-accent)] text-sm hover:opacity-[0.85] inline-flex items-center gap-2"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -984,7 +984,7 @@ export function GitHubDeploymentDialog({ isOpen, onClose, projectName, files }: 
                       type="submit"
                       disabled={isLoading}
                       className={classNames(
-                        'flex-1 px-4 py-2 bg-[var(--accent)] text-[var(--on-accent)] rounded-lg hover:bg-[var(--accent-hover)] text-sm inline-flex items-center justify-center gap-2',
+                        'flex-1 px-4 py-2 bg-[var(--accent)] text-[var(--on-accent)] rounded-lg hover:opacity-[0.85] text-sm inline-flex items-center justify-center gap-2',
                         isLoading ? 'opacity-50 cursor-not-allowed' : '',
                       )}
                       whileHover={!isLoading ? { scale: 1.02 } : {}}
