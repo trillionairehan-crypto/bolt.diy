@@ -29,7 +29,23 @@ export const REVIEW_CHECKLIST: ReviewCheckItem[] = [
     enabled: true,
     description:
       '이모지가 아이콘·이미지 자리에 UI 요소로 쓰였는가 (렌더 실패로 물음표 문자가 되는 원인). ' +
-      '이미지·아이콘 자리의 이모지는 인라인 SVG 또는 플레이스홀더로 교체한다.',
+      '이미지 자리(사진이 없는 상태)의 이모지는 시스템 프롬프트 <image_placeholder_rules>의 코랄 틴트 ' +
+      '플레이스홀더(#FFF4EF 배경 + 인라인 SVG 아이콘 24~32px + "사진을 보내주시면 여기에 넣어드릴게요" ' +
+      '13px, 80px 이하 작은 자리는 문구 생략)로 정확히 교체한다 — 다른 문구·다른 색으로 임의 변형하지 ' +
+      '않는다. 순수 장식용 이모지(아이콘 대체가 아닌 경우)도 인라인 SVG로 교체한다.',
+  },
+  {
+    id: 'image-placeholder-pattern',
+    severity: 'critical',
+    kind: 'text',
+    enabled: true,
+    description:
+      '사진 없는 이미지 자리(가게·상품·프로필·히어로·썸네일)가 <image_placeholder_rules>의 다섯 요건을 ' +
+      '전부 지키는가: (1) 배경이 정확히 #FFF4EF인가 — var(--accent-soft)나 var(--bg) 같은 킷 변수로 ' +
+      '대체하지 않았는가. (2) 인라인 SVG 선 스타일 아이콘(24~32px, var(--muted))인가. (3) 80px보다 큰 ' +
+      '자리에 "사진을 보내주시면 여기에 넣어드릴게요" 캡션(13px, var(--muted))이 실제로 있는가 — 카드형 ' +
+      '썸네일(120~200px 정도)도 기본적으로 캡션이 있어야 하는 대상이다, 작다는 이유로 생략됐다면 추가한다. ' +
+      '(4) 80px 이하인 자리만 캡션을 생략했는가. (5) 높이가 히어로·배너 포함 200px를 넘지 않는가.',
   },
   {
     id: 'color-literal',

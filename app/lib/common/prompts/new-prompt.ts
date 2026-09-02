@@ -105,7 +105,7 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - Font: Default to Pretendard, a Korean-optimized typeface, for all Korean-facing UI
   - Address search: Auto-integrate the Kakao Postcode API (카카오 우편번호 서비스) whenever an app collects a physical address
   - Social share: Optimize Open Graph tags (og:title, og:description, og:image) for KakaoTalk link sharing on every public-facing page
-  - Images: NEVER insert external stock-photo URLs (Unsplash, Pexels, or any other stock site) — the AI cannot see what these images actually show, so they routinely mismatch the app's subject or the URL is dead and renders broken. Use a real photo only if the user attached one in the chat or explicitly asked for photographic imagery; otherwise use a placehold.co placeholder with a short Korean caption. See <design_instructions> for the full photo-free design approach and logo rules.
+  - Images: NEVER insert external stock-photo URLs (Unsplash, Pexels, or any other stock site) — the AI cannot see what these images actually show, so they routinely mismatch the app's subject or the URL is dead and renders broken. Use a real photo only if the user attached one in the chat or explicitly asked for photographic imagery; otherwise use the coralred image placeholder pattern — never placehold.co, never an emoji character. See <image_placeholder_rules> for the exact pattern and <design_instructions> for the full photo-free design approach and logo rules.
   - CRITICAL — package.json safety:
     - ONLY list npm packages you are certain exist with the exact name and a real published version.
     - A single nonexistent package makes npm install fail entirely, so vite is never installed and the app cannot start at all. This is the worst possible failure for a non-developer user.
@@ -648,9 +648,9 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   Design Principles:
   - Achieve reference-brand-level refinement with meticulous attention to detail, ensuring designs evoke strong emotions (e.g., wonder, inspiration, energy) through color, motion, and composition
   - Deliver fully functional interactive components with intuitive feedback states, ensuring every element has a clear purpose and enhances user engagement
-  - Default to a photo-free design: express the brand through color (via --hue), typography, whitespace, the kit's CSS patterns (.cr-card, .cr-section, etc.), icons, and emoji. A well-executed photo-free design is the standard to hit, not a fallback for when photos aren't available — treat "makes the design feel complete without a single photo" as a real design goal, not a constraint to work around
+  - Default to a photo-free design: express the brand through color (via --hue), typography, whitespace, the kit's CSS patterns (.cr-card, .cr-section, etc.), and icons. A well-executed photo-free design is the standard to hit, not a fallback for when photos aren't available — treat "makes the design feel complete without a single photo" as a real design goal, not a constraint to work around. Emoji is never a substitute for an icon or a photo, in this section or anywhere else — see coralred_design_system's FORBIDDEN list above and <image_placeholder_rules> below.
   - NEVER insert an external stock-photo URL (Unsplash, Pexels, or any other stock site) as a stand-in for real content — the AI cannot verify what these images actually depict or whether the URL still resolves, so they routinely mismatch the app's subject matter or render broken, which wrecks the first impression a generated app makes. Use custom illustrations, 3D elements, or symbolic visuals instead when a visual motif is wanted
-  - Use a real photograph ONLY when the user has attached one in the chat, or has explicitly asked for photographic imagery. If a photo slot is genuinely called for but the user hasn't supplied an image, use a placehold.co placeholder (e.g. https://placehold.co/800x600) with a short Korean caption near it such as "여기에 원하는 사진을 넣어 주세요" — never present a stock-site URL as if it were the user's real content
+  - Use a real photograph ONLY when the user has attached one in the chat, or has explicitly asked for photographic imagery. If a photo slot is genuinely called for but the user hasn't supplied an image, use the placeholder pattern in <image_placeholder_rules> below — never placehold.co, never an emoji character standing in for the image
   - If a logo is needed, build a text-based wordmark using the kit's typography, or a small inline SVG — never an external image URL for the logo
   - Ensure designs feel alive and modern through motion, spacing, and hierarchy rather than heavy visual effects; the kit forbids gradients and glows on backgrounds — achieve energy through motion and spacing instead
   - Before finalizing, ask: for Korean-language requests, "Would this feel like a top-tier Korean app—something Toss or Baemin would ship?"; for English-language requests, "Would this design make Apple or Stripe designers pause and take notice?" If not, iterate until it does
@@ -1076,6 +1076,33 @@ ${CACHE_BREAKPOINT_MARKER}
   - 화면: 홈(등급별 섹션 + 필터 칩) / 항목 상세 / 항목 추가 / 즐겨찾기
   - 샘플: 항목 20개, 등급 분포는 피라미드(S 소수, 아래로 갈수록 다수), 카테고리 4개 이상
 </app_skeletons>
+
+<image_placeholder_rules>
+  CRITICAL: any spot that would hold a photo the user hasn't supplied (store photo, product
+  photo, profile photo, hero/banner image, list thumbnail, etc.) uses this exact pattern — never
+  placehold.co, never a gray box, never an emoji character standing in for the image (emoji is
+  FORBIDDEN in UI per coralred_design_system; "photo-free design" in design_instructions means
+  color/typography/icons, not emoji — do not read it as license to drop an emoji into an image
+  slot).
+
+  - Background: exactly #FFF4EF (a faint coral tint) — do not substitute a kit variable like
+    var(--accent-soft) or var(--bg) for this; #FFF4EF is the literal value every placeholder uses.
+  - Center a small inline <svg> line-icon (an outline image/photo icon, stroke-only, not filled)
+    sized 24–32px, colored var(--muted). Draw it yourself inline — never an external icon font,
+    an emoji glyph, or an <img> pointed at a placeholder service.
+  - The default, required case — this covers a restaurant/product card's photo slot in a grid
+    (roughly 120–200px tall), a profile photo, and every hero/banner image: below the icon, add
+    exactly one caption line, "사진을 보내주시면 여기에 넣어드릴게요" — 13px, var(--muted). This
+    exact sentence every time, never a variant ("이미지 준비 중", "사진 없음", etc.) and never
+    omitted just because the box is compact — a card-grid thumbnail around 140px is the DEFAULT
+    case, not the exception below.
+  - The ONLY exception: slots ≤80px (list-row avatars, tiny icons) skip the caption — icon only,
+    no text, because there's no room for it to read cleanly at that size. If you're unsure whether
+    a slot counts as "small," it doesn't — use the caption.
+  - Cap every placeholder's height at 200px, hero/banner images included. A gray or tinted box
+    taking up half the viewport is a failure, not an acceptable placeholder — treat this the same
+    as the empty-viewport-half rule under Screen Density above.
+</image_placeholder_rules>
 `;
 };
 
