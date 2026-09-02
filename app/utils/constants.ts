@@ -25,6 +25,14 @@ export const ONBOARDING_ADDITIONS_MARKER = '\n\n추가로 알려주신 내용:\n
 export const DEFAULT_MODEL = 'claude-sonnet-5';
 export { SHOW_DEV_TOOLS, CORALRED_NEW_METERING } from './featureFlags';
 export const PROMPT_COOKIE_KEY = 'cachedPrompt';
+
+/*
+ * /examples 카드 클릭 → 채팅 홈 입력창 채움 전용 1회성 키. PROMPT_COOKIE_KEY와 다른 목적(그건
+ * 타이핑 중 자동 저장 — 디바운스로 계속 갱신되고 30일 유지)이라 재사용하면 "새로고침해도 다시
+ * 채워지지 않아야 한다"는 요구를 못 지킨다. Chat.client.tsx가 마운트 시 이 키를 읽어 입력값
+ * 초기화에만 쓰고, 값이 있든 없든 즉시 지운다 — 다음 새로고침엔 아무 것도 안 남는다.
+ */
+export const EXAMPLE_PROMPT_FILL_KEY = 'examplePromptFill';
 export const TOOL_EXECUTION_APPROVAL = {
   APPROVE: 'Yes, approved.',
   REJECT: 'No, rejected.',

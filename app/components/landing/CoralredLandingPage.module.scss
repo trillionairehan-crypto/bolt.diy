@@ -213,300 +213,6 @@ $coral: #ff5330;
   margin: 0 auto;
 }
 
-.card {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.browserFrame {
-  border: 1px solid rgba(26, 26, 26, 0.12);
-  border-radius: 12px;
-  overflow: hidden;
-  background: $cream;
-}
-
-.browserBar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  background: rgba(26, 26, 26, 0.04);
-  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
-}
-
-.browserDots {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(26, 26, 26, 0.18);
-}
-
-.addressBar {
-  flex: 1;
-  font-size: 10px;
-  font-weight: 400;
-  color: $ink-soft;
-  background: rgba(26, 26, 26, 0.05);
-  border-radius: 999px;
-  padding: 3px 10px;
-  font-family: 'IBM Plex Mono', 'Pretendard', monospace;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.browserContent {
-  padding: 18px 16px;
-  height: 176px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 14px;
-}
-
-.cardDesc {
-  font-size: 14px;
-  font-weight: 500;
-  color: $ink-soft;
-  margin: 0;
-}
-
-// ---------- Showcase card content — shared across all 6 skeleton kinds ----------
-// 코랄은 프레임당 정확히 한 곳(핵심 숫자 또는 차트 하나)에만 — .statValueAccent/.listingPriceAccent/
-// .tierScore와 Sparkline/DonutChart의 stroke="#FF5330" 지점이 그 "한 곳"이다. 나머지는 전부
-// $ink/$ink-soft만 쓴다.
-
-.statRow {
-  display: flex;
-  gap: 16px;
-}
-
-.statBox {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.statValue {
-  font-size: 22px;
-  font-weight: 700;
-  color: $ink;
-  letter-spacing: -0.02em;
-  margin: 0;
-  line-height: 1.1;
-}
-
-.statValueInline {
-  display: inline;
-  font-size: 15px;
-}
-
-.statValueAccent {
-  color: $coral;
-}
-
-.statLabel {
-  font-size: 11px;
-  font-weight: 500;
-  color: $ink-soft;
-  margin: 0;
-}
-
-.rows {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.rowLine {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 0;
-}
-
-.rowMain {
-  font-size: 12px;
-  font-weight: 600;
-  color: $ink;
-  margin: 0;
-}
-
-.rowMeta {
-  font-size: 11px;
-  font-weight: 500;
-  color: $ink-soft;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-// ---------- Schedule (미용실 예약) ----------
-
-.timelineRow {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
-}
-
-.timelineSlot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  flex: 1;
-  min-width: 0;
-}
-
-.timelineDot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-}
-
-.timelineDotConfirmed {
-  background: $ink;
-}
-
-.timelineDotPending {
-  background: transparent;
-  border: 1.5px solid $ink-soft;
-}
-
-.timelineTime {
-  font-size: 10px;
-  font-weight: 500;
-  color: $ink-soft;
-  font-family: 'IBM Plex Mono', 'Pretendard', monospace;
-}
-
-.timelineLabel {
-  font-size: 11px;
-  font-weight: 600;
-  color: $ink;
-}
-
-// ---------- Finance / tracker charts (우리 가게 매출, 운동 기록) ----------
-
-.chartRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.donutChart {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-}
-
-.sparkline {
-  flex: 1;
-  height: 28px;
-  min-width: 0;
-}
-
-// ---------- Listing (동네 중고거래) ----------
-
-.chipRow {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.chip {
-  font-size: 10px;
-  font-weight: 500;
-  color: $ink-soft;
-  border: 1px solid rgba(26, 26, 26, 0.14);
-  border-radius: 999px;
-  padding: 3px 9px;
-}
-
-.chipActive {
-  color: $cream;
-  background: $ink;
-  border-color: $ink;
-}
-
-.listingRow {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 4px 8px;
-}
-
-.listingTitle {
-  font-size: 12px;
-  font-weight: 600;
-  color: $ink;
-  flex: 1;
-  min-width: 0;
-}
-
-.listingMeta {
-  font-size: 10px;
-  font-weight: 500;
-  color: $ink-soft;
-  white-space: nowrap;
-}
-
-.listingPrice {
-  font-size: 12px;
-  font-weight: 700;
-  color: $ink;
-  white-space: nowrap;
-}
-
-.listingPriceAccent {
-  color: $coral;
-}
-
-// ---------- Ranking (맛집 랭킹) ----------
-
-.tierRow {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.tierLabel {
-  font-size: 13px;
-  font-weight: 700;
-  color: $ink;
-  flex-shrink: 0;
-  width: 12px;
-}
-
-.tierScore {
-  font-size: 10px;
-  font-weight: 700;
-  color: $coral;
-  flex-shrink: 0;
-}
-
-.tierItems {
-  font-size: 11px;
-  font-weight: 500;
-  color: $ink-soft;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .footerLegal {
   font-size: 12px;
   font-weight: 400;
@@ -683,7 +389,12 @@ $coral: #ff5330;
   transform: translateY(0);
 }
 
-.grid .card,
+/*
+ * .grid의 카드는 이제 SkeletonShowcaseCard.tsx(별도 CSS 모듈)가 렌더한다 — 여기서 .card 클래스로
+ * 직접 지목하면 이 파일 스코프로 해시된 이름이라 실제 엘리먼트의 클래스와 안 맞는다. 자식이 무엇이든
+ * .grid > *로 잡는다(카드는 항상 .grid의 direct child).
+ */
+.grid > *,
 .infoList li {
   opacity: 0;
   transform: translateY(14px);
@@ -692,14 +403,14 @@ $coral: #ff5330;
     transform 0.5s ease-out;
 }
 
-.grid.revealVisible .card,
+.grid.revealVisible > *,
 .infoList.revealVisible li {
   opacity: 1;
   transform: translateY(0);
 }
 
 @for $i from 1 through 6 {
-  .grid.revealVisible .card:nth-child(#{$i}) {
+  .grid.revealVisible > *:nth-child(#{$i}) {
     transition-delay: #{($i - 1) * 60}ms;
   }
 }
@@ -712,7 +423,7 @@ $coral: #ff5330;
 
 @media (prefers-reduced-motion: reduce) {
   .reveal,
-  .grid .card,
+  .grid > *,
   .infoList li {
     opacity: 1;
     transform: none;

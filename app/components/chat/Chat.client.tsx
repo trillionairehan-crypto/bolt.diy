@@ -12,6 +12,7 @@ import { workbenchStore } from '~/lib/stores/workbench';
 import {
   DEFAULT_MODEL,
   DEFAULT_PROVIDER,
+  EXAMPLE_PROMPT_FILL_KEY,
   PROMPT_COOKIE_KEY,
   PROVIDER_LIST,
   SHOW_DEV_TOOLS,
@@ -167,8 +168,22 @@ export const ChatImpl = memo(
     const [selectedElement, setSelectedElement] = useState<ElementInfo | null>(null);
     const mcpSettings = useMCPStore((state) => state.settings);
 
-    // v5 useChat() no longer returns `input`/`handleInputChange` — managed locally now.
-    const [input, setInput] = useState(() => Cookies.get(PROMPT_COOKIE_KEY) || '');
+    /*
+     * v5 useChat() no longer returns `input`/`handleInputChange` — managed locally now.
+     * /examples 카드가 채워 놓은 1회성 값(EXAMPLE_PROMPT_FILL_KEY)이 있으면 그걸 우선하고, 없으면
+     * 기존 타이핑-자동저장 쿠키(PROMPT_COOKIE_KEY)로 폴백한다. 1회성 값은 마운트 직후 바로 지운다
+     * (아래 useEffect) — 새로고침하면 다시 안 채워진다.
+     */
+    const [input, setInput] = useState(
+      () => Cookies.get(EXAMPLE_PROMPT_FILL_KEY) || Cookies.get(PROMPT_COOKIE_KEY) || '',
+    );
+
+    useEffect(() => {
+      if (Cookies.get(EXAMPLE_PROMPT_FILL_KEY)) {
+        Cookies.remove(EXAMPLE_PROMPT_FILL_KEY);
+        textareaRef.current?.focus();
+      }
+    }, []);
 
     // v5 useChat() no longer returns `data`/`setData` for custom stream data — rebuilt via onData below.
     const [progressAnnotations, setProgressAnnotations] = useState<ProgressAnnotation[]>([]);
