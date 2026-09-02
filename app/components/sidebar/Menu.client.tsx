@@ -93,7 +93,6 @@ export const Menu = () => {
   const { duplicateCurrentChat, exportChat } = useChatHistory();
   const { id: currentUrlId } = useParams();
   const menuRef = useRef<HTMLDivElement>(null);
-  const hamburgerRef = useRef<HTMLButtonElement>(null);
   const [list, setList] = useState<ChatHistoryItem[]>([]);
   const [isLoadingList, setIsLoadingList] = useState(true);
   const open = useStore(sidebarOpenStore);
@@ -227,9 +226,11 @@ export const Menu = () => {
    * 3: 바깥(포인터다운) 또는 ESC로 닫힌다 — preventDefault/stopPropagation을 쓰지 않아서 클릭
    * 이벤트가 원래 타겟(예: 입력창)에도 그대로 도달한다. 그래서 사이드바가 열린 채로 입력창을
    * 누르면 "사이드바 닫힘"과 "입력창 포커스"가 같은 클릭에서 동시에 일어난다(두 번 클릭 불필요).
-   * menuRef(패널) 안 클릭과 hamburgerRef(토글 버튼) 클릭은 제외 — 패널 안 클릭(앱 선택/삭제)은
-   * 원래 닫힘을 유발하면 안 되고, 햄버거는 자체 onClick으로 이미 토글하므로 이 리스너가 같은
-   * 클릭에서 또 닫아버리면(=순서상 열자마자 닫힘) 안 된다. 데스크톱/모바일 오버레이 공용.
+   * menuRef(패널) 안 클릭과 [data-sidebar-toggle] 클릭은 제외 — 패널 안 클릭(앱 선택/삭제)은
+   * 원래 닫힘을 유발하면 안 되고, 토글 버튼은 자체 onClick으로 이미 토글하므로 이 리스너가 같은
+   * 클릭에서 또 닫아버리면(=순서상 열자마자 닫힘) 안 된다. data-sidebar-toggle 속성 기반이라
+   * 데스크톱 레일 햄버거뿐 아니라 Header.tsx의 모바일 햄버거(별도 컴포넌트, ref 공유 불가)도
+   * 같은 방식으로 제외된다. 데스크톱/모바일 오버레이 공용.
    */
   useEffect(() => {
     if (!open) {
@@ -238,8 +239,9 @@ export const Menu = () => {
 
     const handlePointerDown = (event: PointerEvent) => {
       const target = event.target as Node;
+      const targetEl = target instanceof Element ? target : (target as ChildNode).parentElement;
 
-      if (menuRef.current?.contains(target) || hamburgerRef.current?.contains(target)) {
+      if (menuRef.current?.contains(target) || targetEl?.closest('[data-sidebar-toggle]')) {
         return;
       }
 
@@ -319,10 +321,10 @@ export const Menu = () => {
             <Logo height={24} showWordmark={false} />
           </a>
           <button
-            ref={hamburgerRef}
             type="button"
             title="메뉴"
             aria-label="메뉴"
+            data-sidebar-toggle
             className={classNames(styles.railHamburger, 'z-logo')}
             onClick={toggleSidebar}
           >

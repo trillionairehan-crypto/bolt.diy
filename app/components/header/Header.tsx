@@ -5,6 +5,8 @@ import { chatStore } from '~/lib/stores/chat';
 import { ThemeSwitch } from '~/components/ui/ThemeSwitch';
 import { DeployButton } from '~/components/deploy/DeployButton';
 import { SupabaseConnection } from '~/components/chat/SupabaseConnection';
+import { Logo } from '~/components/ui/Logo';
+import { toggleSidebar } from '~/lib/stores/sidebar';
 import useViewport from '~/lib/hooks';
 import { DARK_MODE_ENABLED } from '~/utils/featureFlags';
 
@@ -33,6 +35,30 @@ export function Header() {
       className="flex items-center gap-3 px-4 border-b h-[var(--header-height)]"
       style={{ background: '#FBF5EE', borderColor: 'rgba(26, 26, 26, 0.08)', color: '#1A1A1A' }}
     >
+      {/*
+        모바일(<1024px, Menu.client.tsx의 데스크톱 레일과 정확히 같은 기준 — 그 사이에 사이드바를
+        열 방법이 하나도 없는 폭이 생기면 안 된다)에서는 데스크톱 레일의 고정 로고/햄버거가 아예
+        렌더되지 않아(!isSmallViewport 조건) 사이드바를 열 방법이 없었다 — 헤더 왼쪽에 대신 넣는다.
+        data-sidebar-toggle: Menu.client.tsx의 바깥클릭-닫힘 리스너가 이 버튼 클릭을 "바깥"으로
+        오인해 열자마자 닫아버리지 않도록 제외 표시.
+      */}
+      {isSmallViewport && (
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            type="button"
+            aria-label="메뉴"
+            data-sidebar-toggle
+            className="flex items-center justify-center"
+            style={{ color: '#1A1A1A', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+            onClick={toggleSidebar}
+          >
+            <span className="i-ph:list" style={{ fontSize: 24 }} />
+          </button>
+          <a href="/" aria-label="홈" className="flex items-center">
+            <Logo height={20} showWordmark={false} />
+          </a>
+        </div>
+      )}
       {chat.started ? (
         <>
           {/* 앱 제목(연필 아이콘 포함)은 헤더에서 제거 — 사이드바에서 확인 가능하다. */}

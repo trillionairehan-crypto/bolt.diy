@@ -379,7 +379,8 @@ $rail-icon-top: calc((var(--header-height) - #{$rail-icon-size}) / 2);
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px;
+  min-height: 36px;
+  padding: 0 8px;
   border-radius: 8px;
   cursor: pointer;
 
