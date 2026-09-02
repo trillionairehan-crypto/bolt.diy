@@ -1,7 +1,6 @@
 import { atom } from 'nanostores';
 import type { User } from '@supabase/supabase-js';
 import { platformSupabase } from '~/lib/supabase/platform-client';
-import { clearAllChats, openDatabase } from '~/lib/persistence/db';
 
 export const authUserStore = atom<User | null>(null);
 
@@ -53,25 +52,6 @@ function recordLastLoginMethod(user: User | null): void {
   }
 }
 
-/*
- * 로그아웃 시 로컬 대화 기록 노출 — IndexedDB의 대화·스냅샷은 서버에 없는 이 기기 전용 데이터라
- * 로그아웃해도 그대로 남아 있었다(공용 PC에서 다음 사용자가 이전 사용자의 대화를 그대로 보는
- * 문제). 명시적 signOut() 호출뿐 아니라 다른 탭에서의 로그아웃·세션 만료로 인한 로그아웃도 전부
- * 여기(onAuthStateChange의 SIGNED_OUT)로 모인다 — 트리거 경로와 무관하게 한 곳에서 확실히 지운다.
- * 로컬 정리 실패가 로그아웃 자체를 막으면 안 되므로 실패는 조용히 삼킨다.
- */
-export async function clearLocalChatHistory(): Promise<void> {
-  try {
-    const db = await openDatabase();
-
-    if (db) {
-      await clearAllChats(db);
-    }
-  } catch (error) {
-    console.error('Failed to clear local chat history on sign-out (non-fatal):', error);
-  }
-}
-
 export function initAuthListener() {
   if (!platformSupabase) {
     authResolvedStore.set(true);
@@ -91,14 +71,10 @@ export function initAuthListener() {
 
   const {
     data: { subscription },
-  } = platformSupabase.auth.onAuthStateChange((event, session) => {
+  } = platformSupabase.auth.onAuthStateChange((_event, session) => {
     authUserStore.set(session?.user ?? null);
     authResolvedStore.set(true);
     recordLastLoginMethod(session?.user ?? null);
-
-    if (event === 'SIGNED_OUT') {
-      clearLocalChatHistory();
-    }
   });
 
   return () => {
@@ -152,17 +128,16 @@ export async function verifyEmailOtp(email: string, token: string) {
   }
 }
 
+/*
+ * 로그아웃해도 이 기기의 IndexedDB 대화 기록(clearAllChats)은 지우지 않는다 — 예전에 "공용 PC
+ * 개인정보" 명목으로 SIGNED_OUT마다 지우게 했다가, 실제로는 로그아웃 시 대화가 전부 사라지는
+ * 프로덕션 버그로 드러나 롤백했다(2026-09-02). 게스트에게 사이드바 목록을 숨기는 건 별도로
+ * authUserStore를 직접 구독하는 쪽(Menu.client.tsx)에서 처리하므로 여기서 데이터를 지울 필요가 없다.
+ */
 export async function signOut() {
   if (!platformSupabase) {
     return;
   }
 
   await platformSupabase.auth.signOut();
-
-  /*
-   * onAuthStateChange의 SIGNED_OUT 훅(위)도 같은 정리를 하지만 fire-and-forget이라, 로그아웃
-   * 직후 페이지를 이동하는 호출부가 정리 완료를 확실히 기다리게 하려면 여기서도 await한다 —
-   * clearAllChats는 멱등이라 두 번 불려도 무해하다.
-   */
-  await clearLocalChatHistory();
 }
