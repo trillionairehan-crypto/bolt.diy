@@ -2,8 +2,11 @@ import type { MetaFunction } from '@remix-run/cloudflare';
 import { useEffect, useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { PageShell } from '~/components/ui/PageShell';
+import { MiniBrowserFrame } from '~/components/ui/MiniBrowserFrame';
+import { classNames } from '~/utils/classNames';
 import { authUserStore } from '~/lib/stores/auth';
 import { getDeployedApps, type DeployedAppRecord } from '~/lib/deployedApps';
+import { db, getAll, type ChatHistoryItem } from '~/lib/persistence';
 import styles from '~/components/apps/AppsPage.module.scss';
 
 export const meta: MetaFunction = () => {
@@ -95,9 +98,26 @@ function AppCard({ app }: { app: DeployedAppRecord }) {
   );
 }
 
+function BuildingCard({ item }: { item: ChatHistoryItem }) {
+  return (
+    <a href={`/chat/${item.urlId}`} className={styles.buildingCard}>
+      <MiniBrowserFrame
+        size="compact"
+        url=""
+        title={item.description || '이름 없는 앱'}
+        addressOverride="배포하면 주소가 생겨요"
+      />
+    </a>
+  );
+}
+
+type AppsTab = 'deployed' | 'building';
+
 export default function Apps() {
   const authUser = useStore(authUserStore);
+  const [activeTab, setActiveTab] = useState<AppsTab>('deployed');
   const [apps, setApps] = useState<DeployedAppRecord[] | null>(null);
+  const [buildingChats, setBuildingChats] = useState<ChatHistoryItem[] | null>(null);
 
   useEffect(() => {
     if (!authUser) {
@@ -118,6 +138,42 @@ export default function Apps() {
     };
   }, [authUser]);
 
+  /*
+   * 4-3: "만드는 중" = deployed_apps에 chat_id가 없는 IndexedDB 대화 전부 — apps(배포됨 목록)가
+   * 먼저 로드돼야 그 chat_id Set으로 제외할 수 있어서 apps에도 의존한다. 앱 그룹(포크) 대표만
+   * 추리는 사이드바 "최근 작업"과 달리 여기는 스펙이 명시한 대로 전부 나열한다(중복 제거 없음).
+   */
+  useEffect(() => {
+    if (!authUser || apps === null) {
+      setBuildingChats(null);
+      return undefined;
+    }
+
+    if (!db) {
+      setBuildingChats([]);
+      return undefined;
+    }
+
+    let cancelled = false;
+    const deployedChatIds = new Set(apps.map((app) => app.chat_id));
+
+    getAll(db)
+      .then((list) =>
+        list
+          .filter((item) => item.urlId && item.description && !deployedChatIds.has(item.urlId))
+          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()),
+      )
+      .then((list) => {
+        if (!cancelled) {
+          setBuildingChats(list);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser, apps]);
+
   return (
     <PageShell headline="내가 만든 앱" subheadline="배포한 앱을 한곳에서 확인해요">
       {!authUser && (
@@ -129,23 +185,68 @@ export default function Apps() {
         </div>
       )}
 
-      {authUser && apps === null && <p className={styles.loadingText}>불러오는 중...</p>}
+      {authUser && (
+        <>
+          <div className={styles.tabRow}>
+            <button
+              type="button"
+              className={classNames(styles.tab, { [styles.tabActive]: activeTab === 'deployed' })}
+              onClick={() => setActiveTab('deployed')}
+            >
+              배포됨
+            </button>
+            <button
+              type="button"
+              className={classNames(styles.tab, { [styles.tabActive]: activeTab === 'building' })}
+              onClick={() => setActiveTab('building')}
+            >
+              만드는 중
+            </button>
+          </div>
 
-      {authUser && apps !== null && apps.length === 0 && (
-        <div className={styles.emptyState}>
-          <p className={styles.emptyText}>아직 배포한 앱이 없어요</p>
-          <a href="/" className={styles.primaryBtn}>
-            첫 앱 만들기
-          </a>
-        </div>
-      )}
+          {activeTab === 'deployed' && (
+            <>
+              {apps === null && <p className={styles.loadingText}>불러오는 중...</p>}
 
-      {authUser && apps !== null && apps.length > 0 && (
-        <div className={styles.grid}>
-          {apps.map((app) => (
-            <AppCard key={app.id} app={app} />
-          ))}
-        </div>
+              {apps !== null && apps.length === 0 && (
+                <div className={styles.emptyState}>
+                  <p className={styles.emptyText}>아직 배포한 앱이 없어요</p>
+                  <a href="/" className={styles.primaryBtn}>
+                    첫 앱 만들기
+                  </a>
+                </div>
+              )}
+
+              {apps !== null && apps.length > 0 && (
+                <div className={styles.grid}>
+                  {apps.map((app) => (
+                    <AppCard key={app.id} app={app} />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {activeTab === 'building' && (
+            <>
+              {buildingChats === null && <p className={styles.loadingText}>불러오는 중...</p>}
+
+              {buildingChats !== null && buildingChats.length === 0 && (
+                <div className={styles.emptyState}>
+                  <p className={styles.emptyText}>만들던 앱이 없어요</p>
+                </div>
+              )}
+
+              {buildingChats !== null && buildingChats.length > 0 && (
+                <div className={styles.grid}>
+                  {buildingChats.map((item) => (
+                    <BuildingCard key={item.id} item={item} />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </>
       )}
     </PageShell>
   );
