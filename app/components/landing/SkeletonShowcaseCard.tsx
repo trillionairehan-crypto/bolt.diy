@@ -188,8 +188,14 @@ function ShowcaseCardContent({ app }: { app: ShowcaseApp }) {
 interface SkeletonShowcaseCardProps {
   app: ShowcaseApp;
 
-  /** 전달되면 카드가 버튼이 된다 — /examples에서 클릭 시 프롬프트 채움에 쓴다. 랜딩에서는 안 준다. */
+  /** 전달되면 카드가 버튼이 된다 — /examples에서 클릭 시 바로 전송에 쓴다. 랜딩에서는 안 준다. */
   onClick?: () => void;
+
+  /**
+   * 전달되면 호버 시 프레임 하단 중앙에 뜬다(카드 전체를 옅게 덮는 오버레이 없이 라벨만) —
+   * onClick과 있으면 코랄 버튼처럼, 없으면(예: 메시지 소진) 회갈색 안내 문구로 보인다.
+   */
+  hoverLabel?: string;
   className?: string;
 }
 
@@ -197,7 +203,7 @@ interface SkeletonShowcaseCardProps {
  * 랜딩 섹션2와 /examples가 공유하는 골격 대표작 카드 — 미니 브라우저 프레임 + 골격별 콘텐츠 +
  * 아래 라벨. 프레임 마크업은 항상 동일하고 안쪽 콘텐츠만 app.kind로 갈라진다.
  */
-export function SkeletonShowcaseCard({ app, onClick, className }: SkeletonShowcaseCardProps) {
+export function SkeletonShowcaseCard({ app, onClick, hoverLabel, className }: SkeletonShowcaseCardProps) {
   const Wrapper = onClick ? 'button' : 'div';
 
   return (
@@ -218,6 +224,14 @@ export function SkeletonShowcaseCard({ app, onClick, className }: SkeletonShowca
         <div className={styles.browserContent}>
           <ShowcaseCardContent app={app} />
         </div>
+
+        {hoverLabel && (
+          <div className={styles.hoverOverlay}>
+            <span className={classNames(styles.hoverLabel, { [styles.hoverLabelDisabled]: !onClick })}>
+              {hoverLabel}
+            </span>
+          </div>
+        )}
       </div>
 
       <p className={styles.cardDesc}>{app.name}</p>

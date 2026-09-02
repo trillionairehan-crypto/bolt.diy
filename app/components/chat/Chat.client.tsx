@@ -179,10 +179,18 @@ export const ChatImpl = memo(
       () => Cookies.get(EXAMPLE_PROMPT_FILL_KEY) || Cookies.get(PROMPT_COOKIE_KEY) || '',
     );
 
+    /*
+     * /examples 카드 클릭은 이제 "채워넣기"가 아니라 "즉시 전송" — 마운트 직후 한 번 sendMessage를
+     * 그대로 호출한다(실제 전송 버튼과 동일 경로라 quota 체크·온보딩 설문이 정상 흐름대로 뜬다).
+     * sendMessage는 이 effect보다 아래에서 선언되지만 클로저라 문제없다 — 실제 호출은 렌더가 끝나고
+     * effect가 실행될 때(=sendMessage가 이미 초기화된 뒤) 일어난다.
+     */
     useEffect(() => {
-      if (Cookies.get(EXAMPLE_PROMPT_FILL_KEY)) {
+      const examplePrompt = Cookies.get(EXAMPLE_PROMPT_FILL_KEY);
+
+      if (examplePrompt) {
         Cookies.remove(EXAMPLE_PROMPT_FILL_KEY);
-        textareaRef.current?.focus();
+        sendMessage({} as React.UIEvent, examplePrompt);
       }
     }, []);
 

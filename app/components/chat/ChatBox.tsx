@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { ClientOnly } from 'remix-utils/client-only';
 import { classNames } from '~/utils/classNames';
 import { PROVIDER_LIST, SHOW_DEV_TOOLS } from '~/utils/constants';
@@ -14,18 +14,17 @@ import { ExpoQrModal } from '~/components/workbench/ExpoQrModal';
 import type { ProviderInfo } from '~/types/model';
 import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
-import { WebSearch } from './WebSearch.client';
 
 const SHOW_ENHANCE_BUTTON = false;
 
 /*
  * Landing card is a fixed cream surface regardless of theme (same convention as the coral hero
  * itself — literal hex, not tokens, because this specific surface must NOT flip with dark mode).
- * Every `--bolt-elements-*` variable the card's descendants read (WebSearch popover, IconButton,
- * the Shift+Return kbd hint, etc.) is re-scoped to these values on the card wrapper via inline
- * CSS custom properties, so none of those child components need their own isLanding prop.
- * Values match the landing page's own brand tokens exactly (app/components/landing/
- * CoralredLandingPage.module.scss: $cream/$ink/$ink-soft) — previously a close-but-different set.
+ * Every `--bolt-elements-*` variable the card's descendants read (IconButton, etc.) is re-scoped
+ * to these values on the card wrapper via inline CSS custom properties, so none of those child
+ * components need their own isLanding prop. Values match the landing page's own brand tokens
+ * exactly (app/components/landing/CoralredLandingPage.module.scss: $cream/$ink/$ink-soft) —
+ * previously a close-but-different set.
  */
 const LANDING_CARD_BG = '#FBF5EE';
 const LANDING_CARD_BG_2 = '#F2E9DC';
@@ -85,30 +84,6 @@ interface ChatBoxProps {
 
 export const ChatBox: React.FC<ChatBoxProps> = (props) => {
   const isLanding = props.isLanding ?? false;
-
-  /*
-   * Attach/link/voice used to be three separate buttons — now one "+" menu, each item delegating
-   * to the same existing handlers (handleFileUpload, WebSearch's own popover, start/stopListening).
-   */
-  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
-  const [webSearchOpen, setWebSearchOpen] = useState(false);
-  const attachMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!attachMenuOpen) {
-      return undefined;
-    }
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (attachMenuRef.current && !attachMenuRef.current.contains(event.target as Node)) {
-        setAttachMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [attachMenuOpen]);
 
   return (
     <div
@@ -319,81 +294,6 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
           )}
         >
           <div className="flex flex-nowrap gap-3 items-center min-w-0">
-            {props.isListening ? (
-              <button
-                type="button"
-                onClick={props.stopListening}
-                className="flex items-center h-8 gap-1.5 px-2 rounded-md text-[13px] font-medium shrink-0 whitespace-nowrap"
-                style={{ color: '#FF5330' }}
-              >
-                <div className="i-ph:microphone-fill text-base animate-pulse" />
-                듣는 중
-              </button>
-            ) : (
-              <div ref={attachMenuRef} className="relative">
-                <IconButton
-                  title="첨부"
-                  className={classNames(
-                    'flex items-center h-8 gap-1.5 px-2 shrink-0 whitespace-nowrap',
-                    isLanding ? '!text-[#6E645B]' : '!text-bolt-elements-textSecondary',
-                  )}
-                  onClick={() => setAttachMenuOpen((open) => !open)}
-                >
-                  <div className="i-ph:plus text-lg" />
-                </IconButton>
-                {attachMenuOpen && (
-                  <div
-                    className="absolute bottom-full left-0 mb-2 flex flex-col gap-0.5 rounded-lg border p-1.5 shadow-lg whitespace-nowrap"
-                    style={{
-                      background: 'var(--bolt-elements-background-depth-1)',
-                      borderColor: 'var(--bolt-elements-borderColor)',
-                    }}
-                  >
-                    <button
-                      type="button"
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[13px] text-left hover:bg-bolt-elements-item-backgroundActive text-bolt-elements-textPrimary"
-                      onClick={() => {
-                        props.handleFileUpload();
-                        setAttachMenuOpen(false);
-                      }}
-                    >
-                      <div className="i-ph:paperclip text-base" />
-                      이미지 첨부
-                    </button>
-                    <button
-                      type="button"
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[13px] text-left hover:bg-bolt-elements-item-backgroundActive text-bolt-elements-textPrimary"
-                      onClick={() => {
-                        setWebSearchOpen(true);
-                        setAttachMenuOpen(false);
-                      }}
-                    >
-                      <div className="i-ph:link text-base" />
-                      사이트 링크
-                    </button>
-                    <button
-                      type="button"
-                      disabled={props.isStreaming || !props.speechRecognitionSupported}
-                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-md text-[13px] text-left hover:bg-bolt-elements-item-backgroundActive text-bolt-elements-textPrimary disabled:opacity-50 disabled:cursor-not-allowed"
-                      onClick={() => {
-                        props.startListening();
-                        setAttachMenuOpen(false);
-                      }}
-                    >
-                      <div className="i-ph:microphone text-base" />
-                      음성 입력
-                    </button>
-                  </div>
-                )}
-                <WebSearch
-                  onSearchResult={(result) => props.onWebSearchResult?.(result)}
-                  disabled={props.isStreaming}
-                  showTrigger={false}
-                  open={webSearchOpen}
-                  onOpenChange={setWebSearchOpen}
-                />
-              </div>
-            )}
             {SHOW_ENHANCE_BUTTON && (
               <IconButton
                 title="Enhance prompt"
@@ -430,12 +330,6 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
             )}
           </div>
           <div className="flex flex-nowrap gap-2 items-center shrink-0">
-            {isLanding && props.input.length > 3 ? (
-              <div className="hidden sm:block text-xs text-bolt-elements-textTertiary whitespace-nowrap shrink-0">
-                <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Shift</kbd> +{' '}
-                <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Return</kbd>으로 줄바꿈
-              </div>
-            ) : null}
             <ClientOnly>
               {() => (
                 <div className="shrink-0">

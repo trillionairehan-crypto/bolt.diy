@@ -33,10 +33,46 @@ $coral: #ff5330;
 }
 
 .browserFrame {
+  position: relative;
   border: 1px solid rgba(26, 26, 26, 0.12);
   border-radius: 12px;
   overflow: hidden;
   background: $cream;
+}
+
+// 호버 시 프레임 하단 중앙에 뜨는 라벨 — 카드 전체를 덮는 옅은 오버레이는 없다, 라벨 하나만.
+.hoverOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease-out;
+
+  .card:hover & {
+    opacity: 1;
+  }
+}
+
+.hoverLabel {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: $coral;
+  color: $cream;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(26, 26, 26, 0.18);
+}
+
+.hoverLabelDisabled {
+  background: rgba(251, 245, 238, 0.95);
+  color: $ink-soft;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(26, 26, 26, 0.1);
 }
 
 .browserBar {

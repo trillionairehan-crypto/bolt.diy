@@ -90,6 +90,8 @@ $border: #efe4d6;
   align-items: center;
   gap: 6px;
   padding: 0 8px;
+  background: rgba(26, 26, 26, 0.04);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
 
   .dot {
     width: 4px;
@@ -98,11 +100,16 @@ $border: #efe4d6;
   }
 }
 
+// default(.address)와 같은 계열 — 회색 바 안에 든 작은 알약, 크기만 compact 높이(20px)에 맞춘다.
 .compactAddress {
   flex: 1;
   min-width: 0;
   font-size: 10px;
   color: $ink-soft;
+  background: rgba(26, 26, 26, 0.05);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-family: 'IBM Plex Mono', 'Pretendard', monospace;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
