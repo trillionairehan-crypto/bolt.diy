@@ -1,38 +1,31 @@
 @use '../z-index';
 
+/*
+ * 코랄레드 시그니처 토스트 — 예전엔 bolt.diy 기본 테마가 성공=초록 왼쪽 테두리+초록 체크 아이콘으로
+ * 새고 있었다(플랫폼 5색 규칙 위반). 타입별 강조색을 전부 없애고 흰 배경 + #EFE4D6 테두리로
+ * 통일한다 — 성공/에러 구분은 아이콘 색(코랄/잉크)과 모양(체크/경고)만으로 한다, 테두리·배경으로는
+ * 구분하지 않는다. 아이콘 자체는 root.tsx의 ToastContainer의 icon prop이 그린다(라이브러리 기본
+ * SVG 아이콘은 그 prop이 있으면 안 쓰인다).
+ */
 .Toastify__toast-container {
   @extend .z-toast;
 }
 
 .Toastify__toast {
-  background-color: var(--surface-2);
-  color: var(--bolt-elements-textPrimary);
-  border: 1px solid var(--bolt-elements-borderColor);
-  border-left: 4px solid var(--border-strong);
-  border-radius: 12px;
-  box-shadow:
-    0 1px 2px rgba(23, 16, 14, 0.08),
-    0 8px 24px rgba(23, 16, 14, 0.14);
-}
-
-.Toastify__toast--success {
-  border-left-color: var(--ok);
-}
-
-.Toastify__toast--warning {
-  border-left-color: var(--warn);
-}
-
-.Toastify__toast--error {
-  border-left-color: var(--err);
+  background-color: #ffffff;
+  color: #1a1a1a;
+  font-size: 14px;
+  border: 1px solid #efe4d6;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(26, 26, 26, 0.06);
 }
 
 .Toastify__close-button {
-  color: var(--bolt-elements-item-contentDefault);
+  color: #6e645b;
   opacity: 1;
   transition: color 150ms ease;
 
   &:hover {
-    color: var(--bolt-elements-item-contentActive);
+    color: #1a1a1a;
   }
 }

@@ -110,6 +110,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <ClientOnly>{() => <DndProvider backend={HTML5Backend}>{children}</DndProvider>}</ClientOnly>
+      {/* 토스트 아이콘은 플랫폼 5색 중 코랄(성공)/잉크(에러)만 쓴다 — 초록·빨강 같은 의미색 구분
+          금지, 성공/에러는 아이콘 모양(체크/경고)으로만 구분한다. toast.scss 참고. */}
       <ToastContainer
         closeButton={({ closeToast }) => {
           return (
@@ -121,10 +123,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         icon={({ type }) => {
           switch (type) {
             case 'success': {
-              return <div className="i-ph:check-bold text-bolt-elements-icon-success text-2xl" />;
+              return <div className="i-ph:check-bold text-2xl" style={{ color: '#FF5330' }} />;
             }
             case 'error': {
-              return <div className="i-ph:warning-circle-bold text-bolt-elements-icon-error text-2xl" />;
+              return <div className="i-ph:warning-circle-bold text-2xl" style={{ color: '#1A1A1A' }} />;
             }
           }
 

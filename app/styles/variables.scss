@@ -339,9 +339,9 @@
   --workbench-inner-width: 100%;
   --workbench-left: calc(100% - var(--workbench-width));
 
-  /* Toasts */
-  --toastify-color-progress-success: var(--bolt-elements-icon-success);
-  --toastify-color-progress-error: var(--bolt-elements-icon-error);
+  /* Toasts — 코랄레드 시그니처(성공=코랄/에러=잉크), 아이콘과 같은 톤. toast.scss 참고. */
+  --toastify-color-progress-success: #ff5330;
+  --toastify-color-progress-error: #1a1a1a;
 
   /* Terminal */
   --bolt-elements-terminal-backgroundColor: var(--bolt-terminal-background);
