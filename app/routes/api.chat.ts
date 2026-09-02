@@ -21,6 +21,8 @@ import { extractPropertiesFromMessage } from '~/lib/.server/llm/utils';
 import type { DesignScheme } from '~/types/design-scheme';
 import { MCPService } from '~/lib/services/mcpService';
 import { StreamRecoveryManager } from '~/lib/.server/llm/stream-recovery';
+import { getPlatformUserId } from '~/lib/cloud/cloudPlatformAuth';
+import { recordMessageUsage } from '~/lib/cloud/messageUsage';
 
 export async function action(args: ActionFunctionArgs) {
   return chatAction(args);
@@ -47,7 +49,7 @@ function parseCookies(cookieHeader: string): Record<string, string> {
 }
 
 async function chatAction({ context, request }: ActionFunctionArgs) {
-  const { messages, files, promptId, contextOptimization, supabase, chatMode, designScheme, maxLLMSteps } =
+  const { messages, files, promptId, contextOptimization, supabase, chatMode, designScheme, maxLLMSteps, chatId } =
     await request.json<{
       messages: Messages;
       files: any;
@@ -64,6 +66,9 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
         };
       };
       maxLLMSteps: number;
+
+      /** 토큰 로깅(message_usage)용 — 대화 식별. 없어도(구버전 클라이언트) 생성 자체는 그대로 진행된다. */
+      chatId?: string;
     }>();
 
   const cookieHeader = request.headers.get('Cookie');
@@ -78,8 +83,21 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
     completionTokens: 0,
     promptTokens: 0,
     totalTokens: 0,
+    cacheReadTokens: 0,
+    cacheWriteTokens: 0,
   };
   let progressCounter: number = 1;
+
+  /*
+   * 토큰 로깅 — 인증은 이 라우트 전체에 원래 없었다(메터링은 클라이언트가 별도 RPC로 미리
+   * 처리). Authorization 헤더가 있으면(Chat.client.tsx가 로그인 사용자만 붙인다) platform JWT를
+   * 검증해 user_id를 얻고, 없으면 게스트로 null — getPlatformUserId 자체가 헤더/키 부재 시 그냥
+   * null을 반환하므로 별도 분기 없이 안전하다.
+   */
+  const usageUserId = await getPlatformUserId(request).catch(() => null);
+  const usageLastUserMessage = [...messages].reverse().find((message) => message.role === 'user');
+  const usageMessageId = usageLastUserMessage?.id ?? 'unknown';
+  const usageIsAutoFix = (usageLastUserMessage?.metadata as { isAutoFix?: boolean } | undefined)?.isAutoFix === true;
 
   try {
     const mcpService = MCPService.getInstance();
@@ -137,6 +155,8 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
                 cumulativeUsage.completionTokens += resp.usage.outputTokens || 0;
                 cumulativeUsage.promptTokens += resp.usage.inputTokens || 0;
                 cumulativeUsage.totalTokens += resp.usage.totalTokens || 0;
+                cumulativeUsage.cacheReadTokens += resp.usage.inputTokenDetails?.cacheReadTokens || 0;
+                cumulativeUsage.cacheWriteTokens += resp.usage.inputTokenDetails?.cacheWriteTokens || 0;
               }
             },
           });
@@ -192,6 +212,8 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
                 cumulativeUsage.completionTokens += resp.usage.outputTokens || 0;
                 cumulativeUsage.promptTokens += resp.usage.inputTokens || 0;
                 cumulativeUsage.totalTokens += resp.usage.totalTokens || 0;
+                cumulativeUsage.cacheReadTokens += resp.usage.inputTokenDetails?.cacheReadTokens || 0;
+                cumulativeUsage.cacheWriteTokens += resp.usage.inputTokenDetails?.cacheWriteTokens || 0;
               }
             },
           });
@@ -249,6 +271,8 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
               cumulativeUsage.completionTokens += usage.outputTokens || 0;
               cumulativeUsage.promptTokens += usage.inputTokens || 0;
               cumulativeUsage.totalTokens += usage.totalTokens || 0;
+              cumulativeUsage.cacheReadTokens += usage.inputTokenDetails?.cacheReadTokens || 0;
+              cumulativeUsage.cacheWriteTokens += usage.inputTokenDetails?.cacheWriteTokens || 0;
             }
 
             if (finishReason !== 'length') {
@@ -272,6 +296,29 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
                 } satisfies ProgressAnnotation,
                 transient: true,
               });
+
+              // 메시지별 토큰 로깅 — 실패해도(키 미설정 포함) 생성 응답에 영향 주면 안 되므로 await하지 않는다.
+              if (chatId) {
+                const { model } = usageLastUserMessage
+                  ? extractPropertiesFromMessage(usageLastUserMessage)
+                  : { model: 'unknown' };
+
+                void recordMessageUsage(
+                  {
+                    userId: usageUserId,
+                    chatId,
+                    messageId: usageMessageId,
+                    promptTokens: cumulativeUsage.promptTokens,
+                    completionTokens: cumulativeUsage.completionTokens,
+                    cacheReadTokens: cumulativeUsage.cacheReadTokens,
+                    cacheWriteTokens: cumulativeUsage.cacheWriteTokens,
+                    model,
+                    isAutoFix: usageIsAutoFix,
+                  },
+                  context.cloudflare?.env as any,
+                );
+              }
+
               await new Promise((resolve) => setTimeout(resolve, 0));
 
               // stream.close();

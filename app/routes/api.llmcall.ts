@@ -13,6 +13,8 @@ import { LLMManager } from '~/lib/modules/llm/manager';
 import type { ModelInfo } from '~/lib/modules/llm/types';
 import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/cookies';
 import { createScopedLogger } from '~/utils/logger';
+import { getPlatformUserId } from '~/lib/cloud/cloudPlatformAuth';
+import { recordMessageUsage } from '~/lib/cloud/messageUsage';
 
 export async function action(args: ActionFunctionArgs) {
   return llmCallAction(args);
@@ -70,7 +72,7 @@ function validateTokenLimits(modelDetails: ModelInfo, requestedTokens: number): 
 }
 
 async function llmCallAction({ context, request }: ActionFunctionArgs) {
-  const { system, message, model, provider, streamOutput, image } = await request.json<{
+  const { system, message, model, provider, streamOutput, image, chatId, isAutoFix, messageId } = await request.json<{
     system: string;
     message: string;
     model: string;
@@ -79,6 +81,15 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
 
     /** 생성물 자동 검토(시각 항목)용 — base64 data URL. 있으면 non-streaming 경로에서만 멀티모달 메시지로 보낸다. */
     image?: string;
+
+    /*
+     * 토큰 로깅(message_usage)용 — 이 라우트는 자동 검토(reviewGeneratedApp.ts) 외에
+     * generateAppQuestions.ts 등 chatId가 없는 다른 호출부도 쓴다. chatId가 없으면 어느 대화 것인지
+     * 특정할 수 없으므로 로깅 자체를 건너뛴다(잘못된 귀속보다 누락이 낫다).
+     */
+    chatId?: string;
+    isAutoFix?: boolean;
+    messageId?: string;
   }>();
 
   const { name: providerName } = provider;
@@ -248,6 +259,27 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
 
       const result = await generateText(finalParams);
       logger.info(`Generated response`);
+
+      if (chatId) {
+        void getPlatformUserId(request)
+          .catch(() => null)
+          .then((userId) =>
+            recordMessageUsage(
+              {
+                userId,
+                chatId,
+                messageId: messageId ?? 'unknown',
+                promptTokens: result.usage.inputTokens || 0,
+                completionTokens: result.usage.outputTokens || 0,
+                cacheReadTokens: result.usage.inputTokenDetails?.cacheReadTokens || 0,
+                cacheWriteTokens: result.usage.inputTokenDetails?.cacheWriteTokens || 0,
+                model: modelDetails.name,
+                isAutoFix: isAutoFix === true,
+              },
+              context.cloudflare?.env as any,
+            ),
+          );
+      }
 
       return new Response(
         JSON.stringify({ text: result.text, usage: result.usage, finishReason: result.finishReason }),

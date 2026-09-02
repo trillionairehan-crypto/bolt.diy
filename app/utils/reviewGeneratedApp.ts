@@ -10,6 +10,7 @@ import {
 } from '~/lib/review/mechanical-checks';
 import { workbenchStore } from '~/lib/stores/workbench';
 import { getActivePalette } from '~/lib/palettes';
+import { chatId } from '~/lib/persistence';
 import { createScopedLogger } from './logger';
 
 /**
@@ -218,6 +219,9 @@ async function runTextReview(files: FileMap, mechanicalHints: string): Promise<T
         model: AUTO_REVIEW_MODEL,
         provider,
         system: buildReviewSystemPrompt(),
+        chatId: chatId.get(),
+        isAutoFix: true,
+        messageId: `auto-review-text-${Date.now()}`,
       }),
     });
 
@@ -366,6 +370,9 @@ async function runVisualReview(
         provider,
         system: buildVisualReviewSystemPrompt(),
         image: screenshot,
+        chatId: chatId.get(),
+        isAutoFix: true,
+        messageId: `auto-review-visual-${Date.now()}`,
       }),
     });
 

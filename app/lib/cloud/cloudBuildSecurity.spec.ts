@@ -13,13 +13,21 @@ import { describe, expect, it } from 'vitest';
 describe('Cloud service key never reaches the client build', () => {
   const repoRoot = join(__dirname, '..', '..', '..');
 
-  it('the client build output contains no reference to CLOUD_SUPABASE_SERVICE_KEY or CLOUD_APP_TOKEN_SECRET', () => {
+  it('the client build output contains no reference to CLOUD_SUPABASE_SERVICE_KEY, CLOUD_APP_TOKEN_SECRET, or PLATFORM_SUPABASE_SERVICE_ROLE_KEY', () => {
     execSync('pnpm run build', { cwd: repoRoot, stdio: 'pipe' });
 
     const clientDir = join(repoRoot, 'build', 'client');
     expect(existsSync(clientDir)).toBe(true);
 
-    const forbiddenStrings = ['CLOUD_SUPABASE_SERVICE_KEY', 'CLOUD_APP_TOKEN_SECRET'];
+    /*
+     * PLATFORM_SUPABASE_SERVICE_ROLE_KEY: 토큰 로깅(message_usage) 라운드 — messageUsage.ts와 같은
+     * 패턴(context.cloudflare.env로만 읽기, VITE_ 접두사 없음)이라 여기도 같이 지킨다.
+     */
+    const forbiddenStrings = [
+      'CLOUD_SUPABASE_SERVICE_KEY',
+      'CLOUD_APP_TOKEN_SECRET',
+      'PLATFORM_SUPABASE_SERVICE_ROLE_KEY',
+    ];
     const offenders: string[] = [];
 
     const walk = (dir: string) => {

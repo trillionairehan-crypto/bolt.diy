@@ -6,7 +6,8 @@ import { useAnimate } from 'framer-motion';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useMessageParser, usePromptEnhancer, useShortcuts } from '~/lib/hooks';
-import { description, useChatHistory } from '~/lib/persistence';
+import { chatId, description, useChatHistory } from '~/lib/persistence';
+import { platformSupabase } from '~/lib/supabase/platform-client';
 import { chatStore } from '~/lib/stores/chat';
 import { workbenchStore } from '~/lib/stores/workbench';
 import {
@@ -293,6 +294,29 @@ export const ChatImpl = memo(
               throw fetchError;
             });
         },
+
+        /*
+         * 토큰 로깅(message_usage)용 — 로그인 사용자만 붙인다(게스트는 헤더 없이, 서버가 user_id를
+         * null로 기록). 매 요청마다 새로 읽어 만료된 토큰을 안 붙이게 한다 — getSession()은 로컬
+         * 세션 캐시를 읽을 뿐 네트워크 호출이 아니라 가볍다.
+         */
+        headers: async (): Promise<Record<string, string>> => {
+          if (!platformSupabase) {
+            return {};
+          }
+
+          const {
+            data: { session },
+          } = await platformSupabase.auth.getSession();
+
+          const headers: Record<string, string> = {};
+
+          if (session?.access_token) {
+            headers.Authorization = `Bearer ${session.access_token}`;
+          }
+
+          return headers;
+        },
         body: () => ({
           apiKeys,
           files,
@@ -300,6 +324,7 @@ export const ChatImpl = memo(
           contextOptimization: contextOptimizationEnabled,
           chatMode,
           designScheme,
+          chatId: chatId.get(),
           supabase: {
             isConnected: supabaseConn.isConnected,
 
@@ -972,8 +997,13 @@ export const ChatImpl = memo(
 
         const fileParts = [...imagesToFileParts(imageDataList), ...(await filesToFileParts(uploadedFiles))];
 
-        // 에러 노출 정리 3-1/3-4: auto-fix's own instruction + raw error content never renders in the transcript.
-        const metadata = isAutoFix ? { hidden: true } : undefined;
+        /*
+         * 에러 노출 정리 3-1/3-4: auto-fix's own instruction + raw error content never renders in
+         * the transcript (hidden). isAutoFix는 그와 별개로 토큰 로깅(message_usage.is_auto_fix)용
+         * 신호 — hidden:true를 쓰는 다른 자리(예: 템플릿 임포트 후 이어붙이는 히든 트리거 메시지)와
+         * 겹치면 안 되므로 hidden과 분리된 필드로 둔다.
+         */
+        const metadata = isAutoFix ? { hidden: true, isAutoFix: true } : undefined;
 
         if (modifiedFiles !== undefined) {
           const userUpdateArtifact = filesToArtifacts(modifiedFiles, `${Date.now()}`);
