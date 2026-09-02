@@ -818,13 +818,54 @@ function runExternalImageCheck(filePath: string, content: string): MechanicalFin
   return findings;
 }
 
+// --- 6. 외부 스톡/플레이스홀더 이미지 도메인 (힌트 전용) ---
+
+/*
+ * 실측(2026-09-02, 배달 플랫폼 생성물): 금지된 스톡 URL이 <img src="..."> 리터럴이 아니라 데이터
+ * 파일의 평범한 객체 속성(`image: 'https://images.pexels.com/...'`)에 있었고, 그 파일을 그린 JSX는
+ * src={r.image}처럼 동적으로 참조했다 — runExternalImageCheck의 IMG_TAG_REGEX/SRC_ATTR_REGEX는 JSX
+ * <img> 태그의 리터럴 src만 보므로 이 경로를 못 잡는다. 그래서 <img> 태그 여부와 무관하게, 이 파일
+ * 확장자 전체에서 알려진 도메인 문자열 자체를 찾는다 — 데이터 파일·CSS background-image·JSX 어디에
+ * 있든 잡힌다. 자동 삭제하지 않는다 — 그 자리를 ImagePlaceholder로 바꾸는 건 레이아웃 판단이 필요해
+ * LLM 검토에 넘긴다(이모지 sole-content와 같은 이유).
+ */
+const STOCK_IMAGE_DOMAINS = ['pexels.com', 'unsplash.com', 'placehold.co', 'picsum.photos'];
+
+function runStockImageDomainCheck(filePath: string, content: string): MechanicalFinding[] {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.ts', '.js', '.css', '.scss', '.html'])) {
+    return [];
+  }
+
+  const masked = maskComments(content);
+  const findings: MechanicalFinding[] = [];
+
+  for (const domain of STOCK_IMAGE_DOMAINS) {
+    const regex = new RegExp(domain.replace(/\./g, '\\.'), 'gi');
+
+    for (const match of masked.matchAll(regex)) {
+      findings.push({
+        file: filePath,
+        line: lineNumberAt(content, match.index as number),
+        rule: 'external-stock-image-domain',
+        message:
+          `외부 스톡/플레이스홀더 이미지 도메인("${domain}")이 발견됐습니다 — 실사진 URL 대신 ` +
+          `ImagePlaceholder(코랄 틴트 플레이스홀더, <image_placeholder_rules> 참고)를 써야 합니다. ` +
+          `사용자가 실제 사진을 보내면 그때 교체하세요.`,
+        autoFixed: false,
+      });
+    }
+  }
+
+  return findings;
+}
+
 // --- 오케스트레이션 ---
 
 /**
  * 파일별로 1(이모지) -> 2(색상 리터럴) 순으로 자동수정을 적용한 뒤(뒤 검사가 앞 검사의 결과를 보게),
- * 3(map 가드)·5(외부 이미지)는 최종 내용 기준으로 힌트만 남긴다. 자동수정된 파일만 updatedFiles에
- * 담기고, 호출자가 이걸 실제로 쓸지 말지(적용 시점·1회 쓰기 배치 등)는 전적으로 결정한다 — 이 함수는
- * store에 아무것도 쓰지 않는다.
+ * 3(map 가드)·5(외부 이미지)·6(외부 스톡/플레이스홀더 도메인)은 최종 내용 기준으로 힌트만 남긴다.
+ * 자동수정된 파일만 updatedFiles에 담기고, 호출자가 이걸 실제로 쓸지 말지(적용 시점·1회 쓰기 배치
+ * 등)는 전적으로 결정한다 — 이 함수는 store에 아무것도 쓰지 않는다.
  */
 export function runMechanicalChecks(files: Record<string, string>, resolvedHue: number | null): MechanicalCheckOutcome {
   const findings: MechanicalFinding[] = [];
@@ -846,6 +887,7 @@ export function runMechanicalChecks(files: Record<string, string>, resolvedHue: 
     }
 
     findings.push(...runExternalImageCheck(filePath, content));
+    findings.push(...runStockImageDomainCheck(filePath, content));
 
     if (content !== originalContent) {
       updatedFiles[filePath] = content;
@@ -887,6 +929,7 @@ export const __internal = {
   runColorLiteralCheck,
   runMapGuardCheck,
   runExternalImageCheck,
+  runStockImageDomainCheck,
   maskComments,
   classifyEmojiContext,
 };

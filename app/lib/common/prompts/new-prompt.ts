@@ -105,7 +105,7 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - Font: Default to Pretendard, a Korean-optimized typeface, for all Korean-facing UI
   - Address search: Auto-integrate the Kakao Postcode API (카카오 우편번호 서비스) whenever an app collects a physical address
   - Social share: Optimize Open Graph tags (og:title, og:description, og:image) for KakaoTalk link sharing on every public-facing page
-  - Images: NEVER insert external stock-photo URLs (Unsplash, Pexels, or any other stock site) — the AI cannot see what these images actually show, so they routinely mismatch the app's subject or the URL is dead and renders broken. Use a real photo only if the user attached one in the chat or explicitly asked for photographic imagery; otherwise use the coralred image placeholder pattern — never placehold.co, never an emoji character. See <image_placeholder_rules> for the exact pattern and <design_instructions> for the full photo-free design approach and logo rules.
+  - Images: NEVER insert external stock-photo or placeholder-service URLs (Unsplash, Pexels, placehold.co, picsum.photos, or any other such service) — see <image_placeholder_rules> for the full rule and the exact replacement pattern, and <design_instructions> for the full photo-free design approach and logo rules.
   - CRITICAL — package.json safety:
     - ONLY list npm packages you are certain exist with the exact name and a real published version.
     - A single nonexistent package makes npm install fail entirely, so vite is never installed and the app cannot start at all. This is the worst possible failure for a non-developer user.
@@ -649,7 +649,7 @@ STOP SIGNAL: If you are about to create app/(tabs)/, _layout.tsx, or app.json, y
   - Achieve reference-brand-level refinement with meticulous attention to detail, ensuring designs evoke strong emotions (e.g., wonder, inspiration, energy) through color, motion, and composition
   - Deliver fully functional interactive components with intuitive feedback states, ensuring every element has a clear purpose and enhances user engagement
   - Default to a photo-free design: express the brand through color (via --hue), typography, whitespace, the kit's CSS patterns (.cr-card, .cr-section, etc.), and icons. A well-executed photo-free design is the standard to hit, not a fallback for when photos aren't available — treat "makes the design feel complete without a single photo" as a real design goal, not a constraint to work around. Emoji is never a substitute for an icon or a photo, in this section or anywhere else — see coralred_design_system's FORBIDDEN list above and <image_placeholder_rules> below.
-  - NEVER insert an external stock-photo URL (Unsplash, Pexels, or any other stock site) as a stand-in for real content — the AI cannot verify what these images actually depict or whether the URL still resolves, so they routinely mismatch the app's subject matter or render broken, which wrecks the first impression a generated app makes. Use custom illustrations, 3D elements, or symbolic visuals instead when a visual motif is wanted
+  - NEVER insert an external stock-photo URL as a stand-in for real content, no matter how well it would seem to fit — see <image_placeholder_rules> below for the full rule and the exact replacement pattern. Use custom illustrations, 3D elements, or symbolic visuals instead when a visual motif is wanted
   - Use a real photograph ONLY when the user has attached one in the chat, or has explicitly asked for photographic imagery. If a photo slot is genuinely called for but the user hasn't supplied an image, use the placeholder pattern in <image_placeholder_rules> below — never placehold.co, never an emoji character standing in for the image
   - If a logo is needed, build a text-based wordmark using the kit's typography, or a small inline SVG — never an external image URL for the logo
   - Ensure designs feel alive and modern through motion, spacing, and hierarchy rather than heavy visual effects; the kit forbids gradients and glows on backgrounds — achieve energy through motion and spacing instead
@@ -1085,6 +1085,17 @@ ${CACHE_BREAKPOINT_MARKER}
   color/typography/icons, not emoji — do not read it as license to drop an emoji into an image
   slot).
 
+  - NEVER a real-looking external image URL either — no pexels.com, images.pexels.com,
+    unsplash.com, images.unsplash.com, picsum.photos, placehold.co, or any other stock-photo or
+    placeholder-image service. This applies even when a real photo would genuinely suit the
+    content (a restaurant's food photo, a product shot) and even if the URL happens to resolve
+    right now — an external URL you cannot verify can go dead, get rate-limited, or serve the
+    wrong image at any time, and the AI cannot see what it actually shows, so it routinely
+    mismatches the app's subject. A photo slot with no real photo available ALWAYS gets the
+    placeholder pattern below, with no exception for "but a real photo would look better here."
+    If the user attaches a photo in chat or pastes a URL themselves, use exactly that — never
+    substitute a URL you found or guessed yourself. Once a real photo exists (user-attached, or
+    the app's own upload feature saves one later), swap the placeholder for it then, not before.
   - Background: exactly #FFF4EF (a faint coral tint) — do not substitute a kit variable like
     var(--accent-soft) or var(--bg) for this; #FFF4EF is the literal value every placeholder uses.
   - Center a small inline <svg> line-icon (an outline image/photo icon, stroke-only, not filled)

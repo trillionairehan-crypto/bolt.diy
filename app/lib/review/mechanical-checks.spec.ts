@@ -281,6 +281,64 @@ describe('runExternalImageCheck (hint only)', () => {
   });
 });
 
+/*
+ * 실측(2026-09-02, 배달 플랫폼 생성물)의 실제 실패 형태를 그대로 재현한다 — 스톡 URL이 <img src>
+ * 리터럴이 아니라 데이터 파일의 평범한 객체 속성에 있었고, JSX는 src={r.image}처럼 동적으로만
+ * 참조했다. runExternalImageCheck의 위 "plain variable reference는 안 잡음" 테스트가 보여주듯 그
+ * 경로는 원래부터 사각지대였다 — runStockImageDomainCheck는 <img> 태그 여부와 무관하게 도메인
+ * 문자열 자체를 찾아 이 사각지대를 메운다.
+ */
+describe('runStockImageDomainCheck (hint only)', () => {
+  it('flags a pexels URL sitting in a plain data-file object property (the real bug shape)', () => {
+    const src = "export const RESTAURANTS = [{ id: 'r1', image: 'https://images.pexels.com/photos/1/photo.jpeg' }];";
+    const findings = __internal.runStockImageDomainCheck('src/data/restaurants.ts', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'external-stock-image-domain', autoFixed: false });
+  });
+
+  it('flags an unsplash URL used directly as an <img> src', () => {
+    const src = '<img src="https://images.unsplash.com/photo-123" alt="x" />';
+    const findings = __internal.runStockImageDomainCheck('src/Card.tsx', src);
+    expect(findings).toHaveLength(1);
+  });
+
+  it('flags placehold.co and picsum.photos too', () => {
+    const src = "const a = 'https://placehold.co/400x300'; const b = 'https://picsum.photos/200';";
+    const findings = __internal.runStockImageDomainCheck('src/Mock.tsx', src);
+    expect(findings).toHaveLength(2);
+  });
+
+  it('flags a stock domain inside a CSS background-image', () => {
+    const src = '.hero { background-image: url("https://images.pexels.com/photos/2/photo.jpeg"); }';
+    const findings = __internal.runStockImageDomainCheck('src/hero.css', src);
+    expect(findings).toHaveLength(1);
+  });
+
+  it('does not flag a local or same-origin image path', () => {
+    const src = '<img src="/local/photo.png" alt="x" />';
+    const findings = __internal.runStockImageDomainCheck('src/Local.tsx', src);
+    expect(findings).toHaveLength(0);
+  });
+
+  it('ignores a stock domain mentioned only in a comment', () => {
+    const src = '// see https://unsplash.com for inspiration\nconst a = 1;';
+    const findings = __internal.runStockImageDomainCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(0);
+  });
+
+  it('does not touch file content (hint only, never auto-fixed)', () => {
+    const src = "const image = 'https://images.pexels.com/photos/1/photo.jpeg';";
+    const findings = __internal.runStockImageDomainCheck('src/data/restaurants.ts', src);
+    expect(findings.every((f) => !f.autoFixed)).toBe(true);
+  });
+
+  it('skips files outside the scanned extension set', () => {
+    const src = "image: 'https://images.pexels.com/photos/1/photo.jpeg'";
+    const findings = __internal.runStockImageDomainCheck('src/data/restaurants.json', src);
+    expect(findings).toHaveLength(0);
+  });
+});
+
 describe('resolveHueFromFiles', () => {
   it('finds --hue set on the body style in index.html', () => {
     const hue = resolveHueFromFiles({
