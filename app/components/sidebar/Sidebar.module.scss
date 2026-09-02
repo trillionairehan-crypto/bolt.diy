@@ -4,6 +4,8 @@ $cream: #fbf5ee;
 $coral: #ff5330;
 $border: #efe4d6;
 $usage-bg: #f5ede3;
+// 사이드바 디테일 라운드 "공통 원칙" — 호버 배경 #F5EDE3 (usage-bg와 같은 값, 쓰임새가 넓어져 이름을 분리).
+$hover-bg: $usage-bg;
 
 // Invisibly grows a small control's tap area to the 44px minimum — same pattern as the landing
 // page's %tapTargetExpand, kept here (not shared) since SCSS modules don't share placeholders
@@ -116,9 +118,82 @@ $rail-icon-top: calc((var(--header-height) - #{$rail-icon-size}) / 2);
 .topRow {
   flex-shrink: 0;
   display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 12px 12px;
+}
+
+// ---------- 상단 검색 (1) ----------
+
+.searchBox {
+  display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px;
+  height: 36px;
+  padding: 0 10px;
+  background: #fff;
+  border: 1px solid $border;
+  border-radius: 8px;
+}
+
+.searchBoxIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  color: $ink-soft;
+}
+
+.searchBoxInput {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: $ink;
+
+  &::placeholder {
+    color: $ink-soft;
+  }
+}
+
+.searchClearButton {
+  @extend %tapTargetExpand;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: none;
+  border: none;
+  color: $ink-soft;
+  cursor: pointer;
+
+  &:hover {
+    color: $coral;
+  }
+}
+
+.railSearchButton {
+  position: fixed;
+  left: 0;
+  width: var(--rail-reserved-width);
+  height: $rail-icon-size;
+  top: calc(#{$rail-icon-top} + #{2 * $rail-icon-size} + #{2 * $rail-icon-gap});
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: $ink-soft;
+  transition: color 0.15s ease-out;
+
+  &:hover {
+    color: $coral;
+  }
 }
 
 .newAppButton {
@@ -176,6 +251,128 @@ $rail-icon-top: calc((var(--header-height) - #{$rail-icon-size}) / 2);
   color: $ink-soft;
 }
 
+// ---------- 날짜 묶음 (3) ----------
+
+.dateHeader {
+  margin: 16px 8px 8px;
+  font-size: 11px;
+  color: $ink-soft;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+// ---------- 기본 표시 제한 (4) ----------
+
+.moreLink {
+  @extend %tapTargetExpand;
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 13px;
+  color: $ink-soft;
+  cursor: pointer;
+
+  &:hover {
+    color: $ink;
+    text-decoration: underline;
+  }
+}
+
+// ---------- 개별 대화 항목(텍스트) ----------
+
+.historyRow {
+  color: $ink-soft;
+  transition:
+    background-color 0.1s ease-out,
+    color 0.1s ease-out;
+
+  &:hover {
+    background: $hover-bg;
+    color: $ink;
+  }
+}
+
+.historyRowActive {
+  background: $hover-bg;
+  color: $ink;
+}
+
+// ---------- 배포 항목(compact 프레임) ----------
+
+.frameChevronButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.frameGroupRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background-color 0.1s ease-out;
+
+  &:hover {
+    background: $hover-bg;
+  }
+}
+
+.frameGroupRowActive {
+  background: $hover-bg;
+}
+
+.frameGroupLink {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.frameActionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  color: $ink-soft;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.15s ease-out,
+    color 0.15s ease-out;
+
+  span {
+    font-size: 11px;
+  }
+
+  &:hover {
+    color: $coral;
+  }
+}
+
+.frameGroupRow:hover .frameActionButton {
+  opacity: 1;
+}
+
 // ---------- App group ----------
 
 .appGroupHeader {
@@ -187,7 +384,7 @@ $rail-icon-top: calc((var(--header-height) - #{$rail-icon-size}) / 2);
   cursor: pointer;
 
   &:hover {
-    background: rgba(26, 26, 26, 0.05);
+    background: $hover-bg;
   }
 }
 

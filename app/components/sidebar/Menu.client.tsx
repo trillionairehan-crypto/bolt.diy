@@ -13,7 +13,8 @@ import {
 import { Logo } from '~/components/ui/Logo';
 import { db, deleteById, getAll, type ChatHistoryItem, useChatHistory } from '~/lib/persistence';
 import { cubicEasingFn } from '~/utils/easings';
-import { groupChatsByApp } from './groupChatsByApp';
+import { groupChatsByApp, type AppGroup as AppGroupData } from './groupChatsByApp';
+import { groupChatsByDate } from './groupChatsByDate';
 import { AppGroup } from './AppGroup';
 import { QuotaBar } from './QuotaBar';
 import { AccountMenu } from './AccountMenu';
@@ -24,9 +25,27 @@ import { profileStore } from '~/lib/stores/profile';
 import { sidebarOpenStore, setSidebarOpen, toggleSidebar } from '~/lib/stores/sidebar';
 import { authUserStore } from '~/lib/stores/auth';
 import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
+import { deployedAppsByChatId, refreshDeployedApps, type DeployedAppRecord } from '~/lib/deployedApps';
 import { Skeleton } from '~/components/ui/Skeleton';
 import useViewport from '~/lib/hooks';
 import styles from './Sidebar.module.scss';
+
+const VISIBLE_GROUPS_LIMIT = 20;
+
+function findDeployedInGroup(
+  group: AppGroupData,
+  deployedById: Map<string, DeployedAppRecord>,
+): DeployedAppRecord | undefined {
+  for (const item of group.items) {
+    const record = item.urlId ? deployedById.get(item.urlId) : undefined;
+
+    if (record) {
+      return record;
+    }
+  }
+
+  return undefined;
+}
 
 /*
  * overnight5 B2: lazy-loaded, same rationale/pattern as Header.tsx's HeaderActionButtons —
@@ -84,6 +103,17 @@ export const Menu = () => {
   const authUser = useStore(authUserStore);
   const isSmallViewport = useViewport(1024);
   const [settingsInitialTab, setSettingsInitialTab] = useState<TabType | null>(null);
+  const deployedById = useStore(deployedAppsByChatId);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showAllGroups, setShowAllGroups] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // 2-7: 사이드바 마운트(및 로그인 상태 변화) 시 한 번만 받는다 — 항목마다 조회하지 않는다.
+  useEffect(() => {
+    if (authUser) {
+      refreshDeployedApps();
+    }
+  }, [authUser]);
 
   /*
    * 게스트 상태에서는 대화 목록을 아예 렌더하지 않는다(로그인 여부 조건) — 공용 PC에서 로그아웃한
@@ -248,7 +278,21 @@ export const Menu = () => {
     setDialogContent(content);
   }, []);
 
-  const groups = groupChatsByApp(list);
+  const normalizedQuery = searchQuery.trim().toLowerCase().replace(/\s+/g, '');
+  const isSearching = normalizedQuery.length > 0;
+  const filteredList = isSearching
+    ? list.filter((item) => (item.description ?? '').toLowerCase().replace(/\s+/g, '').includes(normalizedQuery))
+    : list;
+
+  const allGroups = groupChatsByApp(filteredList);
+  const visibleGroups = isSearching || showAllGroups ? allGroups : allGroups.slice(0, VISIBLE_GROUPS_LIMIT);
+  const hiddenGroupsCount = allGroups.length - visibleGroups.length;
+  const dateBuckets = groupChatsByDate(visibleGroups, (group) => group.latestTimestamp);
+
+  const handleRailSearchClick = () => {
+    setSidebarOpen(true);
+    requestAnimationFrame(() => searchInputRef.current?.focus());
+  };
 
   return (
     <>
@@ -284,6 +328,17 @@ export const Menu = () => {
           >
             <div className={classNames('i-ph:list', styles.railHamburgerIcon)} style={{ fontSize: 20 }} />
           </button>
+          {!open && (
+            <button
+              type="button"
+              title="대화 검색"
+              aria-label="대화 검색"
+              className={classNames(styles.railSearchButton, 'z-logo')}
+              onClick={handleRailSearchClick}
+            >
+              <span className="i-ph:magnifying-glass" style={{ fontSize: 18 }} />
+            </button>
+          )}
         </>
       )}
       <motion.div
@@ -300,14 +355,35 @@ export const Menu = () => {
         )}
       >
         <div className={styles.contentLayer}>
-          {/* 1. 새 앱 만들기 — 로고는 좌상단 고정 아이콘 하나로 통일, 패널 내부엔 중복으로 두지 않는다. */}
+          {/* 1. 대화 검색 + 새 앱 만들기 — 로고는 좌상단 고정 아이콘 하나로 통일, 패널 내부엔 중복으로 두지 않는다. */}
           <div className={styles.topRow}>
+            <div className={styles.searchBox}>
+              <span className={classNames('i-ph:magnifying-glass', styles.searchBoxIcon)} />
+              <input
+                ref={searchInputRef}
+                type="text"
+                className={styles.searchBoxInput}
+                placeholder="대화 검색"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  className={styles.searchClearButton}
+                  aria-label="검색어 지우기"
+                  onClick={() => setSearchQuery('')}
+                >
+                  <span className="i-ph:x" />
+                </button>
+              )}
+            </div>
             <a href="/" className={styles.newAppButton}>
               <span className="i-ph:plus-circle" />새 앱 만들기
             </a>
           </div>
 
-          {/* 2. 내 앱 목록 */}
+          {/* 2. 내 앱 목록 — 날짜 구간(3) 안에 앱 그룹, 배포된 앱은 compact 프레임(2) */}
           <div className={styles.appList}>
             {isLoadingList ? (
               <div className="space-y-2 px-1 pt-1">
@@ -316,23 +392,40 @@ export const Menu = () => {
                 ))}
               </div>
             ) : list.length === 0 ? (
-              <p className={styles.emptyCaption}>{list.length === 0 ? '아직 만든 앱이 없어요' : '찾는 앱이 없어요'}</p>
+              <p className={styles.emptyCaption}>아직 만든 앱이 없어요</p>
+            ) : isSearching && allGroups.length === 0 ? (
+              <p className={styles.emptyCaption}>찾는 대화가 없어요</p>
             ) : (
-              groups.map((group) => (
-                <AppGroup
-                  key={group.key}
-                  group={group}
-                  exportChat={exportChat}
-                  onDuplicate={handleDuplicate}
-                  onDeleteChat={(event, item) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setDialogContentWithLogging({ type: 'delete', item });
-                  }}
-                  onDeleteGroup={(group) => setDialogContentWithLogging({ type: 'bulkDelete', items: group.items })}
-                  defaultExpanded={group.items.some((item) => item.urlId === currentUrlId)}
-                />
-              ))
+              <>
+                {dateBuckets.map((bucket) => (
+                  <div key={bucket.label}>
+                    <p className={styles.dateHeader}>{bucket.label}</p>
+                    {bucket.items.map((group) => (
+                      <AppGroup
+                        key={group.key}
+                        group={group}
+                        deployedApp={findDeployedInGroup(group, deployedById)}
+                        exportChat={exportChat}
+                        onDuplicate={handleDuplicate}
+                        onDeleteChat={(event, item) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          setDialogContentWithLogging({ type: 'delete', item });
+                        }}
+                        onDeleteGroup={(group) =>
+                          setDialogContentWithLogging({ type: 'bulkDelete', items: group.items })
+                        }
+                        defaultExpanded={group.items.some((item) => item.urlId === currentUrlId)}
+                      />
+                    ))}
+                  </div>
+                ))}
+                {hiddenGroupsCount > 0 && (
+                  <button type="button" className={styles.moreLink} onClick={() => setShowAllGroups(true)}>
+                    이전 대화 {hiddenGroupsCount}개 더 보기
+                  </button>
+                )}
+              </>
             )}
           </div>
 

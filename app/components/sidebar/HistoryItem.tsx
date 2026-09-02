@@ -5,6 +5,7 @@ import WithTooltip from '~/components/ui/Tooltip';
 import { useEditChatDescription } from '~/lib/hooks';
 import { forwardRef, type ForwardedRef, useCallback } from 'react';
 import { Checkbox } from '~/components/ui/Checkbox';
+import styles from './Sidebar.module.scss';
 
 interface HistoryItemProps {
   item: ChatHistoryItem;
@@ -68,25 +69,10 @@ export function HistoryItem({
   return (
     <div
       className={classNames(
-        'group rounded-lg text-sm overflow-hidden flex justify-between items-center px-3 py-2 transition-colors',
-        { 'cursor-pointer': selectionMode },
+        'group rounded-lg text-sm overflow-hidden flex justify-between items-center px-3 py-2',
+        styles.historyRow,
+        { 'cursor-pointer': selectionMode, [styles.historyRowActive]: isActiveChat },
       )}
-      style={{
-        color: isActiveChat ? '#1A1A1A' : '#8B7E70',
-        background: isActiveChat ? 'rgba(26, 26, 26, 0.05)' : undefined,
-      }}
-      onMouseEnter={(event) => {
-        if (!isActiveChat) {
-          event.currentTarget.style.background = 'rgba(26, 26, 26, 0.04)';
-          event.currentTarget.style.color = '#1A1A1A';
-        }
-      }}
-      onMouseLeave={(event) => {
-        if (!isActiveChat) {
-          event.currentTarget.style.background = 'transparent';
-          event.currentTarget.style.color = '#8B7E70';
-        }
-      }}
       onClick={selectionMode ? handleItemClick : undefined}
     >
       {selectionMode && (
@@ -115,7 +101,7 @@ export function HistoryItem({
           <button
             type="submit"
             className="i-ph:check h-4 w-4 hover:text-[var(--accent)] transition-colors"
-            style={{ color: '#8B7E70' }}
+            style={{ color: '#6E645B' }}
             onMouseDown={handleSubmit}
           />
         </form>
@@ -135,7 +121,7 @@ export function HistoryItem({
           >
             <div
               className="flex items-center gap-2.5 opacity-0 group-hover:opacity-100 transition-opacity"
-              style={{ color: '#8B7E70' }}
+              style={{ color: '#6E645B' }}
             >
               <ChatActionButton
                 toolTipContent="Export"
@@ -198,7 +184,7 @@ const ChatActionButton = forwardRef(
         <button
           ref={ref}
           type="button"
-          style={{ color: '#8B7E70' }}
+          style={{ color: '#6E645B' }}
           className={`hover:text-[var(--accent)] transition-colors ${icon} ${className ? className : ''}`}
           onClick={onClick}
         />

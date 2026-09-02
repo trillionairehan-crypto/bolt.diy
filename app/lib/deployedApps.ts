@@ -1,3 +1,4 @@
+import { atom } from 'nanostores';
 import { authUserStore } from '~/lib/stores/auth';
 import { platformSupabase } from '~/lib/supabase/platform-client';
 import { openDatabase, getMessagesById } from '~/lib/persistence/db';
@@ -17,6 +18,25 @@ export interface DeployedAppRecord {
   storage_mode: StorageMode;
   storage_expires_at: string | null;
   deployed_at: string;
+}
+
+/*
+ * 사이드바 디테일 라운드 2-7: 사이드바가 대화마다 배포 여부를 개별 조회하지 않도록, chat_id(=urlId)
+ * 기준의 라이브 캐시를 여기 하나에 둔다. 마운트 시 refreshDeployedApps()로 한 번 채우고,
+ * recordDeployedApp()이 성공할 때마다 registerDeployedApp()으로 즉시 갱신해서 배포 완료 직후
+ * 사이드바가 새로고침 없이 compact 프레임으로 바뀌게 한다.
+ */
+export const deployedAppsByChatId = atom<Map<string, DeployedAppRecord>>(new Map());
+
+export async function refreshDeployedApps(): Promise<void> {
+  const apps = await getDeployedApps();
+  deployedAppsByChatId.set(new Map(apps.map((app) => [app.chat_id, app])));
+}
+
+function registerDeployedApp(record: DeployedAppRecord): void {
+  const next = new Map(deployedAppsByChatId.get());
+  next.set(record.chat_id, record);
+  deployedAppsByChatId.set(next);
 }
 
 /*
@@ -113,6 +133,13 @@ export async function recordDeployedApp(params: {
       storage_expires_at: params.storageExpiresAt ?? null,
     };
 
+    // 사이드바 라이브 캐시용 — 실제 DB row의 id는 모르지만, 여기선 chat_id로만 조회하므로 무해하다.
+    const recordForCache: DeployedAppRecord = {
+      id: crypto.randomUUID(),
+      ...row,
+      deployed_at: new Date().toISOString(),
+    };
+
     if (!PLATFORM_HAS_STORAGE_COLUMNS) {
       const { storage_mode: _storageMode, storage_expires_at: _storageExpiresAt, ...rowWithoutStorage } = row;
       const { error: fallbackError } = await platformSupabase.from('deployed_apps').insert(rowWithoutStorage);
@@ -120,6 +147,8 @@ export async function recordDeployedApp(params: {
       if (fallbackError) {
         throw fallbackError;
       }
+
+      registerDeployedApp(recordForCache);
 
       return;
     }
@@ -134,12 +163,16 @@ export async function recordDeployedApp(params: {
         throw fallbackError;
       }
 
+      registerDeployedApp(recordForCache);
+
       return;
     }
 
     if (error) {
       throw error;
     }
+
+    registerDeployedApp(recordForCache);
   } catch (error) {
     logger.warn('Failed to record deployed app (non-fatal)', error);
   }

@@ -1,0 +1,135 @@
+$ink: #1a1a1a;
+$ink-soft: #6e645b;
+$cream: #fbf5ee;
+$border: #efe4d6;
+
+.frame {
+  border-radius: 12px;
+  overflow: hidden;
+  background: $cream;
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(26, 26, 26, 0.18);
+}
+
+// ---------- default (채팅 홈 "내가 만든 앱" 카드) ----------
+
+.default {
+  border: 1px solid rgba(26, 26, 26, 0.12);
+  transition: border-color 0.15s ease-out;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(26, 26, 26, 0.04);
+  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+}
+
+.address {
+  flex: 1;
+  min-width: 0;
+  font-size: 10px;
+  font-weight: 400;
+  color: $ink-soft;
+  background: rgba(26, 26, 26, 0.05);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-family: 'IBM Plex Mono', 'Pretendard', monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.content {
+  padding: 14px 16px;
+  min-height: 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 700;
+  color: $ink;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ---------- compact (사이드바 배포 항목, 2-2) ----------
+
+.compact {
+  height: 56px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $border;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.compactBar {
+  height: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+
+  .dot {
+    width: 4px;
+    height: 4px;
+    background: $ink-soft;
+  }
+}
+
+.compactAddress {
+  flex: 1;
+  min-width: 0;
+  font-size: 10px;
+  color: $ink-soft;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.compactActions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.compactTitleRow {
+  height: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  overflow: hidden;
+}
+
+.compactTitle {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: $ink;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

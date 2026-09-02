@@ -1,5 +1,6 @@
 import type { DeployedAppRecord } from '~/lib/deployedApps';
 import { formatRelativeTime } from '~/utils/relativeTime';
+import { MiniBrowserFrame } from '~/components/ui/MiniBrowserFrame';
 import styles from './ChatHome.module.scss';
 
 interface DeployedAppCardsProps {
@@ -23,19 +24,7 @@ export function DeployedAppCards({ apps }: DeployedAppCardsProps) {
       <div className={styles.cardsWrap}>
         {apps.map((app) => (
           <a key={app.id} href={app.url} target="_blank" rel="noopener noreferrer" className={styles.card}>
-            <div className={styles.browserFrame}>
-              <div className={styles.browserBar}>
-                <span className={styles.browserDots}>
-                  <span className={styles.dot} />
-                  <span className={styles.dot} />
-                  <span className={styles.dot} />
-                </span>
-                <span className={styles.addressBar}>{app.url.replace(/^https?:\/\//, '')}</span>
-              </div>
-              <div className={styles.browserContent}>
-                <p className={styles.appName}>{app.app_name}</p>
-              </div>
-            </div>
+            <MiniBrowserFrame url={app.url} title={app.app_name} className={styles.browserFrame} />
             <p className={styles.deployedAt}>{formatRelativeTime(app.deployed_at)} 배포</p>
           </a>
         ))}
