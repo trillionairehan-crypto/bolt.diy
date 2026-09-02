@@ -24,5 +24,5 @@ export function SettingRow({ label, description, children }: SettingRowProps) {
 
 /** 7-1: a read-only value — plain text, no input chrome, text-selectable. */
 export function SettingReadOnlyValue({ children }: { children: ReactNode }) {
-  return <span style={{ fontSize: 14, color: '#7A7067', cursor: 'text', userSelect: 'text' }}>{children}</span>;
+  return <span style={{ fontSize: 14, color: '#6E645B', cursor: 'text', userSelect: 'text' }}>{children}</span>;
 }

@@ -335,7 +335,7 @@ export const ChatBox: React.FC<ChatBoxProps> = (props) => {
                   title="첨부"
                   className={classNames(
                     'flex items-center h-8 gap-1.5 px-2 shrink-0 whitespace-nowrap',
-                    isLanding ? '!text-[#7A7067]' : '!text-bolt-elements-textSecondary',
+                    isLanding ? '!text-[#6E645B]' : '!text-bolt-elements-textSecondary',
                   )}
                   onClick={() => setAttachMenuOpen((open) => !open)}
                 >

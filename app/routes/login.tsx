@@ -58,7 +58,7 @@ export default function Login() {
         <EmailContinueLink showRecentBadge />
       </div>
 
-      <p className="text-sm text-center" style={{ color: '#7A7067', marginTop: 40 }}>
+      <p className="text-sm text-center" style={{ color: '#6E645B', marginTop: 40 }}>
         계정이 없으신가요?{' '}
         <a href="/signup" className="font-medium" style={{ color: '#FF5330' }}>
           회원가입

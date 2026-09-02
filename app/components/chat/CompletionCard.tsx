@@ -85,7 +85,7 @@ export function CompletionCard() {
             <span className={styles.dot} />
             <span className={styles.dot} />
           </span>
-          <span className={styles.addressBar} style={{ color: url ? '#1A1A1A' : '#7A7067' }}>
+          <span className={styles.addressBar} style={{ color: url ? '#1A1A1A' : '#6E645B' }}>
             {url ? url.replace(/^https?:\/\//, '') : '배포하면 주소가 생겨요'}
           </span>
         </div>

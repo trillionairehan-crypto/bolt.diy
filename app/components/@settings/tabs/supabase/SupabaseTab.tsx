@@ -622,7 +622,7 @@ export default function SupabaseTab() {
       </SettingSection>
 
       <Collapsible>
-        <CollapsibleTrigger className="group flex items-center gap-2 text-sm font-medium" style={{ color: '#7A7067' }}>
+        <CollapsibleTrigger className="group flex items-center gap-2 text-sm font-medium" style={{ color: '#6E645B' }}>
           <span className="i-ph:caret-right transition-transform group-data-[state=open]:rotate-90" />내 Supabase
           연결(고급)
         </CollapsibleTrigger>
@@ -635,7 +635,7 @@ export default function SupabaseTab() {
             transition={{ delay: 0.1 }}
           >
             <div className="flex items-center gap-2">
-              <div style={{ color: '#7A7067' }}>
+              <div style={{ color: '#6E645B' }}>
                 <SupabaseLogo />
               </div>
               <h3 className="text-base font-medium text-bolt-elements-textPrimary dark:text-bolt-elements-textPrimary">

@@ -41,19 +41,19 @@ export default function Signup() {
       </div>
 
       {/* 5-3: 약관 문구는 회원가입에만 — 12px 회갈색, 링크는 밑줄만(코랄 아님). */}
-      <p className="text-center" style={{ fontSize: 12, color: '#7A7067', marginTop: 24 }}>
+      <p className="text-center" style={{ fontSize: 12, color: '#6E645B', marginTop: 24 }}>
         가입하면{' '}
-        <a href="/terms" className="underline" style={{ color: '#7A7067' }}>
+        <a href="/terms" className="underline" style={{ color: '#6E645B' }}>
           이용약관
         </a>
         과{' '}
-        <a href="/privacy" className="underline" style={{ color: '#7A7067' }}>
+        <a href="/privacy" className="underline" style={{ color: '#6E645B' }}>
           개인정보처리방침
         </a>
         에 동의하는 거예요
       </p>
 
-      <p className="text-sm text-center" style={{ color: '#7A7067', marginTop: 24 }}>
+      <p className="text-sm text-center" style={{ color: '#6E645B', marginTop: 24 }}>
         이미 계정이 있으신가요?{' '}
         <a href="/login" className="font-medium" style={{ color: '#FF5330' }}>
           로그인

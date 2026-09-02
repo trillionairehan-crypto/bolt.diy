@@ -169,7 +169,7 @@ export default function Pricing() {
                   </li>
                 ))}
                 {!plan.brandingRemoved && (
-                  <li className="cr-caption" style={{ color: '#7A7067', marginTop: 8 }}>
+                  <li className="cr-caption" style={{ color: '#6E645B', marginTop: 8 }}>
                     코랄레드 브랜딩 표시
                   </li>
                 )}

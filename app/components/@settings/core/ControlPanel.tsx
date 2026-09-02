@@ -182,7 +182,7 @@ export const ControlPanel = ({ open, onClose, initialTab = null }: ControlPanelP
                           className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition-colors duration-150"
                           style={{
                             background: isActive ? 'rgba(255, 83, 48, 0.1)' : 'transparent',
-                            color: isActive ? '#1A1A1A' : '#7A7067',
+                            color: isActive ? '#1A1A1A' : '#6E645B',
                           }}
                         >
                           {Icon && <Icon className="w-4 h-4 shrink-0" />}

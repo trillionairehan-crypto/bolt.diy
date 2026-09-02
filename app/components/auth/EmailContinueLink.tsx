@@ -73,7 +73,7 @@ export function EmailContinueLink({ showRecentBadge = false }: EmailContinueLink
         type="button"
         onClick={() => setExpanded(true)}
         className="relative text-sm hover:underline"
-        style={{ color: '#7A7067', minHeight: 44, background: 'transparent', border: 'none' }}
+        style={{ color: '#6E645B', minHeight: 44, background: 'transparent', border: 'none' }}
       >
         이메일로 계속하기
         {lastMethod === 'email' && <RecentLoginBadge />}
@@ -99,7 +99,7 @@ export function EmailContinueLink({ showRecentBadge = false }: EmailContinueLink
             autoFocus
             className={classNames(
               'w-full px-3.5 rounded-[10px] text-sm',
-              'bg-white text-[#1A1A1A] placeholder-[#7A7067]',
+              'bg-white text-[#1A1A1A] placeholder-[#6E645B]',
               'focus:outline-none disabled:opacity-50',
             )}
             style={{ height: 52, border: '1px solid #EFE4D6' }}
@@ -132,7 +132,7 @@ export function EmailContinueLink({ showRecentBadge = false }: EmailContinueLink
         </>
       ) : (
         <>
-          <p className="text-sm text-center" style={{ color: '#7A7067' }}>
+          <p className="text-sm text-center" style={{ color: '#6E645B' }}>
             <span style={{ color: '#1A1A1A', fontWeight: 500 }}>{email}</span>(으)로 발송된 6자리 인증 코드를
             입력해주세요.
           </p>
@@ -153,7 +153,7 @@ export function EmailContinueLink({ showRecentBadge = false }: EmailContinueLink
             autoFocus
             className={classNames(
               'w-full px-3.5 rounded-[10px] text-sm text-center tracking-[0.4em]',
-              'bg-white text-[#1A1A1A] placeholder-[#7A7067]',
+              'bg-white text-[#1A1A1A] placeholder-[#6E645B]',
               'focus:outline-none disabled:opacity-50',
             )}
             style={{ height: 52, border: '1px solid #EFE4D6' }}
@@ -193,7 +193,7 @@ export function EmailContinueLink({ showRecentBadge = false }: EmailContinueLink
             }}
             disabled={loading}
             className="text-sm hover:underline disabled:opacity-50"
-            style={{ color: '#7A7067', minHeight: 44, background: 'transparent', border: 'none' }}
+            style={{ color: '#6E645B', minHeight: 44, background: 'transparent', border: 'none' }}
           >
             이메일 다시 입력
           </button>

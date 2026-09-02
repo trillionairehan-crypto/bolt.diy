@@ -114,8 +114,8 @@ const NotificationsTab = () => {
       case 'warning':
         return {
           icon: 'i-ph:warning',
-          color: 'text-[#7A7067] dark:text-[#7A7067]',
-          bg: 'hover:bg-[#7A7067]/10 dark:hover:bg-[#7A7067]/20',
+          color: 'text-[#6E645B] dark:text-[#6E645B]',
+          bg: 'hover:bg-[#6E645B]/10 dark:hover:bg-[#6E645B]/20',
         };
       case 'info':
         return {
@@ -167,10 +167,10 @@ const NotificationsTab = () => {
 
   const filterOptions: { id: FilterType; label: string; icon: string; color: string }[] = [
     { id: 'all', label: '전체 알림', icon: 'i-ph:bell', color: '#1A1A1A' },
-    { id: 'system', label: '시스템', icon: 'i-ph:gear', color: '#7A7067' },
+    { id: 'system', label: '시스템', icon: 'i-ph:gear', color: '#6E645B' },
     { id: 'update', label: '업데이트', icon: 'i-ph:arrow-circle-up', color: '#FF5330' },
     { id: 'error', label: '에러', icon: 'i-ph:warning-circle', color: '#FF5330' },
-    { id: 'warning', label: '경고', icon: 'i-ph:warning', color: '#7A7067' },
+    { id: 'warning', label: '경고', icon: 'i-ph:warning', color: '#6E645B' },
     { id: 'info', label: '정보', icon: 'i-ph:info', color: '#1A1A1A' },
     { id: 'provider', label: 'AI 모델', icon: 'i-ph:robot', color: '#1A1A1A' },
     { id: 'network', label: '네트워크', icon: 'i-ph:wifi-high', color: '#1A1A1A' },
