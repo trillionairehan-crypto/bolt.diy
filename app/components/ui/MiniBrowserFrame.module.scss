@@ -1,7 +1,6 @@
 $ink: #1a1a1a;
 $ink-soft: #6e645b;
 $cream: #fbf5ee;
-$border: #efe4d6;
 
 .frame {
   border-radius: 12px;
@@ -78,9 +77,8 @@ $border: #efe4d6;
   height: 56px;
   display: flex;
   flex-direction: column;
-  border: 1px solid $border;
-  border-radius: 6px;
-  background: #fff;
+  border: 1px solid rgba(26, 26, 26, 0.12);
+  border-radius: 12px;
 }
 
 .compactBar {
@@ -96,7 +94,6 @@ $border: #efe4d6;
   .dot {
     width: 4px;
     height: 4px;
-    background: $ink-soft;
   }
 }
 
