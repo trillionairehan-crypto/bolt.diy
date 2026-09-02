@@ -12,6 +12,12 @@ interface MiniBrowserFrameProps {
   /** compact 전용 — 주소줄 오른쪽 끝에 렌더되는 편집·삭제 등 아이콘 버튼. */
   actions?: ReactNode;
   className?: string;
+
+  /**
+   * 주소줄에 url에서 뽑은 도메인 대신 보여줄 문구 — 아직 배포 안 된 대화의 "배포하면 주소가
+   * 생겨요" 같은 안내용. 프레임 모양·테두리·제목 행은 배포 여부와 완전히 동일하게 유지된다.
+   */
+  addressOverride?: string;
 }
 
 const Dots = () => (
@@ -26,8 +32,15 @@ const Dots = () => (
  * 채팅 홈의 미니 브라우저 프레임(점 3개 + 주소줄 + 제목)을 공용 컴포넌트로 뺀 것 — 사이드바의
  * 배포 항목도 이걸 size="compact"로 재사용한다(별도 컴포넌트를 새로 만들지 않는다는 요청).
  */
-export function MiniBrowserFrame({ url, title, size = 'default', actions, className }: MiniBrowserFrameProps) {
-  const domain = url.replace(/^https?:\/\//, '');
+export function MiniBrowserFrame({
+  url,
+  title,
+  size = 'default',
+  actions,
+  className,
+  addressOverride,
+}: MiniBrowserFrameProps) {
+  const domain = addressOverride ?? url.replace(/^https?:\/\//, '');
 
   if (size === 'compact') {
     return (

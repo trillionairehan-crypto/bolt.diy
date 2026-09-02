@@ -14,7 +14,6 @@ describe('실사용 앱 UI 표면들이 var(--accent) 계열 토큰을 쓰고 �
     'components/chat/APIKeyManager.tsx',
     'components/chat/ModelSelector.tsx',
     'components/sidebar/Menu.client.tsx',
-    'components/sidebar/HistoryItem.tsx',
     'components/chat/ChatErrorBoundary.tsx',
   ];
 
@@ -23,6 +22,12 @@ describe('실사용 앱 UI 표면들이 var(--accent) 계열 토큰을 쓰고 �
     expect(source).not.toMatch(/#FF5330/i);
     expect(source).not.toMatch(/#E44A28/i);
   });
+
+  /*
+   * HistoryItem.tsx (checked here before) was deleted in the sidebar full-restructure round —
+   * the per-chat rename/duplicate/export/delete row list it belonged to no longer exists
+   * (replaced by a flat 5-item "최근 작업" list built directly in Menu.client.tsx).
+   */
 
   /*
    * ChatBox.tsx's PromptEffectLine/PromptEffectContainer/PromptShine (checked here before) —

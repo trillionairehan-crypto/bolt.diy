@@ -1,6 +1,6 @@
 import { motion, type Variants } from 'framer-motion';
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import { useParams } from '@remix-run/react';
+import { useLocation, useParams } from '@remix-run/react';
 import { toast } from 'react-toastify';
 import {
   Dialog,
@@ -11,11 +11,11 @@ import {
   dialogBackdropVariants,
 } from '~/components/ui/Dialog';
 import { Logo } from '~/components/ui/Logo';
-import { db, deleteById, getAll, type ChatHistoryItem, useChatHistory } from '~/lib/persistence';
+import { Tooltip } from '~/components/ui/Tooltip';
+import { MiniBrowserFrame } from '~/components/ui/MiniBrowserFrame';
+import { db, deleteById, getAll, type ChatHistoryItem } from '~/lib/persistence';
 import { cubicEasingFn } from '~/utils/easings';
 import { groupChatsByApp, type AppGroup as AppGroupData } from './groupChatsByApp';
-import { groupChatsByDate } from './groupChatsByDate';
-import { AppGroup } from './AppGroup';
 import { QuotaBar } from './QuotaBar';
 import { AccountMenu } from './AccountMenu';
 import type { TabType } from '~/components/@settings/core/types';
@@ -26,11 +26,17 @@ import { sidebarOpenStore, setSidebarOpen, toggleSidebar } from '~/lib/stores/si
 import { authUserStore } from '~/lib/stores/auth';
 import { isPlatformSupabaseConfigured } from '~/lib/supabase/platform-client';
 import { deployedAppsByChatId, refreshDeployedApps, type DeployedAppRecord } from '~/lib/deployedApps';
-import { Skeleton } from '~/components/ui/Skeleton';
 import useViewport from '~/lib/hooks';
 import styles from './Sidebar.module.scss';
 
-const VISIBLE_GROUPS_LIMIT = 20;
+const RECENT_ITEMS_LIMIT = 5;
+
+const NAV_ITEMS = [
+  { href: '/', label: '홈', icon: 'i-ph:house' },
+  { href: '/apps', label: '내 앱', icon: 'i-ph:squares-four' },
+  { href: '/examples', label: '예시로 시작하기', icon: 'i-ph:sparkle' },
+  { href: '/guide', label: '이용 가이드', icon: 'i-ph:book-open' },
+] as const;
 
 function findDeployedInGroup(
   group: AppGroupData,
@@ -76,25 +82,21 @@ const mobileVariants = {
 
 /*
  * Desktop: always visible, pinned at left:0 — only its own width animates between fully collapsed
- * (0 — no visible box at all, see Menu's .railHamburger/.railHomeLink for what stands in for it) and the full
- * expanded panel.
+ * (0 — no visible box at all, see Menu's .rail for what stands in for it) and the full expanded
+ * panel (280px).
  */
 const desktopVariants = {
   collapsed: { width: 0, transition: { duration: 0.2, ease: cubicEasingFn } },
-  expanded: { width: 320, transition: { duration: 0.2, ease: cubicEasingFn } },
+  expanded: { width: 280, transition: { duration: 0.2, ease: cubicEasingFn } },
 } satisfies Variants;
 
-type DialogContent =
-  | { type: 'delete'; item: ChatHistoryItem }
-  | { type: 'bulkDelete'; items: ChatHistoryItem[] }
-  | null;
+type DialogContent = { type: 'delete'; item: ChatHistoryItem } | null;
 
 export const Menu = () => {
-  const { duplicateCurrentChat, exportChat } = useChatHistory();
   const { id: currentUrlId } = useParams();
+  const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
   const [list, setList] = useState<ChatHistoryItem[]>([]);
-  const [isLoadingList, setIsLoadingList] = useState(true);
   const open = useStore(sidebarOpenStore);
   const [dialogContent, setDialogContent] = useState<DialogContent>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -103,11 +105,8 @@ export const Menu = () => {
   const isSmallViewport = useViewport(1024);
   const [settingsInitialTab, setSettingsInitialTab] = useState<TabType | null>(null);
   const deployedById = useStore(deployedAppsByChatId);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showAllGroups, setShowAllGroups] = useState(false);
-  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // 2-7: 사이드바 마운트(및 로그인 상태 변화) 시 한 번만 받는다 — 항목마다 조회하지 않는다.
+  // 사이드바 마운트(및 로그인 상태 변화) 시 한 번만 받는다 — 항목마다 조회하지 않는다.
   useEffect(() => {
     if (authUser) {
       refreshDeployedApps();
@@ -122,20 +121,14 @@ export const Menu = () => {
   const loadEntries = useCallback(() => {
     if (!authUser) {
       setList([]);
-      setIsLoadingList(false);
-
       return;
     }
 
     if (db) {
-      setIsLoadingList(true);
       getAll(db)
         .then((list) => list.filter((item) => item.urlId && item.description))
         .then(setList)
-        .catch((error) => toast.error(error.message))
-        .finally(() => setIsLoadingList(false));
-    } else {
-      setIsLoadingList(false);
+        .catch((error) => toast.error(error.message));
     }
   }, [authUser]);
 
@@ -176,44 +169,6 @@ export const Menu = () => {
     [loadEntries, deleteChat, currentUrlId],
   );
 
-  const deleteSelectedItems = useCallback(
-    async (itemsToDeleteIds: string[]) => {
-      if (!db || itemsToDeleteIds.length === 0) {
-        return;
-      }
-
-      let deletedCount = 0;
-      const errors: string[] = [];
-      const shouldNavigate = itemsToDeleteIds.some((id) => list.find((item) => item.id === id)?.urlId === currentUrlId);
-
-      for (const id of itemsToDeleteIds) {
-        try {
-          await deleteChat(id);
-          deletedCount++;
-        } catch (error) {
-          console.error(`Error deleting chat ${id}:`, error);
-          errors.push(id);
-        }
-      }
-
-      if (errors.length === 0) {
-        toast.success(`대화 ${deletedCount}개를 삭제했어요`);
-      } else {
-        toast.warning(
-          `대화 ${itemsToDeleteIds.length}개 중 ${deletedCount}개를 삭제했어요. ${errors.length}개는 실패했어요.`,
-          { autoClose: 5000 },
-        );
-      }
-
-      await loadEntries();
-
-      if (shouldNavigate) {
-        window.location.pathname = '/';
-      }
-    },
-    [deleteChat, loadEntries, list, currentUrlId],
-  );
-
   const closeDialog = () => setDialogContent(null);
 
   useEffect(() => {
@@ -223,14 +178,14 @@ export const Menu = () => {
   }, [open, authUser, loadEntries]);
 
   /*
-   * 3: 바깥(포인터다운) 또는 ESC로 닫힌다 — preventDefault/stopPropagation을 쓰지 않아서 클릭
+   * 바깥(포인터다운) 또는 ESC로 닫힌다 — preventDefault/stopPropagation을 쓰지 않아서 클릭
    * 이벤트가 원래 타겟(예: 입력창)에도 그대로 도달한다. 그래서 사이드바가 열린 채로 입력창을
    * 누르면 "사이드바 닫힘"과 "입력창 포커스"가 같은 클릭에서 동시에 일어난다(두 번 클릭 불필요).
-   * menuRef(패널) 안 클릭과 [data-sidebar-toggle] 클릭은 제외 — 패널 안 클릭(앱 선택/삭제)은
+   * menuRef(패널) 안 클릭과 [data-sidebar-toggle] 클릭은 제외 — 패널 안 클릭(항목 선택/삭제)은
    * 원래 닫힘을 유발하면 안 되고, 토글 버튼은 자체 onClick으로 이미 토글하므로 이 리스너가 같은
    * 클릭에서 또 닫아버리면(=순서상 열자마자 닫힘) 안 된다. data-sidebar-toggle 속성 기반이라
-   * 데스크톱 레일 햄버거뿐 아니라 Header.tsx의 모바일 햄버거(별도 컴포넌트, ref 공유 불가)도
-   * 같은 방식으로 제외된다. 데스크톱/모바일 오버레이 공용.
+   * 레일 토글뿐 아니라 Header.tsx의 모바일 햄버거(별도 컴포넌트, ref 공유 불가)도 같은 방식으로
+   * 제외된다. 데스크톱/모바일 오버레이 공용.
    */
   useEffect(() => {
     if (!open) {
@@ -263,11 +218,6 @@ export const Menu = () => {
     };
   }, [open]);
 
-  const handleDuplicate = async (id: string) => {
-    await duplicateCurrentChat(id);
-    loadEntries();
-  };
-
   const handleOpenSettings = (tab: TabType | null = null) => {
     setSettingsInitialTab(tab);
     setIsSettingsOpen(true);
@@ -276,25 +226,19 @@ export const Menu = () => {
 
   const handleSettingsClose = () => setIsSettingsOpen(false);
 
-  const setDialogContentWithLogging = useCallback((content: DialogContent) => {
-    setDialogContent(content);
-  }, []);
+  const allGroups = groupChatsByApp(list);
+  const recentGroups = allGroups.slice(0, RECENT_ITEMS_LIMIT);
+  const hasMoreRecent = allGroups.length > RECENT_ITEMS_LIMIT;
 
-  const normalizedQuery = searchQuery.trim().toLowerCase().replace(/\s+/g, '');
-  const isSearching = normalizedQuery.length > 0;
-  const filteredList = isSearching
-    ? list.filter((item) => (item.description ?? '').toLowerCase().replace(/\s+/g, '').includes(normalizedQuery))
-    : list;
-
-  const allGroups = groupChatsByApp(filteredList);
-  const visibleGroups = isSearching || showAllGroups ? allGroups : allGroups.slice(0, VISIBLE_GROUPS_LIMIT);
-  const hiddenGroupsCount = allGroups.length - visibleGroups.length;
-  const dateBuckets = groupChatsByDate(visibleGroups, (group) => group.latestTimestamp);
-
-  const handleRailSearchClick = () => {
-    setSidebarOpen(true);
-    requestAnimationFrame(() => searchInputRef.current?.focus());
-  };
+  const accountTrigger = (
+    <div className={styles.avatar}>
+      {profile?.avatar ? (
+        <img src={profile.avatar} alt={profile?.username || 'User'} className="w-full h-full object-cover" />
+      ) : (
+        <span className="i-ph:user-fill" />
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -307,42 +251,57 @@ export const Menu = () => {
           variants={dialogBackdropVariants}
         />
       )}
+
       {/*
-        좌상단 순서 = 위 로고(홈) / 아래 햄버거(토글), 40x40 동일 히트 영역·같은 왼쪽 정렬축.
-        햄버거는 별도의 position:fixed 요소로 분리해 z-logo(998, .panel의 z-sidebar=997보다 위)를
-        줘서 사이드바가 펼쳐져도 같은 좌표·같은 아이콘으로 그 위에 남는다 — "같은 자리 같은
-        아이콘 = 토글"을 몸으로 알 수 있게. 로고는 항상 낮은 z-index로 남아 패널이 펼쳐지면 그
-        아래 자연스럽게 가려진다(패널 내부에 중복으로 두지 않음). 데스크톱 전용(모바일은 이 대체
-        UI 자체가 필요 없음 — 접혔을 때 화면 밖으로 완전히 사라지는 기존 동작 그대로).
+        레일(접힘 상태) — 로고/토글이 같은 24x24 박스에 겹쳐 있다가 호버 시 크로스페이드된다.
+        낮은 z-index라 패널이 펼쳐지면 자연스럽게 그 아래로 가려진다(패널 내부에 중복으로 두지 않음).
+        데스크톱 전용(모바일은 Header.tsx의 햄버거+로고를 그대로 쓴다).
       */}
       {!isSmallViewport && (
-        <>
-          <a href="/" title="홈" aria-label="홈" className={styles.railHomeLink}>
-            <Logo height={24} showWordmark={false} />
-          </a>
-          <button
-            type="button"
-            title="메뉴"
-            aria-label="메뉴"
-            data-sidebar-toggle
-            className={classNames(styles.railHamburger, 'z-logo')}
-            onClick={toggleSidebar}
-          >
-            <div className={classNames('i-ph:list', styles.railHamburgerIcon)} style={{ fontSize: 20 }} />
-          </button>
-          {!open && (
-            <button
-              type="button"
-              title="대화 검색"
-              aria-label="대화 검색"
-              className={classNames(styles.railSearchButton, 'z-logo')}
-              onClick={handleRailSearchClick}
-            >
-              <span className="i-ph:magnifying-glass" style={{ fontSize: 18 }} />
-            </button>
-          )}
-        </>
+        <div className={styles.rail}>
+          <div className={styles.railLogoToggleWrap}>
+            <Tooltip content="사이드바 열기" side="right" delayDuration={300}>
+              <button
+                type="button"
+                aria-label="사이드바 열기"
+                data-sidebar-toggle
+                className={styles.railLogoToggle}
+                onClick={toggleSidebar}
+              >
+                <span className={styles.railLogoToggleLogo}>
+                  <Logo height={24} showWordmark={false} />
+                </span>
+                <span className={styles.railLogoToggleIcon}>
+                  <span className="i-ph:sidebar-simple" style={{ fontSize: 20 }} />
+                </span>
+              </button>
+            </Tooltip>
+          </div>
+
+          <Tooltip content="새 앱 만들기" side="right" delayDuration={300}>
+            <a href="/" aria-label="새 앱 만들기" className={styles.railNewAppButton}>
+              <span className="i-ph:plus" style={{ fontSize: 18 }} />
+            </a>
+          </Tooltip>
+
+          <div className={styles.railBottom}>
+            {authUser ? (
+              <AccountMenu onOpenSettings={handleOpenSettings}>
+                <button type="button" className={styles.railAvatarButton} aria-label="계정">
+                  {accountTrigger}
+                </button>
+              </AccountMenu>
+            ) : (
+              isPlatformSupabaseConfigured && (
+                <a href="/login" aria-label="로그인" className={styles.railLoginLink}>
+                  <span className="i-ph:sign-in" style={{ fontSize: 16 }} />
+                </a>
+              )
+            )}
+          </div>
+        </div>
       )}
+
       <motion.div
         ref={menuRef}
         initial={isSmallViewport ? 'closed' : 'collapsed'}
@@ -357,95 +316,101 @@ export const Menu = () => {
         )}
       >
         <div className={styles.contentLayer}>
-          {/* 1. 대화 검색 + 새 앱 만들기 — 로고는 좌상단 고정 아이콘 하나로 통일, 패널 내부엔 중복으로 두지 않는다. */}
-          <div className={styles.topRow}>
-            <div className={styles.searchBox}>
-              <span className={classNames('i-ph:magnifying-glass', styles.searchBoxIcon)} />
-              <input
-                ref={searchInputRef}
-                type="text"
-                className={styles.searchBoxInput}
-                placeholder="대화 검색"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  className={styles.searchClearButton}
-                  aria-label="검색어 지우기"
-                  onClick={() => setSearchQuery('')}
-                >
-                  <span className="i-ph:x" />
-                </button>
-              )}
-            </div>
+          {/* 2-1. 상단 행 — 로고 + 접기 */}
+          <div className={styles.expandedTopRow}>
+            <Logo height={24} showWordmark={false} />
+            <Tooltip content="사이드바 접기" side="bottom" delayDuration={300}>
+              <button
+                type="button"
+                aria-label="사이드바 접기"
+                data-sidebar-toggle
+                className={styles.collapseButton}
+                onClick={toggleSidebar}
+              >
+                <span className="i-ph:sidebar-simple" style={{ fontSize: 20 }} />
+              </button>
+            </Tooltip>
+          </div>
+
+          {/* 2-2. 새 앱 만들기 */}
+          <div className={styles.newAppButtonRow}>
             <a href="/" className={styles.newAppButton}>
               <span className="i-ph:plus-circle" />새 앱 만들기
             </a>
           </div>
 
-          {/* 2. 내 앱 목록 — 날짜 구간(3) 안에 앱 그룹, 배포된 앱은 compact 프레임(2) */}
-          <div className={styles.appList}>
-            {isLoadingList ? (
-              <div className="space-y-2 px-1 pt-1">
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <Skeleton key={i} className="h-9 w-full" />
-                ))}
-              </div>
-            ) : list.length === 0 ? (
-              <p className={styles.emptyCaption}>아직 만든 앱이 없어요</p>
-            ) : isSearching && allGroups.length === 0 ? (
-              <p className={styles.emptyCaption}>찾는 대화가 없어요</p>
-            ) : (
-              <>
-                {dateBuckets.map((bucket) => (
-                  <div key={bucket.label}>
-                    <p className={styles.dateHeader}>{bucket.label}</p>
-                    {bucket.items.map((group) => (
-                      <AppGroup
-                        key={group.key}
-                        group={group}
-                        deployedApp={findDeployedInGroup(group, deployedById)}
-                        exportChat={exportChat}
-                        onDuplicate={handleDuplicate}
-                        onDeleteChat={(event, item) => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          setDialogContentWithLogging({ type: 'delete', item });
-                        }}
-                        onDeleteGroup={(group) =>
-                          setDialogContentWithLogging({ type: 'bulkDelete', items: group.items })
-                        }
-                        defaultExpanded={group.items.some((item) => item.urlId === currentUrlId)}
-                      />
-                    ))}
-                  </div>
-                ))}
-                {hiddenGroupsCount > 0 && (
-                  <button type="button" className={styles.moreLink} onClick={() => setShowAllGroups(true)}>
-                    이전 대화 {hiddenGroupsCount}개 더 보기
-                  </button>
-                )}
-              </>
-            )}
-          </div>
+          {/* 2-3. 내비게이션 */}
+          <nav className={styles.nav}>
+            {NAV_ITEMS.map((item) => {
+              const isActive = location.pathname === item.href;
 
-          {/* 3. 계정 영역 — 이름/아바타를 누르면 프로필·설정·요금제·로그아웃 메뉴가 열린다. */}
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  className={classNames(styles.navItem, { [styles.navItemActive]: isActive })}
+                >
+                  <span className={classNames(item.icon, styles.navIcon)} />
+                  <span className={styles.navLabel}>{item.label}</span>
+                </a>
+              );
+            })}
+          </nav>
+
+          <div className={styles.navDivider} />
+
+          {/* 2-5~2-7. 최근 작업 — 0개면 헤더까지 통째로 생략 */}
+          {recentGroups.length > 0 && (
+            <>
+              <p className={styles.recentHeader}>최근 작업</p>
+              <div className={styles.recentList}>
+                {recentGroups.map((group) => {
+                  const item = group.items[0];
+                  const deployedApp = findDeployedInGroup(group, deployedById);
+
+                  return (
+                    <div key={group.key} className={styles.recentItemRow}>
+                      <a href={`/chat/${item.urlId}`} className={styles.recentItemLink}>
+                        <MiniBrowserFrame
+                          size="compact"
+                          url={deployedApp?.url ?? ''}
+                          title={item.description || '이름 없는 앱'}
+                          addressOverride={deployedApp ? undefined : '배포하면 주소가 생겨요'}
+                          actions={
+                            <button
+                              type="button"
+                              className={styles.recentDeleteButton}
+                              aria-label="대화 삭제"
+                              onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                setDialogContent({ type: 'delete', item });
+                              }}
+                            >
+                              <span className="i-ph:trash" />
+                            </button>
+                          }
+                        />
+                      </a>
+                    </div>
+                  );
+                })}
+              </div>
+              {hasMoreRecent && (
+                <div className={styles.viewAllRow}>
+                  <a href="/apps" className={styles.viewAllLink}>
+                    전체 보기 →
+                  </a>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* 2-8. 계정 영역 — 이름/아바타를 누르면 프로필·설정·요금제·로그아웃 메뉴가 열린다. */}
           <div className={styles.accountArea}>
             {authUser ? (
               <AccountMenu onOpenSettings={handleOpenSettings}>
-                <div className={styles.avatar}>
-                  {profile?.avatar ? (
-                    <img
-                      src={profile.avatar}
-                      alt={profile?.username || 'User'}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="i-ph:user-fill" />
-                  )}
-                </div>
+                {accountTrigger}
                 <span className={styles.accountName}>
                   {authUser.user_metadata?.full_name || authUser.email || profile?.username || '내 계정'}
                 </span>
@@ -458,8 +423,6 @@ export const Menu = () => {
                     로그인
                   </a>
                 )}
-                {/* D-1: 로그인 계정의 사용량 텍스트는 계정 메뉴로 옮겼다(AccountUsageBlock) — 게스트는
-                    계정 메뉴 자체가 없어 QuotaBar를 그대로 둔다. */}
                 <QuotaBar />
               </>
             )}
@@ -472,7 +435,7 @@ export const Menu = () => {
               <>
                 <div className="p-6" style={{ background: '#FBF5EE' }}>
                   <DialogTitle style={{ color: '#1A1A1A' }}>대화를 삭제할까요?</DialogTitle>
-                  <DialogDescription className="mt-2" style={{ color: '#8B7E70' }}>
+                  <DialogDescription className="mt-2" style={{ color: '#6E645B' }}>
                     <p>
                       <span style={{ color: '#1A1A1A', fontWeight: 500 }}>{dialogContent.item.description}</span> 대화를
                       삭제해요.
@@ -488,46 +451,6 @@ export const Menu = () => {
                     type="danger"
                     onClick={() => {
                       deleteItem({} as React.UIEvent, dialogContent.item);
-                      closeDialog();
-                    }}
-                  >
-                    삭제
-                  </DialogButton>
-                </div>
-              </>
-            )}
-            {dialogContent?.type === 'bulkDelete' && (
-              <>
-                <div className="p-6" style={{ background: '#FBF5EE' }}>
-                  <DialogTitle style={{ color: '#1A1A1A' }}>
-                    {dialogContent.items.length > 1 ? '앱을 삭제할까요?' : '대화를 삭제할까요?'}
-                  </DialogTitle>
-                  <DialogDescription className="mt-2" style={{ color: '#8B7E70' }}>
-                    <p>대화 {dialogContent.items.length}개를 삭제해요:</p>
-                    <div
-                      className="mt-2 max-h-32 overflow-auto rounded-md p-2"
-                      style={{ border: '1px solid rgba(26,26,26,0.1)', background: '#F5EDE3' }}
-                    >
-                      <ul className="list-disc pl-5 space-y-1">
-                        {dialogContent.items.map((item) => (
-                          <li key={item.id} className="text-sm">
-                            <span style={{ color: '#1A1A1A', fontWeight: 500 }}>{item.description}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <p className="mt-3">삭제하면 되돌릴 수 없어요.</p>
-                  </DialogDescription>
-                </div>
-                <div className="flex justify-end gap-3 px-6 py-4" style={{ background: '#F5EDE3' }}>
-                  <DialogButton type="secondary" onClick={closeDialog}>
-                    취소
-                  </DialogButton>
-                  <DialogButton
-                    type="danger"
-                    onClick={() => {
-                      const itemsToDeleteNow = dialogContent.items.map((item) => item.id);
-                      deleteSelectedItems(itemsToDeleteNow);
                       closeDialog();
                     }}
                   >
