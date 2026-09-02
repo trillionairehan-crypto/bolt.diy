@@ -26,7 +26,7 @@ Use ONLY cr- classes and the kit's CSS variables (--hue, --accent, --bg, --text,
 
 Use icons from lucide-react for logos.
 
-Use stock photos from Pexels (NEVER Unsplash) where appropriate, only valid URLs you know exist. Do not download the images, only link to them in image tags.
+Never insert an external stock-photo or placeholder-service URL (Pexels, Unsplash, placehold.co, picsum.photos, or any other such service) for a photo slot the user hasn't supplied a real image for — an unverifiable external URL can go dead, get rate-limited, or serve the wrong image at any time, and you cannot see what it actually shows. Use the coralred image placeholder pattern instead (see the main system prompt's image_placeholder_rules): #FFF4EF background, a small inline SVG line-icon, and the caption "사진을 보내주시면 여기에 넣어드릴게요" for anything bigger than an 80px slot. Swap in a real photo only once the user actually attaches one.
 `;
 
 export const CORALRED_INDEX_CSS = `/* Project-specific custom styles go here.
