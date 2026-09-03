@@ -278,12 +278,6 @@ export const Menu = () => {
             </Tooltip>
           </div>
 
-          <Tooltip content="새 앱 만들기" side="right" delayDuration={300}>
-            <a href="/" aria-label="새 앱 만들기" className={styles.railNewAppButton}>
-              <span className="i-ph:plus" style={{ fontSize: 18 }} />
-            </a>
-          </Tooltip>
-
           <div className={styles.railBottom}>
             {authUser ? (
               <AccountMenu onOpenSettings={handleOpenSettings}>

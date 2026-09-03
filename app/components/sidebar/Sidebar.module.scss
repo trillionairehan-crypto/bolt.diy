@@ -126,26 +126,6 @@ $hover-bg: $usage-bg;
   }
 }
 
-.railNewAppButton {
-  @extend %tapTargetExpand;
-  margin-top: 24px;
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: $coral;
-  color: $cream;
-  border-radius: 50%;
-  text-decoration: none;
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.92;
-  }
-}
-
 .railBottom {
   margin-top: auto;
   margin-bottom: 16px;
