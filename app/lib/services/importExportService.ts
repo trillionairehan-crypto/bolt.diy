@@ -106,9 +106,6 @@ export class ImportExportService {
           // Context optimization
           contextOptimizationEnabled: this._safeGetItem('contextOptimizationEnabled'),
 
-          // Auto-select template
-          autoSelectTemplate: this._safeGetItem('autoSelectTemplate'),
-
           // Latest branch
           isLatestBranch: this._safeGetItem('isLatestBranch'),
 

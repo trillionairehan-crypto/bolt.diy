@@ -16,7 +16,6 @@ import styles from './BaseChat.module.scss';
 import { ImportButtons } from '~/components/chat/chatExportAndImport/ImportButtons';
 import GitCloneButton from './GitCloneButton';
 import type { ProviderInfo } from '~/types/model';
-import StarterTemplates from './StarterTemplates';
 import type { ActionAlert, SupabaseAlert, DeployAlert, LlmErrorAlertType } from '~/types/actions';
 import DeployChatAlert from '~/components/deploy/DeployAlert';
 import ChatAlert from './ChatAlert';
@@ -676,13 +675,12 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       <GitCloneButton importChat={importChat} />
                     </div>
                   )}
-                  <div className="flex flex-col gap-5">
-                    {/*
-                              ExamplePrompts (suggestion chips) intentionally not rendered on the
-                              landing hero — component kept intact for possible reuse elsewhere later.
-                            */}
-                    {!chatStarted && SHOW_DEV_TOOLS && <StarterTemplates />}
-                  </div>
+                  {/*
+                            ExamplePrompts (suggestion chips) intentionally not rendered on the
+                            landing hero — component kept intact for possible reuse elsewhere later.
+                            StarterTemplates removed 2026-09-03 (출시 블로커 fix) along with the whole
+                            multi-framework auto-template-select system it displayed.
+                          */}
                 </div>
               </div>
             </div>

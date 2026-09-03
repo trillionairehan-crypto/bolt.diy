@@ -1,8 +1,8 @@
 /**
- * Shared Coralred design kit content — the single source of truth for both:
- * - api.github-template.ts, which injects these into a fetched GitHub starter template
- * - selectStarterTemplate.ts's baseline template, used when no GitHub template applies
- *   (blank selection, or a failed fetch) so the kit is never skipped either way.
+ * Shared Coralred design kit content — the single source of truth, consumed by
+ * selectStarterTemplate.ts's getBaselineTemplate(), the only scaffolding path since the
+ * multi-framework GitHub starter-template system (and its own separate injection site,
+ * api.github-template.ts) was removed 2026-09-03 (출시 블로커 fix).
  */
 import coralredUiCss from '~design-handoff/coralred-ui.css?raw';
 

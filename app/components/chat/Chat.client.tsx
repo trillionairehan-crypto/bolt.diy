@@ -28,7 +28,7 @@ import { useSettings } from '~/lib/hooks/useSettings';
 import type { ProviderInfo } from '~/types/model';
 import { useSearchParams } from '@remix-run/react';
 import { createSampler } from '~/utils/sampler';
-import { getTemplates, getBaselineTemplate, selectStarterTemplate } from '~/utils/selectStarterTemplate';
+import { getBaselineTemplate } from '~/utils/selectStarterTemplate';
 import { designSchemeToHue } from '~/utils/paletteToHue';
 import { logStore } from '~/lib/stores/logs';
 import { streamingState } from '~/lib/stores/streaming';
@@ -142,7 +142,7 @@ export const ChatImpl = memo(
     const deployAlert = useStore(workbenchStore.deployAlert);
     const supabaseConn = useStore(supabaseConnection);
     const supabaseAlert = useStore(workbenchStore.supabaseAlert);
-    const { activeProviders, promptId, autoSelectTemplate, contextOptimizationEnabled } = useSettings();
+    const { activeProviders, promptId, contextOptimizationEnabled } = useSettings();
     const [llmErrorAlert, setLlmErrorAlert] = useState<LlmErrorAlertType | undefined>(undefined);
     const [model, setModel] = useState(() => {
       if (!SHOW_DEV_TOOLS) {
@@ -718,107 +718,22 @@ export const ChatImpl = memo(
       /*
        * METERING_FIX_REPORT.md: recordGenerationUsed() used to run right here — before the
        * request even fired, so a stall/cancel/error still cost a free credit. The charge is now
-       * armed immediately before each regenerate() call below instead (never here directly) so
-       * an unrelated throw between this point and the actual request (e.g. selectStarterTemplate
-       * rejecting) can't leave a stale armed charge for some later, unrelated onFinish to consume.
+       * armed immediately before the regenerate() call below instead (never here directly) so an
+       * unrelated throw between this point and the actual request can't leave a stale armed
+       * charge for some later, unrelated onFinish to consume.
        */
       setFakeLoading(true);
 
-      if (autoSelectTemplate) {
-        const { template, title } = await selectStarterTemplate({
-          message: promptContent,
-          model,
-          provider,
-        });
-
-        if (template !== 'blank') {
-          const temResp = await getTemplates(template, title, designSchemeToHue(effectiveDesignScheme?.palette)).catch(
-            (e) => {
-              logger.warn(`Starter template import failed for "${template}", continuing with blank template:`, e);
-              toast.warning('템플릿을 불러오지 못해 기본 설정으로 생성합니다');
-
-              return null;
-            },
-          );
-
-          if (temResp) {
-            const { assistantMessage, userMessage } = temResp;
-            const userMessageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${promptContent}`;
-            const uploadedFileParts = await filesToFileParts(uploadedFiles);
-
-            /*
-             * NOTE: v4 relied on setMessages([...]) + reload() to seed a fake assistant turn and
-             * resume generation from it. v5's regenerate() is designed to redo the last assistant
-             * message, not resume from a synthetic history — this is carried over as the closest
-             * equivalent but its runtime behavior with v5 has not been verified end-to-end.
-             */
-            setMessages([
-              {
-                id: `1-${new Date().getTime()}`,
-                role: 'user',
-                parts: [
-                  { type: 'text', text: userMessageText },
-                  ...imagesToFileParts(imageDataList),
-                  ...uploadedFileParts,
-                ],
-              },
-              {
-                id: `2-${new Date().getTime()}`,
-                role: 'assistant',
-                parts: [{ type: 'text', text: assistantMessage }],
-              },
-              {
-                id: `3-${new Date().getTime()}`,
-                role: 'user',
-                parts: [{ type: 'text', text: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${userMessage}` }],
-                metadata: { hidden: true },
-              },
-            ]);
-
-            /*
-             * GEN_STALL_FIX.md — regenerate() was fired without await/catch: if its returned
-             * promise rejects (or throws synchronously before making a request), nothing in this
-             * file ever saw it — an unhandled rejection that looks, from the user's side, like
-             * generation just silently stopped after "기본 파일을 만들었어요". This log is the
-             * checkpoint that proves generateNewApp actually reached the trigger call; the .catch
-             * below makes sure a rejection surfaces (console + the existing error-alert UI) instead
-             * of vanishing.
-             */
-            logger.info('generateNewApp: template seeded, triggering regenerate()');
-            chargeEligibleRef.current = true;
-            networkRetryCountRef.current = 0;
-            autoReviewArmedRef.current = true;
-            generationChargeGateRef.current.arm();
-            regenerate()
-              .then(() => logger.info('generateNewApp: regenerate() settled (template import)'))
-              .catch((e) => {
-                // Rejected before onFinish could ever fire (e.g. thrown synchronously) — nothing to charge.
-                generationChargeGateRef.current.disarm();
-                logger.error('generateNewApp: regenerate() rejected after template import', e);
-                handleError(e, 'chat');
-              });
-            setInput('');
-            Cookies.remove(PROMPT_COOKIE_KEY);
-
-            setUploadedFiles([]);
-            setImageDataList([]);
-
-            resetEnhancer();
-
-            textareaRef.current?.blur();
-            setFakeLoading(false);
-
-            return;
-          }
-        }
-      }
-
       /*
-       * Reached when autoSelectTemplate is off, the LLM chose 'blank', or a GitHub template
-       * fetch failed — every one of these previously sent a bare prompt with zero files,
-       * meaning the design kit was never present. Seed the Coralred baseline (no GitHub
-       * dependency, can't fail the way a template fetch can) via the same synthetic-history
-       * mechanism used for real templates above.
+       * Always the Coralred baseline (no GitHub dependency, no LLM template-selection call) —
+       * 2026-09-03, 출시 블로커 fix. This used to be one fallback among many: an LLM would first
+       * pick from a dozen-plus framework starter templates fetched live from GitHub, and this
+       * baseline only ran if it picked 'blank' or the fetch failed. That selection layer let the
+       * picker choose a framework the generation pipeline (App.tsx-based React, coralredKit,
+       * every skeleton prompt in new-prompt.ts) doesn't actually support — confirmed broken for
+       * Astro specifically (the LLM wrote into App.tsx, but the live preview only ever serves
+       * src/pages/index.astro, which nothing wires App.tsx into — the app was dead on arrival).
+       * See selectStarterTemplate.ts's getBaselineTemplate() doc comment for the full story.
        */
       const { assistantMessage, userMessage } = getBaselineTemplate(designSchemeToHue(effectiveDesignScheme?.palette));
       const userMessageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${promptContent}`;
@@ -843,7 +758,14 @@ export const ChatImpl = memo(
         },
       ]);
 
-      // GEN_STALL_FIX.md — same reasoning as the template-import branch above.
+      /*
+       * GEN_STALL_FIX.md — regenerate() was fired without await/catch: if its returned promise
+       * rejects (or throws synchronously before making a request), nothing in this file ever saw
+       * it — an unhandled rejection that looks, from the user's side, like generation just
+       * silently stopped after "기본 파일을 만들었어요". This log is the checkpoint that proves
+       * generateNewApp actually reached the trigger call; the .catch below makes sure a rejection
+       * surfaces (console + the existing error-alert UI) instead of vanishing.
+       */
       logger.info('generateNewApp: baseline seeded, triggering regenerate()');
       chargeEligibleRef.current = true;
       networkRetryCountRef.current = 0;
