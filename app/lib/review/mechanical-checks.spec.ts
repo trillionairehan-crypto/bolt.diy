@@ -8,7 +8,17 @@ import {
   __internal,
 } from './mechanical-checks';
 
-const { runEmojiCheck, runColorLiteralCheck, runMapGuardCheck, runExternalImageCheck } = __internal;
+const {
+  runEmojiCheck,
+  runColorLiteralCheck,
+  runMapGuardCheck,
+  runExternalImageCheck,
+  runSkeleton7DataSlotCheck,
+  runSkeleton7FallbackHeadlineCheck,
+  runSkeleton7CaptionDedupeCheck,
+  runSkeleton7CardGridHintCheck,
+  isSkeleton7File,
+} = __internal;
 
 const HUE = 20; // coralred 기본 hue와 무관한 임의의 고정값 — 계산이 실행되는지만 확인.
 
@@ -381,6 +391,177 @@ describe('runMechanicalChecks (orchestration)', () => {
     const { findings, updatedFiles } = runMechanicalChecks(files, HUE);
     expect(findings).toHaveLength(0);
     expect(updatedFiles).toEqual({});
+  });
+});
+
+describe('isSkeleton7File', () => {
+  it('detects via data-slot="hero" marker', () => {
+    expect(isSkeleton7File('<section data-slot="hero">x</section>')).toBe(true);
+  });
+
+  it('detects via cr-ch-fallback-headline marker', () => {
+    expect(isSkeleton7File('<h1 class="cr-ch-fallback-headline">x</h1>')).toBe(true);
+  });
+
+  it('detects via 2+ literal 100vh occurrences as a fallback signal', () => {
+    expect(isSkeleton7File('height: 100vh; ... height: 100vh;')).toBe(true);
+  });
+
+  it('does not flag an ordinary file with no skeleton-7 markers', () => {
+    expect(isSkeleton7File('<div className="card">평범한 카드</div>')).toBe(false);
+  });
+
+  it('does not flag a single incidental 100vh mention', () => {
+    expect(isSkeleton7File('min-height: 100vh;')).toBe(false);
+  });
+});
+
+describe('runSkeleton7DataSlotCheck', () => {
+  const chapter = (inner: string, dataSlot?: string) =>
+    `<section style={{height:"100vh"}}${dataSlot ? ` data-slot="${dataSlot}"` : ''}>${inner}</section>`;
+
+  it('renames 4 chapter containers to hero/ch1/ch2/ch3 in order, leaving already-correct ones untouched', () => {
+    const src = [chapter('A', 'wrong'), chapter('B'), chapter('C', 'ch2'), chapter('D')].join('\n');
+    const { findings, content } = runSkeleton7DataSlotCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'skeleton7-data-slot', autoFixed: true });
+    expect(content).toContain('data-slot="hero"');
+    expect(content).toContain('data-slot="ch1"');
+    expect(content).toContain('data-slot="ch2"');
+    expect(content).toContain('data-slot="ch3"');
+    expect(content).not.toContain('data-slot="wrong"');
+
+    // C already had the correct ch2 slot — its surrounding tag text is untouched.
+    expect(content).toContain(chapter('C', 'ch2'));
+  });
+
+  it('does nothing when all 4 slots are already correctly named in order', () => {
+    const src = [chapter('A', 'hero'), chapter('B', 'ch1'), chapter('C', 'ch2'), chapter('D', 'ch3')].join('\n');
+    const { findings, content } = runSkeleton7DataSlotCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+
+  it('only leaves a hint (no auto-fix) when the chapter count is not exactly 4', () => {
+    const src = [chapter('A'), chapter('B'), chapter('C')].join('\n');
+    const { findings, content } = runSkeleton7DataSlotCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'skeleton7-chapter-count', autoFixed: false });
+    expect(content).toBe(src);
+  });
+
+  it('is a no-op on a file with no skeleton-7 markers', () => {
+    const src = '<div className="card">평범한 카드</div>';
+    const { findings, content } = runSkeleton7DataSlotCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+});
+
+describe('runSkeleton7FallbackHeadlineCheck', () => {
+  it('bumps a sub-56px fallback headline font-size up to 56px, preserving original formatting', () => {
+    const src = '<h1 class="cr-ch-fallback-headline" style="font-size:44px">환영합니다</h1>';
+    const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'skeleton7-fallback-headline-size', autoFixed: true });
+    expect(content).toContain('font-size:56px');
+    expect(content).not.toContain('44px');
+  });
+
+  it('leaves a font-size already at or above 56px untouched', () => {
+    const src = '<h1 class="cr-ch-fallback-headline" style="font-size:60px">환영합니다</h1>';
+    const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+
+  it('is a no-op when the fallback headline class is absent', () => {
+    const src = '<h1 style="font-size:20px">평범한 제목</h1>';
+    const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+
+  it('fixes an inline style that appears BEFORE the className attribute (regression: 2026-09-03 cafe case)', () => {
+    const src = '<h1 style={{fontSize:"44px"}} className="cr-ch-fallback-headline">환영합니다</h1>';
+    const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0].autoFixed).toBe(true);
+    expect(content).not.toContain('44px');
+    expect(content).toContain('56px');
+  });
+
+  it('fixes a camelCase JSX inline style object (fontSize, not font-size)', () => {
+    const src = '<h1 className="cr-ch-fallback-headline" style={{ fontSize: \'44px\' }}>환영합니다</h1>';
+    const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(content).toContain("fontSize: '56px'");
+    expect(content).not.toContain('44px');
+  });
+
+  it('fixes an inline override while leaving an already-correct CSS rule for the same class untouched', () => {
+    const src = [
+      '.cr-ch-fallback-headline { font-size: 56px; }',
+      '<h1 className="cr-ch-fallback-headline" style={{ fontSize: 44 }}>환영합니다</h1>',
+    ].join('\n');
+    const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(content).toContain('.cr-ch-fallback-headline { font-size: 56px; }');
+    expect(content).toContain('fontSize: 56');
+    expect(content).not.toContain('fontSize: 44');
+  });
+});
+
+describe('runSkeleton7CaptionDedupeCheck', () => {
+  const CAPTION = '사진을 보내주시면 여기에 넣어드릴게요';
+
+  it('keeps the occurrence nearest data-slot="hero" and removes the rest', () => {
+    const src = [
+      `<div data-slot="hero"><span>${CAPTION}</span></div>`,
+      `<div data-slot="ch1"><span>${CAPTION}</span></div>`,
+      `<div data-slot="ch2"><span>${CAPTION}</span></div>`,
+    ].join('');
+    const { findings, content } = runSkeleton7CaptionDedupeCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'skeleton7-hero-caption-dedupe', autoFixed: true });
+    expect(content.split(CAPTION)).toHaveLength(2); // one occurrence left
+    expect(content).toContain(`<div data-slot="hero"><span>${CAPTION}</span></div>`);
+  });
+
+  it('leaves a single occurrence untouched', () => {
+    const src = `<div data-slot="hero"><span>${CAPTION}</span></div>`;
+    const { findings, content } = runSkeleton7CaptionDedupeCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+});
+
+describe('runSkeleton7CardGridHintCheck', () => {
+  it('flags a 3+ column grid with a nearby .map() as a card/list violation hint', () => {
+    const src = `
+      <section style={{height: '100vh'}}>hero</section>
+      <div className="grid" /* grid-template-columns: repeat(4, 1fr); */>
+        {items.map((item) => <Card key={item.id} {...item} />)}
+      </div>
+      <section style={{height: '100vh'}}>last</section>
+    `;
+    const findings = runSkeleton7CardGridHintCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'skeleton7-card-grid-detected', autoFixed: false });
+  });
+
+  it('does not flag a grid with no nearby .map() call', () => {
+    const src = `
+      <section style={{height: '100vh'}}>hero</section>
+      <div /* grid-template-columns: repeat(3, 1fr); */>고정된 카드 3개, 반복 렌더링 아님</div>
+      <section style={{height: '100vh'}}>last</section>
+    `;
+    expect(runSkeleton7CardGridHintCheck('src/App.tsx', src)).toHaveLength(0);
+  });
+
+  it('is a no-op on a file with no skeleton-7 markers', () => {
+    const src = '.grid { grid-template-columns: repeat(3, 1fr); } // items.map(...)';
+    expect(runSkeleton7CardGridHintCheck('src/App.tsx', src)).toHaveLength(0);
   });
 });
 

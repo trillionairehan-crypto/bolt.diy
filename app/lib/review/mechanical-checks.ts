@@ -859,6 +859,274 @@ function runStockImageDomainCheck(filePath: string, content: string): Mechanical
   return findings;
 }
 
+// --- 7. 골격 7(소개·홍보형) 챕터 구조 — data-slot 명명, 폴백 헤드라인 크기, 안내 문구 중복 ---
+
+/*
+ * 실측(2026-09-03, 골격 7 3회 재생성 검증 라운드): 빵집만 data-slot을 정확히 냈고, 포트폴리오·카페는
+ * 이름이 틀렸거나(임의 명명) 아예 없었다. "프롬프트만으로는 확률적으로 지켜지지 않는다"는 이 세션의
+ * 반복된 교훈에 따라, 프롬프트에 절차형으로 못 박아도 이름·크기·중복은 코드로 다시 강제한다.
+ *
+ * 골격 7 여부는 data-slot="hero"/cr-ch-fallback-headline 같은 골격 7 전용 마커가 이미 있으면 그걸로
+ * 판정하고, 마커 자체가 통째로 빠진 최악의 실패(2026-09-03 카페 재생성 사례: data-slot 전무)까지
+ * 잡으려고 "height: 100vh" 리터럴이 파일에 2회 이상 있는지도 보조 신호로 쓴다 — 100vh는 프롬프트에
+ * 직접 박아둔 리터럴이라 슬롯 이름보다 훨씬 잘 지켜졌다(실측 3/3 전부 정확).
+ */
+const CH7_VH_MARKER_REGEX = /100vh/gi;
+const CH7_DETECT_MIN_VH = 2;
+const CH7_FALLBACK_HEADLINE_CLASS = 'cr-ch-fallback-headline';
+const CH7_HERO_CAPTION = '사진을 보내주시면 여기에 넣어드릴게요';
+
+function isSkeleton7File(content: string): boolean {
+  if (content.includes('data-slot="hero"') || content.includes(CH7_FALLBACK_HEADLINE_CLASS)) {
+    return true;
+  }
+
+  const vhMatches = content.match(CH7_VH_MARKER_REGEX);
+
+  return (vhMatches?.length ?? 0) >= CH7_DETECT_MIN_VH;
+}
+
+const CH7_CHAPTER_TAG_REGEX = /<(section|div)\b[^>]*?100vh[^>]*?>/gi;
+const CH7_DATA_SLOT_ATTR_REGEX = /data-slot=(["'])([\w-]*)\1/i;
+const CH7_EXPECTED_SLOTS = ['hero', 'ch1', 'ch2', 'ch3'];
+
+/**
+ * 챕터 컨테이너(100vh 스타일을 가진 태그) 정확히 4개를 찾아 순서대로 data-slot을 hero/ch1/ch2/ch3로
+ * 강제한다. 4개가 아니면(챕터가 빠졌거나 더 있으면) 구조 자체가 잘못된 것이라 자동수정하지 않고
+ * 힌트만 남긴다 — 몇 개를 지우거나 새로 만들지는 판단이 필요하다.
+ */
+function runSkeleton7DataSlotCheck(
+  filePath: string,
+  content: string,
+): { findings: MechanicalFinding[]; content: string } {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.html']) || !isSkeleton7File(content)) {
+    return { findings: [], content };
+  }
+
+  const tags = [...content.matchAll(CH7_CHAPTER_TAG_REGEX)];
+
+  if (tags.length !== 4) {
+    return {
+      findings: [
+        {
+          file: filePath,
+          line: tags.length > 0 ? lineNumberAt(content, tags[0].index as number) : 1,
+          rule: 'skeleton7-chapter-count',
+          message: `골격 7 챕터(100vh 컨테이너)가 ${tags.length}개 감지됐습니다 — 정확히 4개(hero/ch1/ch2/ch3)여야 합니다. 자동수정하지 않았습니다.`,
+          autoFixed: false,
+        },
+      ],
+      content,
+    };
+  }
+
+  const replacements: Array<{ start: number; end: number; text: string }> = [];
+  let needsFix = false;
+
+  for (let i = 0; i < tags.length; i++) {
+    const tag = tags[i][0];
+    const tagStart = tags[i].index as number;
+    const expected = CH7_EXPECTED_SLOTS[i];
+    const existing = tag.match(CH7_DATA_SLOT_ATTR_REGEX);
+
+    if (existing && existing[2] === expected) {
+      continue;
+    }
+
+    needsFix = true;
+
+    if (existing) {
+      const attrStart = tagStart + (existing.index as number);
+      const attrEnd = attrStart + existing[0].length;
+      replacements.push({ start: attrStart, end: attrEnd, text: `data-slot="${expected}"` });
+    } else {
+      const tagNameMatch = tag.match(/^<(section|div)\b/i) as RegExpMatchArray;
+      const insertAt = tagStart + tagNameMatch[0].length;
+      replacements.push({ start: insertAt, end: insertAt, text: ` data-slot="${expected}"` });
+    }
+  }
+
+  if (!needsFix) {
+    return { findings: [], content };
+  }
+
+  replacements.sort((a, b) => b.start - a.start);
+
+  let nextContent = content;
+
+  for (const { start, end, text } of replacements) {
+    nextContent = nextContent.slice(0, start) + text + nextContent.slice(end);
+  }
+
+  return {
+    findings: [
+      {
+        file: filePath,
+        line: lineNumberAt(content, tags[0].index as number),
+        rule: 'skeleton7-data-slot',
+        message: '골격 7 챕터 4개의 data-slot을 순서대로 hero/ch1/ch2/ch3로 재명명했습니다.',
+        autoFixed: true,
+      },
+    ],
+    content: nextContent,
+  };
+}
+
+const CH7_FALLBACK_HEADLINE_MIN_PX = 56;
+
+// 쉼표 없는 CSS 문자열(font-size:44px)과 JSX 인라인 style 객체(fontSize: '44px')를 둘 다 잡는다.
+const CH7_KEBAB_FONT_SIZE_REGEX = /font-size:\s*([\d.]+)px/gi;
+const CH7_CAMEL_FONT_SIZE_REGEX = /fontSize:\s*['"]?([\d.]+)(?:px)?['"]?/gi;
+const CH7_FALLBACK_HEADLINE_WINDOW = 300;
+
+/*
+ * 실측(2026-09-03, 재검증 라운드 1, 카페 생성물): CSS 규칙(.cr-ch-fallback-headline{font-size:56px})은
+ * 정확했는데, 같은 요소에 인라인 스타일이 따로 44px로 덮어써서 computed 값은 44px였다. 클래스명
+ * "뒤쪽"만 보던 이전 구현은 클래스 속성보다 앞에 오는 style 속성(<h1 style={{...}} className="...">
+ * 같은 순서)을 놓쳤다 — 그래서 클래스 매치를 중심으로 앞뒤 양쪽 창을 다 본다. JSX 인라인 style 객체는
+ * camelCase(fontSize)를 쓰므로 kebab-case 정규식만으로는 애초에 못 잡는 경우도 있어 두 표기 모두 검사한다.
+ */
+function runSkeleton7FallbackHeadlineCheck(
+  filePath: string,
+  content: string,
+): { findings: MechanicalFinding[]; content: string } {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.css', '.scss']) || !content.includes(CH7_FALLBACK_HEADLINE_CLASS)) {
+    return { findings: [], content };
+  }
+
+  const findings: MechanicalFinding[] = [];
+  const replacements: Array<{ start: number; end: number; text: string }> = [];
+  const seenStarts = new Set<number>();
+  const classRegex = new RegExp(CH7_FALLBACK_HEADLINE_CLASS, 'g');
+
+  for (const classMatch of content.matchAll(classRegex)) {
+    const classStart = classMatch.index as number;
+    const classEnd = classStart + CH7_FALLBACK_HEADLINE_CLASS.length;
+    const windowStart = Math.max(0, classStart - CH7_FALLBACK_HEADLINE_WINDOW);
+    const windowEnd = Math.min(content.length, classEnd + CH7_FALLBACK_HEADLINE_WINDOW);
+    const windowText = content.slice(windowStart, windowEnd);
+
+    for (const regex of [CH7_KEBAB_FONT_SIZE_REGEX, CH7_CAMEL_FONT_SIZE_REGEX]) {
+      for (const sizeMatch of windowText.matchAll(regex)) {
+        const px = parseFloat(sizeMatch[1]);
+
+        if (px >= CH7_FALLBACK_HEADLINE_MIN_PX) {
+          continue;
+        }
+
+        const sizeStart = windowStart + (sizeMatch.index as number);
+
+        if (seenStarts.has(sizeStart)) {
+          continue;
+        }
+
+        seenStarts.add(sizeStart);
+
+        const sizeEnd = sizeStart + sizeMatch[0].length;
+        const fixedText = sizeMatch[0].replace(sizeMatch[1], String(CH7_FALLBACK_HEADLINE_MIN_PX));
+        replacements.push({ start: sizeStart, end: sizeEnd, text: fixedText });
+        findings.push({
+          file: filePath,
+          line: lineNumberAt(content, sizeStart),
+          rule: 'skeleton7-fallback-headline-size',
+          message: `골격 7 폴백 헤드라인 font-size(${px}px)가 56px 미만이라 56px로 자동수정했습니다.`,
+          autoFixed: true,
+        });
+      }
+    }
+  }
+
+  if (replacements.length === 0) {
+    return { findings: [], content };
+  }
+
+  replacements.sort((a, b) => b.start - a.start);
+
+  let nextContent = content;
+
+  for (const { start, end, text } of replacements) {
+    nextContent = nextContent.slice(0, start) + text + nextContent.slice(end);
+  }
+
+  return { findings, content: nextContent };
+}
+
+const CH7_CAPTION_REGEX = new RegExp(CH7_HERO_CAPTION.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+const CH7_HERO_PROXIMITY_WINDOW = 3000;
+
+/** 안내 문구가 2회 이상이면 히어로(data-slot="hero") 근처 1곳만 남기고 나머지를 지운다. */
+function runSkeleton7CaptionDedupeCheck(
+  filePath: string,
+  content: string,
+): { findings: MechanicalFinding[]; content: string } {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.html']) || !content.includes(CH7_HERO_CAPTION)) {
+    return { findings: [], content };
+  }
+
+  const occurrences = [...content.matchAll(CH7_CAPTION_REGEX)].map((m) => m.index as number);
+
+  if (occurrences.length <= 1) {
+    return { findings: [], content };
+  }
+
+  const heroIndex = content.indexOf('data-slot="hero"');
+  const nearHero =
+    heroIndex === -1 ? undefined : occurrences.find((idx) => Math.abs(idx - heroIndex) <= CH7_HERO_PROXIMITY_WINDOW);
+  const keepIndex = nearHero ?? occurrences[0];
+  const removeStarts = occurrences.filter((idx) => idx !== keepIndex).sort((a, b) => b - a);
+
+  let nextContent = content;
+
+  for (const start of removeStarts) {
+    nextContent = nextContent.slice(0, start) + nextContent.slice(start + CH7_HERO_CAPTION.length);
+  }
+
+  return {
+    findings: [
+      {
+        file: filePath,
+        line: lineNumberAt(content, keepIndex),
+        rule: 'skeleton7-hero-caption-dedupe',
+        message: `안내 문구("${CH7_HERO_CAPTION}")가 ${occurrences.length}회 등장해 히어로 근처 1곳만 남기고 ${removeStarts.length}곳을 제거했습니다.`,
+        autoFixed: true,
+      },
+    ],
+    content: nextContent,
+  };
+}
+
+const CH7_GRID_COLS_REGEX = /grid-template-columns:\s*[^;]*repeat\(\s*([3-9]|\d{2,})\s*,/gi;
+const CH7_MAP_NEARBY_WINDOW = 500;
+
+/** 골격 7에서 3열 이상 그리드 + 근처 .map() 반복 렌더링이 보이면 카드·리스트 금지 규칙 위반 힌트. */
+function runSkeleton7CardGridHintCheck(filePath: string, content: string): MechanicalFinding[] {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.css', '.scss']) || !isSkeleton7File(content)) {
+    return [];
+  }
+
+  const findings: MechanicalFinding[] = [];
+
+  for (const match of content.matchAll(CH7_GRID_COLS_REGEX)) {
+    const start = match.index as number;
+    const windowStart = Math.max(0, start - CH7_MAP_NEARBY_WINDOW);
+    const windowEnd = Math.min(content.length, start + CH7_MAP_NEARBY_WINDOW);
+
+    if (!content.slice(windowStart, windowEnd).includes('.map(')) {
+      continue;
+    }
+
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, start),
+      rule: 'skeleton7-card-grid-detected',
+      message: `골격 7(소개·홍보형)에서 ${match[1]}열 카드 그리드 + 반복 렌더링이 감지됐습니다 — 이 골격은 카드·리스트를 쓰지 않고 대표 3개를 챕터 2~4에 하나씩 녹여야 합니다.`,
+      autoFixed: false,
+    });
+  }
+
+  return findings;
+}
+
 // --- 오케스트레이션 ---
 
 /**
@@ -882,12 +1150,25 @@ export function runMechanicalChecks(files: Record<string, string>, resolvedHue: 
     findings.push(...colorResult.findings);
     content = colorResult.content;
 
+    const ch7SlotResult = runSkeleton7DataSlotCheck(filePath, content);
+    findings.push(...ch7SlotResult.findings);
+    content = ch7SlotResult.content;
+
+    const ch7HeadlineResult = runSkeleton7FallbackHeadlineCheck(filePath, content);
+    findings.push(...ch7HeadlineResult.findings);
+    content = ch7HeadlineResult.content;
+
+    const ch7CaptionResult = runSkeleton7CaptionDedupeCheck(filePath, content);
+    findings.push(...ch7CaptionResult.findings);
+    content = ch7CaptionResult.content;
+
     if (MAP_GUARD_ENABLED) {
       findings.push(...runMapGuardCheck(filePath, content));
     }
 
     findings.push(...runExternalImageCheck(filePath, content));
     findings.push(...runStockImageDomainCheck(filePath, content));
+    findings.push(...runSkeleton7CardGridHintCheck(filePath, content));
 
     if (content !== originalContent) {
       updatedFiles[filePath] = content;
@@ -930,6 +1211,11 @@ export const __internal = {
   runMapGuardCheck,
   runExternalImageCheck,
   runStockImageDomainCheck,
+  runSkeleton7DataSlotCheck,
+  runSkeleton7FallbackHeadlineCheck,
+  runSkeleton7CaptionDedupeCheck,
+  runSkeleton7CardGridHintCheck,
+  isSkeleton7File,
   maskComments,
   classifyEmojiContext,
 };
