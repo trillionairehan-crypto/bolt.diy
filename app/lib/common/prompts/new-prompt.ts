@@ -1085,7 +1085,9 @@ ${CACHE_BREAKPOINT_MARKER}
        data-slot="hero", data-slot="ch1", data-slot="ch2", data-slot="ch3". 다른 이름(예:
        data-slot="chapter-1")을 쓰지 않는다. 각 컨테이너는 height: 100vh로 화면을 꽉 채운다 —
        "100vh" 리터럴 문자열을 스타일에 그대로 쓴다(변수나 계산식으로 대체하지 않는다). 스크롤로
-       한 장씩 넘어간다.
+       한 장씩 넘어간다. 4개를 하나의 재사용 컴포넌트(예: <Chapter slot="ch1" .../>처럼 prop으로
+       구분해서 여러 번 호출하는 형태)로 묶지 않는다 — hero/ch1/ch2/ch3 각각을 파일에 독립된 JSX
+       블록으로 직접 쓴다. data-slot 값과 height: 100vh가 4곳 모두에 리터럴로 그대로 보여야 한다.
     2. 헤드라인(히어로와 챕터 2~4 전부)의 font-family는 반드시 이 값 그대로 쓴다:
        font-family: 'Noto Serif KR', serif; — 그리고 이 웹폰트를 실제로 로드하는 코드를 <head>에
        포함한다(Google Fonts preconnect + Noto Serif KR을 불러오는 link 태그, 또는 동등한 @import).
@@ -1095,13 +1097,12 @@ ${CACHE_BREAKPOINT_MARKER}
        좌우 정렬은 챕터마다 교대한다(ch1이 왼쪽 이미지면 ch2는 오른쪽, ch3은 다시 왼쪽 — 업종
        특성으로 정하되 무작위로 고르지 않는다).
     4. 이미지가 없는 슬롯(지금은 전부 없다)은 <image_placeholder_rules>의 코랄 틴트 박스를 쓰지
-       않는다 — 이 골격의 예외다. 대신 그 챕터 배경을 팔레트 배경색으로 채우고, 헤드라인 요소에
-       클래스 이름 cr-ch-fallback-headline을 그대로 붙여 화면 중앙에 배치한다(직접 이 클래스명을
-       써야 한다 — 다른 이름을 짓지 않는다). 정확히 이렇게 쓴다:
-       <h1 className="cr-ch-fallback-headline" style={{ fontSize: '56px' }}>...</h1>
-       이 클래스의 font-size는 정확히 56px(모바일 40px)로 쓴다 — 54px·50px 같은 근사값이 아니라
-       정확히 56px다. 다른 곳(부모 요소 등)에 이 값을 덮어쓰는 별도 font-size를 얹지 않는다. 사진이
-       하나도 없어도 완성된 페이지로 보여야 한다.
+       않는다 — 이 골격의 예외다. 대신 그 챕터 배경을 팔레트 배경색으로 채우고, 헤드라인을 실제
+       헤딩 태그(h1·h2·h3 중 하나)로 화면 중앙에 배치한다. 정확히 이렇게 쓴다:
+       <h1 style={{ fontSize: '56px' }}>...</h1>
+       font-size는 정확히 56px(모바일 40px)로 쓴다 — 54px·50px 같은 근사값이 아니라 정확히 56px다.
+       다른 곳(부모 요소 등)에 이 값을 덮어쓰는 별도 font-size를 얹지 않는다. 사진이 하나도 없어도
+       완성된 페이지로 보여야 한다.
     5. "사진을 보내주시면 여기에 넣어드릴게요" 문구는 data-slot="hero" 안에만 정확히 1회 넣는다.
        data-slot="ch1"/"ch2"/"ch3" 안에는 이 문구를 절대 넣지 않는다. 히어로와 챕터 2~4의
        "이미지 없음" 처리를 하나의 공용 컴포넌트로 재사용하지 않는다 — 재사용하면 그 안에 있는
@@ -1111,10 +1112,24 @@ ${CACHE_BREAKPOINT_MARKER}
        주소는 텍스트로만 넣는다.
     7. 각 챕터가 뷰포트에 들어올 때 페이드+상승(opacity 0→1, translateY 24px→0, 600ms)으로
        등장한다. 패럴랙스(background-attachment: fixed, 스크롤 연동 transform 등)는 쓰지 않는다.
-    8. 카드·리스트는 예외 없이 금지한다. 포트폴리오·메뉴·작업물처럼 항목이 여러 개인 요청이어도
-       4개 넘게 나열하지 않는다 — 대표 3개만 골라 ch1·ch2·ch3에 하나씩 녹인다(그리드나 반복 카드로
-       늘어놓지 않는다). 사용자가 4개보다 많은 항목을 목록으로 보여달라고 명시하면 이 골격이 아니라
-       4번 목록·상세형으로 분류한다.
+    8. 포트폴리오·메뉴·작업물처럼 항목이 여러 개인 요청이어도 .map()으로 나열하거나 그리드에 카드를
+       반복해서 찍지 않는다 — 이 골격은 나열이 아니라 챕터로 보여준다. 대표 3개만 골라 ch1·ch2·ch3에
+       하나씩 아래 예시와 동일한 구조로 직접 펼쳐 쓴다:
+       const works = [work1, work2, work3]; // 대표 3개만 고른다
+       <section data-slot="ch1" style={{ height: '100vh' }}>
+         <h2>{works[0].title}</h2>
+         <p>{works[0].desc}</p>
+       </section>
+       <section data-slot="ch2" style={{ height: '100vh' }}>
+         <h2>{works[1].title}</h2>
+         <p>{works[1].desc}</p>
+       </section>
+       <section data-slot="ch3" style={{ height: '100vh' }}>
+         <h2>{works[2].title}</h2>
+         <p>{works[2].desc}</p>
+       </section>
+       .map()·3열 이상 grid·반복 카드 컴포넌트를 이 골격에서 쓰지 않는다. 사용자가 4개보다 많은
+       항목을 목록으로 보여달라고 명시하면 이 골격이 아니라 4번 목록·상세형으로 분류한다.
   - 밀도는 spacious로 고정한다.
 </app_skeletons>
 

@@ -18,6 +18,7 @@ const {
   runSkeleton7CaptionDedupeCheck,
   runSkeleton7CardGridHintCheck,
   isSkeleton7File,
+  runSpacingGridCheck,
 } = __internal;
 
 const HUE = 20; // coralred 기본 hue와 무관한 임의의 고정값 — 계산이 실행되는지만 확인.
@@ -399,10 +400,6 @@ describe('isSkeleton7File', () => {
     expect(isSkeleton7File('<section data-slot="hero">x</section>')).toBe(true);
   });
 
-  it('detects via cr-ch-fallback-headline marker', () => {
-    expect(isSkeleton7File('<h1 class="cr-ch-fallback-headline">x</h1>')).toBe(true);
-  });
-
   it('detects via 2+ literal 100vh occurrences as a fallback signal', () => {
     expect(isSkeleton7File('height: 100vh; ... height: 100vh;')).toBe(true);
   });
@@ -458,57 +455,93 @@ describe('runSkeleton7DataSlotCheck', () => {
   });
 });
 
-describe('runSkeleton7FallbackHeadlineCheck', () => {
-  it('bumps a sub-56px fallback headline font-size up to 56px, preserving original formatting', () => {
-    const src = '<h1 class="cr-ch-fallback-headline" style="font-size:44px">환영합니다</h1>';
+describe('runSkeleton7FallbackHeadlineCheck (structural — class name irrelevant)', () => {
+  const ch = (inner: string, slot: string) =>
+    `<section data-slot="${slot}" style={{height:'100vh'}}>${inner}</section>`;
+
+  // 다른 3개 챕터는 사진이 있는 걸로(<img>) 채워 "폴백 챕터" 판정에서 빠지게 한다 — hero 하나만 검사 대상.
+  const NON_FALLBACK = '<img src="x.jpg" />';
+  const fourChapters = (hero: string, c1 = NON_FALLBACK, c2 = NON_FALLBACK, c3 = NON_FALLBACK) =>
+    [ch(hero, 'hero'), ch(c1, 'ch1'), ch(c2, 'ch2'), ch(c3, 'ch3')].join('\n');
+
+  it('fixes a sub-56px h1 that uses an arbitrary, model-invented class name (round-2 regression: LLM never used cr-ch-fallback-headline)', () => {
+    const src = fourChapters('<h1 className="bakery-headline" style={{ fontSize: "44px" }}>환영합니다</h1>');
     const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
     expect(findings).toHaveLength(1);
     expect(findings[0]).toMatchObject({ rule: 'skeleton7-fallback-headline-size', autoFixed: true });
-    expect(content).toContain('font-size:56px');
+    expect(content).toContain('fontSize: "56px"');
     expect(content).not.toContain('44px');
   });
 
-  it('leaves a font-size already at or above 56px untouched', () => {
-    const src = '<h1 class="cr-ch-fallback-headline" style="font-size:60px">환영합니다</h1>';
+  it('fixes a differently-named class in a plain HTML-style attribute too', () => {
+    const src = fourChapters('<h2 class="portfolio-serif" style="font-size:48px">소개</h2>');
     const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
-    expect(findings).toHaveLength(0);
-    expect(content).toBe(src);
+    expect(findings).toHaveLength(1);
+    expect(content).toContain('font-size:56px');
+    expect(content).not.toContain('48px');
   });
 
-  it('is a no-op when the fallback headline class is absent', () => {
-    const src = '<h1 style="font-size:20px">평범한 제목</h1>';
-    const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
-    expect(findings).toHaveLength(0);
-    expect(content).toBe(src);
-  });
-
-  it('fixes an inline style that appears BEFORE the className attribute (regression: 2026-09-03 cafe case)', () => {
-    const src = '<h1 style={{fontSize:"44px"}} className="cr-ch-fallback-headline">환영합니다</h1>';
+  it('injects a font-size when the heading has no style attribute at all', () => {
+    const src = fourChapters('<h1>환영합니다</h1>');
     const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
     expect(findings).toHaveLength(1);
     expect(findings[0].autoFixed).toBe(true);
-    expect(content).not.toContain('44px');
-    expect(content).toContain('56px');
+    expect(content).toContain("style={{ fontSize: '56px' }}");
   });
 
-  it('fixes a camelCase JSX inline style object (fontSize, not font-size)', () => {
-    const src = '<h1 className="cr-ch-fallback-headline" style={{ fontSize: \'44px\' }}>환영합니다</h1>';
+  it('leaves an h1 already at or above 56px untouched', () => {
+    const src = fourChapters('<h1 style={{ fontSize: "60px" }}>환영합니다</h1>');
     const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
-    expect(findings).toHaveLength(1);
-    expect(content).toContain("fontSize: '56px'");
-    expect(content).not.toContain('44px');
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
   });
 
-  it('fixes an inline override while leaving an already-correct CSS rule for the same class untouched', () => {
-    const src = [
-      '.cr-ch-fallback-headline { font-size: 56px; }',
-      '<h1 className="cr-ch-fallback-headline" style={{ fontSize: 44 }}>환영합니다</h1>',
-    ].join('\n');
+  it('skips a chapter that has a real photo (<img>) — not a fallback chapter', () => {
+    const src = fourChapters('<img src="x.jpg" /><h1 style={{ fontSize: "20px" }}>제목</h1>');
+    const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+
+  it('skips a chapter with a CSS background-image — not a fallback chapter', () => {
+    const src = fourChapters(
+      '<div style={{ backgroundImage: "url(x.jpg)" }}><h1 style={{ fontSize: "20px" }}>제목</h1></div>',
+    );
+    const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+
+  it('falls back to the largest inline font-size in the chapter when there is no h1~h3 tag', () => {
+    const src = fourChapters(
+      '<p style={{ fontSize: "44px" }}>큰 텍스트</p><span style={{ fontSize: "12px" }}>작은 텍스트</span>',
+    );
     const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
     expect(findings).toHaveLength(1);
-    expect(content).toContain('.cr-ch-fallback-headline { font-size: 56px; }');
-    expect(content).toContain('fontSize: 56');
-    expect(content).not.toContain('fontSize: 44');
+    expect(content).toContain('fontSize: "56px"');
+    expect(content).toContain('fontSize: "12px"'); // 안 건드림
+  });
+
+  it('emits an unresolved hint (no auto-fix) when neither a heading tag nor any font-size exists', () => {
+    const src = fourChapters('그냥 텍스트만 있음');
+    const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'skeleton7-fallback-headline-unresolved', autoFixed: false });
+    expect(content).toBe(src);
+  });
+
+  it('finds the style attribute regardless of its position among other attributes', () => {
+    const src = fourChapters('<h1 data-x="1" style={{ fontSize: "40px" }} className="whatever">제목</h1>');
+    const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(content).toContain('fontSize: "56px"');
+  });
+
+  it('is a no-op when the file is not shaped like 4 skeleton-7 chapters', () => {
+    const src = '<section style={{height:"100vh"}}><h1 style={{ fontSize: "10px" }}>x</h1></section>';
+    const { findings, content } = runSkeleton7FallbackHeadlineCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
   });
 });
 
@@ -536,30 +569,119 @@ describe('runSkeleton7CaptionDedupeCheck', () => {
   });
 });
 
-describe('runSkeleton7CardGridHintCheck', () => {
-  it('flags a 3+ column grid with a nearby .map() as a card/list violation hint', () => {
+describe('runSpacingGridCheck (8pt grid, hint-only)', () => {
+  it('flags a non-4-multiple padding value in a kebab CSS declaration', () => {
+    const src = '.card { padding: 6px; }';
+    const findings = runSpacingGridCheck('src/card.css', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'spacing-not-4pt-grid', autoFixed: false });
+    expect(findings[0].message).toContain('padding');
+    expect(findings[0].message).toContain('6px');
+    expect(findings[0].message).toContain('8px'); // 가장 가까운 4의 배수
+  });
+
+  it('does not flag a 4-multiple padding value', () => {
+    const src = '.card { padding: 8px; }';
+    expect(runSpacingGridCheck('src/card.css', src)).toHaveLength(0);
+  });
+
+  it('flags each token independently in a shorthand value', () => {
+    const src = '.card { margin: 6px 10px; }';
+    const findings = runSpacingGridCheck('src/card.css', src);
+    expect(findings).toHaveLength(2);
+    expect(findings[0].message).toContain('6px');
+    expect(findings[1].message).toContain('10px');
+  });
+
+  it('flags directional variants (padding-top, margin-inline-start, row-gap)', () => {
+    const src = '.a { padding-top: 6px; } .b { margin-inline-start: 10px; } .c { row-gap: 14px; }';
+    const findings = runSpacingGridCheck('src/card.css', src);
+    expect(findings).toHaveLength(3);
+  });
+
+  it('flags a JSX inline-style camelCase declaration', () => {
+    const src = "<div style={{ padding: '6px' }} />";
+    const findings = runSpacingGridCheck('src/Card.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0].message).toContain('padding');
+  });
+
+  it('flags camelCase directional/gap variants', () => {
+    const src = "<div style={{ marginTop: '10px', rowGap: '6px' }} />";
+    const findings = runSpacingGridCheck('src/Card.tsx', src);
+    expect(findings).toHaveLength(2);
+  });
+
+  it('does not flag excluded properties: width/height/border/line-height/font-size/border-radius/transform/letter-spacing/top-right-bottom-left', () => {
     const src = `
-      <section style={{height: '100vh'}}>hero</section>
-      <div className="grid" /* grid-template-columns: repeat(4, 1fr); */>
-        {items.map((item) => <Card key={item.id} {...item} />)}
-      </div>
-      <section style={{height: '100vh'}}>last</section>
+      .a { width: 10px; height: 10px; border: 1px solid red; line-height: 10px; }
+      .b { font-size: 10px; border-radius: 10px; transform: translateX(10px); letter-spacing: 1px; }
+      .c { top: 10px; right: 10px; bottom: 10px; left: 10px; }
     `;
+    expect(runSpacingGridCheck('src/card.css', src)).toHaveLength(0);
+  });
+
+  it('does not flag percentage/rem/vh/vw/auto/calc() values', () => {
+    const src = '.a { padding: 8%; margin: 1rem; gap: 2vh 2vw; } .b { padding: auto; margin: calc(4px + 1px); }';
+    expect(runSpacingGridCheck('src/card.css', src)).toHaveLength(0);
+  });
+
+  it('does not false-positive on a CSS custom property that ends in "margin"/"padding"/"gap"', () => {
+    const src = ':root { --card-margin: 6px; --section-padding: 10px; --grid-gap: 6px; }';
+    expect(runSpacingGridCheck('src/theme.css', src)).toHaveLength(0);
+  });
+
+  it('is hint-only — never modifies content', () => {
+    const src = '.card { padding: 6px; margin: 10px; }';
+
+    // runSpacingGridCheck itself has no content-mutation return — this asserts the finding shape only.
+    const findings = runSpacingGridCheck('src/card.css', src);
+    expect(findings.every((f) => f.autoFixed === false)).toBe(true);
+  });
+});
+
+describe('runSkeleton7CardGridHintCheck', () => {
+  const ch = (inner: string, slot: string) =>
+    `<section data-slot="${slot}" style={{height:'100vh'}}>${inner}</section>`;
+  const withChapter2 = (inner: string) =>
+    [ch('hero', 'hero'), ch('ch1', 'ch1'), ch(inner, 'ch2'), ch('ch3', 'ch3')].join('\n');
+
+  it('flags a bare .map() call inside a chapter, even with no grid at all', () => {
+    const src = withChapter2('{items.map((item) => <Card key={item.id} {...item} />)}');
     const findings = runSkeleton7CardGridHintCheck('src/App.tsx', src);
     expect(findings).toHaveLength(1);
     expect(findings[0]).toMatchObject({ rule: 'skeleton7-card-grid-detected', autoFixed: false });
+    expect(findings[0].message).toContain('.map()');
   });
 
-  it('does not flag a grid with no nearby .map() call', () => {
-    const src = `
-      <section style={{height: '100vh'}}>hero</section>
-      <div /* grid-template-columns: repeat(3, 1fr); */>고정된 카드 3개, 반복 렌더링 아님</div>
-      <section style={{height: '100vh'}}>last</section>
-    `;
+  it('flags a grid + 3x repeated class even without an explicit .map() call (manually copy-pasted cards)', () => {
+    const src = withChapter2(
+      '<div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr" }}>' +
+        '<div className="proj-card">A</div><div className="proj-card">B</div><div className="proj-card">C</div>' +
+        '</div>',
+    );
+    const findings = runSkeleton7CardGridHintCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0].message).toContain('proj-card');
+  });
+
+  it('does not flag a grid whose cells all have distinct classes (not a repeated card pattern)', () => {
+    const src = withChapter2(
+      '<div style={{ gridTemplateColumns: "1fr 1fr 1fr" }}>' +
+        '<div className="a">1</div><div className="b">2</div><div className="c">3</div>' +
+        '</div>',
+    );
     expect(runSkeleton7CardGridHintCheck('src/App.tsx', src)).toHaveLength(0);
   });
 
-  it('is a no-op on a file with no skeleton-7 markers', () => {
+  it('does not flag 3 repeated-class elements with no grid property present', () => {
+    const src = withChapter2(
+      '<div className="proj-card">A</div><div className="proj-card">B</div><div className="proj-card">C</div>',
+    );
+    expect(runSkeleton7CardGridHintCheck('src/App.tsx', src)).toHaveLength(0);
+  });
+
+  it('is a no-op when the file is not shaped like 4 skeleton-7 chapters', () => {
     const src = '.grid { grid-template-columns: repeat(3, 1fr); } // items.map(...)';
     expect(runSkeleton7CardGridHintCheck('src/App.tsx', src)).toHaveLength(0);
   });

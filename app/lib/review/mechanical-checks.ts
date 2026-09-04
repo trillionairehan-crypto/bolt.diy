@@ -859,25 +859,108 @@ function runStockImageDomainCheck(filePath: string, content: string): Mechanical
   return findings;
 }
 
-// --- 7. 골격 7(소개·홍보형) 챕터 구조 — data-slot 명명, 폴백 헤드라인 크기, 안내 문구 중복 ---
+// --- 7. 8pt 그리드(padding/margin/gap px 값이 4의 배수인지, 힌트 전용) ---
+
+/*
+ * 1단계는 힌트만 남긴다 — 자동수정하지 않는다. 어떤 px 값이 실제로 자주 나오는지(6px? 10px? 14px?)
+ * 실측 분포를 먼저 보고 자동수정 전환 여부를 판단하기로 했다(2026-09-03).
+ *
+ * 대상은 padding/margin/gap과 각 방향 변형(padding-top, margin-inline-start, row-gap 등)뿐 —
+ * width/height/border/line-height/font-size/border-radius/transform/letter-spacing/
+ * top·right·bottom·left(포지션 오프셋)는 명시적으로 제외한다. CSS 커스텀 속성(--card-margin: 6px
+ * 같은)이 "margin"으로 오탐되지 않도록 속성명 앞에 하이픈이 오면 매치하지 않는다(negative
+ * lookbehind) — 하이픈 없이 시작하는 진짜 margin/padding/gap 선언만 잡는다.
+ *
+ * 가로/세로 shorthand(예: padding: 8px 16px 4px)는 공백으로 나뉜 각 토큰을 독립적으로 검사한다.
+ * px 단위가 아닌 값(%, rem, vh, vw, auto, calc(...))은 정규식 자체가 "숫자+px"만 매치하므로 자연히
+ * 제외된다 — calc(4px + 1px) 같은 토큰도 앞뒤에 여분 문자가 붙어 있어 매치 실패로 스킵된다(알려진
+ * 한계이자 의도된 동작 — calc 안의 값까지 검사하려면 별도 파서가 필요하다).
+ */
+/*
+ * 한 정규식으로 kebab-case CSS(padding-top)와 camelCase JSX 인라인 스타일(paddingTop)을 동시에
+ * 잡는다 — margin/padding/gap처럼 방향 접미사가 없는 한 단어짜리 속성은 CSS와 JS 객체 표기가 완전히
+ * 같은 철자("margin")라서, 애초에 kebab용/camel용 정규식을 따로 두면 그 한 단어짜리 속성에서 둘 다
+ * 매치해 같은 값을 두 번 세는 버그가 생긴다(실측: `.card{margin:6px 10px;}`가 findings 2건이 아니라
+ * 4건으로 나왔다 — kebab 패스·camel 패스 각각 6px/10px를 잡았다). 값도 따옴표 유무와 무관하게
+ * 한 번에 잡는다(CSS는 따옴표 없음, JSX 문자열 값은 따옴표 있음 — 둘 다 그룹 3 하나로).
+ */
+const SPACING_PROPERTY = String.raw`padding(?:-(?:top|right|bottom|left|inline(?:-start|-end)?|block(?:-start|-end)?)|Top|Right|Bottom|Left|Inline(?:Start|End)?|Block(?:Start|End)?)?|margin(?:-(?:top|right|bottom|left|inline(?:-start|-end)?|block(?:-start|-end)?)|Top|Right|Bottom|Left|Inline(?:Start|End)?|Block(?:Start|End)?)?|gap|row-gap|column-gap|rowGap|columnGap`;
+const SPACING_DECL_REGEX = new RegExp(`(?<!-)\\b(${SPACING_PROPERTY})\\s*:\\s*(['"]?)([^'",;}\\n]+)\\2`, 'gid');
+
+const PX_VALUE_TOKEN_REGEX = /^-?\d+(?:\.\d+)?px$/;
+
+function nearestMultipleOf4(value: number): number {
+  return Math.round(value / 4) * 4;
+}
+
+function checkSpacingValue(
+  filePath: string,
+  content: string,
+  property: string,
+  rawValue: string,
+  valueStart: number,
+): MechanicalFinding[] {
+  const findings: MechanicalFinding[] = [];
+  let cursor = valueStart;
+
+  for (const token of rawValue.split(/(\s+)/)) {
+    if (PX_VALUE_TOKEN_REGEX.test(token)) {
+      const px = parseFloat(token.slice(0, -2));
+
+      if (px % 4 !== 0) {
+        findings.push({
+          file: filePath,
+          line: lineNumberAt(content, cursor),
+          rule: 'spacing-not-4pt-grid',
+          message: `${property} 값 "${token}"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 ${nearestMultipleOf4(px)}px입니다.`,
+          autoFixed: false,
+        });
+      }
+    }
+
+    cursor += token.length;
+  }
+
+  return findings;
+}
+
+function runSpacingGridCheck(filePath: string, content: string): MechanicalFinding[] {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.css', '.scss'])) {
+    return [];
+  }
+
+  const masked = maskComments(content);
+  const findings: MechanicalFinding[] = [];
+
+  for (const match of masked.matchAll(SPACING_DECL_REGEX)) {
+    const property = match[1];
+    const rawValue = match[3];
+    const valueStart = (match as RegExpMatchArray & { indices: RegExpIndicesArray }).indices[3][0];
+    findings.push(...checkSpacingValue(filePath, content, property, rawValue, valueStart));
+  }
+
+  return findings;
+}
+
+// --- 8. 골격 7(소개·홍보형) 챕터 구조 — data-slot 명명, 폴백 헤드라인 크기, 안내 문구 중복 ---
 
 /*
  * 실측(2026-09-03, 골격 7 3회 재생성 검증 라운드): 빵집만 data-slot을 정확히 냈고, 포트폴리오·카페는
  * 이름이 틀렸거나(임의 명명) 아예 없었다. "프롬프트만으로는 확률적으로 지켜지지 않는다"는 이 세션의
  * 반복된 교훈에 따라, 프롬프트에 절차형으로 못 박아도 이름·크기·중복은 코드로 다시 강제한다.
  *
- * 골격 7 여부는 data-slot="hero"/cr-ch-fallback-headline 같은 골격 7 전용 마커가 이미 있으면 그걸로
- * 판정하고, 마커 자체가 통째로 빠진 최악의 실패(2026-09-03 카페 재생성 사례: data-slot 전무)까지
- * 잡으려고 "height: 100vh" 리터럴이 파일에 2회 이상 있는지도 보조 신호로 쓴다 — 100vh는 프롬프트에
- * 직접 박아둔 리터럴이라 슬롯 이름보다 훨씬 잘 지켜졌다(실측 3/3 전부 정확).
+ * 골격 7 여부는 data-slot="hero" 마커가 이미 있으면 그걸로 판정하고, 마커 자체가 통째로 빠진 최악의
+ * 실패(2026-09-03 카페 재생성 사례: data-slot 전무)까지 잡으려고 "height: 100vh" 리터럴이 파일에
+ * 2회 이상 있는지도 보조 신호로 쓴다 — 100vh는 프롬프트에 직접 박아둔 리터럴이라 슬롯 이름보다
+ * 훨씬 잘 지켜졌다(실측 3/3 전부 정확). 헤드라인 폴백 검사(아래)는 이 마커에도 의존하지 않고
+ * data-slot 챕터 자체를 구조적으로 다시 찾는다 — 클래스명 기반 감지는 라운드 2에서 폐기했다.
  */
 const CH7_VH_MARKER_REGEX = /100vh/gi;
 const CH7_DETECT_MIN_VH = 2;
-const CH7_FALLBACK_HEADLINE_CLASS = 'cr-ch-fallback-headline';
 const CH7_HERO_CAPTION = '사진을 보내주시면 여기에 넣어드릴게요';
 
 function isSkeleton7File(content: string): boolean {
-  if (content.includes('data-slot="hero"') || content.includes(CH7_FALLBACK_HEADLINE_CLASS)) {
+  if (content.includes('data-slot="hero"')) {
     return true;
   }
 
@@ -889,6 +972,80 @@ function isSkeleton7File(content: string): boolean {
 const CH7_CHAPTER_TAG_REGEX = /<(section|div)\b[^>]*?100vh[^>]*?>/gi;
 const CH7_DATA_SLOT_ATTR_REGEX = /data-slot=(["'])([\w-]*)\1/i;
 const CH7_EXPECTED_SLOTS = ['hero', 'ch1', 'ch2', 'ch3'];
+
+/*
+ * 챕터의 닫는 태그를 찾는 깊이 추적 스캐너 — 같은 태그명(section/div)이 챕터 내부에 중첩돼 있어도
+ * 정확한 짝을 찾는다(단순 indexOf로 첫 "</section>"을 잡으면 중첩된 내부 section에서 일찍 끝나버린다).
+ * 알려진 한계: 태그 이름이 속성값 문자열 안에("<div>" 텍스트를 표시하는 코드 등) 등장하면 오탐 가능 —
+ * 생성물에서 극히 드물어 실무상 허용(파일의 다른 검사들과 동일한 타협).
+ */
+function findChapterSpan(
+  content: string,
+  openTagStart: number,
+  tagName: string,
+): { start: number; end: number } | null {
+  const openTagEnd = content.indexOf('>', openTagStart);
+
+  if (openTagEnd === -1) {
+    return null;
+  }
+
+  const openRe = new RegExp(`<${tagName}\\b`, 'gi');
+  const closeRe = new RegExp(`</${tagName}\\s*>`, 'gi');
+  let depth = 1;
+  let cursor = openTagEnd + 1;
+
+  while (depth > 0 && cursor < content.length) {
+    openRe.lastIndex = cursor;
+    closeRe.lastIndex = cursor;
+
+    const openMatch = openRe.exec(content);
+    const closeMatch = closeRe.exec(content);
+
+    if (!closeMatch) {
+      return null;
+    }
+
+    if (openMatch && openMatch.index < closeMatch.index) {
+      depth++;
+      cursor = openMatch.index + openMatch[0].length;
+    } else {
+      depth--;
+      cursor = closeMatch.index + closeMatch[0].length;
+
+      if (depth === 0) {
+        return { start: openTagStart, end: cursor };
+      }
+    }
+  }
+
+  return null;
+}
+
+/** 골격 7의 4개 챕터(100vh 컨테이너) 각각의 전체 span([start,end))을 반환한다. 정확히 4개가 아니거나 닫는 태그를 못 찾으면 null. */
+function findSkeleton7ChapterSpans(content: string): Array<{ start: number; end: number }> | null {
+  const tags = [...content.matchAll(CH7_CHAPTER_TAG_REGEX)];
+
+  if (tags.length !== 4) {
+    return null;
+  }
+
+  const spans: Array<{ start: number; end: number }> = [];
+
+  for (const tag of tags) {
+    const tagStart = tag.index as number;
+    const tagName = tag[1].toLowerCase();
+    const span = findChapterSpan(content, tagStart, tagName);
+
+    if (!span) {
+      return null;
+    }
+
+    spans.push(span);
+  }
+
+  return spans;
+}
 
 /**
  * 챕터 컨테이너(100vh 스타일을 가진 태그) 정확히 4개를 찾아 순서대로 data-slot을 hero/ch1/ch2/ch3로
@@ -973,71 +1130,188 @@ function runSkeleton7DataSlotCheck(
 }
 
 const CH7_FALLBACK_HEADLINE_MIN_PX = 56;
+const CH7_IMG_OR_BG_REGEX = /<img\b|background-image\s*:|backgroundImage\s*:/i;
+const CH7_HEADING_TAG_REGEX = /<(h1|h2|h3)\b[^>]*>/i;
+const CH7_STYLE_OBJECT_REGEX = /style=\{\{([^}]*)\}\}/;
+const CH7_STYLE_STRING_REGEX = /style=(["'])([^"']*)\1/;
+const CH7_KEBAB_FONT_SIZE_REGEX = /font-size:\s*([\d.]+)px/i;
+const CH7_CAMEL_FONT_SIZE_REGEX = /fontSize:\s*['"]?([\d.]+)(?:px)?['"]?/i;
 
-// 쉼표 없는 CSS 문자열(font-size:44px)과 JSX 인라인 style 객체(fontSize: '44px')를 둘 다 잡는다.
-const CH7_KEBAB_FONT_SIZE_REGEX = /font-size:\s*([\d.]+)px/gi;
-const CH7_CAMEL_FONT_SIZE_REGEX = /fontSize:\s*['"]?([\d.]+)(?:px)?['"]?/gi;
-const CH7_FALLBACK_HEADLINE_WINDOW = 300;
+/**
+ * 태그 텍스트(예: 헤드라인 태그의 여는 부분)에서 font-size를 찾아 56px 미만이면 56px로 올리고,
+ * 아예 없으면 새로 넣는다. style={{...}} 객체(camelCase)와 style="..." 문자열(kebab-case) 둘 다
+ * 지원, 어느 쪽도 없으면 태그 이름 바로 뒤에 새 style 속성을 삽입한다.
+ */
+function fixHeadlineTagFontSize(tagText: string): { tagText: string; changed: boolean } {
+  const objMatch = tagText.match(CH7_STYLE_OBJECT_REGEX);
+
+  if (objMatch) {
+    const inner = objMatch[1];
+    const sizeMatch = inner.match(CH7_CAMEL_FONT_SIZE_REGEX);
+
+    if (sizeMatch) {
+      const px = parseFloat(sizeMatch[1]);
+
+      if (px >= CH7_FALLBACK_HEADLINE_MIN_PX) {
+        return { tagText, changed: false };
+      }
+
+      const fixedInner = inner.replace(sizeMatch[1], String(CH7_FALLBACK_HEADLINE_MIN_PX));
+
+      return { tagText: tagText.replace(objMatch[0], `style={{${fixedInner}}}`), changed: true };
+    }
+
+    const fixedInner = `fontSize: '${CH7_FALLBACK_HEADLINE_MIN_PX}px', ${inner}`;
+
+    return { tagText: tagText.replace(objMatch[0], `style={{${fixedInner}}}`), changed: true };
+  }
+
+  const strMatch = tagText.match(CH7_STYLE_STRING_REGEX);
+
+  if (strMatch) {
+    const quote = strMatch[1];
+    const inner = strMatch[2];
+    const sizeMatch = inner.match(CH7_KEBAB_FONT_SIZE_REGEX);
+
+    if (sizeMatch) {
+      const px = parseFloat(sizeMatch[1]);
+
+      if (px >= CH7_FALLBACK_HEADLINE_MIN_PX) {
+        return { tagText, changed: false };
+      }
+
+      const fixedInner = inner.replace(sizeMatch[1], String(CH7_FALLBACK_HEADLINE_MIN_PX));
+
+      return { tagText: tagText.replace(strMatch[0], `style=${quote}${fixedInner}${quote}`), changed: true };
+    }
+
+    const fixedInner = `font-size:${CH7_FALLBACK_HEADLINE_MIN_PX}px;${inner}`;
+
+    return { tagText: tagText.replace(strMatch[0], `style=${quote}${fixedInner}${quote}`), changed: true };
+  }
+
+  const tagNameMatch = tagText.match(/^<(h1|h2|h3)\b/i) as RegExpMatchArray;
+  const insertAt = tagNameMatch[0].length;
+  const newTagText =
+    tagText.slice(0, insertAt) + ` style={{ fontSize: '${CH7_FALLBACK_HEADLINE_MIN_PX}px' }}` + tagText.slice(insertAt);
+
+  return { tagText: newTagText, changed: true };
+}
 
 /*
- * 실측(2026-09-03, 재검증 라운드 1, 카페 생성물): CSS 규칙(.cr-ch-fallback-headline{font-size:56px})은
- * 정확했는데, 같은 요소에 인라인 스타일이 따로 44px로 덮어써서 computed 값은 44px였다. 클래스명
- * "뒤쪽"만 보던 이전 구현은 클래스 속성보다 앞에 오는 style 속성(<h1 style={{...}} className="...">
- * 같은 순서)을 놓쳤다 — 그래서 클래스 매치를 중심으로 앞뒤 양쪽 창을 다 본다. JSX 인라인 style 객체는
- * camelCase(fontSize)를 쓰므로 kebab-case 정규식만으로는 애초에 못 잡는 경우도 있어 두 표기 모두 검사한다.
+ * 실측(2026-09-03, 재검증 라운드 2): 클래스명(cr-ch-fallback-headline)에 의존한 이전 구현은 LLM이
+ * 그 클래스를 안 쓰면(3케이스 중 2케이스에서 발생) 걸 훅이 아예 없어 손을 못 댔다. 클래스명은 무엇이든
+ * 상관없게, 구조로만 폴백 헤드라인을 찾는다: 이미지가 없는(<img>도 background-image도 없는) 챕터를
+ * "폴백 챕터"로 보고, 그 안의 첫 h1~h3 태그(없으면 가장 큰 인라인 font-size를 가진 요소)를 헤드라인으로
+ * 판정해 56px를 강제한다. 헤드라인 태그도, font-size 선언도 전혀 없으면 안전하게 손대지 않고 힌트만
+ * 남긴다(어느 요소가 "헤드라인"인지 구조적으로 확정할 수 없다).
+ *
+ * 모바일 40px(스펙 요구사항)은 인라인 style로는 표현할 수 없다 — 인라인 스타일은 미디어쿼리보다 항상
+ * 우선하므로, 인라인으로 56px를 강제하면서 동시에 별도 CSS 미디어쿼리로 40px를 얹어도 인라인이 그걸
+ * 덮어써 무의미해진다. 데스크톱 56px 강제만 기계 검사로 다루고, 모바일 축소는 프롬프트 지시에 맡긴다
+ * (알려진 한계 — 검증 게이팅 4항목에 모바일 크기는 포함되지 않는다).
+ *
+ * TODO(백로그 1, 2026-09-04): 이 검사는 tsx 소스 문자열에서 정규식으로 찾은 챕터 span·태그의 font-size
+ * "리터럴"만 본다 — 부모 요소의 CSS나 클래스가 실제 렌더 크기를 덮어써도 소스 값만 고치면 통과로
+ * 잘못 판정할 수 있다. 근본 해결은 실제 렌더된 DOM(getComputedStyle)을 보는 방식으로 전환하는 것.
+ * 재현 픽스처: tests/fixtures/generated/{bakery,portfolio}.json — 둘 다 지금 검사로는 이미 56px라
+ * 통과하지만, "소스에 적힌 값 = 실제 렌더 값"이라는 전제 자체를 검증하지는 못한다.
  */
 function runSkeleton7FallbackHeadlineCheck(
   filePath: string,
   content: string,
 ): { findings: MechanicalFinding[]; content: string } {
-  if (!hasExtension(filePath, ['.tsx', '.jsx', '.css', '.scss']) || !content.includes(CH7_FALLBACK_HEADLINE_CLASS)) {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.html'])) {
+    return { findings: [], content };
+  }
+
+  const chapterSpans = findSkeleton7ChapterSpans(content);
+
+  if (!chapterSpans) {
     return { findings: [], content };
   }
 
   const findings: MechanicalFinding[] = [];
   const replacements: Array<{ start: number; end: number; text: string }> = [];
-  const seenStarts = new Set<number>();
-  const classRegex = new RegExp(CH7_FALLBACK_HEADLINE_CLASS, 'g');
 
-  for (const classMatch of content.matchAll(classRegex)) {
-    const classStart = classMatch.index as number;
-    const classEnd = classStart + CH7_FALLBACK_HEADLINE_CLASS.length;
-    const windowStart = Math.max(0, classStart - CH7_FALLBACK_HEADLINE_WINDOW);
-    const windowEnd = Math.min(content.length, classEnd + CH7_FALLBACK_HEADLINE_WINDOW);
-    const windowText = content.slice(windowStart, windowEnd);
+  for (const { start, end } of chapterSpans) {
+    const chapterText = content.slice(start, end);
+
+    if (CH7_IMG_OR_BG_REGEX.test(chapterText)) {
+      continue; // 사진이 있는 챕터 — 이 규칙 대상이 아니다.
+    }
+
+    const headingMatch = chapterText.match(CH7_HEADING_TAG_REGEX);
+
+    if (headingMatch) {
+      const { tagText, changed } = fixHeadlineTagFontSize(headingMatch[0]);
+
+      if (!changed) {
+        continue;
+      }
+
+      const tagStart = start + (headingMatch.index as number);
+      replacements.push({ start: tagStart, end: tagStart + headingMatch[0].length, text: tagText });
+      findings.push({
+        file: filePath,
+        line: lineNumberAt(content, tagStart),
+        rule: 'skeleton7-fallback-headline-size',
+        message: '골격 7 폴백 챕터의 헤드라인 태그 font-size를 56px로 자동수정했습니다.',
+        autoFixed: true,
+      });
+      continue;
+    }
+
+    // h1~h3가 없으면 챕터 안에서 가장 큰 인라인 font-size를 가진 요소를 헤드라인으로 취급한다.
+    let largest: { start: number; end: number; text: string; raw: string; px: number } | null = null;
 
     for (const regex of [CH7_KEBAB_FONT_SIZE_REGEX, CH7_CAMEL_FONT_SIZE_REGEX]) {
-      for (const sizeMatch of windowText.matchAll(regex)) {
+      const globalRegex = new RegExp(regex.source, 'gi');
+
+      for (const sizeMatch of chapterText.matchAll(globalRegex)) {
         const px = parseFloat(sizeMatch[1]);
 
-        if (px >= CH7_FALLBACK_HEADLINE_MIN_PX) {
-          continue;
+        if (!largest || px > largest.px) {
+          largest = {
+            start: start + (sizeMatch.index as number),
+            end: start + (sizeMatch.index as number) + sizeMatch[0].length,
+            text: sizeMatch[0],
+            raw: sizeMatch[1],
+            px,
+          };
         }
-
-        const sizeStart = windowStart + (sizeMatch.index as number);
-
-        if (seenStarts.has(sizeStart)) {
-          continue;
-        }
-
-        seenStarts.add(sizeStart);
-
-        const sizeEnd = sizeStart + sizeMatch[0].length;
-        const fixedText = sizeMatch[0].replace(sizeMatch[1], String(CH7_FALLBACK_HEADLINE_MIN_PX));
-        replacements.push({ start: sizeStart, end: sizeEnd, text: fixedText });
-        findings.push({
-          file: filePath,
-          line: lineNumberAt(content, sizeStart),
-          rule: 'skeleton7-fallback-headline-size',
-          message: `골격 7 폴백 헤드라인 font-size(${px}px)가 56px 미만이라 56px로 자동수정했습니다.`,
-          autoFixed: true,
-        });
       }
     }
+
+    if (!largest) {
+      findings.push({
+        file: filePath,
+        line: lineNumberAt(content, start),
+        rule: 'skeleton7-fallback-headline-unresolved',
+        message:
+          '골격 7 폴백 챕터에서 헤드라인 태그(h1~h3)도, font-size 선언도 찾지 못해 56px 강제를 건너뛰었습니다 — 헤드라인을 실제 헤딩 태그로 마크업하세요.',
+        autoFixed: false,
+      });
+      continue;
+    }
+
+    if (largest.px >= CH7_FALLBACK_HEADLINE_MIN_PX) {
+      continue;
+    }
+
+    const fixedText = largest.text.replace(largest.raw, String(CH7_FALLBACK_HEADLINE_MIN_PX));
+    replacements.push({ start: largest.start, end: largest.end, text: fixedText });
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, largest.start),
+      rule: 'skeleton7-fallback-headline-size',
+      message: `골격 7 폴백 챕터에서 가장 큰 텍스트(font-size ${largest.px}px, 헤딩 태그 없음)를 헤드라인으로 보고 56px로 자동수정했습니다.`,
+      autoFixed: true,
+    });
   }
 
   if (replacements.length === 0) {
-    return { findings: [], content };
+    return { findings, content };
   }
 
   replacements.sort((a, b) => b.start - a.start);
@@ -1054,6 +1328,14 @@ function runSkeleton7FallbackHeadlineCheck(
 const CH7_CAPTION_REGEX = new RegExp(CH7_HERO_CAPTION.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
 const CH7_HERO_PROXIMITY_WINDOW = 3000;
 
+/*
+ * TODO(백로그 2, 2026-09-04): 파일 내 캡션 "리터럴 문자열" 개수만 센다 — 캡션을 감싼 로직이 별도
+ * 컴포넌트(예: PhotoSlot.tsx)로 추출되고 여러 챕터에서 재사용되면 소스엔 리터럴이 1번뿐이어도 렌더된
+ * DOM엔 여러 번 나온다. 실측 재현: tests/fixtures/generated/cafe.json — 실제 캡션 4회 렌더인데
+ * (CDP로 찍은 cafe-v2-inspect.json 기준 captionCount: 4) 이 검사는 못 잡는다
+ * (mechanical-checks.fixtures.spec.ts의 "KNOWN GAP" 테스트가 이 사각지대를 고정해서 보여준다).
+ * 근본 해결은 소스 문자열이 아니라 렌더 결과(DOM) 기반 검사로 전환하는 것.
+ */
 /** 안내 문구가 2회 이상이면 히어로(data-slot="hero") 근처 1곳만 남기고 나머지를 지운다. */
 function runSkeleton7CaptionDedupeCheck(
   filePath: string,
@@ -1095,23 +1377,60 @@ function runSkeleton7CaptionDedupeCheck(
   };
 }
 
-const CH7_GRID_COLS_REGEX = /grid-template-columns:\s*[^;]*repeat\(\s*([3-9]|\d{2,})\s*,/gi;
-const CH7_MAP_NEARBY_WINDOW = 500;
+const CH7_MAP_CALL_REGEX = /\.map\(/;
+const CH7_GRID_PROPERTY_REGEX = /(?:grid-template-columns|gridTemplateColumns)\s*[:=]/i;
+const CH7_CLASS_ATTR_REGEX = /class(?:Name)?=["']([^"']+)["']/g;
+const CH7_REGEN_MESSAGE_SUFFIX =
+  '이 골격은 나열이 아니라 챕터로 보여줍니다. 대표 3개를 골라 ch1/ch2/ch3에 하나씩 고정 JSX로 펼쳐 쓰고 .map()·그리드·반복 카드 컴포넌트를 제거하세요. 자동수정 대상이 아닙니다(재배치는 코드로 할 수 없는 판단이라 재생성이 맞습니다).';
 
-/** 골격 7에서 3열 이상 그리드 + 근처 .map() 반복 렌더링이 보이면 카드·리스트 금지 규칙 위반 힌트. */
+/*
+ * 코드로 재배치할 수 없는 위반이라 자동수정하지 않고 힌트(autoFixed:false)로만 남긴다 — 이 힌트는
+ * formatMechanicalFindingsForPrompt를 거쳐 reviewGeneratedApp.ts의 LLM 텍스트 검토 단계로 넘어가고,
+ * 그 단계가 실제로 파일을 다시 쓴다(이미 존재하는 "기계 검사 힌트 -> LLM 재작성" 경로 — 별도의 새
+ * 재생성 트리거를 만들 필요가 없다).
+ */
 function runSkeleton7CardGridHintCheck(filePath: string, content: string): MechanicalFinding[] {
-  if (!hasExtension(filePath, ['.tsx', '.jsx', '.css', '.scss']) || !isSkeleton7File(content)) {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.html'])) {
+    return [];
+  }
+
+  const chapterSpans = findSkeleton7ChapterSpans(content);
+
+  if (!chapterSpans) {
     return [];
   }
 
   const findings: MechanicalFinding[] = [];
 
-  for (const match of content.matchAll(CH7_GRID_COLS_REGEX)) {
-    const start = match.index as number;
-    const windowStart = Math.max(0, start - CH7_MAP_NEARBY_WINDOW);
-    const windowEnd = Math.min(content.length, start + CH7_MAP_NEARBY_WINDOW);
+  for (const { start, end } of chapterSpans) {
+    const chapterText = content.slice(start, end);
 
-    if (!content.slice(windowStart, windowEnd).includes('.map(')) {
+    if (CH7_MAP_CALL_REGEX.test(chapterText)) {
+      findings.push({
+        file: filePath,
+        line: lineNumberAt(content, start),
+        rule: 'skeleton7-card-grid-detected',
+        message: `골격 7 챕터 안에 .map() 반복 렌더링이 있습니다 — ${CH7_REGEN_MESSAGE_SUFFIX}`,
+        autoFixed: false,
+      });
+      continue;
+    }
+
+    if (!CH7_GRID_PROPERTY_REGEX.test(chapterText)) {
+      continue;
+    }
+
+    const classCounts = new Map<string, number>();
+
+    for (const classMatch of chapterText.matchAll(CH7_CLASS_ATTR_REGEX)) {
+      for (const token of classMatch[1].split(/\s+/).filter(Boolean)) {
+        classCounts.set(token, (classCounts.get(token) ?? 0) + 1);
+      }
+    }
+
+    const repeated = [...classCounts.entries()].find(([, count]) => count >= 3);
+
+    if (!repeated) {
       continue;
     }
 
@@ -1119,7 +1438,7 @@ function runSkeleton7CardGridHintCheck(filePath: string, content: string): Mecha
       file: filePath,
       line: lineNumberAt(content, start),
       rule: 'skeleton7-card-grid-detected',
-      message: `골격 7(소개·홍보형)에서 ${match[1]}열 카드 그리드 + 반복 렌더링이 감지됐습니다 — 이 골격은 카드·리스트를 쓰지 않고 대표 3개를 챕터 2~4에 하나씩 녹여야 합니다.`,
+      message: `골격 7 챕터 안에서 그리드 레이아웃 + 같은 클래스("${repeated[0]}")가 ${repeated[1]}회 반복되는 카드가 감지됐습니다 — ${CH7_REGEN_MESSAGE_SUFFIX}`,
       autoFixed: false,
     });
   }
@@ -1169,6 +1488,7 @@ export function runMechanicalChecks(files: Record<string, string>, resolvedHue: 
     findings.push(...runExternalImageCheck(filePath, content));
     findings.push(...runStockImageDomainCheck(filePath, content));
     findings.push(...runSkeleton7CardGridHintCheck(filePath, content));
+    findings.push(...runSpacingGridCheck(filePath, content));
 
     if (content !== originalContent) {
       updatedFiles[filePath] = content;
@@ -1216,6 +1536,10 @@ export const __internal = {
   runSkeleton7CaptionDedupeCheck,
   runSkeleton7CardGridHintCheck,
   isSkeleton7File,
+  findChapterSpan,
+  findSkeleton7ChapterSpans,
+  fixHeadlineTagFontSize,
+  runSpacingGridCheck,
   maskComments,
   classifyEmojiContext,
 };
