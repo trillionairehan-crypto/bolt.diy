@@ -1,5 +1,7 @@
 name: CI/CD
 
+# Actions enabled on this fork 2026-09-04 — this comment is the trivial trigger for that
+# verification run (see install -> tsc -> eslint -> vitest -> build below).
 on:
   push:
   pull_request:
