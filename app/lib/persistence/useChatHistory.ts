@@ -38,6 +38,42 @@ export const db = persistenceEnabled ? await openDatabase() : undefined;
 export const chatId = atom<string | undefined>(undefined);
 export const description = atom<string | undefined>(undefined);
 export const chatMetadata = atom<IChatMetadata | undefined>(undefined);
+
+/*
+ * 실측(2026-09-04, message_usage 토큰 로깅 3건 조사): 새 앱의 첫 요청이 나갈 때 chatId는 아직
+ * undefined다 — 기존에는 storeMessageHistory가 첫 응답을 다 받은 "뒤"에야 getNextId(db)로 채웠기
+ * 때문이다. 그래서 그 첫 요청(가장 비싼 호출)은 api.chat.ts의 `if (chatId)` 게이트에 걸려 로깅 자체가
+ * 안 됐고, 같은 턴의 자동 검토(api.llmcall.ts) 호출은 그보다 늦게 나가 storeMessageHistory가 이미
+ * chatId를 채운 뒤라 값이 있었다 — 결과적으로 같은 대화의 앞뒤 호출이 있다/없다로 갈렸다.
+ *
+ * 이 함수는 요청을 만들기 "전에" 미리 chatId를 확정한다(멱등 — 이미 있으면 그대로 반환). db의 "chats"
+ * 스토어엔 아직 아무것도 안 쓰므로(실제 저장은 storeMessageHistory가 나중에 한다) 이 시점에 미리
+ * 계산해도 번호가 낭비되지 않는다 — 사용자가 끝까지 안 보내고 나가면 다음 getNextId(db) 호출이
+ * 똑같은 값을 다시 계산할 뿐이다. Chat.client.tsx가 매 요청(sendChatMessage/regenerate 둘 다 거치는
+ * useChat의 body 리졸버)에서 호출하고, storeMessageHistory도 그 아래에서 그대로 재사용한다 — 두 곳에
+ * 같은 로직을 따로 두지 않는다.
+ */
+export async function ensureChatId(): Promise<string | undefined> {
+  const existing = chatId.get();
+
+  if (existing) {
+    return existing;
+  }
+
+  if (!db) {
+    return undefined;
+  }
+
+  const nextId = await getNextId(db);
+  chatId.set(nextId);
+
+  if (!chatMetadata.get()?.rootChatId) {
+    chatMetadata.set({ ...chatMetadata.get(), rootChatId: nextId } as IChatMetadata);
+  }
+
+  return nextId;
+}
+
 export function useChatHistory() {
   const navigate = useNavigate();
   const { id: mixedId } = useLoaderData<{ id?: string }>();
@@ -324,22 +360,16 @@ ${value.content}
         description.set(firstArtifact?.title);
       }
 
-      // Ensure chatId.get() is used here as well
+      /*
+       * Normally a no-op by the time we get here — Chat.client.tsx's transport body resolver
+       * already calls ensureChatId() before the request goes out (see that function's doc
+       * comment). Kept as a fallback for any caller that persists messages without going through
+       * that path.
+       */
       if (initialMessages.length === 0 && !chatId.get()) {
-        const nextId = await getNextId(db);
+        const nextId = await ensureChatId();
 
-        chatId.set(nextId);
-
-        /*
-         * A genuinely new chat (not a fork/duplicate, which already arrive with rootChatId set —
-         * see forkChat/duplicateChat in db.ts) becomes its own app-group root here, once, at the
-         * moment it first gets an id. Sidebar grouping (groupChatsByApp) reads this field.
-         */
-        if (!chatMetadata.get()?.rootChatId) {
-          chatMetadata.set({ ...chatMetadata.get(), rootChatId: nextId } as IChatMetadata);
-        }
-
-        if (!_urlId) {
+        if (nextId && !_urlId) {
           navigateChat(nextId);
         }
       }

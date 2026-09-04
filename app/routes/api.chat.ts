@@ -22,7 +22,7 @@ import type { DesignScheme } from '~/types/design-scheme';
 import { MCPService } from '~/lib/services/mcpService';
 import { StreamRecoveryManager } from '~/lib/.server/llm/stream-recovery';
 import { getPlatformUserId } from '~/lib/cloud/cloudPlatformAuth';
-import { recordMessageUsage } from '~/lib/cloud/messageUsage';
+import { recordMessageUsageInBackground } from '~/lib/cloud/messageUsage';
 
 export async function action(args: ActionFunctionArgs) {
   return chatAction(args);
@@ -297,27 +297,36 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
                 transient: true,
               });
 
-              // 메시지별 토큰 로깅 — 실패해도(키 미설정 포함) 생성 응답에 영향 주면 안 되므로 await하지 않는다.
-              if (chatId) {
-                const { model } = usageLastUserMessage
-                  ? extractPropertiesFromMessage(usageLastUserMessage)
-                  : { model: 'unknown' };
+              /*
+               * 메시지별 토큰 로깅 — 실패해도(키 미설정 포함) 생성 응답에 영향 주면 안 되므로
+               * await하지 않는다(recordMessageUsageInBackground가 waitUntil로 감싸거나, 없으면
+               * fire-and-forget). 예전엔 `if (chatId)`로 감싸서 chatId가 아직 없는(새 앱의 첫
+               * 요청 — Chat.client.tsx가 이 요청을 만들 때는 아직 chatId를 못 채웠던) 가장 비싼
+               * 호출이 통째로 안 잡혔다. Chat.client.tsx는 이제 ensureChatId()로 요청 전에
+               * chatId를 미리 확정해두므로 정상적인 경로에서는 거의 항상 채워져 있고, 그래도
+               * 없는 극단적인 경우(퍼시스턴스 비활성화 등)엔 요청 하나짜리 fallback 식별자를 써서
+               * 행 자체는 남긴다 — chat_id를 nullable로 두는 대신, 집계 쿼리에서
+               * "unknown-" 접두사로 걸러낼 수 있는 값을 채운다.
+               */
+              const { model } = usageLastUserMessage
+                ? extractPropertiesFromMessage(usageLastUserMessage)
+                : { model: 'unknown' };
 
-                void recordMessageUsage(
-                  {
-                    userId: usageUserId,
-                    chatId,
-                    messageId: usageMessageId,
-                    promptTokens: cumulativeUsage.promptTokens,
-                    completionTokens: cumulativeUsage.completionTokens,
-                    cacheReadTokens: cumulativeUsage.cacheReadTokens,
-                    cacheWriteTokens: cumulativeUsage.cacheWriteTokens,
-                    model,
-                    isAutoFix: usageIsAutoFix,
-                  },
-                  context.cloudflare?.env as any,
-                );
-              }
+              recordMessageUsageInBackground(
+                {
+                  userId: usageUserId,
+                  chatId: chatId ?? `unknown-${crypto.randomUUID()}`,
+                  messageId: usageMessageId,
+                  promptTokens: cumulativeUsage.promptTokens,
+                  completionTokens: cumulativeUsage.completionTokens,
+                  cacheReadTokens: cumulativeUsage.cacheReadTokens,
+                  cacheWriteTokens: cumulativeUsage.cacheWriteTokens,
+                  model,
+                  isAutoFix: usageIsAutoFix,
+                },
+                context.cloudflare?.env as any,
+                context.cloudflare?.ctx,
+              );
 
               await new Promise((resolve) => setTimeout(resolve, 0));
 

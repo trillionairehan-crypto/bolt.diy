@@ -6,7 +6,7 @@ import { useAnimate } from 'framer-motion';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useMessageParser, usePromptEnhancer, useShortcuts } from '~/lib/hooks';
-import { chatId, description, useChatHistory } from '~/lib/persistence';
+import { chatId, description, ensureChatId, useChatHistory } from '~/lib/persistence';
 import { platformSupabase } from '~/lib/supabase/platform-client';
 import { chatStore } from '~/lib/stores/chat';
 import { workbenchStore } from '~/lib/stores/workbench';
@@ -325,31 +325,43 @@ export const ChatImpl = memo(
 
           return headers;
         },
-        body: () => ({
-          apiKeys,
-          files,
-          promptId,
-          contextOptimization: contextOptimizationEnabled,
-          chatMode,
-          designScheme,
-          chatId: chatId.get(),
-          supabase: {
-            isConnected: supabaseConn.isConnected,
 
-            /*
-             * What actually matters for whether the AI should write real Supabase calls vs
-             * sample-data code is "do we have usable credentials", not the PAT-flow's project-list
-             * selection (selectedProjectId) — the simplified URL+anon-key wizard never populates
-             * that at all, only credentials.
-             */
-            hasSelectedProject: !!(supabaseConn.credentials?.supabaseUrl && supabaseConn.credentials?.anonKey),
-            credentials: {
-              supabaseUrl: supabaseConn?.credentials?.supabaseUrl,
-              anonKey: supabaseConn?.credentials?.anonKey,
+        /*
+         * message_usage 토큰 로깅용 chatId — 새 앱의 첫 요청(sendChatMessage든 generateNewApp의
+         * regenerate()든, 이 body 리졸버는 둘 다 거친다) 시점엔 chatId가 아직 없을 수 있다.
+         * ensureChatId()가 먼저 확정해서(멱등 — 이미 있으면 즉시 반환) chatId.get()이 항상 채워진
+         * 값을 읽게 한다. 이 로직을 storeMessageHistory에도 따로 두지 않고 여기 한 곳으로 합쳐서,
+         * 본 생성 호출과 이어지는 자동 검토(api.llmcall.ts) 호출이 같은 chatId를 쓰게 한다.
+         */
+        body: async () => {
+          await ensureChatId();
+
+          return {
+            apiKeys,
+            files,
+            promptId,
+            contextOptimization: contextOptimizationEnabled,
+            chatMode,
+            designScheme,
+            chatId: chatId.get(),
+            supabase: {
+              isConnected: supabaseConn.isConnected,
+
+              /*
+               * What actually matters for whether the AI should write real Supabase calls vs
+               * sample-data code is "do we have usable credentials", not the PAT-flow's
+               * project-list selection (selectedProjectId) — the simplified URL+anon-key wizard
+               * never populates that at all, only credentials.
+               */
+              hasSelectedProject: !!(supabaseConn.credentials?.supabaseUrl && supabaseConn.credentials?.anonKey),
+              credentials: {
+                supabaseUrl: supabaseConn?.credentials?.supabaseUrl,
+                anonKey: supabaseConn?.credentials?.anonKey,
+              },
             },
-          },
-          maxLLMSteps: mcpSettings.maxLLMSteps,
-        }),
+            maxLLMSteps: mcpSettings.maxLLMSteps,
+          };
+        },
       }),
       onError: (e) => {
         setFakeLoading(false);

@@ -261,7 +261,15 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
       logger.info(`Generated response`);
 
       if (chatId) {
-        void getPlatformUserId(request)
+        const ctx = context.cloudflare?.ctx;
+
+        /*
+         * userId 조회(getPlatformUserId, 내부적으로 Supabase auth.getUser 네트워크 호출)까지
+         * 응답을 막지 않고 이어서 처리하던 기존 동작은 그대로 두고, 그 체인 전체를 한 Promise로
+         * 묶어 waitUntil에 넘긴다 — recordMessageUsage 자체가 모든 에러를 삼키므로(messageUsage.ts)
+         * 여기서 추가로 .catch()할 필요는 없다.
+         */
+        const usageWork = getPlatformUserId(request)
           .catch(() => null)
           .then((userId) =>
             recordMessageUsage(
@@ -279,6 +287,12 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
               context.cloudflare?.env as any,
             ),
           );
+
+        if (ctx && typeof ctx.waitUntil === 'function') {
+          ctx.waitUntil(usageWork);
+        } else {
+          void usageWork;
+        }
       }
 
       return new Response(
