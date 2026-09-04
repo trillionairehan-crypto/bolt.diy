@@ -1,7 +1,5 @@
 name: CI/CD
 
-# Actions enabled on this fork 2026-09-04 — this comment is the trivial trigger for that
-# verification run (see install -> tsc -> eslint -> vitest -> build below).
 on:
   push:
   pull_request:
@@ -13,7 +11,7 @@ concurrency:
 
 jobs:
   test:
-    name: Install, Typecheck, Lint, Test, Build
+    name: Install, Build, Typecheck, Lint, Test
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -36,6 +34,14 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # functions/[[path]].ts does `import('../build/server')` (the Remix/Cloudflare Pages
+      # server bundle), which tsc statically resolves even though the result is cast — so a
+      # clean checkout fails typecheck unless build has already produced build/server. Build
+      # has to run before typecheck for that reason (verified via a clean git-worktree repro
+      # 2026-09-04, not just a CI-vs-local guess).
+      - name: Build
+        run: pnpm run build
 
       - name: Cache TypeScript compilation
         uses: actions/cache@v4
@@ -63,9 +69,6 @@ jobs:
 
       - name: Run tests
         run: pnpm run test
-
-      - name: Build
-        run: pnpm run build
 
       - name: Upload test coverage
         uses: actions/upload-artifact@v4
