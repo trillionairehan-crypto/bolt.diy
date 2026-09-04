@@ -67,8 +67,17 @@ jobs:
       - name: Run ESLint
         run: pnpm run lint
 
+      # getPlatformUserId()/buildPlatformClient() (app/lib/cloud/cloudPlatformAuth.ts) return
+      # null before ever calling Supabase — including in tests that vi.mock('@supabase/supabase-js')
+      # — when these two are unset, so every request looks unauthenticated (401) regardless of
+      # the mocked token. They're VITE_-prefixed anon-key-style values Vite already bundles into
+      # the client output, not secrets; these CI values are placeholders the mocked client never
+      # actually dials out to.
       - name: Run tests
         run: pnpm run test
+        env:
+          VITE_PLATFORM_SUPABASE_URL: https://ci-placeholder.supabase.co
+          VITE_PLATFORM_SUPABASE_ANON_KEY: ci-placeholder-anon-key
 
       - name: Upload test coverage
         uses: actions/upload-artifact@v4
