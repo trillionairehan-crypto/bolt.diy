@@ -88,8 +88,8 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
   };
 
   const buildDirectivesAndConclude = (finalQ1: Q1Value, finalQ2: Q2Value, finalQ3: Q3Answer | null) => {
-    const perspectiveLine = buildSkeletonAndPerspectiveDirective(finalQ1, finalQ3?.skeleton ?? null);
-    const parts = [{ promptAdditions: [perspectiveLine] }, mapQ2ToDirectives(finalQ2)];
+    const skeletonAndPerspectiveLines = buildSkeletonAndPerspectiveDirective(finalQ1, finalQ3?.skeleton ?? null);
+    const parts = [{ promptAdditions: skeletonAndPerspectiveLines }, mapQ2ToDirectives(finalQ2)];
 
     if (finalQ3?.raw) {
       // 직접 입력이 격자 항목에 못 매핑됐으면(기타) 사용자가 실제로 타이핑한 업종 원문을 그대로 알려준다.

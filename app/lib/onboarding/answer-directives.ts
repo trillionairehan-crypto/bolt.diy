@@ -9,13 +9,7 @@
  * 프롬프트나 이 지시문 체계를 거칠 필요가 없다.
  */
 
-import {
-  SKELETON_DEFAULT_PERSPECTIVE,
-  SKELETON_NAMES,
-  type Q1Value,
-  type Q2Value,
-  type SkeletonId,
-} from './question-bank';
+import { SKELETON_NAMES, type Q1Value, type Q2Value, type SkeletonId } from './question-bank';
 
 export interface GenerationDirectives {
   /** Natural-language lines appended to the prompt under "추가로 알려주신 내용:". */
@@ -39,41 +33,47 @@ export interface GenerationDirectives {
 const EMPTY: Partial<GenerationDirectives> = {};
 
 /**
- * Q1(누가 쓰나요) + Q3에서 정해진 골격을 합쳐 "골격: X / 사용자 관점: Y" 한 줄을 만든다.
- * <app_skeletons>의 "사용자 요청에 관점이 명시되면 그것을 따른다" 규칙이 이 줄을 그대로 읽게
- * 설계했다 — 골격 이름은 new-prompt.ts의 표기와 정확히 일치해야 한다(SKELETON_NAMES 참고).
- *
- * Q1 답과 골격 기본 관점이 다를 때: 골격 기본이 방문자가 아닌데 Q1이 "손님·고객도 써요"(방문자)면
- * 대체가 아니라 추가로 포함시킨다(예: 기록·추이형은 원래 본인 전용이지만 손님도 쓴다면 방문자 화면도
- * 필요하다는 뜻이지, 본인용 화면을 없애라는 뜻이 아니다). 그 외의 불일치는 Q1이 그대로 관점을
- * 대체한다.
+ * Q1(누가 쓰나요) 답은 사용자가 직접 밝힌 사실이라 무조건 강제한다 — 골격이 무엇으로 정해지든 이
+ * 관점을 따라야 한다. skeletonDefault를 참조하지 않는 이유: 골격 자체가 이제 기본값일 뿐 강제가
+ * 아니라서(아래 buildSkeletonAndPerspectiveDirective 참고), 실제로 어느 골격이 쓰일지 directive
+ * 생성 시점엔 알 수 없다 — 그래서 "이 골격이 관리자·본인 전용이면"처럼 조건부로, 어떤 골격이 와도
+ * 맞게 쓴다.
  */
-export function buildSkeletonAndPerspectiveDirective(q1: Q1Value, skeleton: SkeletonId | null): string {
-  const q1Perspective = Q1_TO_PERSPECTIVE[q1];
+const Q1_PERSPECTIVE_DIRECTIVE: Record<Q1Value, string> = {
+  solo: '사용자 관점: 본인 — 만드는 사람 혼자 씁니다.',
+  team: '사용자 관점: 관리자 — 관리자·직원이 관리합니다.',
+  public:
+    '사용자 관점: 이 골격이 원래 관리자·본인 전용이면 그 관점은 유지한 채 손님·고객이 쓰는 방문자용 화면을 추가로 포함하고, 원래 방문자 관점이면 방문자 기준 그대로 만드세요.',
+};
+
+/**
+ * Q1(누가 쓰나요) + Q3에서 정해진 업종의 골격을 지시문 줄들로 만든다.
+ *
+ * 실측 1차(2026-09-04, 헬스장 시나리오): "골격: X"를 강제 문구로 두면 "헬스장 예약 앱"처럼 요청 자체가
+ * 다른 골격(예약·일정형)을 명확히 말하고 있는데도 업종 기반 기본값(명단·차감형)이 요청을 덮어써
+ * 버리는 문제가 있었다 — 업종은 어디까지나 힌트지 요청 자체보다 우선할 수 없다.
+ *
+ * 실측 2차(2026-09-04): "요청이 다른 골격을 더 명확히 가리키면 그 요청을 따르고, 모호하면 이
+ * 기본값을 쓴다"는 조건부 서술문으로 1차 수정했지만 여전히 실패했다 — "헬스장 예약 앱"→명단·차감형,
+ * "카페 포인트 적립 앱"→소개·홍보형(둘 다 기본값 그대로, 요청의 명확한 신호를 무시함). 서술문은
+ * 모델이 "판단 후 조건 적용"을 실제로 수행하게 만들지 못했다. 그래서 순서를 명시하는 절차문으로 다시
+ * 바꿨다 — "먼저 요청 문장만 보고 판단, 근거가 없을 때만 기본값" 순서를 1)2)로 못박는다. Q1의 사용자
+ * 관점 줄은 그대로 강제 유지한다 — 이건 업종 추측이 아니라 사용자가 실제로 답한 사실이기 때문이다.
+ *
+ * 골격 이름은 new-prompt.ts <app_skeletons>의 표기와 정확히 일치해야 한다(SKELETON_NAMES 참고).
+ */
+export function buildSkeletonAndPerspectiveDirective(q1: Q1Value, skeleton: SkeletonId | null): string[] {
+  const perspectiveLine = Q1_PERSPECTIVE_DIRECTIVE[q1];
 
   if (!skeleton) {
-    return `사용자 관점: ${q1Perspective}`;
+    return [perspectiveLine];
   }
 
   const skeletonName = SKELETON_NAMES[skeleton];
-  const skeletonDefault = SKELETON_DEFAULT_PERSPECTIVE[skeleton];
+  const skeletonLine = `골격 기본값(최후 순위): ${skeletonName} — 판단 순서: 1) 먼저 사용자가 실제로 쓴 요청 문장만 보고 골격을 정하세요. 문장에 골격을 가리키는 핵심 명사(예: 예약, 적립, 순위)가 있으면 이 기본값과 달라도 그 문장을 따르세요. 2) 문장에 그런 근거가 전혀 없을 때만 이 기본값을 쓰세요.`;
 
-  if (q1Perspective === skeletonDefault) {
-    return `골격: ${skeletonName} / 사용자 관점: ${skeletonDefault}`;
-  }
-
-  if (q1Perspective === '방문자' && skeletonDefault !== '방문자') {
-    return `골격: ${skeletonName} / 사용자 관점: ${skeletonDefault} 기준으로 만들되, 손님·고객도 쓰는 방문자용 화면을 추가로 포함하세요.`;
-  }
-
-  return `골격: ${skeletonName} / 사용자 관점: ${q1Perspective} (사용자가 직접 밝힌 관점이므로 이 골격의 기본 관점(${skeletonDefault}) 대신 이 관점을 따르세요.)`;
+  return [skeletonLine, perspectiveLine];
 }
-
-const Q1_TO_PERSPECTIVE: Record<Q1Value, '관리자' | '본인' | '방문자'> = {
-  solo: '본인',
-  team: '관리자',
-  public: '방문자',
-};
 
 export function mapQ2ToDirectives(value: Q2Value): Partial<GenerationDirectives> {
   switch (value) {

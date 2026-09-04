@@ -7,46 +7,54 @@ import {
 } from './answer-directives';
 
 describe('buildSkeletonAndPerspectiveDirective', () => {
-  it('emits the exact new-prompt.ts skeleton name when Q1 matches the skeleton default (team -> 관리자, skeleton 2 예약·일정형)', () => {
-    const result = buildSkeletonAndPerspectiveDirective('team', 2);
-    expect(result).toBe('골격: 예약·일정형 / 사용자 관점: 관리자');
+  it('returns 2 lines when a skeleton is given: a non-forcing "골격 기본값" line + a forced perspective line', () => {
+    const lines = buildSkeletonAndPerspectiveDirective('team', 2);
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toBe(
+      '골격 기본값(최후 순위): 예약·일정형 — 판단 순서: 1) 먼저 사용자가 실제로 쓴 요청 문장만 보고 골격을 정하세요. 문장에 골격을 가리키는 핵심 명사(예: 예약, 적립, 순위)가 있으면 이 기본값과 달라도 그 문장을 따르세요. 2) 문장에 그런 근거가 전혀 없을 때만 이 기본값을 쓰세요.',
+    );
+    expect(lines[1]).toBe('사용자 관점: 관리자 — 관리자·직원이 관리합니다.');
   });
 
-  it('solo (본인) matches skeleton 5 기록·추이형 default -> no override wording', () => {
-    const result = buildSkeletonAndPerspectiveDirective('solo', 5);
-    expect(result).toBe('골격: 기록·추이형 / 사용자 관점: 본인');
-    expect(result).not.toContain('대신');
+  it('the skeleton line never says "골격:" alone (forced) — always "골격 기본값(최후 순위):" with the ordered override procedure', () => {
+    for (const skeletonId of [1, 2, 3, 4, 5, 6, 7] as const) {
+      const lines = buildSkeletonAndPerspectiveDirective('solo', skeletonId);
+      expect(lines[0]).toMatch(/^골격 기본값\(최후 순위\): /);
+      expect(lines[0]).toContain('먼저 사용자가 실제로 쓴 요청 문장만 보고 골격을 정하세요');
+      expect(lines[0]).toContain('그런 근거가 전혀 없을 때만 이 기본값을 쓰세요');
+      expect(lines[0]).not.toMatch(/^골격: /);
+    }
   });
 
-  it('public (방문자) on a non-방문자 skeleton ADDS a visitor view instead of replacing the default (기록·추이형 예시)', () => {
-    const result = buildSkeletonAndPerspectiveDirective('public', 5);
-    expect(result).toContain('골격: 기록·추이형');
-    expect(result).toContain('본인 기준으로 만들되');
-    expect(result).toContain('방문자용 화면을 추가로 포함');
+  it('solo -> 본인, forced regardless of skeleton', () => {
+    const lines1 = buildSkeletonAndPerspectiveDirective('solo', 1); // skeleton 1 default is 관리자
+    const lines7 = buildSkeletonAndPerspectiveDirective('solo', 7); // skeleton 7 default is 방문자
+    expect(lines1[1]).toBe('사용자 관점: 본인 — 만드는 사람 혼자 씁니다.');
+    expect(lines7[1]).toBe('사용자 관점: 본인 — 만드는 사람 혼자 씁니다.');
   });
 
-  it('team (관리자) on a 방문자-default skeleton (4, 목록·상세형) overrides straight, not additively', () => {
-    const result = buildSkeletonAndPerspectiveDirective('team', 4);
-    expect(result).toContain('골격: 목록·상세형');
-    expect(result).toContain('사용자 관점: 관리자');
-    expect(result).toContain('대신');
-    expect(result).not.toContain('추가로 포함');
+  it('public (방문자) is phrased conditionally so it applies correctly no matter which skeleton actually ends up used', () => {
+    const lines = buildSkeletonAndPerspectiveDirective('public', 5);
+    expect(lines[1]).toContain('이 골격이 원래 관리자·본인 전용이면');
+    expect(lines[1]).toContain('손님·고객이 쓰는 방문자용 화면을 추가로 포함');
+    expect(lines[1]).toContain('원래 방문자 관점이면 방문자 기준 그대로');
   });
 
   it('every skeleton name matches new-prompt.ts exactly (spot-check all 7)', () => {
-    expect(buildSkeletonAndPerspectiveDirective('team', 1)).toContain('명단·차감형');
-    expect(buildSkeletonAndPerspectiveDirective('team', 2)).toContain('예약·일정형');
-    expect(buildSkeletonAndPerspectiveDirective('solo', 3)).toContain('거래·수지형');
-    expect(buildSkeletonAndPerspectiveDirective('public', 4)).toContain('목록·상세형');
-    expect(buildSkeletonAndPerspectiveDirective('solo', 5)).toContain('기록·추이형');
-    expect(buildSkeletonAndPerspectiveDirective('solo', 6)).toContain('순위·티어형');
-    expect(buildSkeletonAndPerspectiveDirective('public', 7)).toContain('소개·홍보형');
+    expect(buildSkeletonAndPerspectiveDirective('team', 1)[0]).toContain('명단·차감형');
+    expect(buildSkeletonAndPerspectiveDirective('team', 2)[0]).toContain('예약·일정형');
+    expect(buildSkeletonAndPerspectiveDirective('solo', 3)[0]).toContain('거래·수지형');
+    expect(buildSkeletonAndPerspectiveDirective('public', 4)[0]).toContain('목록·상세형');
+    expect(buildSkeletonAndPerspectiveDirective('solo', 5)[0]).toContain('기록·추이형');
+    expect(buildSkeletonAndPerspectiveDirective('solo', 6)[0]).toContain('순위·티어형');
+    expect(buildSkeletonAndPerspectiveDirective('public', 7)[0]).toContain('소개·홍보형');
   });
 
-  it('null skeleton (직접 입력 매핑 실패 -> 자유 생성): no "골격:" prefix, still states the perspective', () => {
-    const result = buildSkeletonAndPerspectiveDirective('team', null);
-    expect(result).toBe('사용자 관점: 관리자');
-    expect(result).not.toContain('골격:');
+  it('null skeleton (직접 입력 매핑 실패 -> 자유 생성): only the perspective line, no skeleton line at all', () => {
+    const lines = buildSkeletonAndPerspectiveDirective('team', null);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toBe('사용자 관점: 관리자 — 관리자·직원이 관리합니다.');
+    expect(lines.join(' ')).not.toContain('골격');
   });
 });
 
@@ -91,13 +99,14 @@ describe('mergeDirectives', () => {
     expect(merged).toEqual({ promptAdditions: [] });
   });
 
-  it('merges a realistic Q1+Q2+Q3 answer set into one directive', () => {
+  it('merges a realistic Q1+Q2+Q3 answer set into one directive (skeleton line + perspective line + Q2 line = 3)', () => {
     const merged = mergeDirectives([
-      { promptAdditions: [buildSkeletonAndPerspectiveDirective('team', 2)] },
+      { promptAdditions: buildSkeletonAndPerspectiveDirective('team', 2) },
       mapQ2ToDirectives('cloud'),
     ]);
-    expect(merged.promptAdditions).toHaveLength(2);
-    expect(merged.promptAdditions[0]).toBe('골격: 예약·일정형 / 사용자 관점: 관리자');
+    expect(merged.promptAdditions).toHaveLength(3);
+    expect(merged.promptAdditions[0]).toContain('골격 기본값(최후 순위): 예약·일정형');
+    expect(merged.promptAdditions[1]).toBe('사용자 관점: 관리자 — 관리자·직원이 관리합니다.');
   });
 });
 

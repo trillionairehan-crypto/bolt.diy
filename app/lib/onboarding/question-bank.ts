@@ -83,9 +83,13 @@ export interface Q3GridItem {
  * 예시), 쇼핑·부동산→목록·상세형("쇼핑", "부동산" 골격4 예시), 프리랜서→거래·수지형("정산" 골격3
  * 예시), 개인 기록→기록·추이형(카테고리명 자체가 "기록"과 직결, "습관" 골격5 예시). 카페·음식점은
  * 골격1 예시에도 "카페 적립"이 있지만, 이번 세션 실측(골격 7 검증 라운드 다수가 카페·빵집 프롬프트로
- * 진행됨)과 "가게 소개" 수요가 더 흔하다고 판단해 소개·홍보형으로 뒀다. 모임·동호회는 직접 겹치는
- * 예시가 없어 "게임 티어표"(골격6 예시)와 구조적으로 가장 가까운 순위·티어형으로 배정했다 — 근거가
- * 가장 약한 항목.
+ * 진행됨)과 "가게 소개" 수요가 더 흔하다고 판단해 소개·홍보형으로 뒀다.
+ *
+ * 모임·동호회 → 명단·차감형(2026-09-04 수정, 이전엔 순위·티어형이었음): "모임·동호회 회원 명단과
+ * 참여 횟수를 관리한다"는 게 "게임 티어표처럼 항목 순위를 매긴다"보다 훨씬 흔한 실사용 형태라고
+ * 판단해 옮겼다 — 골격1의 실제 예시("카페 적립, 헬스장, 학원, 세차장")도 전부 "명단 + 횟수 차감/적립"
+ * 구조라 동호회 회비·참석 관리와 구조적으로 더 가깝다. 이제 순위·티어형은 Q3 격자에 직접 매칭되는
+ * 항목이 없다(직접 입력에서 Haiku가 골라줄 수는 있다) — 의도된 상태.
  */
 export const Q3_GRID: Q3GridItem[] = [
   { id: 'cafe', label: '카페·음식점', skeleton: 7, recommendedPalettes: ['brown'] },
@@ -96,7 +100,7 @@ export const Q3_GRID: Q3GridItem[] = [
   { id: 'shopping', label: '쇼핑·판매', skeleton: 4, recommendedPalettes: ['red'] },
   { id: 'realestate', label: '공간·부동산', skeleton: 4, recommendedPalettes: ['blue'] },
   { id: 'freelance', label: '프리랜서·서비스', skeleton: 3, recommendedPalettes: ['indigo'] },
-  { id: 'club', label: '모임·동호회', skeleton: 6, recommendedPalettes: ['purple'] },
+  { id: 'club', label: '모임·동호회', skeleton: 1, recommendedPalettes: ['purple'] },
   { id: 'personal', label: '개인 기록(가계부·습관)', skeleton: 5, recommendedPalettes: ['coral'] },
 ];
 

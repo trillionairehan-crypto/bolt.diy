@@ -19,12 +19,18 @@ describe('question-bank data integrity', () => {
     expect(Q3_GRID).toHaveLength(10);
   });
 
-  it('Q3_GRID covers all 7 skeletons at least once (골고루 커버 요구사항)', () => {
+  /*
+   * 2026-09-04: 모임·동호회를 순위·티어형(6)에서 명단·차감형(1)으로 옮기면서 골격6은 격자에 직접
+   * 매칭되는 항목이 없어졌다(의도된 상태 — 직접 입력에서 Haiku가 골라줄 수는 있음). "골고루 커버"는
+   * 이제 필수 조건이 아니라 참고 지표라, 정확히 7종 전부를 요구하진 않되 최소 몇 종 이상은 커버하는지
+   * 하한선만 남긴다.
+   */
+  it('Q3_GRID covers most skeletons (골격6 순위·티어형은 격자에 직접 매칭되는 항목이 없어도 통과)', () => {
     const covered = new Set(Q3_GRID.map((item) => item.skeleton));
-    expect(covered.size).toBe(7);
+    expect(covered.size).toBeGreaterThanOrEqual(6);
 
-    for (let skeleton = 1; skeleton <= 7; skeleton++) {
-      expect(covered.has(skeleton as 1 | 2 | 3 | 4 | 5 | 6 | 7), `skeleton ${skeleton} uncovered`).toBe(true);
+    for (const skeleton of [1, 2, 3, 4, 5, 7] as const) {
+      expect(covered.has(skeleton), `skeleton ${skeleton} uncovered`).toBe(true);
     }
   });
 
