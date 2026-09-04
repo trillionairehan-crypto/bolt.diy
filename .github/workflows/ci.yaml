@@ -87,3 +87,48 @@ jobs:
           path: coverage/
           retention-days: 7
           if-no-files-found: ignore
+
+  deploy:
+    name: Deploy to Cloudflare Pages (production)
+    needs: test
+    # needs: test already gates this on build+typecheck+eslint+vitest all succeeding (they're
+    # steps of that one job) — this only adds "and only on a push to main", never on PRs or
+    # other branches.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9.14.4'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.18.0'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # VITE_-prefixed vars get baked into the client bundle by `vite build` (see
+      # app/lib/cloud/cloudPlatformAuth.ts's buildPlatformClient()) — without the real values
+      # here, the deployed production bundle would silently ship with platform login broken
+      # (same "always looks unauthenticated" shape the CI test-step placeholder papers over on
+      # purpose for tests, which must NOT happen for a real production build).
+      - name: Build
+        run: pnpm run build
+        env:
+          VITE_PLATFORM_SUPABASE_URL: ${{ secrets.VITE_PLATFORM_SUPABASE_URL }}
+          VITE_PLATFORM_SUPABASE_ANON_KEY: ${{ secrets.VITE_PLATFORM_SUPABASE_ANON_KEY }}
+
+      - name: Deploy to Cloudflare Pages
+        run: pnpm exec wrangler pages deploy build/client --project-name=coralred --branch=coralred
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
