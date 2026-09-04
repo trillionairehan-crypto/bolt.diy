@@ -9,6 +9,8 @@
  * app/utils/paletteToHue.ts의 CORALRED_DEFAULT_HUE=33이 바로 이 #FF5330에서 나온 값).
  */
 
+import { atom } from 'nanostores';
+
 export type PaletteId =
   | 'coral'
   | 'red'
@@ -333,9 +335,19 @@ export function recommendPalette(industry: string): PaletteId[] {
 }
 
 /**
- * 현재 활성 팔레트. 항상 coral을 반환한다 — 팔레트 선택 기능은 아직 시스템 프롬프트에 연결되지
- * 않았고(이번 라운드 범위 아님), 이 함수는 그 연결 지점만 미리 배선해두는 용도다. 동작 변경 없음.
+ * Q5(온보딩 색 선택)의 실제 상태 — chatId 아톰(app/lib/persistence/useChatHistory.ts)과 같은
+ * 계층(모듈 레벨 nanostore, React state 아님)에 둔다. PromptClarification.tsx가 온보딩 완료 시
+ * set()하고, 새 온보딩 세션이 시작될 때(PromptClarification 마운트) coral로 reset한다 — 건너뛰면
+ * coral 그대로.
+ */
+export const activePaletteId = atom<PaletteId>('coral');
+
+/**
+ * 현재 활성 팔레트. Q5에서 선택된 값(activePaletteId)을 반환한다 — 아무것도 선택 안 했으면(건너뛰기,
+ * 또는 아직 온보딩 전) coral. designSchemeToHue()의 폴백 경로(app/utils/paletteToHue.ts)와
+ * reviewGeneratedApp.ts의 자동 검토 힌트가 이 함수를 통해 이미 배선돼 있어, 여기만 고치면 둘 다
+ * 자동으로 선택된 팔레트를 반영한다.
  */
 export function getActivePalette(): Palette {
-  return PALETTES_BY_ID.coral;
+  return PALETTES_BY_ID[activePaletteId.get()];
 }

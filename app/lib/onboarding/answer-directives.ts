@@ -1,16 +1,21 @@
 /**
- * Turns question-bank.ts answers into concrete generation directives, instead of just gluing
- * "질문: 답변" text onto the prompt (the old PromptClarification.tsx behavior). Kept as pure
- * functions, separate from the question data and from the UI, so a new question only needs a
- * new case here — no restructuring.
+ * 온보딩 5문항(Q1~Q5) 답변을 구체적인 생성 지시문으로 바꾼다. "질문: 답변" 텍스트를 그대로 붙이는 게
+ * 아니라, 실제 코드 훅(connectSupabase, 골격·관점 강제)이 있는 것만 구조화하고 나머지는 자연어
+ * 문장으로 표현한다.
  *
- * Only `hue` has a real pre-generation code hook today (designSchemeToHue's injection into the
- * template — see hueToRepresentativeHex below and its use in Chat.client.tsx). `connectSupabase`
- * has no separate mechanism to plug into beyond the prompt itself — there's no "toggle Supabase
- * on/off" hook in the generation pipeline independent of what the LLM is told to build — so its
- * real effect is still through promptAdditions; the boolean is kept structured for whatever
- * later needs to branch on it (e.g. skipping a "Supabase 연결하세요" nudge elsewhere).
+ * Q4(연동)는 여기서 다루지 않는다 — DB에만 저장되는 수요조사 문항이라 지시문·프롬프트·생성물 어디로도
+ * 흐르지 않는다(별도 요구사항). Q5(색)도 여기서 다루지 않는다 — app/lib/palettes.ts의 activePaletteId
+ * 아톰으로 흐르고, getActivePalette()가 이미 designSchemeToHue()의 폴백 경로에 배선돼 있어 시스템
+ * 프롬프트나 이 지시문 체계를 거칠 필요가 없다.
  */
+
+import {
+  SKELETON_DEFAULT_PERSPECTIVE,
+  SKELETON_NAMES,
+  type Q1Value,
+  type Q2Value,
+  type SkeletonId,
+} from './question-bank';
 
 export interface GenerationDirectives {
   /** Natural-language lines appended to the prompt under "추가로 알려주신 내용:". */
@@ -22,141 +27,78 @@ export interface GenerationDirectives {
    */
   connectSupabase?: boolean;
 
-  /** OKLCH hue (0-359) for the design kit's --hue token. Undefined = keep the brand default. */
+  /**
+   * OKLCH hue (0-359) for the design kit's --hue token. Undefined = keep whatever
+   * getActivePalette() currently resolves to (coral by default, or the Q5 selection).
+   * No current onboarding answer sets this — kept for backward compatibility with
+   * hueToRepresentativeHex/Chat.client.tsx's designSchemeOverride wiring.
+   */
   hue?: number;
 }
-
-const FRIENDLY_HUE = 33; // brand default (#FF5330), matches paletteToHue.ts's CORALRED_DEFAULT_HUE
 
 const EMPTY: Partial<GenerationDirectives> = {};
 
 /**
- * Per-question, per-option mapping. "잘 모르겠어요" (value === null) and any option not listed
- * here fall through to the default case, which is intentionally EMPTY for every question right
- * now — see the per-case comments for why silence (deferring to the base prompt/existing
- * new-prompt.ts judgment) is the correct behavior in this phase, not a guessed default. A real
- * app-type-specific default would replace these once a type classifier exists.
+ * Q1(누가 쓰나요) + Q3에서 정해진 골격을 합쳐 "골격: X / 사용자 관점: Y" 한 줄을 만든다.
+ * <app_skeletons>의 "사용자 요청에 관점이 명시되면 그것을 따른다" 규칙이 이 줄을 그대로 읽게
+ * 설계했다 — 골격 이름은 new-prompt.ts의 표기와 정확히 일치해야 한다(SKELETON_NAMES 참고).
+ *
+ * Q1 답과 골격 기본 관점이 다를 때: 골격 기본이 방문자가 아닌데 Q1이 "손님·고객도 써요"(방문자)면
+ * 대체가 아니라 추가로 포함시킨다(예: 기록·추이형은 원래 본인 전용이지만 손님도 쓴다면 방문자 화면도
+ * 필요하다는 뜻이지, 본인용 화면을 없애라는 뜻이 아니다). 그 외의 불일치는 Q1이 그대로 관점을
+ * 대체한다.
  */
-export function mapAnswerToDirectives(questionId: string, value: unknown): Partial<GenerationDirectives> {
-  switch (questionId) {
-    case 'audience':
-      switch (value) {
-        case 'solo':
-          return {
-            promptAdditions: [
-              '이 앱은 만드는 사람 본인만 써요 — 온보딩이나 도움말 문구는 최소화하고 핵심 기능에 집중하세요. 본인만 쓰는 만큼 항목을 추가·수정·삭제하는 관리 기능도 자연스럽게 포함하세요.',
-            ],
-          };
-        case 'team':
-          return {
-            promptAdditions: [
-              '팀 내부에서 함께 쓸 앱이에요 — 담당자 표시, 활동 이력처럼 여러 사용자를 구분하는 요소를 자연스럽게 고려하세요. 팀만 쓰는 만큼 항목을 추가·수정·삭제하는 관리 기능도 자연스럽게 포함하세요.',
-            ],
-          };
-        case 'public':
-          return {
-            promptAdditions: [
-              '일반 고객이 쓰는 앱이에요 — 처음 보는 사람도 바로 이해할 수 있게 문구와 흐름을 더 친절하고 명확하게 만드세요.',
-            ],
-          };
-        default:
-          /*
-           * Unsure — no safe app-wide default audience exists; guessing risks contradicting
-           * what the user's own request already implied.
-           */
-          return EMPTY;
-      }
+export function buildSkeletonAndPerspectiveDirective(q1: Q1Value, skeleton: SkeletonId | null): string {
+  const q1Perspective = Q1_TO_PERSPECTIVE[q1];
 
-    case 'persistence':
-      switch (value) {
-        case 'withAuth':
-          return {
-            connectSupabase: true,
-            promptAdditions: [
-              '사용자별로 로그인해서 자기 데이터를 관리하는 구조를 원해요. 지금 저장 방식이 코랄레드 Cloud(기본)라면 로그인 계정은 지원되지 않으니 기기 단위 구조로 만들고, 답변에서 로그인이 꼭 필요하면 "저장 기능 켜기"의 내 Supabase 연결(고급)이 필요하다고 짧게 안내하세요. 저장 방식이 내 Supabase(고급)라면 Supabase 인증과 RLS로 실제 로그인 구조를 만드세요.',
-            ],
-          };
-        case 'withoutAuth':
-          return {
-            promptAdditions: ['로그인 없이도 데이터가 저장되는 구조로 만들어주세요 — 기기 단위 저장이면 충분해요.'],
-          };
-        case 'none':
-          return {
-            connectSupabase: false,
-            promptAdditions: [
-              '이 앱은 데이터를 저장할 필요가 없어요. 저장 SDK도 Supabase도 쓰지 말고, 필요한 상태는 컴포넌트 state로만 관리하는 클라이언트 전용 앱으로 만들어주세요.',
-            ],
-          };
-        default:
-          /*
-           * Unsure — deliberately don't set connectSupabase at all, so new-prompt.ts's existing
-           * "don't add auth unless the app actually needs per-user data" rule keeps deciding,
-           * instead of a guessed default overriding an already-reasonable judgment.
-           */
-          return EMPTY;
-      }
+  if (!skeleton) {
+    return `사용자 관점: ${q1Perspective}`;
+  }
 
-    case 'device':
-      switch (value) {
-        case 'mobile':
-          return {
-            promptAdditions: [
-              '모바일에서 주로 사용될 앱이에요 — 터치하기 편한 큰 버튼, 세로 레이아웃, 하단 고정 액션 버튼처럼 모바일 우선 UI로 만들어주세요.',
-            ],
-          };
-        case 'desktop':
-          return {
-            promptAdditions: [
-              '데스크톱에서 주로 사용될 앱이에요 — 사이드바, 다단 구성처럼 넓은 화면을 활용한 레이아웃을 고려해도 좋아요.',
-            ],
-          };
-        default:
-          // 'both' and unsure both mean "no bias" — the baseline is already responsive.
-          return EMPTY;
-      }
+  const skeletonName = SKELETON_NAMES[skeleton];
+  const skeletonDefault = SKELETON_DEFAULT_PERSPECTIVE[skeleton];
 
-    case 'mood':
-      switch (value) {
-        case 'trust':
-          /*
-           * Used to override --hue to a calm teal-blue (222) for this mood — a real, shipped bug:
-           * it made the brand accent go blue on the one onboarding path a user could hit it from,
-           * directly contradicting new-prompt.ts's own "the accent stays whatever --hue is set to,
-           * regardless of category" rule everywhere else in the app. Same fix as that rule: express
-           * the mood through everything BUT the accent color.
-           */
-          return {
-            promptAdditions: [
-              '차분하고 신뢰감 있는 분위기를 원해요 — 여백, 타이포그래피, 아이콘, 모션으로 그 느낌을 표현하고, 강조색은 브랜드 기본색(코랄) 그대로 유지하세요.',
-            ],
-          };
-        case 'friendly':
-          return { hue: FRIENDLY_HUE };
-        case 'minimal':
-          /*
-           * The kit's --accent chroma is fixed in CSS (design-handoff/coralred-ui.css), only hue
-           * is a variable — there's no way to make it read as "desaturated" through --hue alone,
-           * so minimal stays a prompt instruction instead of a hue value.
-           */
-          return { promptAdditions: ['액센트 색 사용을 최소화하고, 강조가 꼭 필요한 곳에만 쓰세요.'] };
-        default:
-          return EMPTY;
-      }
+  if (q1Perspective === skeletonDefault) {
+    return `골격: ${skeletonName} / 사용자 관점: ${skeletonDefault}`;
+  }
 
+  if (q1Perspective === '방문자' && skeletonDefault !== '방문자') {
+    return `골격: ${skeletonName} / 사용자 관점: ${skeletonDefault} 기준으로 만들되, 손님·고객도 쓰는 방문자용 화면을 추가로 포함하세요.`;
+  }
+
+  return `골격: ${skeletonName} / 사용자 관점: ${q1Perspective} (사용자가 직접 밝힌 관점이므로 이 골격의 기본 관점(${skeletonDefault}) 대신 이 관점을 따르세요.)`;
+}
+
+const Q1_TO_PERSPECTIVE: Record<Q1Value, '관리자' | '본인' | '방문자'> = {
+  solo: '본인',
+  team: '관리자',
+  public: '방문자',
+};
+
+export function mapQ2ToDirectives(value: Q2Value): Partial<GenerationDirectives> {
+  switch (value) {
+    case 'cloud':
+      return {
+        promptAdditions: [
+          '데이터 저장은 코랄레드 Cloud(기본 저장 방식)를 씁니다 — 로그인 없이 기기와 무관하게 저장돼요.',
+        ],
+      };
+    case 'none':
+      return {
+        connectSupabase: false,
+        promptAdditions: [
+          '이 앱은 데이터를 저장할 필요가 없어요. 저장 SDK도 Supabase도 쓰지 말고, 필요한 상태는 컴포넌트 state로만 관리하는 클라이언트 전용 앱으로 만들어주세요.',
+        ],
+      };
+    case 'supabase':
+      return {
+        promptAdditions: [
+          '사용자가 자기 Supabase 프로젝트를 연결해서 쓰고 싶어해요. 아직 연결 전이라면 화면 상단의 "저장 기능 켜기"를 눌러 연결하라고 답변에서 짧게 안내하세요. 이미 연결됐다면 Supabase 인증과 RLS로 실제 저장 구조를 만드세요.',
+        ],
+      };
     default:
       return EMPTY;
   }
-}
-
-/**
- * Cross-question adjustments that don't fit a single question's independent mapping. No active
- * rules right now — the one rule this existed for (audience solo/team + coreAction) was folded
- * directly into the 'audience' case above after coreAction (Q2) was removed from the fixed bank.
- * Kept as a real call site (see PromptClarification.tsx) so a future cross-question rule doesn't
- * need any restructuring to add.
- */
-export function combineDirectives(_answerValues: Record<string, unknown>): Partial<GenerationDirectives> {
-  return EMPTY;
 }
 
 export function mergeDirectives(parts: Array<Partial<GenerationDirectives>>): GenerationDirectives {
@@ -180,16 +122,14 @@ export function mergeDirectives(parts: Array<Partial<GenerationDirectives>>): Ge
 }
 
 /**
- * The only hue value mapAnswerToDirectives ever produces right now. designSchemeToHue
- * (paletteToHue.ts) only reads DesignScheme.palette.primary as a hex color and derives the hue
- * from it — there's no direct "set this hue" entry point — so this is the representative hex,
- * verified against the real hexToOklchHue conversion (33 matches the brand default's own
- * documented hex #FF5330). A lookup table (not a general hue->hex inverse) is enough since only
- * this one value exists — kept as a table rather than inlined so a future mood/hue addition here
- * doesn't need Chat.client.tsx's hueToRepresentativeHex call site to change at all.
+ * The only hue value any onboarding answer could ever produce historically (the old 'mood'
+ * question's 'friendly' case, now removed). Kept only so Chat.client.tsx's existing
+ * designSchemeOverride wiring (directives.hue !== undefined -> hueToRepresentativeHex(hue))
+ * keeps compiling — no current answer sets GenerationDirectives.hue, so this branch is
+ * currently dead code, not a regression risk.
  */
 const HUE_REPRESENTATIVE_HEX: Record<number, string> = {
-  [FRIENDLY_HUE]: '#FF5330',
+  33: '#FF5330',
 };
 
 export function hueToRepresentativeHex(hue: number): string | undefined {

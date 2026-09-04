@@ -3,19 +3,24 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { classNames } from '~/utils/classNames';
 import styles from './PromptClarification.module.scss';
 import {
-  QUESTION_BANK,
-  selectQuestions,
-  type ClarifyOption,
-  type ClarifyQuestionDef,
+  Q1_OPTIONS,
+  Q2_OPTIONS,
+  Q3_GRID,
+  Q4_CATEGORIES,
+  type Q1Value,
+  type Q2Value,
+  type SkeletonId,
 } from '~/lib/onboarding/question-bank';
 import {
-  combineDirectives,
-  mapAnswerToDirectives,
+  buildSkeletonAndPerspectiveDirective,
+  mapQ2ToDirectives,
   mergeDirectives,
   type GenerationDirectives,
 } from '~/lib/onboarding/answer-directives';
-import { generateAppQuestions } from '~/utils/generateAppQuestions';
+import { mapIndustryToSkeleton } from '~/utils/mapIndustryToSkeleton';
+import { PALETTES, activePaletteId, type PaletteId } from '~/lib/palettes';
 import { ONBOARDING_ADDITIONS_MARKER } from '~/utils/constants';
+import { chatId, ensureChatId } from '~/lib/persistence';
 import { useReducedMotion } from '~/lib/hooks';
 
 interface PromptClarificationProps {
@@ -23,144 +28,157 @@ interface PromptClarificationProps {
   onComplete: (finalPrompt: string, directives: GenerationDirectives) => void;
 }
 
-/*
- * 'waitingForDynamic': the 4 fixed questions are all answered but generateAppQuestions() hasn't
- * resolved yet — held here for up to DYNAMIC_WAIT_MS before concluding with fixed answers only.
- */
-type Status = 'questions' | 'waitingForDynamic' | 'summary';
+type Step = 'q1' | 'q2' | 'q3' | 'q4' | 'q5' | 'summary';
 
-const DYNAMIC_WAIT_MS = 3000;
+const STEP_ORDER: Step[] = ['q1', 'q2', 'q3', 'q4', 'q5', 'summary'];
 
-interface RecordedAnswer {
-  optionId: string;
-  value: unknown;
-  label: string;
+interface Q3Answer {
+  gridItemId: string | null;
+  raw: string | null;
+  skeleton: SkeletonId | null;
 }
 
 const EMPTY_DIRECTIVES: GenerationDirectives = { promptAdditions: [] };
 
-function buildFinalPromptAndDirectives(
-  initialPrompt: string,
-  questions: ClarifyQuestionDef[],
-  answers: Record<string, RecordedAnswer>,
-): { finalPrompt: string; directives: GenerationDirectives } {
-  const perQuestionParts = questions.map((question) => {
-    const answer = answers[question.id];
-
-    if (!answer) {
-      return {};
-    }
-
-    /*
-     * "잘 모르겠어요" means silence for fixed questions too (see mapAnswerToDirectives's default
-     * cases) — without this check, dynamic questions would leak a useless "질문: 잘 모르겠어요"
-     * line into the generation prompt instead of adding nothing like the fixed-question path does.
-     */
-    if (answer.optionId === 'unsure') {
-      return {};
-    }
-
-    /*
-     * Free-text fallback ("직접 입력") and every app-specific (isDynamic) question have no fixed
-     * id answer-directives.ts knows about — both become a plain "질문: 답변" line instead, same
-     * as the old behavior. Only the 4 fixed questions go through mapAnswerToDirectives.
-     */
-    if (answer.optionId === 'custom' || question.isDynamic) {
-      return { promptAdditions: [`${question.question} ${answer.label}`] };
-    }
-
-    return mapAnswerToDirectives(question.id, answer.value);
-  });
-
-  const combined = combineDirectives(Object.fromEntries(Object.entries(answers).map(([id, a]) => [id, a.value])));
-
-  const directives = mergeDirectives([...perQuestionParts, combined]);
-
-  const finalPrompt =
-    directives.promptAdditions.length > 0
-      ? `${initialPrompt}${ONBOARDING_ADDITIONS_MARKER}${directives.promptAdditions.map((line) => `- ${line}`).join('\n')}`
-      : initialPrompt;
-
-  return { finalPrompt, directives };
-}
-
 export default function PromptClarification({ initialPrompt, onComplete }: PromptClarificationProps) {
-  /*
-   * Starts with just the 4 fixed questions — synchronous, no loading state needed. Up to 2
-   * app-specific questions get appended once generateAppQuestions() resolves (see the mount
-   * effect below); if the user reaches the end of the fixed 4 before that happens, the
-   * 'waitingForDynamic' status briefly holds for them — see the effect further down.
-   */
-  const [questions, setQuestions] = useState<ClarifyQuestionDef[]>(() => selectQuestions(undefined, QUESTION_BANK));
-  const [dynamicStatus, setDynamicStatus] = useState<'pending' | 'resolved'>('pending');
-  const [status, setStatus] = useState<Status>('questions');
-  const [currentStep, setCurrentStep] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, RecordedAnswer>>({});
-  const [customInput, setCustomInput] = useState('');
-  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [step, setStep] = useState<Step>('q1');
+  const [q1, setQ1] = useState<Q1Value | null>(null);
+  const [q2, setQ2] = useState<Q2Value | null>(null);
+  const [q3, setQ3] = useState<Q3Answer | null>(null);
+  const [q4, setQ4] = useState<string[]>([]);
+  const [q5, setQ5] = useState<PaletteId | null>(null);
   const [finalPrompt, setFinalPrompt] = useState(initialPrompt);
   const [directives, setDirectives] = useState<GenerationDirectives>(EMPTY_DIRECTIVES);
-  const [pendingOptionId, setPendingOptionId] = useState<string | null>(null);
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customInput, setCustomInput] = useState('');
+  const [mappingIndustry, setMappingIndustry] = useState(false);
   const reducedMotion = useReducedMotion();
 
-  /** onComplete unmounts this component; guards against a double-tap firing it (and generateNewApp) twice. */
+  /** Guards against a double-tap on "만들기" firing onComplete (and generateNewApp) twice. */
   const completedRef = useRef(false);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    generateAppQuestions(initialPrompt).then((result) => {
-      if (cancelled) {
-        return;
-      }
-
-      const dynamicQuestions = result ?? [];
-
-      if (dynamicQuestions.length > 0) {
-        setQuestions((prev) => [...prev, ...dynamicQuestions]);
-      }
-
-      setDynamicStatus('resolved');
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const concludeWithAnswers = (finalAnswers: Record<string, RecordedAnswer>) => {
-    const built = buildFinalPromptAndDirectives(initialPrompt, questions, finalAnswers);
-    setFinalPrompt(built.finalPrompt);
-    setDirectives(built.directives);
-    setStatus('summary');
-  };
-
   /*
-   * Handles both directions of the wait: if generateAppQuestions already resolved by the time we
-   * enter 'waitingForDynamic' (fast path — either new questions already landed, or it came back
-   * empty), resolve immediately; otherwise wait up to DYNAMIC_WAIT_MS for it to resolve mid-wait.
+   * activePaletteId(app/lib/palettes.ts)는 chatId 아톰과 같은 계층(모듈 레벨 nanostore)이라 여러
+   * 채팅 세션에 걸쳐 값이 남는다 — 새 온보딩 세션이 시작될 때(이 컴포넌트가 마운트될 때) coral로
+   * reset해서, Q5를 건너뛴 이전 채팅의 팔레트가 이번 채팅에 새는 일이 없게 한다.
    */
   useEffect(() => {
-    if (status !== 'waitingForDynamic') {
-      return undefined;
+    activePaletteId.set('coral');
+  }, []);
+
+  const stepIndex = STEP_ORDER.indexOf(step);
+  const progressPct = step === 'summary' ? 100 : Math.min(100, (stepIndex / (STEP_ORDER.length - 1)) * 100);
+
+  const selectWithConfirm = (id: string, after: () => void) => {
+    if (pendingId) {
+      return;
     }
 
-    if (dynamicStatus === 'resolved') {
-      if (currentStep < questions.length) {
-        setStatus('questions');
-      } else {
-        concludeWithAnswers(answers);
+    if (reducedMotion) {
+      after();
+      return;
+    }
+
+    setPendingId(id);
+    setTimeout(() => {
+      after();
+      setPendingId(null);
+    }, 220);
+  };
+
+  const buildDirectivesAndConclude = (finalQ1: Q1Value, finalQ2: Q2Value, finalQ3: Q3Answer | null) => {
+    const perspectiveLine = buildSkeletonAndPerspectiveDirective(finalQ1, finalQ3?.skeleton ?? null);
+    const parts = [{ promptAdditions: [perspectiveLine] }, mapQ2ToDirectives(finalQ2)];
+
+    if (finalQ3?.raw) {
+      // 직접 입력이 격자 항목에 못 매핑됐으면(기타) 사용자가 실제로 타이핑한 업종 원문을 그대로 알려준다.
+      parts.push({ promptAdditions: [`업종: ${finalQ3.raw}`] });
+    }
+
+    const merged = mergeDirectives(parts);
+    const built =
+      merged.promptAdditions.length > 0
+        ? `${initialPrompt}${ONBOARDING_ADDITIONS_MARKER}${merged.promptAdditions.map((line) => `- ${line}`).join('\n')}`
+        : initialPrompt;
+
+    setFinalPrompt(built);
+    setDirectives(merged);
+    setStep('summary');
+  };
+
+  // --- Q1 ---
+  const answerQ1 = (value: Q1Value) => {
+    selectWithConfirm(value, () => {
+      setQ1(value);
+      setStep('q2');
+    });
+  };
+
+  // --- Q2 ---
+  const answerQ2 = (value: Q2Value) => {
+    selectWithConfirm(value, () => {
+      setQ2(value);
+      setStep('q3');
+    });
+  };
+
+  // --- Q3 ---
+  const answerQ3Grid = (item: (typeof Q3_GRID)[number]) => {
+    selectWithConfirm(item.id, () => {
+      setQ3({ gridItemId: item.id, raw: null, skeleton: item.skeleton });
+      setStep('q4');
+    });
+  };
+
+  const submitQ3Custom = async () => {
+    const trimmed = customInput.trim();
+
+    if (!trimmed || mappingIndustry) {
+      return;
+    }
+
+    setMappingIndustry(true);
+
+    const mapped = await mapIndustryToSkeleton(trimmed).catch(() => ({ gridItemId: null, skeleton: null }));
+
+    setMappingIndustry(false);
+    setQ3({ gridItemId: mapped.gridItemId, raw: trimmed, skeleton: mapped.skeleton });
+    setCustomInput('');
+    setShowCustomInput(false);
+    setStep('q4');
+  };
+
+  // --- Q4 (수요조사 전용 — DB에만 저장, 지시문/프롬프트로 안 흐른다) ---
+  const toggleQ4 = (id: string) => {
+    setQ4((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+  };
+
+  const confirmQ4 = () => setStep('q5');
+  const skipQ4 = () => {
+    setQ4([]);
+    setStep('q5');
+  };
+
+  // --- Q5 ---
+  const answerQ5 = (paletteId: PaletteId) => {
+    selectWithConfirm(paletteId, () => {
+      setQ5(paletteId);
+      activePaletteId.set(paletteId);
+
+      if (q1 && q2) {
+        buildDirectivesAndConclude(q1, q2, q3);
       }
+    });
+  };
 
-      return undefined;
+  const skipQ5 = () => {
+    setQ5(null);
+
+    if (q1 && q2) {
+      buildDirectivesAndConclude(q1, q2, q3);
     }
-
-    const timeoutId = setTimeout(() => {
-      concludeWithAnswers(answers);
-    }, DYNAMIC_WAIT_MS);
-
-    return () => clearTimeout(timeoutId);
-  }, [status, dynamicStatus, questions.length, currentStep]);
+  };
 
   const completeOnce = (finalPromptValue: string, finalDirectives: GenerationDirectives) => {
     if (completedRef.current) {
@@ -168,154 +186,96 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
     }
 
     completedRef.current = true;
+
+    // 설문 저장 — 실패해도(non-fatal) 생성 진행에 영향 없다. 결과를 기다리지 않는다.
+    void saveOnboardingResponse({ q1, q2, q3, q4, q5 }).catch(() => {});
+
     onComplete(finalPromptValue, finalDirectives);
   };
 
-  const handleSkip = () => completeOnce(initialPrompt, EMPTY_DIRECTIVES);
-
-  const recordAnswer = (option: ClarifyOption) => {
-    const question = questions[currentStep];
-    const nextAnswers: Record<string, RecordedAnswer> = {
-      ...answers,
-      [question.id]: { optionId: option.id, value: option.value, label: option.label },
-    };
-
-    setAnswers(nextAnswers);
-    setCustomInput('');
-    setShowCustomInput(false);
-
-    if (currentStep + 1 < questions.length) {
-      setCurrentStep(currentStep + 1);
-      return;
-    }
-
-    /*
-     * Reached the end of what we currently know about. Advance the pointer regardless — if
-     * generateAppQuestions appends more questions, this is exactly the index they land on.
-     */
-    setCurrentStep(currentStep + 1);
-
-    if (dynamicStatus === 'pending') {
-      setStatus('waitingForDynamic');
-    } else {
-      concludeWithAnswers(nextAnswers);
-    }
-  };
-
-  /** Brief "confirmed" beat (coral border + check) before advancing, skipped under reduced-motion. */
-  const selectOption = (option: ClarifyOption) => {
-    if (pendingOptionId) {
-      return;
-    }
-
-    if (reducedMotion) {
-      recordAnswer(option);
-      return;
-    }
-
-    setPendingOptionId(option.id);
-    setTimeout(() => {
-      recordAnswer(option);
-      setPendingOptionId(null);
-    }, 220);
-  };
-
-  const handleCustomAnswer = () => {
-    const trimmed = customInput.trim();
-
-    if (!trimmed) {
-      return;
-    }
-
-    recordAnswer({ id: 'custom', label: trimmed, value: trimmed });
-  };
-
-  const currentQuestion = questions[currentStep];
-  const normalOptions = currentQuestion?.options.filter((option) => !option.isUnsure) ?? [];
-  const unsureOption = currentQuestion?.options.find((option) => option.isUnsure);
-
-  const progressPct = status === 'summary' ? 100 : Math.min(100, (currentStep / Math.max(questions.length, 1)) * 100);
+  const currentQ3Recommended = q3?.gridItemId
+    ? (Q3_GRID.find((item) => item.id === q3.gridItemId)?.recommendedPalettes ?? [])
+    : [];
+  const previewPaletteId =
+    pendingId && PALETTES.some((p) => p.id === pendingId) ? (pendingId as PaletteId) : (q5 ?? 'coral');
+  const previewPalette = PALETTES.find((p) => p.id === previewPaletteId)!;
 
   return (
-    <div className={classNames(styles.screen, 'h-full w-full flex flex-col')}>
+    <div className={classNames(styles.screen, 'h-full w-full flex flex-col overflow-y-auto')}>
       <div className={styles.progressTrack}>
         <div className={styles.progressFill} style={{ width: `${progressPct}%` }} />
       </div>
 
-      <div className="w-full flex justify-end px-4 lg:px-8 pt-4">
-        <button
-          type="button"
-          onClick={handleSkip}
-          className="min-h-11 inline-flex items-center bg-transparent border-none text-sm font-medium text-bolt-elements-textSecondary hover:text-[var(--accent-text)] transition-colors duration-150"
-        >
-          바로 만들기
-        </button>
-      </div>
-
       <div
-        className={classNames(styles.content, 'flex-1 flex flex-col items-center px-4 lg:px-0 w-full')}
-        style={{ paddingTop: 'clamp(48px, 15vh, 160px)' }}
+        className={classNames(styles.content, 'flex-1 flex flex-col items-center px-4 lg:px-0 w-full pb-10')}
+        style={{ paddingTop: 'clamp(40px, 12vh, 140px)' }}
       >
-        {status === 'waitingForDynamic' && (
-          <div className="flex flex-col items-center gap-4 py-10 text-center">
-            <div className="i-svg-spinners:90-ring-with-bg text-4xl" style={{ color: 'var(--accent)' }} />
-            <p className="text-base text-bolt-elements-textPrimary">이 앱에 맞는 질문을 확인하고 있어요</p>
-          </div>
-        )}
-
         <AnimatePresence mode="wait">
-          {status === 'questions' && currentQuestion && (
-            <motion.div
-              key={currentQuestion.id}
-              initial={reducedMotion ? false : { opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reducedMotion ? undefined : { opacity: 0, transition: { duration: 0.12 } }}
-              transition={{ duration: 0.16 }}
-              className="flex flex-col items-center w-full"
-            >
-              <h2 className={styles.question}>{currentQuestion.question}</h2>
+          {step === 'q1' && (
+            <StepShell key="q1" reducedMotion={reducedMotion} title="누가 쓰나요">
               <div className={classNames(styles.options, 'w-full max-w-[520px]')}>
-                {normalOptions.map((option) => {
-                  const isPending = pendingOptionId === option.id;
-
-                  return (
-                    <button
-                      key={option.id}
-                      type="button"
-                      onClick={() => selectOption(option)}
-                      disabled={pendingOptionId !== null}
-                      className={classNames(styles.optionButton, isPending && styles.optionButtonActive)}
-                    >
-                      <span>{option.label}</span>
-                      {isPending && (
-                        <motion.span
-                          initial={{ opacity: 0, scale: 0.6 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ duration: 0.15 }}
-                          className="i-ph:check-circle-fill text-xl shrink-0"
-                          style={{ color: 'var(--accent)' }}
-                        />
-                      )}
-                    </button>
-                  );
-                })}
+                {Q1_OPTIONS.map((option) => (
+                  <OptionButton
+                    key={option.id}
+                    pending={pendingId === option.id}
+                    disabled={!!pendingId}
+                    onClick={() => answerQ1(option.id)}
+                  >
+                    {option.label}
+                  </OptionButton>
+                ))}
               </div>
+            </StepShell>
+          )}
 
-              {/* "잘 모르겠어요"/"직접 입력할게요" are one step weaker than the options above —
-                  small text links, not another bordered button in the list. */}
-              {unsureOption && (
+          {step === 'q2' && (
+            <StepShell key="q2" reducedMotion={reducedMotion} title="데이터를 저장할까요">
+              {q1 === 'public' && (
+                <p className="text-sm mb-4 text-center" style={{ color: '#8B7E70' }}>
+                  손님 데이터가 쌓이려면 저장이 필요해요
+                </p>
+              )}
+              <div className={classNames(styles.options, 'w-full max-w-[520px]')}>
+                {Q2_OPTIONS.map((option) => (
+                  <OptionButton
+                    key={option.id}
+                    pending={pendingId === option.id}
+                    disabled={!!pendingId}
+                    onClick={() => answerQ2(option.id)}
+                  >
+                    {option.label}
+                  </OptionButton>
+                ))}
+              </div>
+            </StepShell>
+          )}
+
+          {step === 'q3' && (
+            <StepShell key="q3" reducedMotion={reducedMotion} title="어떤 일을 하시나요">
+              <div className={classNames(styles.grid, 'w-full max-w-[620px]')}>
+                {Q3_GRID.map((item) => (
+                  <OptionButton
+                    key={item.id}
+                    pending={pendingId === item.id}
+                    disabled={!!pendingId || mappingIndustry}
+                    onClick={() => answerQ3Grid(item)}
+                    compact
+                  >
+                    {item.label}
+                  </OptionButton>
+                ))}
                 <button
                   type="button"
-                  onClick={() => selectOption(unsureOption)}
-                  disabled={pendingOptionId !== null}
-                  className={classNames(styles.weakLink, 'mt-6')}
+                  disabled={!!pendingId || mappingIndustry}
+                  onClick={() => setShowCustomInput(true)}
+                  className={classNames(styles.optionButton, styles.optionButtonCompact)}
                 >
-                  {unsureOption.label}
+                  직접 입력
                 </button>
-              )}
+              </div>
 
-              {showCustomInput ? (
-                <div className="flex flex-col gap-2 mt-4 w-full max-w-[520px]">
+              {showCustomInput && (
+                <div className="flex flex-col gap-2 mt-5 w-full max-w-[520px]">
                   <input
                     autoFocus
                     type="text"
@@ -323,37 +283,124 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
                     onChange={(e) => setCustomInput(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-                        handleCustomAnswer();
+                        void submitQ3Custom();
                       }
                     }}
-                    placeholder="직접 입력해주세요"
+                    placeholder="예: 배달 도시락 가게"
+                    disabled={mappingIndustry}
                     className="w-full min-h-[52px] rounded-xl border px-5 py-3.5 text-base outline-none bg-transparent"
                     style={{ borderColor: 'var(--accent)', color: 'var(--text)' }}
                   />
                   <button
                     type="button"
-                    onClick={handleCustomAnswer}
-                    disabled={!customInput.trim()}
+                    onClick={() => void submitQ3Custom()}
+                    disabled={!customInput.trim() || mappingIndustry}
                     className="self-end min-h-11 rounded-full px-5 text-sm font-semibold text-[var(--on-accent)] disabled:opacity-40 transition-opacity duration-150"
                     style={{ backgroundColor: 'var(--accent)' }}
                   >
-                    확인
+                    {mappingIndustry ? '확인하는 중…' : '확인'}
                   </button>
                 </div>
-              ) : (
+              )}
+            </StepShell>
+          )}
+
+          {step === 'q4' && (
+            <StepShell key="q4" reducedMotion={reducedMotion} title="필요한 연동이 있나요">
+              <p className="text-sm mb-5 text-center" style={{ color: '#8B7E70' }}>
+                아직 준비 중이에요. 필요한 걸 알려주시면 먼저 만들어요.
+              </p>
+              <div className={classNames(styles.accordion, 'w-full max-w-[520px]')}>
+                {Q4_CATEGORIES.map((category) => {
+                  const checked = q4.includes(category.id);
+
+                  return (
+                    <button
+                      key={category.id}
+                      type="button"
+                      onClick={() => toggleQ4(category.id)}
+                      className={classNames(styles.checklistRow, checked && styles.checklistRowChecked)}
+                      aria-pressed={checked}
+                    >
+                      <span
+                        className={classNames(styles.checkbox, checked && styles.checkboxChecked)}
+                        aria-hidden="true"
+                      >
+                        {checked && <span className="i-ph:check-bold text-xs" />}
+                      </span>
+                      <span>{category.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex flex-col items-center gap-3 mt-6 w-full max-w-[520px]">
                 <button
                   type="button"
-                  onClick={() => setShowCustomInput(true)}
-                  className="min-h-11 inline-flex items-center bg-transparent border-none text-sm font-medium mt-2 underline underline-offset-4 text-bolt-elements-textSecondary hover:text-[var(--accent-text)] transition-colors duration-150"
+                  onClick={confirmQ4}
+                  className="w-full min-h-14 rounded-xl px-5 py-4 text-base font-bold text-[var(--on-accent)] transition-opacity duration-150 hover:opacity-90 active:opacity-80"
+                  style={{ backgroundColor: 'var(--accent)' }}
                 >
-                  직접 입력할게요
+                  다음
                 </button>
-              )}
-            </motion.div>
+                <button type="button" onClick={skipQ4} className={styles.weakLink}>
+                  건너뛰기
+                </button>
+              </div>
+            </StepShell>
+          )}
+
+          {step === 'q5' && (
+            <StepShell key="q5" reducedMotion={reducedMotion} title="색">
+              <div
+                className="w-full max-w-[420px] rounded-2xl p-5 mb-6 flex flex-col gap-2"
+                style={{ background: previewPalette.bgBase, border: `1px solid ${previewPalette.border}` }}
+              >
+                <span className="text-xs font-medium" style={{ color: previewPalette.textSub }}>
+                  미리보기
+                </span>
+                <span className="text-lg font-bold" style={{ color: previewPalette.textMain }}>
+                  {previewPalette.name}
+                </span>
+                <span
+                  className="self-start rounded-full px-4 py-2 text-sm font-semibold"
+                  style={{
+                    background: previewPalette.accent,
+                    color: previewPalette.accentTextOverride ?? '#FFFFFF',
+                  }}
+                >
+                  강조 버튼
+                </span>
+              </div>
+
+              <div className={classNames(styles.paletteRow, 'w-full max-w-[620px]')}>
+                {PALETTES.map((palette) => {
+                  const recommended = currentQ3Recommended.includes(palette.id);
+
+                  return (
+                    <button
+                      key={palette.id}
+                      type="button"
+                      disabled={!!pendingId}
+                      onClick={() => answerQ5(palette.id)}
+                      className={classNames(styles.paletteCard, pendingId === palette.id && styles.paletteCardActive)}
+                      style={{ background: palette.bgBase, borderColor: palette.border }}
+                    >
+                      {recommended && <span className={styles.paletteBadge}>추천</span>}
+                      <span className={styles.paletteSwatch} style={{ background: palette.accent }} />
+                      <span style={{ color: palette.textMain }}>{palette.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button type="button" onClick={skipQ5} className={classNames(styles.weakLink, 'mt-6')}>
+                건너뛰기
+              </button>
+            </StepShell>
           )}
         </AnimatePresence>
 
-        {status === 'summary' && (
+        {step === 'summary' && (
           <div className="flex flex-col gap-4 w-full max-w-[520px]">
             <h2 className={styles.question}>이렇게 만들게요</h2>
             <textarea
@@ -376,4 +423,94 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
       </div>
     </div>
   );
+}
+
+function StepShell({
+  children,
+  title,
+  reducedMotion,
+}: {
+  children: React.ReactNode;
+  title: string;
+  reducedMotion: boolean;
+}) {
+  return (
+    <motion.div
+      initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={reducedMotion ? undefined : { opacity: 0, transition: { duration: 0.12 } }}
+      transition={{ duration: 0.16 }}
+      className="flex flex-col items-center w-full"
+    >
+      <h2 className={styles.question}>{title}</h2>
+      {children}
+    </motion.div>
+  );
+}
+
+function OptionButton({
+  children,
+  onClick,
+  pending,
+  disabled,
+  compact,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  pending: boolean;
+  disabled: boolean;
+  compact?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={classNames(
+        styles.optionButton,
+        pending && styles.optionButtonActive,
+        compact && styles.optionButtonCompact,
+      )}
+    >
+      <span>{children}</span>
+      {pending && (
+        <motion.span
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.15 }}
+          className="i-ph:check-circle-fill text-xl shrink-0"
+          style={{ color: 'var(--accent)' }}
+        />
+      )}
+    </button>
+  );
+}
+
+/**
+ * 설문 저장 — message_usage와 같은 방식(app/lib/cloud/messageUsage.ts): 서버 라우트가
+ * PLATFORM_SUPABASE_SERVICE_ROLE_KEY로 쓰고, ctx.waitUntil로 응답 이후에도 살아남게 한다. 여기서는
+ * chat_id만 미리 확정해서(ensureChatId — message_usage와 같은 식별자) 서버로 보낸다.
+ */
+async function saveOnboardingResponse(answers: {
+  q1: Q1Value | null;
+  q2: Q2Value | null;
+  q3: Q3Answer | null;
+  q4: string[];
+  q5: PaletteId | null;
+}): Promise<void> {
+  const resolvedChatId = await ensureChatId();
+
+  await fetch('/api/onboarding', {
+    method: 'POST',
+    body: JSON.stringify({
+      chatId: resolvedChatId ?? chatId.get(),
+      q1Audience: answers.q1,
+      q2Storage: answers.q2,
+      q3Industry: answers.q3?.gridItemId ?? null,
+      q3Raw: answers.q3?.raw ?? null,
+      q3MappedSkeleton: answers.q3?.skeleton ?? null,
+      q4Integrations: answers.q4,
+      q5Palette: answers.q5,
+    }),
+  });
 }

@@ -1,5 +1,27 @@
-import { describe, it, expect } from 'vitest';
-import { PALETTES } from './palettes';
+import { describe, it, expect, afterEach } from 'vitest';
+import { PALETTES, activePaletteId, getActivePalette } from './palettes';
+
+describe('getActivePalette / activePaletteId', () => {
+  afterEach(() => {
+    activePaletteId.set('coral');
+  });
+
+  it('defaults to coral before Q5 is answered', () => {
+    expect(getActivePalette().id).toBe('coral');
+  });
+
+  it('returns whatever activePaletteId is set to (Q5 selection flowing through)', () => {
+    activePaletteId.set('teal');
+    expect(getActivePalette().id).toBe('teal');
+    expect(getActivePalette().accent).toBe(PALETTES.find((p) => p.id === 'teal')!.accent);
+  });
+
+  it('reflects a reset back to coral (new onboarding session / skip)', () => {
+    activePaletteId.set('purple');
+    activePaletteId.set('coral');
+    expect(getActivePalette().id).toBe('coral');
+  });
+});
 
 /*
  * WCAG 2.x 상대 휘도/대비비 공식(표준 정의, 0.03928 브레이크포인트 — WebAIM 등 대부분의 대비

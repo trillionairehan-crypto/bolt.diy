@@ -1,8 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { createHash } from 'node:crypto';
+import { describe, expect, it, afterEach } from 'vitest';
 import { getFineTunedPrompt, CACHE_BREAKPOINT_MARKER } from './new-prompt';
+import { activePaletteId } from '~/lib/palettes';
 
 function staticPrefixOf(prompt: string): string {
   return prompt.split(CACHE_BREAKPOINT_MARKER)[0];
+}
+
+function sha256(text: string): string {
+  return createHash('sha256').update(text).digest('hex');
 }
 
 describe('getFineTunedPrompt — storage track selection (overnight6 task 4)', () => {
@@ -92,5 +98,56 @@ describe('getFineTunedPrompt — storage track selection (overnight6 task 4)', (
 
     expect(prefix).toContain('TRACK A — 코랄레드 Cloud');
     expect(prefix).toContain('TRACK B — 내 Supabase 연결');
+  });
+});
+
+/*
+ * 온보딩 5문항 전면 개편(2026-09) — Q1/Q3는 유저 메시지 지시문 줄로만 흐르고, Q5는
+ * getActivePalette()를 거쳐 designSchemeToHue()의 폴백 경로로만 흐른다(둘 다
+ * getFineTunedPrompt의 시그니처를 안 건드림 — Chat.client.tsx가 여전히 designScheme만 넘긴다).
+ * 이 테스트는 그 배선이 실제로 캐시 프리픽스를 건드리지 않는지 SHA256 해시로 실측한다 —
+ * <request_specific_values>(캐시 경계 뒤)의 --hue 줄 값만 바뀌고, 그 앞 정적 프리픽스는
+ * 팔레트가 무엇이든 완전히 동일해야 한다.
+ */
+describe('getFineTunedPrompt — 온보딩 Q5(팔레트) 변경이 캐시 프리픽스를 깨지 않는다', () => {
+  afterEach(() => {
+    activePaletteId.set('coral');
+  });
+
+  it('activePaletteId가 달라져도 캐시 프리픽스의 SHA256 해시가 동일하다', () => {
+    activePaletteId.set('coral');
+
+    const coralPrompt = getFineTunedPrompt();
+    const coralPrefixHash = sha256(staticPrefixOf(coralPrompt));
+
+    activePaletteId.set('pink');
+
+    const pinkPrompt = getFineTunedPrompt();
+    const pinkPrefixHash = sha256(staticPrefixOf(pinkPrompt));
+
+    activePaletteId.set('dark');
+
+    const darkPrompt = getFineTunedPrompt();
+    const darkPrefixHash = sha256(staticPrefixOf(darkPrompt));
+
+    expect(pinkPrefixHash).toBe(coralPrefixHash);
+    expect(darkPrefixHash).toBe(coralPrefixHash);
+  });
+
+  it('the --hue value itself DOES change in the dynamic suffix (proves the palette is actually wired, not just inert)', () => {
+    activePaletteId.set('coral');
+
+    const coralPrompt = getFineTunedPrompt();
+
+    activePaletteId.set('pink');
+
+    const pinkPrompt = getFineTunedPrompt();
+
+    const coralHueLine = coralPrompt.split(CACHE_BREAKPOINT_MARKER)[1].match(/--hue: (\d+)/)?.[1];
+    const pinkHueLine = pinkPrompt.split(CACHE_BREAKPOINT_MARKER)[1].match(/--hue: (\d+)/)?.[1];
+
+    expect(coralHueLine).toBeDefined();
+    expect(pinkHueLine).toBeDefined();
+    expect(pinkHueLine).not.toBe(coralHueLine);
   });
 });

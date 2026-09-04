@@ -432,7 +432,7 @@ export interface AutoReviewResult {
 }
 
 /**
- * 체크리스트 검토를 별도 LLM 호출로 실행한다 — app/utils/generateAppQuestions.ts와 같은
+ * 체크리스트 검토를 별도 LLM 호출로 실행한다 — app/utils/mapIndustryToSkeleton.ts와 같은
  * "/api/llmcall 호출 → JSON 파싱 → 실패 시 조용히 null" 패턴. 파일 쓰기는 정확히 두 번:
  *   1) 기계 검사(메모리에서만 반영) + 텍스트 검토 결과를 합쳐서 한 번
  *   2) 시각 검토 결과가 있으면 한 번 더

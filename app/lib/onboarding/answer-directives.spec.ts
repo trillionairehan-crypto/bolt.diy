@@ -1,99 +1,72 @@
 import { describe, expect, it } from 'vitest';
-import { mapAnswerToDirectives, mergeDirectives, hueToRepresentativeHex } from './answer-directives';
+import {
+  buildSkeletonAndPerspectiveDirective,
+  mapQ2ToDirectives,
+  mergeDirectives,
+  hueToRepresentativeHex,
+} from './answer-directives';
 
-describe('mapAnswerToDirectives — audience', () => {
-  it('solo: adds a prompt addition, no supabase/hue opinion', () => {
-    const result = mapAnswerToDirectives('audience', 'solo');
-    expect(result.promptAdditions).toHaveLength(1);
-    expect(result.connectSupabase).toBeUndefined();
-    expect(result.hue).toBeUndefined();
+describe('buildSkeletonAndPerspectiveDirective', () => {
+  it('emits the exact new-prompt.ts skeleton name when Q1 matches the skeleton default (team -> 관리자, skeleton 2 예약·일정형)', () => {
+    const result = buildSkeletonAndPerspectiveDirective('team', 2);
+    expect(result).toBe('골격: 예약·일정형 / 사용자 관점: 관리자');
   });
 
-  it('team: adds a distinct prompt addition from solo', () => {
-    const solo = mapAnswerToDirectives('audience', 'solo');
-    const team = mapAnswerToDirectives('audience', 'team');
-    expect(team.promptAdditions).toHaveLength(1);
-    expect(team.promptAdditions?.[0]).not.toBe(solo.promptAdditions?.[0]);
+  it('solo (본인) matches skeleton 5 기록·추이형 default -> no override wording', () => {
+    const result = buildSkeletonAndPerspectiveDirective('solo', 5);
+    expect(result).toBe('골격: 기록·추이형 / 사용자 관점: 본인');
+    expect(result).not.toContain('대신');
   });
 
-  it('public: adds a prompt addition', () => {
-    const result = mapAnswerToDirectives('audience', 'public');
-    expect(result.promptAdditions).toHaveLength(1);
+  it('public (방문자) on a non-방문자 skeleton ADDS a visitor view instead of replacing the default (기록·추이형 예시)', () => {
+    const result = buildSkeletonAndPerspectiveDirective('public', 5);
+    expect(result).toContain('골격: 기록·추이형');
+    expect(result).toContain('본인 기준으로 만들되');
+    expect(result).toContain('방문자용 화면을 추가로 포함');
   });
 
-  it('unsure (null value): falls through to empty', () => {
-    expect(mapAnswerToDirectives('audience', null)).toEqual({});
+  it('team (관리자) on a 방문자-default skeleton (4, 목록·상세형) overrides straight, not additively', () => {
+    const result = buildSkeletonAndPerspectiveDirective('team', 4);
+    expect(result).toContain('골격: 목록·상세형');
+    expect(result).toContain('사용자 관점: 관리자');
+    expect(result).toContain('대신');
+    expect(result).not.toContain('추가로 포함');
   });
 
-  it('an unrecognized option value: also falls through to empty', () => {
-    expect(mapAnswerToDirectives('audience', 'something-not-in-the-bank')).toEqual({});
+  it('every skeleton name matches new-prompt.ts exactly (spot-check all 7)', () => {
+    expect(buildSkeletonAndPerspectiveDirective('team', 1)).toContain('명단·차감형');
+    expect(buildSkeletonAndPerspectiveDirective('team', 2)).toContain('예약·일정형');
+    expect(buildSkeletonAndPerspectiveDirective('solo', 3)).toContain('거래·수지형');
+    expect(buildSkeletonAndPerspectiveDirective('public', 4)).toContain('목록·상세형');
+    expect(buildSkeletonAndPerspectiveDirective('solo', 5)).toContain('기록·추이형');
+    expect(buildSkeletonAndPerspectiveDirective('solo', 6)).toContain('순위·티어형');
+    expect(buildSkeletonAndPerspectiveDirective('public', 7)).toContain('소개·홍보형');
+  });
+
+  it('null skeleton (직접 입력 매핑 실패 -> 자유 생성): no "골격:" prefix, still states the perspective', () => {
+    const result = buildSkeletonAndPerspectiveDirective('team', null);
+    expect(result).toBe('사용자 관점: 관리자');
+    expect(result).not.toContain('골격:');
   });
 });
 
-describe('mapAnswerToDirectives — persistence', () => {
-  it('withAuth: connectSupabase true + a prompt addition', () => {
-    const result = mapAnswerToDirectives('persistence', 'withAuth');
-    expect(result.connectSupabase).toBe(true);
-    expect(result.promptAdditions).toHaveLength(1);
-  });
-
-  it('withoutAuth: no connectSupabase opinion (Cloud/기본 already persists without login)', () => {
-    const result = mapAnswerToDirectives('persistence', 'withoutAuth');
+describe('mapQ2ToDirectives', () => {
+  it('cloud: no connectSupabase opinion (Cloud storage is not Supabase)', () => {
+    const result = mapQ2ToDirectives('cloud');
     expect(result.connectSupabase).toBeUndefined();
     expect(result.promptAdditions).toHaveLength(1);
   });
 
-  it('none: connectSupabase explicitly false', () => {
-    const result = mapAnswerToDirectives('persistence', 'none');
+  it('none: connectSupabase explicitly false, client-only app', () => {
+    const result = mapQ2ToDirectives('none');
     expect(result.connectSupabase).toBe(false);
+    expect(result.promptAdditions?.[0]).toContain('저장할 필요가 없어요');
   });
 
-  it('unsure: connectSupabase left undefined, not defaulted to false', () => {
-    const result = mapAnswerToDirectives('persistence', null);
+  it('supabase: mentions the 저장 기능 켜기 flow, no connectSupabase opinion (depends on real connection state)', () => {
+    const result = mapQ2ToDirectives('supabase');
     expect(result.connectSupabase).toBeUndefined();
-    expect(result).toEqual({});
-  });
-});
-
-describe('mapAnswerToDirectives — device', () => {
-  it('mobile: adds a mobile-first prompt addition', () => {
-    expect(mapAnswerToDirectives('device', 'mobile').promptAdditions).toHaveLength(1);
-  });
-
-  it('desktop: adds a desktop-oriented prompt addition', () => {
-    expect(mapAnswerToDirectives('device', 'desktop').promptAdditions).toHaveLength(1);
-  });
-
-  it('"both" is treated the same as unsure: empty', () => {
-    expect(mapAnswerToDirectives('device', 'both')).toEqual({});
-  });
-});
-
-describe('mapAnswerToDirectives — mood', () => {
-  it('trust: no hue override (regression: used to force the accent blue) — a prompt addition instead', () => {
-    const result = mapAnswerToDirectives('mood', 'trust');
-    expect(result.hue).toBeUndefined();
-    expect(result.promptAdditions).toHaveLength(1);
-  });
-
-  it('friendly: sets hue to 33 (brand default)', () => {
-    expect(mapAnswerToDirectives('mood', 'friendly').hue).toBe(33);
-  });
-
-  it('minimal: no hue, only a prompt addition (kit chroma is fixed)', () => {
-    const result = mapAnswerToDirectives('mood', 'minimal');
-    expect(result.hue).toBeUndefined();
-    expect(result.promptAdditions).toHaveLength(1);
-  });
-
-  it('unsure: empty, keeps the brand default hue', () => {
-    expect(mapAnswerToDirectives('mood', null)).toEqual({});
-  });
-});
-
-describe('mapAnswerToDirectives — unknown question id', () => {
-  it('returns empty for a question id the mapping has never heard of', () => {
-    expect(mapAnswerToDirectives('some-future-question', 'anything')).toEqual({});
+    expect(result.promptAdditions?.[0]).toContain('저장 기능 켜기');
   });
 });
 
@@ -108,11 +81,6 @@ describe('mergeDirectives', () => {
     expect(merged.connectSupabase).toBe(false);
   });
 
-  it("a later part's hue overrides an earlier one", () => {
-    const merged = mergeDirectives([{ hue: 33 }, { hue: 222 }]);
-    expect(merged.hue).toBe(222);
-  });
-
   it('a part with connectSupabase undefined does not clear a previously-set value', () => {
     const merged = mergeDirectives([{ connectSupabase: true }, { promptAdditions: ['x'] }]);
     expect(merged.connectSupabase).toBe(true);
@@ -123,26 +91,22 @@ describe('mergeDirectives', () => {
     expect(merged).toEqual({ promptAdditions: [] });
   });
 
-  it('merges a realistic full set of onboarding answers into one directive', () => {
+  it('merges a realistic Q1+Q2+Q3 answer set into one directive', () => {
     const merged = mergeDirectives([
-      mapAnswerToDirectives('audience', 'solo'),
-      mapAnswerToDirectives('persistence', 'none'),
-      mapAnswerToDirectives('device', 'mobile'),
-      mapAnswerToDirectives('mood', 'trust'),
+      { promptAdditions: [buildSkeletonAndPerspectiveDirective('team', 2)] },
+      mapQ2ToDirectives('cloud'),
     ]);
-    expect(merged.promptAdditions).toHaveLength(4);
-    expect(merged.connectSupabase).toBe(false);
-    expect(merged.hue).toBeUndefined();
+    expect(merged.promptAdditions).toHaveLength(2);
+    expect(merged.promptAdditions[0]).toBe('골격: 예약·일정형 / 사용자 관점: 관리자');
   });
 });
 
 describe('hueToRepresentativeHex', () => {
-  it('returns the brand default hex for hue 33', () => {
+  it('returns the brand default hex for hue 33 (kept for Chat.client.tsx compatibility, currently unreachable)', () => {
     expect(hueToRepresentativeHex(33)).toBe('#FF5330');
   });
 
-  it('returns undefined for a hue with no representative hex (e.g. the old trust hue, 222, no longer maps to one)', () => {
+  it('returns undefined for any other hue', () => {
     expect(hueToRepresentativeHex(222)).toBeUndefined();
-    expect(hueToRepresentativeHex(180)).toBeUndefined();
   });
 });

@@ -84,7 +84,7 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
 
     /*
      * 토큰 로깅(message_usage)용 — 이 라우트는 자동 검토(reviewGeneratedApp.ts) 외에
-     * generateAppQuestions.ts 등 chatId가 없는 다른 호출부도 쓴다. chatId가 없으면 어느 대화 것인지
+     * mapIndustryToSkeleton.ts 등 chatId가 없는 다른 호출부도 쓴다. chatId가 없으면 어느 대화 것인지
      * 특정할 수 없으므로 로깅 자체를 건너뛴다(잘못된 귀속보다 누락이 낫다).
      */
     chatId?: string;
