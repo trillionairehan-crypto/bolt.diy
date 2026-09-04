@@ -1,0 +1,18 @@
+#!/bin/sh
+
+echo "🔍 Running pre-push hook — full test suite... 🔍"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+if ! command -v pnpm >/dev/null 2>&1; then
+    echo "❌ pnpm not found! Please ensure pnpm is installed and available in PATH."
+    exit 1
+fi
+
+if ! pnpm test; then
+    echo "❌ Full test suite failed! Fix the failing tests before pushing."
+    exit 1
+fi
+
+echo "👍 Full test suite passed! Pushing..."

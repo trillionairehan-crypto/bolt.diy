@@ -13,7 +13,8 @@ if ! command -v pnpm >/dev/null 2>&1; then
     exit 1
 fi
 
-# Run typecheck
+# Run typecheck (tsconfig.json has noEmit: true, so this is a type-only check — whole project,
+# TypeScript doesn't support a meaningful "changed files only" mode)
 echo "Running typecheck..."
 if ! pnpm typecheck; then
     echo "❌ Type checking failed! Please review TypeScript types."
@@ -21,12 +22,26 @@ if ! pnpm typecheck; then
     exit 1
 fi
 
-# Run lint
-echo "Running lint..."
-if ! pnpm lint; then
+# Run lint — staged files only, via lint-staged (see "lint-staged" in package.json)
+echo "Running lint on staged files..."
+if ! pnpm exec lint-staged; then
     echo "❌ Linting failed! Run 'pnpm lint:fix' to fix the easy issues."
     echo "Once you're done, don't forget to add your beautification to the commit! 🤩"
     exit 1
+fi
+
+# Run only the tests related to what's staged (module-graph lookup, not just staged test files) —
+# the full suite takes ~60s (one security test alone takes ~50s building the client), too slow for
+# a commit-time gate. The full suite still runs in pre-push and in CI.
+STAGED_SRC_FILES=$(git diff --cached --name-only --diff-filter=ACMR -- '*.ts' '*.tsx' '*.js' '*.jsx')
+if [ -n "$STAGED_SRC_FILES" ]; then
+    echo "Running tests related to staged files..."
+    if ! printf '%s\n' "$STAGED_SRC_FILES" | tr '\n' '\0' | xargs -0 pnpm exec vitest related --run; then
+        echo "❌ Tests related to your changes failed!"
+        exit 1
+    fi
+else
+    echo "No staged JS/TS files — skipping related tests."
 fi
 
 echo "👍 All checks passed! Committing changes..."
