@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 /**
  * Phase 2 검증 사이클 (감사 대상: 요금제/결제, 2회차) — 무료 생성 남은 횟수 표시가
- * getGenerationsRemaining()의 실패(로그인 계정은 Supabase RPC 에러 시 throw)를 잡지 않아,
+ * getV2GenerationsRemaining()의 실패(로그인 계정은 Supabase RPC 에러 시 throw)를 잡지 않아,
  * 초기값 0이 그대로 남아 "무료 체험을 다 썼어요"로 잘못 표시되던 문제. 실제로는 남은 횟수를
  * 모르는 상태(일시적 네트워크 오류 등)인데 소진됐다고 오인시킴. OVERNIGHT5_PROGRESS.md 사이클
  * 21 기록 참고.
@@ -16,8 +16,8 @@ import { describe, expect, it } from 'vitest';
 describe('요금제/결제 — 무료 생성 카운터 로딩 실패 처리', () => {
   const quotaBarSource = readFileSync(join(__dirname, 'components/sidebar/QuotaBar.tsx'), 'utf-8');
 
-  it('getGenerationsRemaining() 호출에 .catch()가 붙어 있다', () => {
-    const callIndex = quotaBarSource.indexOf('getGenerationsRemaining()');
+  it('getV2GenerationsRemaining() 호출에 .catch()가 붙어 있다', () => {
+    const callIndex = quotaBarSource.indexOf('getV2GenerationsRemaining()');
     expect(callIndex).toBeGreaterThan(-1);
 
     const afterCall = quotaBarSource.slice(callIndex, callIndex + 400);

@@ -610,20 +610,6 @@ $hover-bg: $usage-bg;
   gap: 4px;
 }
 
-.quotaTrack {
-  height: 3px;
-  border-radius: 999px;
-  background: rgba(26, 26, 26, 0.08);
-  overflow: hidden;
-}
-
-.quotaFill {
-  height: 100%;
-  background: $coral;
-  border-radius: 999px;
-  transition: width 0.2s ease-out;
-}
-
 .quotaLabel {
   font-size: 11px;
   color: $ink-soft;

@@ -7,8 +7,8 @@ import {
 } from './freeTrial';
 
 /*
- * BaseChat.tsx's "N회 남았어요" display now calls these under CORALRED_NEW_METERING (see
- * METERING_FIX_REPORT.md) — covers the guest/localStorage path directly since it needs no
+ * QuotaBar.tsx's "N회 남았어요" display calls these (see METERING_FIX_REPORT.md) — covers the
+ * guest/localStorage path directly since it needs no
  * Supabase mock. The account path (getV2AccountGenerationsRemaining) is a one-line wrapper
  * around the already-existing getV2AccountGenerationStatus() RPC call and isn't separately
  * covered here.

@@ -17,7 +17,6 @@ import {
   PROMPT_COOKIE_KEY,
   PROVIDER_LIST,
   SHOW_DEV_TOOLS,
-  CORALRED_NEW_METERING,
 } from '~/utils/constants';
 import { cubicEasingFn } from '~/utils/easings';
 import { createScopedLogger, renderLogger } from '~/utils/logger';
@@ -39,12 +38,7 @@ import { hueToRepresentativeHex, type GenerationDirectives } from '~/lib/onboard
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import { useMCPStore } from '~/lib/stores/mcp';
 import type { LlmErrorAlertType } from '~/types/actions';
-import {
-  hasGenerationsRemaining,
-  incrementGenerationsUsed,
-  hasV2GenerationsRemaining,
-  incrementV2GenerationsUsed,
-} from '~/lib/freeTrial';
+import { hasV2GenerationsRemaining, incrementV2GenerationsUsed } from '~/lib/freeTrial';
 import { createGenerationChargeGate } from '~/lib/generationChargeGate';
 import { authUserStore } from '~/lib/stores/auth';
 import { buildFixPrompt } from '~/utils/buildFixPrompt';
@@ -673,7 +667,7 @@ export const ChatImpl = memo(
       let remaining: boolean;
 
       try {
-        remaining = CORALRED_NEW_METERING ? await hasV2GenerationsRemaining() : await hasGenerationsRemaining();
+        remaining = await hasV2GenerationsRemaining();
       } catch (error) {
         logger.error('Failed to check free generation limit', error);
         toast.error('일시적인 오류가 발생했어요. 잠시 후 다시 시도해주세요.');
@@ -689,10 +683,7 @@ export const ChatImpl = memo(
       return true;
     };
 
-    /*
-     * overnight3 A5: single spot both call sites below use to record a real generation, so the
-     * v2/legacy split lives in exactly one place. See CORALRED_NEW_METERING's own doc comment.
-     */
+    // overnight3 A5: single spot both call sites below use to record a real generation.
     const recordGenerationUsed = async () => {
       /*
        * Double-charge investigation (2026-08-31): temporary instrumentation, remove once the
@@ -704,7 +695,7 @@ export const ChatImpl = memo(
       logger.info('recordGenerationUsed: charging now', { at: Date.now() });
 
       try {
-        await (CORALRED_NEW_METERING ? incrementV2GenerationsUsed() : incrementGenerationsUsed());
+        await incrementV2GenerationsUsed();
         logger.info('recordGenerationUsed: charge succeeded');
       } catch (error) {
         logger.error('Failed to record generation usage', error);
@@ -896,18 +887,13 @@ export const ChatImpl = memo(
         }
 
         /*
-         * overnight3 A5: under the OLD (flag-off) metering, follow-up messages after the first one
-         * were never counted at all — a real, currently-shipped gap (see OVERNIGHT-REPORT-3.md's A5
-         * section). Deliberately left as-is here so flag-off behavior is unchanged; this block only
-         * runs under the new metering, and never for auto-fix retries (those aren't a user utterance).
-         */
-        /*
          * METERING_FIX_REPORT.md: recordGenerationUsed() used to run right here — before
          * sendChatMessage() below was even called. Now just remembers "this message should charge
          * on success"; the charge itself is armed immediately before sendChatMessage() further down
-         * (not here) and onFinish above does the actual increment, only on a real success.
+         * (not here) and onFinish above does the actual increment, only on a real success. Never
+         * true for auto-fix retries (those aren't a user utterance).
          */
-        const shouldChargeThisMessage = CORALRED_NEW_METERING && !isAutoFix;
+        const shouldChargeThisMessage = !isAutoFix;
 
         chargeEligibleRef.current = shouldChargeThisMessage;
         networkRetryCountRef.current = 0;

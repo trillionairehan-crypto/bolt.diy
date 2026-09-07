@@ -4,8 +4,8 @@ import Cookies from 'js-cookie';
 import { PageShell } from '~/components/ui/PageShell';
 import { SkeletonShowcaseCard } from '~/components/landing/SkeletonShowcaseCard';
 import { SHOWCASE_APPS } from '~/components/landing/showcaseApps';
-import { EXAMPLE_PROMPT_FILL_KEY, CORALRED_NEW_METERING } from '~/utils/constants';
-import { hasGenerationsRemaining, hasV2GenerationsRemaining } from '~/lib/freeTrial';
+import { EXAMPLE_PROMPT_FILL_KEY } from '~/utils/constants';
+import { hasV2GenerationsRemaining } from '~/lib/freeTrial';
 import styles from '~/components/examples/ExamplesPage.module.scss';
 
 export const meta: MetaFunction = () => {
@@ -40,9 +40,7 @@ export default function Examples() {
   useEffect(() => {
     let cancelled = false;
 
-    const check = CORALRED_NEW_METERING ? hasV2GenerationsRemaining() : hasGenerationsRemaining();
-
-    check
+    hasV2GenerationsRemaining()
       .then((remaining) => {
         if (!cancelled) {
           setHasQuota(remaining);
