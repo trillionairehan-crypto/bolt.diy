@@ -19,6 +19,16 @@ const {
   runSkeleton7CardGridHintCheck,
   isSkeleton7File,
   runSpacingGridCheck,
+  run100vhToDvhCheck,
+  runFontSizeMinimumCheck,
+  runLineHeightRatioCheck,
+  runImgMaxWidthCheck,
+  runTextContainerMaxWidthCheck,
+  runExpensiveTransitionCheck,
+  runHeadingLevelSkipCheck,
+  runTypographyExtremesCheck,
+  runGradientTextCheck,
+  runZeroOffsetChromaticShadowCheck,
 } = __internal;
 
 const HUE = 20; // coralred 기본 hue와 무관한 임의의 고정값 — 계산이 실행되는지만 확인.
@@ -684,6 +694,261 @@ describe('runSkeleton7CardGridHintCheck', () => {
   it('is a no-op when the file is not shaped like 4 skeleton-7 chapters', () => {
     const src = '.grid { grid-template-columns: repeat(3, 1fr); } // items.map(...)';
     expect(runSkeleton7CardGridHintCheck('src/App.tsx', src)).toHaveLength(0);
+  });
+});
+
+describe('run100vhToDvhCheck (auto-fix)', () => {
+  it('rewrites 100vh to 100dvh in a CSS declaration', () => {
+    const src = '.hero { height: 100vh; }';
+    const { findings, content } = run100vhToDvhCheck('src/hero.css', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'viewport-height-100vh', autoFixed: true });
+    expect(content).toBe('.hero { height: 100dvh; }');
+  });
+
+  it('rewrites 100vh in a JSX inline style', () => {
+    const src = "<div style={{ minHeight: '100vh' }} />";
+    const { content } = run100vhToDvhCheck('src/Hero.tsx', src);
+    expect(content).toBe("<div style={{ minHeight: '100dvh' }} />");
+  });
+
+  it('does not touch an unrelated vh value', () => {
+    const src = '.a { height: 50vh; }';
+    const { findings, content } = run100vhToDvhCheck('src/a.css', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+
+  it('does not touch 100vh mentioned only in a comment', () => {
+    const src = '/* used to be height: 100vh */\n.a { height: 50vh; }';
+    const { findings, content } = run100vhToDvhCheck('src/a.css', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+});
+
+describe('runFontSizeMinimumCheck (auto-fix)', () => {
+  it('bumps a below-16px kebab font-size to 16px', () => {
+    const src = '.a { font-size: 13px; }';
+    const { findings, content } = runFontSizeMinimumCheck('src/a.css', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'font-size-below-16px', autoFixed: true });
+    expect(content).toBe('.a { font-size: 16px; }');
+  });
+
+  it('bumps a below-16px camelCase fontSize (quoted) to 16px', () => {
+    const src = "<p style={{ fontSize: '12px' }} />";
+    const { content } = runFontSizeMinimumCheck('src/P.tsx', src);
+    expect(content).toBe("<p style={{ fontSize: '16px' }} />");
+  });
+
+  it('bumps a bare-number camelCase fontSize to 16', () => {
+    const src = '<p style={{ fontSize: 12 }} />';
+    const { content } = runFontSizeMinimumCheck('src/P.tsx', src);
+    expect(content).toBe('<p style={{ fontSize: 16 }} />');
+  });
+
+  it('does not touch a font-size already at or above 16px', () => {
+    const src = '.a { font-size: 18px; }';
+    const { findings, content } = runFontSizeMinimumCheck('src/a.css', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+
+  it('does not touch a font-size inside a :root block (rem base)', () => {
+    const src = ':root { font-size: 14px; }';
+    const { findings, content } = runFontSizeMinimumCheck('src/theme.css', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+});
+
+describe('runLineHeightRatioCheck (auto-fix)', () => {
+  it('raises line-height to 1.5 when the unitless ratio is below 1.3x in the same CSS rule', () => {
+    const src = '.a { font-size: 16px; line-height: 1.1; }';
+    const { findings, content } = runLineHeightRatioCheck('src/a.css', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'line-height-too-tight', autoFixed: true });
+    expect(content).toBe('.a { font-size: 16px; line-height: 1.5; }');
+  });
+
+  it('raises a too-small px line-height in the same JSX style object', () => {
+    const src = "<p style={{ fontSize: '16px', lineHeight: '18px' }} />";
+    const { content } = runLineHeightRatioCheck('src/P.tsx', src);
+    expect(content).toBe("<p style={{ fontSize: '16px', lineHeight: '1.5' }} />");
+  });
+
+  it('raises a too-small percentage line-height', () => {
+    const src = '.a { font-size: 20px; line-height: 110%; }';
+    const { content } = runLineHeightRatioCheck('src/a.css', src);
+    expect(content).toBe('.a { font-size: 20px; line-height: 1.5; }');
+  });
+
+  it('does not touch a line-height already at or above 1.3x', () => {
+    const src = '.a { font-size: 16px; line-height: 1.5; }';
+    const { findings, content } = runLineHeightRatioCheck('src/a.css', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+
+  it('does not compare font-size and line-height from unrelated blocks', () => {
+    const src = '.a { font-size: 40px; } .b { line-height: 1.1; }';
+    const { findings, content } = runLineHeightRatioCheck('src/a.css', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+});
+
+describe('runImgMaxWidthCheck (auto-fix)', () => {
+  it('adds max-width:100% to an image with no style attribute', () => {
+    const src = '<img src="/a.png" alt="x" />';
+    const { findings, content } = runImgMaxWidthCheck('src/Photo.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'img-missing-max-width', autoFixed: true });
+    expect(content).toContain("style={{ maxWidth: '100%' }}");
+  });
+
+  it('merges max-width into an existing style object', () => {
+    const src = '<img src="/a.png" style={{ borderRadius: 8 }} alt="x" />';
+    const { content } = runImgMaxWidthCheck('src/Photo.tsx', src);
+    expect(content).toContain("maxWidth: '100%'");
+    expect(content).toContain('borderRadius: 8');
+  });
+
+  it('merges max-width into an existing style string', () => {
+    const src = '<img src="/a.png" style="border-radius:8px" alt="x" />';
+    const { content } = runImgMaxWidthCheck('src/Photo.tsx', src);
+    expect(content).toContain('max-width:100%');
+    expect(content).toContain('border-radius:8px');
+  });
+
+  it('does not touch an image that already has max-width', () => {
+    const src = '<img src="/a.png" style={{ maxWidth: \'100%\' }} alt="x" />';
+    const { findings, content } = runImgMaxWidthCheck('src/Photo.tsx', src);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+});
+
+describe('runTextContainerMaxWidthCheck (hint only)', () => {
+  it('flags a long paragraph with no max-width', () => {
+    const src = `<p>${'가'.repeat(90)}</p>`;
+    const findings = runTextContainerMaxWidthCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'text-container-no-max-width', autoFixed: false });
+  });
+
+  it('does not flag a short paragraph', () => {
+    const src = '<p>짧은 문장</p>';
+    expect(runTextContainerMaxWidthCheck('src/App.tsx', src)).toHaveLength(0);
+  });
+
+  it('does not flag a long paragraph that already sets max-width', () => {
+    const src = `<p style={{ maxWidth: 640 }}>${'가'.repeat(90)}</p>`;
+    expect(runTextContainerMaxWidthCheck('src/App.tsx', src)).toHaveLength(0);
+  });
+});
+
+describe('runExpensiveTransitionCheck (hint only)', () => {
+  it('flags a transition animating width', () => {
+    const src = '.a { transition: width 0.2s ease; }';
+    const findings = runExpensiveTransitionCheck('src/a.css', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'transition-expensive-property', autoFixed: false });
+  });
+
+  it('flags a directional padding variant', () => {
+    const src = ".a { transition: 'padding-left 0.2s'; }";
+    const findings = runExpensiveTransitionCheck('src/a.css', src);
+    expect(findings).toHaveLength(1);
+  });
+
+  it('does not flag "transition: all"', () => {
+    const src = '.a { transition: all 0.2s ease; }';
+    expect(runExpensiveTransitionCheck('src/a.css', src)).toHaveLength(0);
+  });
+
+  it('does not flag a transform/opacity transition', () => {
+    const src = '.a { transition: transform 0.2s ease, opacity 0.2s; }';
+    expect(runExpensiveTransitionCheck('src/a.css', src)).toHaveLength(0);
+  });
+});
+
+describe('runHeadingLevelSkipCheck (hint only)', () => {
+  it('flags an h1 followed directly by an h3', () => {
+    const src = '<h1>제목</h1><h3>소제목</h3>';
+    const findings = runHeadingLevelSkipCheck('src/App.tsx', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'heading-level-skip', autoFixed: false });
+  });
+
+  it('does not flag a normal h1 -> h2 -> h3 sequence', () => {
+    const src = '<h1>a</h1><h2>b</h2><h3>c</h3>';
+    expect(runHeadingLevelSkipCheck('src/App.tsx', src)).toHaveLength(0);
+  });
+
+  it('does not flag going back up to a lower level', () => {
+    const src = '<h1>a</h1><h2>b</h2><h1>c</h1><h2>d</h2>';
+    expect(runHeadingLevelSkipCheck('src/App.tsx', src)).toHaveLength(0);
+  });
+});
+
+describe('runTypographyExtremesCheck (hint only)', () => {
+  it('flags text-transform:uppercase', () => {
+    const src = '.a { text-transform: uppercase; }';
+    const findings = runTypographyExtremesCheck('src/a.css', src);
+    expect(findings.some((f) => f.rule === 'text-transform-uppercase')).toBe(true);
+  });
+
+  it('flags letter-spacing above 0.05em', () => {
+    const src = '.a { letter-spacing: 0.08em; }';
+    const findings = runTypographyExtremesCheck('src/a.css', src);
+    expect(findings.some((f) => f.rule === 'letter-spacing-too-wide')).toBe(true);
+  });
+
+  it('does not flag letter-spacing at or below 0.05em', () => {
+    const src = '.a { letter-spacing: 0.03em; }';
+    const findings = runTypographyExtremesCheck('src/a.css', src);
+    expect(findings.some((f) => f.rule === 'letter-spacing-too-wide')).toBe(false);
+  });
+
+  it('does not flag lowercase text-transform', () => {
+    const src = '.a { text-transform: lowercase; }';
+    const findings = runTypographyExtremesCheck('src/a.css', src);
+    expect(findings.some((f) => f.rule === 'text-transform-uppercase')).toBe(false);
+  });
+});
+
+describe('runGradientTextCheck (hint only)', () => {
+  it('flags background-clip:text', () => {
+    const src = '.a { background-clip: text; -webkit-background-clip: text; }';
+    const findings = runGradientTextCheck('src/a.css', src);
+    expect(findings.length).toBeGreaterThanOrEqual(1);
+    expect(findings[0]).toMatchObject({ rule: 'gradient-text-clip', autoFixed: false });
+  });
+
+  it('does not flag an unrelated background-clip value', () => {
+    const src = '.a { background-clip: border-box; }';
+    expect(runGradientTextCheck('src/a.css', src)).toHaveLength(0);
+  });
+});
+
+describe('runZeroOffsetChromaticShadowCheck (hint only)', () => {
+  it('flags a zero-offset box-shadow with a chromatic hex color', () => {
+    const src = '.a { box-shadow: 0 0 24px #ff5330; }';
+    const findings = runZeroOffsetChromaticShadowCheck('src/a.css', src);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]).toMatchObject({ rule: 'zero-offset-chromatic-shadow', autoFixed: false });
+  });
+
+  it('does not flag a zero-offset shadow with a neutral gray color', () => {
+    const src = '.a { box-shadow: 0 0 24px #333333; }';
+    expect(runZeroOffsetChromaticShadowCheck('src/a.css', src)).toHaveLength(0);
+  });
+
+  it('does not flag a shadow with a real offset', () => {
+    const src = '.a { box-shadow: 0 8px 24px #ff5330; }';
+    expect(runZeroOffsetChromaticShadowCheck('src/a.css', src)).toHaveLength(0);
   });
 });
 

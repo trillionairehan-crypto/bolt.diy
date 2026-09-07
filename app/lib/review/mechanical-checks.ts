@@ -1446,6 +1446,573 @@ function runSkeleton7CardGridHintCheck(filePath: string, content: string): Mecha
   return findings;
 }
 
+// --- 9. 100vh -> 100dvh (자동수정) ---
+
+/*
+ * 모바일 브라우저는 주소창만큼 100vh가 실제 보이는 화면보다 커서 하단이 잘린다 — 100dvh(동적
+ * 뷰포트 단위)로 바꾸면 주소창이 접히고 펼쳐지는 만큼 항상 정확히 맞는다. 골격 7의 챕터 판정
+ * (CH7_CHAPTER_TAG_REGEX/isSkeleton7File)이 "100vh" 리터럴 자체를 신호로 쓰므로, 이 검사는
+ * 오케스트레이션에서 반드시 골격 7 검사들 뒤에(원본 100vh가 아직 남아있을 때 그 검사들이 먼저
+ * 끝난 뒤) 돈다 — 순서를 앞으로 옮기면 골격 7 챕터를 통째로 못 찾게 된다.
+ */
+const VH_100_REGEX = /\b100vh\b/g;
+
+function run100vhToDvhCheck(filePath: string, content: string): { findings: MechanicalFinding[]; content: string } {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.css', '.scss', '.html'])) {
+    return { findings: [], content };
+  }
+
+  const masked = maskComments(content);
+  const matches = [...masked.matchAll(VH_100_REGEX)];
+
+  if (matches.length === 0) {
+    return { findings: [], content };
+  }
+
+  const findings: MechanicalFinding[] = [];
+  const replacements: Array<{ start: number; end: number; text: string }> = [];
+
+  for (const match of matches) {
+    const start = match.index as number;
+    const end = start + match[0].length;
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, start),
+      rule: 'viewport-height-100vh',
+      message:
+        '100vh를 100dvh로 바꿨습니다 — 모바일 브라우저 주소창만큼 100vh가 실제 화면보다 커서 하단이 잘릴 수 있습니다.',
+      autoFixed: true,
+    });
+    replacements.push({ start, end, text: '100dvh' });
+  }
+
+  let nextContent = content;
+
+  for (let i = replacements.length - 1; i >= 0; i--) {
+    const { start, end, text } = replacements[i];
+    nextContent = nextContent.slice(0, start) + text + nextContent.slice(end);
+  }
+
+  return { findings, content: nextContent };
+}
+
+// --- 10. 본문 font-size 최소 16px (자동수정) ---
+
+/*
+ * "본문"인지(라벨·배지처럼 의도적으로 작은 텍스트가 아닌지)를 정규식으로 정확히 가릴 수는 없다 —
+ * 모든 font-size 선언에 16px 미만이면 일괄 적용한다(:root 안의 rem 베이스 정의만 예외 — 그건
+ * 전역 스케일 값이라 강제로 16으로 올리면 rem 기반 크기 전체가 어긋난다). 실 생성으로 오탐률이
+ * 높게 나오면 map-guard처럼 끌 수 있게 __internal로 내보낸다.
+ */
+const MIN_BODY_FONT_SIZE_PX = 16;
+const FONT_SIZE_KEBAB_REGEX = /(?<!-)\bfont-size\s*:\s*(-?\d+(?:\.\d+)?)px\b/dg;
+const FONT_SIZE_CAMEL_REGEX = /\bfontSize\s*:\s*(['"]?)(-?\d+(?:\.\d+)?)(?:px)?\1/dg;
+
+function runFontSizeMinimumCheck(
+  filePath: string,
+  content: string,
+): { findings: MechanicalFinding[]; content: string } {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.css', '.scss'])) {
+    return { findings: [], content };
+  }
+
+  const masked = maskComments(content);
+  const rootRanges = findRootBlockRanges(content);
+  const findings: MechanicalFinding[] = [];
+  const replacements: Array<{ start: number; end: number; text: string }> = [];
+
+  for (const match of masked.matchAll(FONT_SIZE_KEBAB_REGEX)) {
+    const index = match.index as number;
+
+    if (isInsideRanges(index, rootRanges)) {
+      continue;
+    }
+
+    const px = parseFloat(match[1]);
+
+    if (Number.isNaN(px) || px < 0 || px >= MIN_BODY_FONT_SIZE_PX) {
+      continue;
+    }
+
+    const indexed = match as RegExpMatchArray & { indices: RegExpIndicesArray };
+    const [start, end] = indexed.indices[1];
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, index),
+      rule: 'font-size-below-16px',
+      message: `font-size ${px}px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.`,
+      autoFixed: true,
+    });
+    replacements.push({ start, end, text: String(MIN_BODY_FONT_SIZE_PX) });
+  }
+
+  for (const match of masked.matchAll(FONT_SIZE_CAMEL_REGEX)) {
+    const px = parseFloat(match[2]);
+
+    if (Number.isNaN(px) || px < 0 || px >= MIN_BODY_FONT_SIZE_PX) {
+      continue;
+    }
+
+    const indexed = match as RegExpMatchArray & { indices: RegExpIndicesArray };
+    const [start, end] = indexed.indices[2];
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, match.index as number),
+      rule: 'font-size-below-16px',
+      message: `fontSize ${px}px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.`,
+      autoFixed: true,
+    });
+    replacements.push({ start, end, text: String(MIN_BODY_FONT_SIZE_PX) });
+  }
+
+  if (replacements.length === 0) {
+    return { findings, content };
+  }
+
+  replacements.sort((a, b) => b.start - a.start);
+
+  let nextContent = content;
+
+  for (const { start, end, text } of replacements) {
+    nextContent = nextContent.slice(0, start) + text + nextContent.slice(end);
+  }
+
+  return { findings, content: nextContent };
+}
+
+// --- 11. line-height가 font-size의 1.3배 미만 (자동수정) ---
+
+/*
+ * font-size와 line-height는 같은 선언 블록(같은 CSS 규칙 본문 또는 같은 style={{...}} 객체) 안에
+ * 함께 있을 때만 서로 연관지어 비교할 수 있다 — 파일 전체에서 아무 font-size와 아무 line-height를
+ * 비교하면 완전히 다른 요소끼리 잘못 엮인다. "\{([^{}]*)\}"(중첩 없는 중괄호 쌍)로 가장 안쪽
+ * 블록만 잡으면 CSS 규칙 본문과 style={{...}}의 안쪽 객체 리터럴 둘 다 자연히 걸린다(중첩된
+ * @media {.a{...}}나 style={{...}}의 이중 중괄호에서도 정규식이 스스로 가장 안쪽 것만 찾는다 —
+ * 얕은 중첩이면 depth 추적 없이도 성립). 같은 블록에 font-size가 없으면 그냥 지나친다.
+ */
+const LINE_HEIGHT_BLOCK_REGEX = /\{([^{}]*)\}/dg;
+const BLOCK_FONT_SIZE_REGEX = /\b(?:font-size|fontSize)\s*:\s*['"]?(\d+(?:\.\d+)?)(?:px)?['"]?/i;
+const BLOCK_LINE_HEIGHT_REGEX = /\b(?:line-height|lineHeight)\s*:\s*(['"]?)(\d+(?:\.\d+)?(?:px|%)?)\1/di;
+const LINE_HEIGHT_MIN_RATIO = 1.3;
+const LINE_HEIGHT_FIX_VALUE = '1.5';
+
+function runLineHeightRatioCheck(
+  filePath: string,
+  content: string,
+): { findings: MechanicalFinding[]; content: string } {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.css', '.scss'])) {
+    return { findings: [], content };
+  }
+
+  const masked = maskComments(content);
+  const findings: MechanicalFinding[] = [];
+  const replacements: Array<{ start: number; end: number; text: string }> = [];
+
+  for (const blockMatch of masked.matchAll(LINE_HEIGHT_BLOCK_REGEX)) {
+    const indexedBlock = blockMatch as RegExpMatchArray & { indices: RegExpIndicesArray };
+    const blockText = blockMatch[1];
+    const [blockStart] = indexedBlock.indices[1];
+
+    const fsMatch = blockText.match(BLOCK_FONT_SIZE_REGEX);
+
+    if (!fsMatch) {
+      continue;
+    }
+
+    const fontSizePx = parseFloat(fsMatch[1]);
+
+    if (Number.isNaN(fontSizePx) || fontSizePx <= 0) {
+      continue;
+    }
+
+    const lhMatch = blockText.match(BLOCK_LINE_HEIGHT_REGEX) as
+      | (RegExpMatchArray & { indices: RegExpIndicesArray })
+      | null;
+
+    if (!lhMatch) {
+      continue;
+    }
+
+    const valueToken = lhMatch[2];
+    const tokenParts = valueToken.match(/^(\d+(?:\.\d+)?)(px|%)?$/);
+
+    if (!tokenParts) {
+      continue;
+    }
+
+    const rawValue = parseFloat(tokenParts[1]);
+    const unit = tokenParts[2];
+    const lineHeightPx =
+      unit === 'px' ? rawValue : unit === '%' ? fontSizePx * (rawValue / 100) : fontSizePx * rawValue;
+
+    if (lineHeightPx >= fontSizePx * LINE_HEIGHT_MIN_RATIO) {
+      continue;
+    }
+
+    const [tokenStart, tokenEnd] = lhMatch.indices[2];
+    const absoluteStart = blockStart + tokenStart;
+    const absoluteEnd = blockStart + tokenEnd;
+
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, absoluteStart),
+      rule: 'line-height-too-tight',
+      message: `line-height "${valueToken}"가 font-size(${fontSizePx}px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.`,
+      autoFixed: true,
+    });
+    replacements.push({ start: absoluteStart, end: absoluteEnd, text: LINE_HEIGHT_FIX_VALUE });
+  }
+
+  if (replacements.length === 0) {
+    return { findings, content };
+  }
+
+  replacements.sort((a, b) => b.start - a.start);
+
+  let nextContent = content;
+
+  for (const { start, end, text } of replacements) {
+    nextContent = nextContent.slice(0, start) + text + nextContent.slice(end);
+  }
+
+  return { findings, content: nextContent };
+}
+
+// --- 12. 이미지에 max-width:100% 없으면 추가 (자동수정) ---
+
+const HAS_MAX_WIDTH_REGEX = /max-width|maxWidth/i;
+const IMG_STYLE_OBJECT_REGEX = /style=\{\{([^}]*)\}\}/;
+const IMG_STYLE_STRING_REGEX = /style=(["'])([^"']*)\1/;
+
+function ensureImgMaxWidth(tagText: string): { tagText: string; changed: boolean } {
+  if (HAS_MAX_WIDTH_REGEX.test(tagText)) {
+    return { tagText, changed: false };
+  }
+
+  const objMatch = tagText.match(IMG_STYLE_OBJECT_REGEX);
+
+  if (objMatch) {
+    const fixedInner = `maxWidth: '100%', ${objMatch[1]}`;
+    return { tagText: tagText.replace(objMatch[0], `style={{${fixedInner}}}`), changed: true };
+  }
+
+  const strMatch = tagText.match(IMG_STYLE_STRING_REGEX);
+
+  if (strMatch) {
+    const quote = strMatch[1];
+    const fixedInner = `max-width:100%;${strMatch[2]}`;
+
+    return { tagText: tagText.replace(strMatch[0], `style=${quote}${fixedInner}${quote}`), changed: true };
+  }
+
+  const insertAt = '<img'.length;
+
+  return {
+    tagText: tagText.slice(0, insertAt) + ` style={{ maxWidth: '100%' }}` + tagText.slice(insertAt),
+    changed: true,
+  };
+}
+
+function runImgMaxWidthCheck(filePath: string, content: string): { findings: MechanicalFinding[]; content: string } {
+  if (!hasExtension(filePath, ['.tsx', '.jsx'])) {
+    return { findings: [], content };
+  }
+
+  const findings: MechanicalFinding[] = [];
+  const replacements: Array<{ start: number; end: number; text: string }> = [];
+
+  for (const match of content.matchAll(IMG_TAG_REGEX)) {
+    const { tagText, changed } = ensureImgMaxWidth(match[0]);
+
+    if (!changed) {
+      continue;
+    }
+
+    const start = match.index as number;
+    replacements.push({ start, end: start + match[0].length, text: tagText });
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, start),
+      rule: 'img-missing-max-width',
+      message:
+        '이미지에 max-width:100%를 추가했습니다 — 컨테이너보다 큰 원본 이미지가 레이아웃을 밀어내는 걸 막습니다.',
+      autoFixed: true,
+    });
+  }
+
+  if (replacements.length === 0) {
+    return { findings, content };
+  }
+
+  replacements.sort((a, b) => b.start - a.start);
+
+  let nextContent = content;
+
+  for (const { start, end, text } of replacements) {
+    nextContent = nextContent.slice(0, start) + text + nextContent.slice(end);
+  }
+
+  return { findings, content: nextContent };
+}
+
+// --- 13. 텍스트 컨테이너에 max-width 없음 (힌트 전용) ---
+
+const P_TAG_REGEX = /<p\b([^>]*)>([\s\S]*?)<\/p>/gi;
+const TEXT_CONTAINER_LENGTH_THRESHOLD = 80;
+
+function estimateJsxTextLength(inner: string): number {
+  return inner
+    .replace(/<[^>]+>/g, '')
+    .replace(/\{[^}]*\}/g, '')
+    .trim().length;
+}
+
+function runTextContainerMaxWidthCheck(filePath: string, content: string): MechanicalFinding[] {
+  if (!hasExtension(filePath, ['.tsx', '.jsx'])) {
+    return [];
+  }
+
+  const findings: MechanicalFinding[] = [];
+
+  for (const match of content.matchAll(P_TAG_REGEX)) {
+    const attrs = match[1];
+
+    if (HAS_MAX_WIDTH_REGEX.test(attrs)) {
+      continue;
+    }
+
+    const textLength = estimateJsxTextLength(match[2]);
+
+    if (textLength < TEXT_CONTAINER_LENGTH_THRESHOLD) {
+      continue;
+    }
+
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, match.index as number),
+      rule: 'text-container-no-max-width',
+      message: `본문 텍스트(약 ${textLength}자)가 있는 <p>에 max-width가 없습니다 — 넓은 화면에서 한 줄이 너무 길어질 수 있습니다(줄 길이 80자 초과 위험). 부모 컨테이너가 이미 폭을 제한하는지 확인하세요.`,
+      autoFixed: false,
+    });
+  }
+
+  return findings;
+}
+
+// --- 14. width/height/padding/margin에 transition 적용 (힌트 전용, 성능) ---
+
+/*
+ * "all"은 제외한다 — 호버 트랜지션에 워낙 흔히 쓰여(실측 없이도 예상되는 노이즈가 큼) 전부 잡으면
+ * 힌트가 다른 신호를 덮어버린다. width/height/padding/margin(방향 변형 포함, \b padding \b이
+ * "padding-left"의 "padding"도 그대로 잡는다)처럼 명시적으로 레이아웃 속성을 적은 경우만 잡는다.
+ */
+const TRANSITION_DECL_REGEX = /\btransition(?:-property)?\s*:\s*(['"]?)([^'",;}\n]+)\1/gi;
+const EXPENSIVE_TRANSITION_PROP_REGEX = /\b(width|height|padding|margin)\b/i;
+
+function runExpensiveTransitionCheck(filePath: string, content: string): MechanicalFinding[] {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.css', '.scss'])) {
+    return [];
+  }
+
+  const masked = maskComments(content);
+  const findings: MechanicalFinding[] = [];
+
+  for (const match of masked.matchAll(TRANSITION_DECL_REGEX)) {
+    const propMatch = match[2].match(EXPENSIVE_TRANSITION_PROP_REGEX);
+
+    if (!propMatch) {
+      continue;
+    }
+
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, match.index as number),
+      rule: 'transition-expensive-property',
+      message: `transition에 "${propMatch[0]}"가 있습니다 — width/height/padding/margin 애니메이션은 레이아웃을 다시 계산해 느립니다. transform/opacity로 바꿀 수 있는지 확인하세요.`,
+      autoFixed: false,
+    });
+  }
+
+  return findings;
+}
+
+// --- 15. 헤딩 레벨 건너뜀 (힌트 전용) ---
+
+/*
+ * 파일 단위로만 순서를 본다 — 여러 컴포넌트 파일에 걸친 실제 렌더 순서까지는 정적 분석으로 알 수
+ * 없다(알려진 한계, 이 파일의 다른 검사들과 같은 타협).
+ */
+const HEADING_TAG_REGEX = /<h([1-6])\b/gi;
+
+function runHeadingLevelSkipCheck(filePath: string, content: string): MechanicalFinding[] {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.html'])) {
+    return [];
+  }
+
+  const findings: MechanicalFinding[] = [];
+  let prevLevel: number | null = null;
+
+  for (const match of content.matchAll(HEADING_TAG_REGEX)) {
+    const level = Number(match[1]);
+
+    if (prevLevel !== null && level > prevLevel + 1) {
+      findings.push({
+        file: filePath,
+        line: lineNumberAt(content, match.index as number),
+        rule: 'heading-level-skip',
+        message: `헤딩 레벨이 h${prevLevel}에서 h${level}로 건너뜁니다 — 중간 레벨(h${prevLevel + 1})을 채우거나 순서를 맞추세요.`,
+        autoFixed: false,
+      });
+    }
+
+    prevLevel = level;
+  }
+
+  return findings;
+}
+
+// --- 16. 본문 text-transform:uppercase / letter-spacing 과다 (힌트 전용) ---
+
+/*
+ * letter-spacing은 em 단위만 다룬다 — px 단위는 font-size를 알아야 상대 비율을 낼 수 있는데, 이
+ * 파일에서 그 둘을 안전하게 짝지으려면 11번 검사와 같은 블록 스코핑이 또 필요해져 배보다 배꼽이
+ * 커진다(알려진 한계).
+ */
+const TEXT_TRANSFORM_UPPERCASE_REGEX = /\b(?:text-transform|textTransform)\s*:\s*(['"]?)uppercase\1/gi;
+const LETTER_SPACING_EM_REGEX = /\b(?:letter-spacing|letterSpacing)\s*:\s*(['"]?)(-?\d+(?:\.\d+)?)em\1/gi;
+const LETTER_SPACING_MAX_EM = 0.05;
+
+function runTypographyExtremesCheck(filePath: string, content: string): MechanicalFinding[] {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.css', '.scss'])) {
+    return [];
+  }
+
+  const masked = maskComments(content);
+  const findings: MechanicalFinding[] = [];
+
+  for (const match of masked.matchAll(TEXT_TRANSFORM_UPPERCASE_REGEX)) {
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, match.index as number),
+      rule: 'text-transform-uppercase',
+      message:
+        'text-transform:uppercase가 있습니다 — 본문에 쓰이면 가독성이 떨어질 수 있어 라벨·버튼 등 짧은 텍스트에만 쓰는지 확인하세요.',
+      autoFixed: false,
+    });
+  }
+
+  for (const match of masked.matchAll(LETTER_SPACING_EM_REGEX)) {
+    const value = parseFloat(match[2]);
+
+    if (Number.isNaN(value) || value <= LETTER_SPACING_MAX_EM) {
+      continue;
+    }
+
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, match.index as number),
+      rule: 'letter-spacing-too-wide',
+      message: `letter-spacing "${match[2]}em"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.`,
+      autoFixed: false,
+    });
+  }
+
+  return findings;
+}
+
+// --- 17. 그라데이션 텍스트 / 오프셋 0인 유채색 그림자 (힌트 전용) ---
+
+const BG_CLIP_TEXT_REGEX =
+  /\b(?:background-clip|backgroundClip|WebkitBackgroundClip|-webkit-background-clip)\s*:\s*(['"]?)text\1/gi;
+
+function runGradientTextCheck(filePath: string, content: string): MechanicalFinding[] {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.css', '.scss'])) {
+    return [];
+  }
+
+  const masked = maskComments(content);
+  const findings: MechanicalFinding[] = [];
+
+  for (const match of masked.matchAll(BG_CLIP_TEXT_REGEX)) {
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, match.index as number),
+      rule: 'gradient-text-clip',
+      message:
+        'background-clip:text로 그라데이션 텍스트를 쓰고 있습니다 — 브라우저 호환성·가독성 문제가 없는지, 남용되지 않았는지 확인하세요.',
+      autoFixed: false,
+    });
+  }
+
+  return findings;
+}
+
+/*
+ * OKLab 채도(chroma = sqrt(a^2+b^2))로 "유채색"을 가린다 — 이미 위쪽(섹션 2)의 rgbToOklab/
+ * parseColorLiteral을 그대로 재사용해 색을 또 파싱하는 코드를 새로 안 만든다. 채도가 거의 0이면
+ * 회색·검정·흰색이라 대상이 아니다(문턱값 0.02는 무채색의 미세한 색조 오차를 흡수하는 여유값).
+ */
+const SHADOW_DECL_REGEX = /\b(?:box-shadow|boxShadow|text-shadow|textShadow)\s*:\s*(['"]?)([^'",;}\n]+)\1/gi;
+const SHADOW_ZERO_OFFSET_REGEX = /^\s*(?:inset\s+)?0(?:px)?\s+0(?:px)?(?:\s+|$)/i;
+const SHADOW_CHROMA_THRESHOLD = 0.02;
+
+function findFirstColorInText(text: string): string | null {
+  for (const regex of [HEX_COLOR_REGEX, RGB_FN_REGEX, HSL_FN_REGEX, OKLCH_FN_REGEX]) {
+    const found = text.match(regex);
+
+    if (found && found[0]) {
+      return found[0];
+    }
+  }
+
+  return null;
+}
+
+function runZeroOffsetChromaticShadowCheck(filePath: string, content: string): MechanicalFinding[] {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.css', '.scss'])) {
+    return [];
+  }
+
+  const masked = maskComments(content);
+  const findings: MechanicalFinding[] = [];
+
+  for (const match of masked.matchAll(SHADOW_DECL_REGEX)) {
+    const value = match[2];
+
+    if (!SHADOW_ZERO_OFFSET_REGEX.test(value)) {
+      continue;
+    }
+
+    const colorRaw = findFirstColorInText(value);
+
+    if (!colorRaw) {
+      continue;
+    }
+
+    const parsed = parseColorLiteral(colorRaw);
+
+    if (!parsed) {
+      continue;
+    }
+
+    const chroma = Math.sqrt(parsed.a ** 2 + parsed.b ** 2);
+
+    if (chroma < SHADOW_CHROMA_THRESHOLD) {
+      continue;
+    }
+
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, match.index as number),
+      rule: 'zero-offset-chromatic-shadow',
+      message: `오프셋이 0인 유채색 그림자("${colorRaw}")가 있습니다 — 발광 효과가 과할 수 있어 의도한 디자인인지 확인하세요.`,
+      autoFixed: false,
+    });
+  }
+
+  return findings;
+}
+
 // --- 오케스트레이션 ---
 
 /**
@@ -1481,6 +2048,26 @@ export function runMechanicalChecks(files: Record<string, string>, resolvedHue: 
     findings.push(...ch7CaptionResult.findings);
     content = ch7CaptionResult.content;
 
+    const fontSizeResult = runFontSizeMinimumCheck(filePath, content);
+    findings.push(...fontSizeResult.findings);
+    content = fontSizeResult.content;
+
+    const lineHeightResult = runLineHeightRatioCheck(filePath, content);
+    findings.push(...lineHeightResult.findings);
+    content = lineHeightResult.content;
+
+    const imgMaxWidthResult = runImgMaxWidthCheck(filePath, content);
+    findings.push(...imgMaxWidthResult.findings);
+    content = imgMaxWidthResult.content;
+
+    /*
+     * 골격 7 챕터 판정(위)이 원본 "100vh" 리터럴에 의존하므로 이 자동수정은 반드시 마지막에 —
+     * 100dvh로 바꾼 뒤에 챕터 검사가 돌면 챕터를 하나도 못 찾는다.
+     */
+    const vhResult = run100vhToDvhCheck(filePath, content);
+    findings.push(...vhResult.findings);
+    content = vhResult.content;
+
     if (MAP_GUARD_ENABLED) {
       findings.push(...runMapGuardCheck(filePath, content));
     }
@@ -1489,6 +2076,12 @@ export function runMechanicalChecks(files: Record<string, string>, resolvedHue: 
     findings.push(...runStockImageDomainCheck(filePath, content));
     findings.push(...runSkeleton7CardGridHintCheck(filePath, content));
     findings.push(...runSpacingGridCheck(filePath, content));
+    findings.push(...runTextContainerMaxWidthCheck(filePath, content));
+    findings.push(...runExpensiveTransitionCheck(filePath, content));
+    findings.push(...runHeadingLevelSkipCheck(filePath, content));
+    findings.push(...runTypographyExtremesCheck(filePath, content));
+    findings.push(...runGradientTextCheck(filePath, content));
+    findings.push(...runZeroOffsetChromaticShadowCheck(filePath, content));
 
     if (content !== originalContent) {
       updatedFiles[filePath] = content;
@@ -1542,4 +2135,14 @@ export const __internal = {
   runSpacingGridCheck,
   maskComments,
   classifyEmojiContext,
+  run100vhToDvhCheck,
+  runFontSizeMinimumCheck,
+  runLineHeightRatioCheck,
+  runImgMaxWidthCheck,
+  runTextContainerMaxWidthCheck,
+  runExpensiveTransitionCheck,
+  runHeadingLevelSkipCheck,
+  runTypographyExtremesCheck,
+  runGradientTextCheck,
+  runZeroOffsetChromaticShadowCheck,
 };
