@@ -29,6 +29,7 @@ const {
   runTypographyExtremesCheck,
   runGradientTextCheck,
   runZeroOffsetChromaticShadowCheck,
+  isCustomPropertyValue,
 } = __internal;
 
 const HUE = 20; // coralred 기본 hue와 무관한 임의의 고정값 — 계산이 실행되는지만 확인.
@@ -164,6 +165,44 @@ describe('runColorLiteralCheck — hex/rgb/hsl/oklch literals', () => {
     const { findings, content } = runColorLiteralCheck('src/Card.tsx', src, HUE);
     expect(findings).toHaveLength(0);
     expect(content).toBe(src);
+  });
+
+  /*
+   * 실측(2026-09-07): coralred-ui.css의 실제 팔레트 정의는 ":root {}"가 아니라
+   * "*, ::before, ::after {}"와 "[data-theme=\"dark\"] ... {}" 아래에 있다 — findRootBlockRanges만
+   * 믿으면 이 정의 자체가 색상 리터럴로 오인돼 --surface: var(--surface) 같은 자기 참조(무효값)로
+   * 치환된다. 어떤 셀렉터 아래든 "--이름: <색상>" 정의 자리는 제외해야 한다.
+   */
+  it('does not flag a custom property definition outside a :root block (real coralred-ui.css shape)', () => {
+    const src = '*, ::before, ::after { --surface: oklch(1 0 0); --ok: oklch(0.45 0.12 155); }';
+    const { findings, content } = runColorLiteralCheck('src/kit.css', src, HUE);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+
+  it('does not flag a custom property definition under a [data-theme] selector', () => {
+    const src = '[data-theme="dark"] { --err: oklch(0.68 0.16 25); }';
+    const { findings, content } = runColorLiteralCheck('src/kit.css', src, HUE);
+    expect(findings).toHaveLength(0);
+    expect(content).toBe(src);
+  });
+
+  it('still auto-fixes a normal (non-custom-property) color literal on the same line as a custom property definition', () => {
+    const src = '.a { --brand: #ff5330; color: #ffffff; }';
+    const { findings, content } = runColorLiteralCheck('src/kit.css', src, HUE);
+    expect(findings.some((f) => f.rule === 'color-literal' && f.autoFixed)).toBe(true);
+    expect(content).toContain('--brand: #ff5330');
+    expect(content).not.toContain('color: #ffffff');
+  });
+});
+
+describe('isCustomPropertyValue', () => {
+  it('detects a color sitting right after "--name:"', () => {
+    expect(isCustomPropertyValue('--ok: oklch(0.45 0.12 155)', '--ok: '.length)).toBe(true);
+  });
+
+  it('does not flag a normal property value', () => {
+    expect(isCustomPropertyValue('color: #ffffff', 'color: '.length)).toBe(false);
   });
 });
 

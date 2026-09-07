@@ -353,6 +353,23 @@ function isInsideRanges(index: number, ranges: Array<[number, number]>): boolean
   return ranges.some(([s, e]) => index >= s && index < e);
 }
 
+/*
+ * 실측(2026-09-07): findRootBlockRanges는 ":root {...}" 셀렉터만 찾는데, 이 킷의 실제 팔레트
+ * 정의는 "*, ::before, ::after {...}"와 "[data-theme=\"dark\"] ... {...}"에 있다(coralred-ui.css
+ * 실물 확인) — :root 블록만 제외하면 팔레트 변수 "정의" 자체(--ok: oklch(...) 같은)가 색상
+ * 리터럴로 오인돼 var(--가장가까운값)로 치환되고, 심하면 --surface: var(--surface)처럼 자기
+ * 자신을 참조해 CSS 스펙상 무효값이 된다. 셀렉터를 더 나열하는 대신 "이 색상이 커스텀 프로퍼티의
+ * 값 자리에 있는가"(관용구 "--이름: <값>")를 직접 본다 — 어떤 셀렉터 아래 있든, 커스텀 프로퍼티를
+ * *정의*하는 값이면 무조건 제외된다(그 값을 var()로 "쓰는" 자리와는 다르다).
+ */
+const CUSTOM_PROPERTY_VALUE_TAIL_REGEX = /--[\w-]+\s*:\s*$/;
+const CUSTOM_PROPERTY_LOOKBEHIND_WINDOW = 100;
+
+function isCustomPropertyValue(content: string, index: number): boolean {
+  const before = content.slice(Math.max(0, index - CUSTOM_PROPERTY_LOOKBEHIND_WINDOW), index);
+  return CUSTOM_PROPERTY_VALUE_TAIL_REGEX.test(before);
+}
+
 interface OklabColor {
   L: number;
   a: number;
@@ -657,7 +674,7 @@ function runColorLiteralCheck(
     for (const match of content.matchAll(regex)) {
       const index = match.index as number;
 
-      if (isInsideRanges(index, rootRanges)) {
+      if (isInsideRanges(index, rootRanges) || isCustomPropertyValue(content, index)) {
         continue;
       }
 
@@ -2145,4 +2162,5 @@ export const __internal = {
   runTypographyExtremesCheck,
   runGradientTextCheck,
   runZeroOffsetChromaticShadowCheck,
+  isCustomPropertyValue,
 };
