@@ -58,6 +58,15 @@ export async function selectContext(props: {
   });
 
   const provider = PROVIDER_LIST.find((p) => p.name === currentProvider) || DEFAULT_PROVIDER;
+
+  /*
+   * 원가 절감 — 파일 목록에서 관련 파일 몇 개를 고르는 건 프론티어 모델 품질이 필요 없는 기계적
+   * 분류 작업이라, 실제 생성에 쓰는 모델(currentModel, 유저가 고른 것)과 분리해 저렴한 Haiku로
+   * 돌린다. Anthropic provider일 때만 적용 — 프로덕션은 항상 Anthropic 하나뿐이지만(README.md,
+   * SHOW_DEV_TOOLS 꺼짐), 다른 provider가 currentProvider로 들어오는 이론상 경로까지 깨뜨리지
+   * 않기 위해 provider.name 가드를 둔다.
+   */
+  const contextSelectionModel = provider.name === 'Anthropic' ? 'claude-haiku-4-5' : currentModel;
   const staticModels = LLMManager.getInstance().getStaticModelListFromProvider(provider);
   let modelDetails = staticModels.find((m) => m.name === currentModel);
 
@@ -174,7 +183,7 @@ export async function selectContext(props: {
 
         `,
     model: provider.getModelInstance({
-      model: currentModel,
+      model: contextSelectionModel,
       serverEnv,
       apiKeys,
       providerSettings,

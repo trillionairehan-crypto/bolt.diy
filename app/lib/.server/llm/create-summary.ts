@@ -44,6 +44,9 @@ export async function createSummary(props: {
   });
 
   const provider = PROVIDER_LIST.find((p) => p.name === currentProvider) || DEFAULT_PROVIDER;
+
+  // select-context.ts와 같은 이유(원가 절감) — 대화 요약은 압축 작업이라 Haiku로 충분하다.
+  const summaryModel = provider.name === 'Anthropic' ? 'claude-haiku-4-5' : currentModel;
   const staticModels = LLMManager.getInstance().getStaticModelListFromProvider(provider);
   let modelDetails = staticModels.find((m) => m.name === currentModel);
 
@@ -179,7 +182,7 @@ ${slicedMessages
 Please provide a summary of the chat till now including the hitorical summary of the chat.
 `,
     model: provider.getModelInstance({
-      model: currentModel,
+      model: summaryModel,
       serverEnv,
       apiKeys,
       providerSettings,
