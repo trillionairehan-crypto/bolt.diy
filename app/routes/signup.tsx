@@ -8,7 +8,13 @@ import { EmailContinueLink } from '~/components/auth/EmailContinueLink';
 import { authUserStore } from '~/lib/stores/auth';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '회원가입 | 코랄레드' }, { name: 'description', content: '코랄레드 가입하고 첫 앱을 만들어보세요' }];
+  return [
+    { title: '회원가입 | 코랄레드' },
+    { name: 'description', content: '코랄레드 가입하고 첫 앱을 만들어보세요' },
+    { property: 'og:title', content: '회원가입 | 코랄레드' },
+    { property: 'og:description', content: '코랄레드 가입하고 첫 앱을 만들어보세요' },
+    { property: 'og:url', content: 'https://coralred.kr/signup' },
+  ];
 };
 
 export default function Signup() {

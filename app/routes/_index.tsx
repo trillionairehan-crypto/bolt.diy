@@ -10,6 +10,9 @@ export const meta: MetaFunction = () => {
   return [
     { title: '코랄레드' },
     { name: 'description', content: '코딩 몰라도 한국어 한마디로 웹사이트와 앱을 만들어요' },
+    { property: 'og:title', content: '코랄레드' },
+    { property: 'og:description', content: '코딩 몰라도 한국어 한마디로 웹사이트와 앱을 만들어요' },
+    { property: 'og:url', content: 'https://coralred.kr/' },
   ];
 };
 

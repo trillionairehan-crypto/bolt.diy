@@ -6,6 +6,9 @@ export const meta: MetaFunction = () => {
   return [
     { title: '이용 가이드 | 코랄레드' },
     { name: 'description', content: '코랄레드를 처음 쓸 때 궁금한 것들을 모아뒀어요' },
+    { property: 'og:title', content: '이용 가이드 | 코랄레드' },
+    { property: 'og:description', content: '코랄레드를 처음 쓸 때 궁금한 것들을 모아뒀어요' },
+    { property: 'og:url', content: 'https://coralred.kr/guide' },
   ];
 };
 

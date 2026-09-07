@@ -6,7 +6,13 @@ import coralredUiCssUrl from '~design-handoff/coralred-ui.css?url';
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: coralredUiCssUrl }];
 
 export const meta: MetaFunction = () => {
-  return [{ title: '요금제 | 코랄레드' }, { name: 'description', content: '코랄레드 요금제 안내' }];
+  return [
+    { title: '요금제 | 코랄레드' },
+    { name: 'description', content: '코랄레드 요금제 안내' },
+    { property: 'og:title', content: '요금제 | 코랄레드' },
+    { property: 'og:description', content: '코랄레드 요금제 안내' },
+    { property: 'og:url', content: 'https://coralred.kr/pricing' },
+  ];
 };
 
 interface PricingPlan {

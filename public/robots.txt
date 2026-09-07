@@ -4,5 +4,6 @@ Disallow: /chat/
 Disallow: /api/
 Disallow: /webcontainer/
 Disallow: /git/
+Disallow: /apps
 
 Sitemap: https://coralred.kr/sitemap.xml

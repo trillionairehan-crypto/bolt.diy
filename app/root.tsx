@@ -83,16 +83,16 @@ export const Head = createHead(() => (
       not), page-wide notranslate is the right call over chasing every element with translate="no".
     */}
     <meta name="google" content="notranslate" />
-    {/* Site-wide OG defaults — individual routes still control <title>/description via their own
-        meta() export; these just make sure link previews (e.g. KakaoTalk) always have an image. */}
+    {/* Site-wide OG defaults that don't vary by page — og:title/og:description/og:url are set per
+        route instead (in each route's own meta() export, alongside its <title>/description), so
+        a link shared from /pricing or /guide previews with that page's own text, not the
+        homepage's. Keep only truly page-invariant tags here — duplicating og:title here too would
+        put two og:title tags in the document, which social-preview parsers handle inconsistently. */}
     <meta property="og:site_name" content="코랄레드" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="코랄레드" />
-    <meta property="og:description" content="코딩 몰라도 한국어 한마디로 웹사이트와 앱을 만들어요" />
     <meta property="og:image" content="https://coralred.kr/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:url" content="https://coralred.kr" />
     <meta name="twitter:card" content="summary_large_image" />
     <Meta />
     <Links />

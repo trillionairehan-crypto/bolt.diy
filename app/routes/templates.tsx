@@ -8,6 +8,9 @@ export const meta: MetaFunction = () => {
   return [
     { title: '템플릿 | 코랄레드' },
     { name: 'description', content: '자주 만드는 앱 8가지 중 하나로 골라서 바로 시작해요' },
+    { property: 'og:title', content: '템플릿 | 코랄레드' },
+    { property: 'og:description', content: '자주 만드는 앱 8가지 중 하나로 골라서 바로 시작해요' },
+    { property: 'og:url', content: 'https://coralred.kr/templates' },
   ];
 };
 

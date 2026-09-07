@@ -12,6 +12,9 @@ export const meta: MetaFunction = () => {
   return [
     { title: '예시로 시작하기 | 코랄레드' },
     { name: 'description', content: '골라서 누르면 바로 만들기 시작해요' },
+    { property: 'og:title', content: '예시로 시작하기 | 코랄레드' },
+    { property: 'og:description', content: '골라서 누르면 바로 만들기 시작해요' },
+    { property: 'og:url', content: 'https://coralred.kr/examples' },
   ];
 };
 

@@ -2,7 +2,13 @@ import type { MetaFunction } from '@remix-run/cloudflare';
 import { LegalPageLayout, LegalSection } from '~/components/legal/LegalPageLayout';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '개인정보처리방침 | 코랄레드' }, { name: 'description', content: '코랄레드 개인정보처리방침' }];
+  return [
+    { title: '개인정보처리방침 | 코랄레드' },
+    { name: 'description', content: '코랄레드 개인정보처리방침' },
+    { property: 'og:title', content: '개인정보처리방침 | 코랄레드' },
+    { property: 'og:description', content: '코랄레드 개인정보처리방침' },
+    { property: 'og:url', content: 'https://coralred.kr/privacy' },
+  ];
 };
 
 const EFFECTIVE_DATE = '2026년 8월 19일';

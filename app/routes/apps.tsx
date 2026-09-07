@@ -10,7 +10,11 @@ import { db, getAll, type ChatHistoryItem } from '~/lib/persistence';
 import styles from '~/components/apps/AppsPage.module.scss';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '내가 만든 앱 | 코랄레드' }, { name: 'description', content: '배포한 앱을 한곳에서 확인해요' }];
+  return [
+    { title: '내가 만든 앱 | 코랄레드' },
+    { name: 'description', content: '배포한 앱을 한곳에서 확인해요' },
+    { name: 'robots', content: 'noindex' },
+  ];
 };
 
 const PROVIDER_LABEL: Record<string, string> = {

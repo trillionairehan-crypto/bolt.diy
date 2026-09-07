@@ -9,7 +9,13 @@ import { authUserStore } from '~/lib/stores/auth';
 import { buildLoginHeadline } from '~/utils/greeting';
 
 export const meta: MetaFunction = () => {
-  return [{ title: '로그인 | 코랄레드' }, { name: 'description', content: '코랄레드에 로그인하세요' }];
+  return [
+    { title: '로그인 | 코랄레드' },
+    { name: 'description', content: '코랄레드에 로그인하세요' },
+    { property: 'og:title', content: '로그인 | 코랄레드' },
+    { property: 'og:description', content: '코랄레드에 로그인하세요' },
+    { property: 'og:url', content: 'https://coralred.kr/login' },
+  ];
 };
 
 /*
