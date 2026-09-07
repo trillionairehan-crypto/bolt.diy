@@ -1,6 +1,11 @@
 import { atom } from 'nanostores';
 import type { User } from '@supabase/supabase-js';
 import { platformSupabase } from '~/lib/supabase/platform-client';
+import { getPlatformAuthHeaders } from '~/lib/supabase/platformAuthHeader';
+import { getStoredUtmParams } from '~/utils/utm';
+import { createScopedLogger } from '~/utils/logger';
+
+const logger = createScopedLogger('auth');
 
 export const authUserStore = atom<User | null>(null);
 
@@ -52,6 +57,59 @@ function recordLastLoginMethod(user: User | null): void {
   }
 }
 
+const utmAttributionAttempted = new Set<string>();
+
+/**
+ * 이메일 OTP·카카오·구글 전부 signUp()이 따로 없다 — verifyOtp/OAuth 콜백 둘 다 계정이 없으면
+ * Supabase가 그 자리에서 만들고, 있으면 그냥 로그인시킨다. 그래서 "방금 가입했다"를 별도 이벤트로
+ * 알 수 없고, Supabase가 계정 생성 시 같은 트랜잭션으로 채우는 created_at과 last_sign_in_at이
+ * (거의) 같은 시각이라는 사실로 유추한다 — 재로그인이면 last_sign_in_at만 갱신되고 created_at은
+ * 그대로라 둘 사이 간격이 벌어진다. 10초는 OTP 검증 왕복시간을 넉넉히 덮는 여유값.
+ */
+function isLikelyNewSignup(user: User): boolean {
+  const createdAt = Date.parse(user.created_at);
+  const lastSignInAt = user.last_sign_in_at ? Date.parse(user.last_sign_in_at) : NaN;
+
+  if (Number.isNaN(createdAt) || Number.isNaN(lastSignInAt)) {
+    return false;
+  }
+
+  return Math.abs(lastSignInAt - createdAt) < 10_000;
+}
+
+function recordUtmAttributionIfNewSignup(user: User | null): void {
+  if (!user || utmAttributionAttempted.has(user.id) || !isLikelyNewSignup(user)) {
+    return;
+  }
+
+  utmAttributionAttempted.add(user.id);
+
+  const utm = getStoredUtmParams();
+
+  void (async () => {
+    try {
+      const headers = await getPlatformAuthHeaders();
+
+      if (!headers.Authorization) {
+        return;
+      }
+
+      await fetch('/api/utm-attribution', {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          utmSource: utm?.utmSource ?? null,
+          utmMedium: utm?.utmMedium ?? null,
+          utmCampaign: utm?.utmCampaign ?? null,
+          utmContent: utm?.utmContent ?? null,
+        }),
+      });
+    } catch (error) {
+      logger.warn('Failed to send UTM attribution (non-fatal)', error);
+    }
+  })();
+}
+
 export function initAuthListener() {
   if (!platformSupabase) {
     authResolvedStore.set(true);
@@ -67,6 +125,7 @@ export function initAuthListener() {
     authUserStore.set(data.session?.user ?? null);
     authResolvedStore.set(true);
     recordLastLoginMethod(data.session?.user ?? null);
+    recordUtmAttributionIfNewSignup(data.session?.user ?? null);
   });
 
   const {
@@ -75,6 +134,7 @@ export function initAuthListener() {
     authUserStore.set(session?.user ?? null);
     authResolvedStore.set(true);
     recordLastLoginMethod(session?.user ?? null);
+    recordUtmAttributionIfNewSignup(session?.user ?? null);
   });
 
   return () => {

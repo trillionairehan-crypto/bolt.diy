@@ -12,6 +12,7 @@ import { ClientOnly } from 'remix-utils/client-only';
 import { cssTransition, ToastContainer } from 'react-toastify';
 import { createScopedLogger } from './utils/logger';
 import { initGlobalErrorRecovery } from './utils/globalErrorRecovery';
+import { captureUtmFromUrl } from './utils/utm';
 import { initAuthListener } from './lib/stores/auth';
 import { Logo } from './components/ui/Logo';
 import { DARK_MODE_ENABLED } from './utils/featureFlags';
@@ -150,6 +151,14 @@ export default function App() {
 
   useEffect(() => {
     initGlobalErrorRecovery();
+  }, []);
+
+  /*
+   * 앱 루트에서 한 번 — 랜딩/로그인/회원가입 어디로 들어오든 "진입 시" 요구를 만족하고, 라우트마다
+   * 중복으로 챙길 필요가 없다. captureUtmFromUrl 자체가 이미 캡처된 값을 절대 덮어쓰지 않는다.
+   */
+  useEffect(() => {
+    captureUtmFromUrl(window.location.search);
   }, []);
 
   /*
