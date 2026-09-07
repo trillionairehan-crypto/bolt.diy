@@ -1,20 +1,56 @@
 import { useState } from 'react';
 import { useStore } from '@nanostores/react';
+import { toast } from 'react-toastify';
 import { classNames } from '~/utils/classNames';
 import { profileStore, updateProfile } from '~/lib/stores/profile';
 import { authUserStore, signOut } from '~/lib/stores/auth';
+import { getPlatformAuthHeaders } from '~/lib/supabase/platformAuthHeader';
 import { SettingSection } from '~/components/@settings/shared/components/SettingSection';
 import { SettingRow, SettingReadOnlyValue } from '~/components/@settings/shared/components/SettingRow';
 import { AutoSaveField } from '~/components/@settings/shared/components/AutoSaveField';
+import { ConfirmationDialog } from '~/components/ui/Dialog';
 
 export default function ProfileTab() {
   const profile = useStore(profileStore);
   const authUser = useStore(authUserStore);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
     window.location.href = '/';
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+
+    try {
+      const headers = await getPlatformAuthHeaders();
+
+      if (!headers.Authorization) {
+        toast.error('로그인이 필요해요.');
+        setIsDeleting(false);
+
+        return;
+      }
+
+      const response = await fetch('/api/account-delete', { method: 'POST', headers });
+
+      if (!response.ok) {
+        const body = await response.json<{ error?: string }>().catch(() => ({}) as { error?: string });
+        toast.error(body.error ?? '탈퇴 처리 중 문제가 생겼어요. 잠시 후 다시 시도해주세요.');
+        setIsDeleting(false);
+
+        return;
+      }
+
+      await signOut();
+      window.location.href = '/';
+    } catch {
+      toast.error('탈퇴 처리 중 문제가 생겼어요. 잠시 후 다시 시도해주세요.');
+      setIsDeleting(false);
+    }
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,7 +139,29 @@ export default function ProfileTab() {
             로그아웃
           </button>
         </SettingRow>
+        <SettingRow label="회원 탈퇴" description="계정과 만든 앱 기록이 모두 삭제되고 되돌릴 수 없어요.">
+          <button
+            type="button"
+            onClick={() => setIsDeleteDialogOpen(true)}
+            className="text-sm font-medium hover:underline"
+            style={{ color: '#B8391E' }}
+          >
+            회원 탈퇴
+          </button>
+        </SettingRow>
       </SettingSection>
+
+      <ConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleDeleteAccount}
+        title="정말 탈퇴하시겠어요?"
+        description="계정과 만든 앱 기록이 모두 삭제돼요. 이 작업은 되돌릴 수 없어요."
+        confirmLabel="탈퇴하기"
+        cancelLabel="취소"
+        variant="destructive"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }
