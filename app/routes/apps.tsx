@@ -1,12 +1,14 @@
 import type { MetaFunction } from '@remix-run/cloudflare';
 import { useEffect, useState } from 'react';
 import { useStore } from '@nanostores/react';
+import { toast } from 'react-toastify';
 import { PageShell } from '~/components/ui/PageShell';
 import { MiniBrowserFrame } from '~/components/ui/MiniBrowserFrame';
+import { ConfirmationDialog } from '~/components/ui/Dialog';
 import { classNames } from '~/utils/classNames';
 import { authUserStore } from '~/lib/stores/auth';
 import { getDeployedApps, type DeployedAppRecord } from '~/lib/deployedApps';
-import { db, getAll, type ChatHistoryItem } from '~/lib/persistence';
+import { db, deleteById, getAll, type ChatHistoryItem } from '~/lib/persistence';
 import styles from '~/components/apps/AppsPage.module.scss';
 
 export const meta: MetaFunction = () => {
@@ -102,7 +104,38 @@ function AppCard({ app }: { app: DeployedAppRecord }) {
   );
 }
 
-function BuildingCard({ item }: { item: ChatHistoryItem }) {
+function BuildingCard({
+  item,
+  selectMode,
+  selected,
+  onToggleSelect,
+}: {
+  item: ChatHistoryItem;
+  selectMode: boolean;
+  selected: boolean;
+  onToggleSelect: () => void;
+}) {
+  if (selectMode) {
+    return (
+      <button
+        type="button"
+        className={classNames(styles.buildingCard, styles.buildingCardSelectable)}
+        onClick={onToggleSelect}
+        aria-pressed={selected}
+      >
+        <span className={classNames(styles.selectCheckbox, { [styles.selectCheckboxChecked]: selected })}>
+          {selected && <span className="i-ph:check-bold" />}
+        </span>
+        <MiniBrowserFrame
+          size="compact"
+          url=""
+          title={item.description || '이름 없는 앱'}
+          addressOverride="배포하면 주소가 생겨요"
+        />
+      </button>
+    );
+  }
+
   return (
     <a href={`/chat/${item.urlId}`} className={styles.buildingCard}>
       <MiniBrowserFrame
@@ -122,6 +155,10 @@ export default function Apps() {
   const [activeTab, setActiveTab] = useState<AppsTab>('deployed');
   const [apps, setApps] = useState<DeployedAppRecord[] | null>(null);
   const [buildingChats, setBuildingChats] = useState<ChatHistoryItem[] | null>(null);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
   useEffect(() => {
     if (!authUser) {
@@ -178,6 +215,48 @@ export default function Apps() {
     };
   }, [authUser, apps]);
 
+  const toggleSelectMode = () => {
+    setSelectMode((prev) => !prev);
+    setSelectedIds(new Set());
+  };
+
+  const toggleSelected = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+
+      return next;
+    });
+  };
+
+  const handleBulkDelete = async () => {
+    if (!db || selectedIds.size === 0) {
+      return;
+    }
+
+    setIsBulkDeleting(true);
+
+    try {
+      await Promise.all(Array.from(selectedIds).map((id) => deleteById(db!, id)));
+
+      setBuildingChats((prev) => (prev ? prev.filter((item) => !selectedIds.has(item.id)) : prev));
+      toast.success(`대화 ${selectedIds.size}개를 삭제했어요`, { position: 'bottom-right', autoClose: 3000 });
+      setSelectedIds(new Set());
+      setSelectMode(false);
+    } catch (error) {
+      console.error('Failed to bulk delete chats:', error);
+      toast.error('일부 대화를 삭제하지 못했어요', { position: 'bottom-right', autoClose: 3000 });
+    } finally {
+      setIsBulkDeleting(false);
+      setIsBulkDeleteOpen(false);
+    }
+  };
+
   return (
     <PageShell headline="내가 만든 앱" subheadline="배포한 앱을 한곳에서 확인해요">
       {!authUser && (
@@ -206,7 +285,27 @@ export default function Apps() {
             >
               만드는 중
             </button>
+            {activeTab === 'building' && buildingChats !== null && buildingChats.length > 0 && (
+              <button type="button" className={styles.selectModeToggle} onClick={toggleSelectMode}>
+                {selectMode ? '취소' : '선택'}
+              </button>
+            )}
           </div>
+
+          {selectMode && activeTab === 'building' && (
+            <div className={styles.bulkActionBar}>
+              <span>{selectedIds.size}개 선택됨</span>
+              <button
+                type="button"
+                className={styles.bulkDeleteBtn}
+                disabled={selectedIds.size === 0}
+                onClick={() => setIsBulkDeleteOpen(true)}
+              >
+                <span className="i-ph:trash" />
+                삭제
+              </button>
+            </div>
+          )}
 
           {activeTab === 'deployed' && (
             <>
@@ -244,7 +343,13 @@ export default function Apps() {
               {buildingChats !== null && buildingChats.length > 0 && (
                 <div className={styles.grid}>
                   {buildingChats.map((item) => (
-                    <BuildingCard key={item.id} item={item} />
+                    <BuildingCard
+                      key={item.id}
+                      item={item}
+                      selectMode={selectMode}
+                      selected={selectedIds.has(item.id)}
+                      onToggleSelect={() => toggleSelected(item.id)}
+                    />
                   ))}
                 </div>
               )}
@@ -252,6 +357,18 @@ export default function Apps() {
           )}
         </>
       )}
+
+      <ConfirmationDialog
+        isOpen={isBulkDeleteOpen}
+        onClose={() => setIsBulkDeleteOpen(false)}
+        onConfirm={handleBulkDelete}
+        title={`대화 ${selectedIds.size}개를 삭제할까요?`}
+        description="삭제하면 되돌릴 수 없어요."
+        confirmLabel="삭제"
+        cancelLabel="취소"
+        variant="destructive"
+        isLoading={isBulkDeleting}
+      />
     </PageShell>
   );
 }
