@@ -509,7 +509,7 @@ export function EventLogsTab() {
       doc.setFont('helvetica', 'bold');
       doc.text('Event Logs Report', margin, 35);
 
-      // Add subtitle with bolt.diy
+      // Add subtitle
       doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
       doc.text('코랄레드 - AI Development Platform', margin, 45);

@@ -8,7 +8,7 @@ interface HeaderActionButtonsProps {
   chatStarted: boolean;
 }
 
-// Report Bug/Debug Log link to the upstream bolt.diy repo and are developer-only — kept but hidden.
+// Debug Log download is developer-only — kept but hidden.
 const SHOW_DEBUG_TOOLS = false;
 
 export function HeaderActionButtons({ chatStarted: _chatStarted }: HeaderActionButtonsProps) {
@@ -32,17 +32,6 @@ export function HeaderActionButtons({ chatStarted: _chatStarted }: HeaderActionB
       {shouldShowButtons && SHOW_DEBUG_TOOLS && (
         <div className="flex border border-bolt-elements-borderColor rounded-md overflow-hidden text-sm">
           <button
-            onClick={() =>
-              window.open('https://github.com/stackblitz-labs/bolt.diy/issues/new?template=bug_report.yml', '_blank')
-            }
-            className="rounded-l-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:opacity-[0.85] outline-[var(--accent)] flex gap-1.5"
-            title="Report Bug"
-          >
-            <div className="i-ph:bug" />
-            <span>Report Bug</span>
-          </button>
-          <div className="w-px bg-bolt-elements-borderColor" />
-          <button
             onClick={async () => {
               try {
                 const { downloadDebugLog } = await import('~/utils/debugLogger');
@@ -51,7 +40,7 @@ export function HeaderActionButtons({ chatStarted: _chatStarted }: HeaderActionB
                 console.error('Failed to download debug log:', error);
               }
             }}
-            className="rounded-r-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:opacity-[0.85] outline-[var(--accent)] flex gap-1.5"
+            className="rounded-md items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-3 py-1.5 text-xs bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:opacity-[0.85] outline-[var(--accent)] flex gap-1.5"
             title="Download Debug Log"
           >
             <div className="i-ph:download" />

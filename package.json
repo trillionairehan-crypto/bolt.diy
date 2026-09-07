@@ -1,14 +1,14 @@
 {
   "name": "bolt",
-  "description": "An AI Agent",
+  "description": "코딩 몰라도 한국어 한마디로 웹사이트와 앱을 만드는 코랄레드",
   "private": true,
   "license": "MIT",
   "sideEffects": false,
   "type": "module",
   "version": "1.0.0",
   "author": {
-    "name": "bolt.diy team",
-    "email": "maintainers@bolt.diy"
+    "name": "coralred",
+    "email": "coralred@coralred.kr"
   },
   "scripts": {
     "deploy": "npm run build && wrangler pages deploy build/client --project-name=coralred --branch=coralred",
