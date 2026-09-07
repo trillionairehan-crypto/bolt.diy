@@ -36,6 +36,19 @@ export function initGlobalErrorRecovery() {
     return;
   }
 
+  /*
+   * Vite dispatches this when a dynamically-imported chunk 404s — the shape when a tab stays
+   * open (or serves a cached HTML/manifest) across a deploy, since each build hashes chunk
+   * filenames and Cloudflare Pages' production URL only ever serves the latest deployment's
+   * assets, not the previous build's. preventDefault() stops it from also surfacing as an
+   * unhandled rejection; reloading always fixes it since the new HTML points at current hashes.
+   */
+  window.addEventListener('vite:preloadError', (event) => {
+    logger.error('Chunk load failed (stale build after deploy)', event);
+    event.preventDefault();
+    showRecoveryOverlay();
+  });
+
   window.addEventListener('error', (event) => {
     const details = getErrorDetails(event.error ?? event.message);
 
