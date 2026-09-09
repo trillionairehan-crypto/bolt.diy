@@ -33,6 +33,7 @@ import { ChatBox } from './ChatBox';
 import type { DesignScheme } from '~/types/design-scheme';
 import type { ElementInfo } from '~/components/workbench/Inspector';
 import LlmErrorAlert from './LLMApiAlert';
+import { GenerationStageIndicator } from './GenerationStageIndicator';
 import PromptClarification from './PromptClarification';
 import type { GenerationDirectives } from '~/lib/onboarding/answer-directives';
 import { DeployedAppCards } from './DeployedAppCards';
@@ -102,6 +103,7 @@ interface BaseChatProps {
   previewAlert?: ActionAlert;
   onRetryAutoFix?: () => void;
   autoReviewing?: boolean;
+  pipelineStage?: number;
   supabaseAlert?: SupabaseAlert;
   clearSupabaseAlert?: () => void;
   deployAlert?: DeployAlert;
@@ -164,6 +166,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       previewAlert,
       onRetryAutoFix,
       autoReviewing,
+      pipelineStage = 0,
       deployAlert,
       clearDeployAlert,
       supabaseAlert,
@@ -537,6 +540,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                     />
                   )}
                 </div>
+                {chatStarted && <GenerationStageIndicator stage={pipelineStage} />}
                 {progressAnnotations && <ProgressCompilation data={progressAnnotations} />}
                 <ChatBox
                   isModelSettingsCollapsed={isModelSettingsCollapsed}

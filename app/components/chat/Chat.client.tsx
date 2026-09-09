@@ -251,6 +251,17 @@ export const ChatImpl = memo(
      */
     const autoReviewArmedRef = useRef(false);
 
+    /*
+     * 출시 블로커(2026-09-09) 무한 대기 방지 — 서버 3분 상한과 별개로, 클라이언트가 "마지막 진행
+     * 신호"를 직접 추적한다. data-progress 이벤트(요약/컨텍스트/응답 단계 전환)와 스트리밍되는
+     * 메시지 내용(파일/텍스트 델타) 둘 다 "신호"로 친다 — data-progress만 보면 정상적인 긴 응답
+     * 단계(단계 전환 없이 수 분간 이어지는) 자체를 오탐한다. 90초 동안 이 두 신호가 모두 없으면
+     * 서버가 죽었든 네트워크가 끊겼든 상관없이 사용자에게 알린다.
+     */
+    const lastProgressAtRef = useRef<number>(Date.now());
+    const lastMessageSignatureRef = useRef<string>('');
+    const clientStallHandledRef = useRef(false);
+
     const {
       messages,
       status,
@@ -366,6 +377,8 @@ export const ChatImpl = memo(
         handleError(e, 'chat');
       },
       onData: (dataPart) => {
+        lastProgressAtRef.current = Date.now();
+
         if (dataPart.type === 'data-progress') {
           setProgressAnnotations((prev) => [...prev, dataPart.data as ProgressAnnotation]);
         }
@@ -423,6 +436,128 @@ export const ChatImpl = memo(
 
     // Same isLoading timing the auto-fix effect itself waits on — no need for a duplicate indicator mid-stream.
     const previewAlert = actionAlert && actionAlert.source === 'preview' && !isLoading ? actionAlert : undefined;
+
+    /*
+     * 진행 신호 갱신: 스트리밍되는 마지막 메시지의 파트 개수/마지막 파트 길이가 바뀌면(텍스트든
+     * 파일 델타든) "살아있다"는 뜻 — data-progress 단계 전환(요약/컨텍스트/응답 시작-끝)만으로는
+     * 정상적인 긴 응답 구간(단계 전환 없이 수 분) 자체를 오탐하므로 반드시 같이 봐야 한다.
+     */
+    useEffect(() => {
+      const last = messages[messages.length - 1];
+
+      if (!last || last.role !== 'assistant') {
+        return;
+      }
+
+      const lastPart = last.parts?.[last.parts.length - 1];
+      const signature = `${last.id}:${last.parts?.length ?? 0}:${JSON.stringify(lastPart)?.length ?? 0}`;
+
+      if (signature !== lastMessageSignatureRef.current) {
+        lastMessageSignatureRef.current = signature;
+        lastProgressAtRef.current = Date.now();
+      }
+    }, [messages]);
+
+    const handleClientStall = useCallback(
+      (idleMs: number) => {
+        logger.error('Client-side generation stall detected — no progress signal for 90s+', { idleMs });
+
+        // 재시도는 무과금 — 원본 요청이 이미 armed 상태였다면 여기서 확실히 해제한다.
+        generationChargeGateRef.current.disarm();
+        stop();
+
+        const lastStage = progressAnnotations.slice(-1)[0]?.label ?? 'unknown';
+
+        Sentry.captureMessage('client generation stall', {
+          level: 'error',
+          tags: { route: 'chat.client', event: 'client_stall' },
+          extra: {
+            chatId: chatId.get() ?? 'unknown',
+            lastStage,
+            elapsedSec: Math.round(idleMs / 1000),
+          },
+        });
+
+        setLlmErrorAlert({
+          type: 'error',
+          title: '결과를 받지 못했어요',
+          description: '90초 넘게 응답이 없어서 중단했어요. 다시 시도해주세요.',
+          provider: provider.name,
+          errorType: 'client_stall',
+        });
+        setProgressAnnotations([]);
+      },
+      [provider.name, stop, progressAnnotations],
+    );
+
+    const CLIENT_STALL_TIMEOUT_MS = 90_000;
+
+    useEffect(() => {
+      if (!isLoading) {
+        clientStallHandledRef.current = false;
+
+        return () => {};
+      }
+
+      lastProgressAtRef.current = Date.now();
+
+      const interval = setInterval(() => {
+        if (clientStallHandledRef.current) {
+          return;
+        }
+
+        const idleMs = Date.now() - lastProgressAtRef.current;
+
+        if (idleMs > CLIENT_STALL_TIMEOUT_MS) {
+          clientStallHandledRef.current = true;
+          handleClientStall(idleMs);
+        }
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }, [isLoading]);
+
+    /*
+     * 진행 단계 표시(빌드 → 코드 점검 → 화면 확인 → 마무리) — 도달한 최고 단계만 기록(뒤로 안
+     * 감), 전부 끝나면 "마무리"를 잠깐 보여주고 숨긴다. 3분 넘게 걸려도 화면 만들기 단계에 머무는
+     * 것 자체가 "아직 응답 생성 중"이라는 정확한 신호이므로 별도 세부 진행률은 만들지 않는다.
+     */
+    const [pipelineStage, setPipelineStage] = useState(0);
+
+    useEffect(() => {
+      if (isLoading || fakeLoading) {
+        setPipelineStage((s) => Math.max(s, 1));
+        return;
+      }
+
+      if (autoReviewing) {
+        setPipelineStage((s) => Math.max(s, 2));
+        return;
+      }
+
+      if (previewAlert) {
+        setPipelineStage((s) => Math.max(s, 3));
+        return;
+      }
+
+      setPipelineStage((s) => {
+        if (s === 0 || s === 4) {
+          return s;
+        }
+
+        return 4;
+      });
+    }, [isLoading, fakeLoading, autoReviewing, previewAlert]);
+
+    useEffect(() => {
+      if (pipelineStage !== 4) {
+        return () => {};
+      }
+
+      const timeout = setTimeout(() => setPipelineStage(0), 2000);
+
+      return () => clearTimeout(timeout);
+    }, [pipelineStage]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
       setInput(event.target.value);
@@ -1221,6 +1356,7 @@ export const ChatImpl = memo(
         previewAlert={previewAlert}
         onRetryAutoFix={retryAutoFix}
         autoReviewing={autoReviewing}
+        pipelineStage={pipelineStage}
         supabaseAlert={supabaseAlert}
         clearSupabaseAlert={() => workbenchStore.clearSupabaseAlert()}
         deployAlert={deployAlert}

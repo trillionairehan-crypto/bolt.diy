@@ -12,6 +12,7 @@ interface Props {
 export default function LlmErrorAlert({ alert, clearAlert, onRetry, onContinue }: Props) {
   const { title, description, provider, errorType } = alert;
   const isDurationCap = errorType === 'duration_cap';
+  const isClientStall = errorType === 'client_stall';
 
   const getErrorIcon = () => {
     switch (errorType) {
@@ -23,6 +24,8 @@ export default function LlmErrorAlert({ alert, clearAlert, onRetry, onContinue }
         return 'i-ph:warning-circle-duotone';
       case 'duration_cap':
         return 'i-ph:hourglass-duotone';
+      case 'client_stall':
+        return 'i-ph:wifi-slash-duotone';
       default:
         return 'i-ph:warning-duotone';
     }
@@ -38,6 +41,9 @@ export default function LlmErrorAlert({ alert, clearAlert, onRetry, onContinue }
         return `${provider}의 사용량을 초과했어요. 계정 한도를 확인해주세요.`;
       case 'duration_cap':
         // 서버가 보낸 문구("~까지 만들었어요. 이어서 만들까요?") 자체가 이미 사용자에게 보여줄 메시지 — 그대로 쓴다.
+        return description;
+      case 'client_stall':
+        // Chat.client.tsx가 보낸 문구 그대로 — 재시도는 무과금.
         return description;
       default:
         return '잠시 문제가 있었어요. 다시 시도해주세요.';
@@ -81,8 +87,8 @@ export default function LlmErrorAlert({ alert, clearAlert, onRetry, onContinue }
             >
               <p>{getErrorMessage()}</p>
 
-              {/* duration_cap은 getErrorMessage()가 이미 description 자체를 보여주므로 중복 표시 안 함. */}
-              {description && !isDurationCap && (
+              {/* duration_cap/client_stall은 getErrorMessage()가 이미 description 자체를 보여주므로 중복 표시 안 함. */}
+              {description && !isDurationCap && !isClientStall && (
                 <div className="text-xs text-bolt-elements-textSecondary p-2 bg-bolt-elements-background-depth-3 rounded mt-4 mb-4">
                   오류 상세: {description}
                 </div>
