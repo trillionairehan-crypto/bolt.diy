@@ -1233,6 +1233,15 @@ function fixHeadlineTagFontSize(tagText: string): { tagText: string; changed: bo
  * 잘못 판정할 수 있다. 근본 해결은 실제 렌더된 DOM(getComputedStyle)을 보는 방식으로 전환하는 것.
  * 재현 픽스처: tests/fixtures/generated/{bakery,portfolio}.json — 둘 다 지금 검사로는 이미 56px라
  * 통과하지만, "소스에 적힌 값 = 실제 렌더 값"이라는 전제 자체를 검증하지는 못한다.
+ *
+ * TODO(백로그 3, 2026-09-09, 결정: 정적 검사 추가 금지): 실생성 검증(개인 포트폴리오, tests/skeleton7-dom)
+ * 에서 재현 — 헤드라인이 챕터 span 밖(같은 파일 안의 하위 컴포넌트 정의부, 호출부만 span 안)에 있으면
+ * 이 함수는 그 태그 자체를 못 봐서 unresolved로 넘어가고, 실제 렌더는 CSS 클래스에만 의존해 56px
+ * 미달로 나온다(캡션 쪽도 대칭 사각지대 — 아래 runSkeleton7SharedCaptionCheck 주석 참고). 소스
+ * 문자열 기반 정적 검사로 컴포넌트 트리를 더 따라가는 정규식을 추가하는 방향은 막다른 길로 판단해
+ * 중단 — 이 라인의 정적 검사 확장은 더 하지 않는다. 근본 해결은 골격 7 검증 자체를 여기(자동수정
+ * 파이프라인)가 아니라 시각 검토 단계(LLM 비전 검토 등 실제 렌더 DOM을 보는 단계)로 옮기는 것 —
+ * 별도 작업.
  */
 function runSkeleton7FallbackHeadlineCheck(
   filePath: string,
@@ -1346,12 +1355,12 @@ const CH7_CAPTION_REGEX = new RegExp(CH7_HERO_CAPTION.replace(/[.*+?^${}()|[\]\\
 const CH7_HERO_PROXIMITY_WINDOW = 3000;
 
 /*
- * TODO(백로그 2, 2026-09-04): 파일 내 캡션 "리터럴 문자열" 개수만 센다 — 캡션을 감싼 로직이 별도
- * 컴포넌트(예: PhotoSlot.tsx)로 추출되고 여러 챕터에서 재사용되면 소스엔 리터럴이 1번뿐이어도 렌더된
- * DOM엔 여러 번 나온다. 실측 재현: tests/fixtures/generated/cafe.json — 실제 캡션 4회 렌더인데
- * (CDP로 찍은 cafe-v2-inspect.json 기준 captionCount: 4) 이 검사는 못 잡는다
- * (mechanical-checks.fixtures.spec.ts의 "KNOWN GAP" 테스트가 이 사각지대를 고정해서 보여준다).
- * 근본 해결은 소스 문자열이 아니라 렌더 결과(DOM) 기반 검사로 전환하는 것.
+ * 파일 내 캡션 "리터럴 문자열" 개수만 센다 — 캡션을 감싼 로직이 별도 컴포넌트(예: PhotoSlot.tsx)로
+ * 추출되고 여러 챕터에서 재사용되면 소스엔 리터럴이 1번뿐이어도 렌더된 DOM엔 여러 번 나온다. 그
+ * 크로스 파일 케이스는 이 함수가 아니라 아래 runSkeleton7SharedCaptionCheck(전체 파일셋을 보고 prop
+ * 게이트 호출 지점을 추적)가 별도로 처리한다 — 이 함수는 여전히 "한 파일 안에서 리터럴이 그대로
+ * 여러 번 박힌" 단순 케이스 전용. 2026-09-09: tests/skeleton7-dom(Playwright 실렌더)로 cafe
+ * 픽스처 실측 검증 완료(캡션 4회 -> 1회로 축소 확인).
  */
 /** 안내 문구가 2회 이상이면 히어로(data-slot="hero") 근처 1곳만 남기고 나머지를 지운다. */
 function runSkeleton7CaptionDedupeCheck(
@@ -1392,6 +1401,188 @@ function runSkeleton7CaptionDedupeCheck(
     ],
     content: nextContent,
   };
+}
+
+const CH7_CAPTION_PROP_GATE_REGEX = /\{\s*([A-Za-z_$][\w$]*)\s*&&/g;
+const CH7_CAPTION_GATE_SEARCH_WINDOW = 500;
+
+interface Skeleton7SharedCaptionComponent {
+  file: string;
+  componentName: string;
+  propName: string;
+}
+
+/**
+ * 캡션이 별도 파일의 컴포넌트 안에서 `{propName && (...캡션...)}` 형태로 prop에 의해 켜지는지 찾는다.
+ * 오탐 방지로 propName이 그 파일의 구조분해 매개변수(`{ ..., propName, ... }:`)에 실제로 선언돼
+ * 있는지까지 확인한다. 히어로 파일 자체는 호출자에서 건너뛰고 넘긴다.
+ */
+function findSharedCaptionComponent(filePath: string, content: string): Skeleton7SharedCaptionComponent | null {
+  if (!hasExtension(filePath, ['.tsx', '.jsx']) || !content.includes(CH7_HERO_CAPTION)) {
+    return null;
+  }
+
+  const captionIdx = content.indexOf(CH7_HERO_CAPTION);
+  const windowStart = Math.max(0, captionIdx - CH7_CAPTION_GATE_SEARCH_WINDOW);
+  const before = content.slice(windowStart, captionIdx);
+  const gateMatches = [...before.matchAll(CH7_CAPTION_PROP_GATE_REGEX)];
+  const gateMatch = gateMatches[gateMatches.length - 1]; // 캡션 바로 앞(가장 가까운) 게이트
+
+  if (!gateMatch) {
+    return null;
+  }
+
+  const propName = gateMatch[1];
+  const propDeclRegex = new RegExp(`\\{[^}]*\\b${propName}\\b[^}]*\\}\\s*:`);
+
+  if (!propDeclRegex.test(content)) {
+    return null;
+  }
+
+  const nameMatch =
+    content.match(/function\s+([A-Z]\w*)\s*\(/) ??
+    content.match(/const\s+([A-Z]\w*)\s*=\s*\(/) ??
+    content.match(/export\s+default\s+(?:function\s+)?([A-Z]\w*)/);
+
+  if (!nameMatch) {
+    return null;
+  }
+
+  return { file: filePath, componentName: nameMatch[1], propName };
+}
+
+/*
+ * 크로스 파일 캡션 중복 — 캡션이 PhotoSlot.tsx 같은 공용 컴포넌트로 추출되고 여러 챕터에서
+ * `<PhotoSlot showCaption ... />` 형태로 반복 호출되면, 파일별 리터럴 검사(위)는 컴포넌트
+ * 정의 파일에서 리터럴을 1번만 보므로 못 잡는다. 실측(2026-09-09, tests/skeleton7-dom):
+ * tests/fixtures/generated/cafe.json이 정확히 이 패턴 — 소스엔 리터럴 1번인데 렌더된 DOM엔
+ * PhotoSlot이 4개 챕터 각각에서 호출돼 캡션이 4번 나온다.
+ *
+ * 전체 파일셋에서 공용 캡션 컴포넌트를 찾은 뒤, 그 컴포넌트의 JSX 호출 지점을 전 파일에서
+ * 찾아 히어로 챕터(data-slot="hero") 안에 있는 호출 1곳만 prop을 남기고 나머지 호출에서
+ * prop을 제거한다(JSX 불리언 shorthand/명시적 값 모두 대상 — prop이 없으면 컴포넌트 내부의
+ * `propName && (...)` 게이트가 자연히 false로 닫힌다).
+ *
+ * TODO(백로그 3, 2026-09-09, 결정: 정적 검사 추가 금지): 위 방식은 호출부에 prop이 "명시적으로"
+ * 붙어 있어야 site로 잡는다 — 실생성 검증(개인 포트폴리오)에서 `caption = true` 같은 기본값
+ * 파라미터로 게이트를 걸고 호출부는 `<ImagePlaceholder />`처럼 prop을 아예 안 넘기는 패턴이
+ * 나와 이 검사가 그대로 못 잡는 걸 재현했다(호출부만 봐선 "기본값이 뭔지" 알 수 없어 소스
+ * 분석만으론 정확한 판정이 원천적으로 불가능). 위 헤드라인 검사 TODO와 같은 결론 — 이 라인의
+ * 정적 검사는 더 확장하지 않는다. 골격 7 검증 자체를 시각 검토 단계(실제 렌더 DOM 기반)로
+ * 옮기는 별도 작업으로 대체 예정.
+ */
+function runSkeleton7SharedCaptionCheck(files: Record<string, string>): {
+  findings: MechanicalFinding[];
+  updatedFiles: Record<string, string>;
+} {
+  const findings: MechanicalFinding[] = [];
+  const updatedFiles: Record<string, string> = {};
+
+  const heroFileEntry = Object.entries(files).find(([, content]) => content.includes('data-slot="hero"'));
+
+  if (!heroFileEntry) {
+    return { findings, updatedFiles };
+  }
+
+  const [heroFilePath] = heroFileEntry;
+
+  let shared: Skeleton7SharedCaptionComponent | null = null;
+
+  for (const [filePath, content] of Object.entries(files)) {
+    if (filePath === heroFilePath) {
+      continue; // 히어로 파일 자체가 아니라 별도로 추출된 "공용 컴포넌트" 파일을 찾는다.
+    }
+
+    const found = findSharedCaptionComponent(filePath, content);
+
+    if (found) {
+      shared = found;
+      break;
+    }
+  }
+
+  if (!shared) {
+    return { findings, updatedFiles };
+  }
+
+  const tagOpenRegex = new RegExp(`<${shared.componentName}\\b[^>]*>`, 'g');
+  const propRegex = new RegExp(`\\s*\\b${shared.propName}(?:=\\{[^}]*\\})?`);
+
+  interface CaptionSite {
+    file: string;
+    tagStart: number;
+    propStart: number;
+    propEnd: number;
+  }
+
+  const sites: CaptionSite[] = [];
+
+  for (const [filePath, content] of Object.entries(files)) {
+    for (const tagMatch of content.matchAll(tagOpenRegex)) {
+      const tagText = tagMatch[0];
+      const propMatch = tagText.match(propRegex);
+
+      if (!propMatch) {
+        continue; // 그 호출엔 prop 자체가 없음(이미 꺼져 있음) — 대상 아님.
+      }
+
+      const tagStart = tagMatch.index as number;
+      sites.push({
+        file: filePath,
+        tagStart,
+        propStart: tagStart + (propMatch.index as number),
+        propEnd: tagStart + (propMatch.index as number) + propMatch[0].length,
+      });
+    }
+  }
+
+  if (sites.length < 2) {
+    return { findings, updatedFiles };
+  }
+
+  const heroChapterSpans = findSkeleton7ChapterSpans(files[heroFilePath]);
+  const heroSpan = heroChapterSpans?.[0]; // hero는 항상 첫 챕터.
+  let keepIndex = 0;
+
+  if (heroSpan) {
+    const idx = sites.findIndex(
+      (site) => site.file === heroFilePath && site.tagStart >= heroSpan.start && site.tagStart < heroSpan.end,
+    );
+
+    if (idx !== -1) {
+      keepIndex = idx;
+    }
+  }
+
+  const toRemove = sites.filter((_, i) => i !== keepIndex);
+  const byFile = new Map<string, CaptionSite[]>();
+
+  for (const site of toRemove) {
+    const list = byFile.get(site.file) ?? [];
+    list.push(site);
+    byFile.set(site.file, list);
+  }
+
+  for (const [filePath, fileSites] of byFile) {
+    let content = files[filePath];
+    const sorted = [...fileSites].sort((a, b) => b.propStart - a.propStart);
+
+    for (const site of sorted) {
+      content = content.slice(0, site.propStart) + content.slice(site.propEnd);
+    }
+
+    updatedFiles[filePath] = content;
+  }
+
+  findings.push({
+    file: shared.file,
+    line: lineNumberAt(files[shared.file], files[shared.file].indexOf(CH7_HERO_CAPTION)),
+    rule: 'skeleton7-caption-dedupe-shared-component',
+    message: `공용 컴포넌트(${shared.componentName})의 안내 문구가 ${sites.length}개 호출 지점에서 렌더돼 히어로 근처 1곳만 남기고 ${toRemove.length}곳의 "${shared.propName}"을 제거했습니다.`,
+    autoFixed: true,
+  });
+
+  return { findings, updatedFiles };
 }
 
 const CH7_MAP_CALL_REGEX = /\.map\(/;
@@ -2105,6 +2296,23 @@ export function runMechanicalChecks(files: Record<string, string>, resolvedHue: 
     }
   }
 
+  /*
+   * 크로스 파일 캡션 중복은 파일 하나씩 보는 위 루프로는 못 잡는다(공용 컴포넌트 호출 지점이
+   * 다른 챕터 파일에 흩어져 있음) — 루프가 끝난 뒤 전체 파일셋(자동수정 반영본)을 한 번에 본다.
+   */
+  const postLoopFiles: Record<string, string> = {};
+
+  for (const filePath of Object.keys(files)) {
+    postLoopFiles[filePath] = updatedFiles[filePath] ?? files[filePath];
+  }
+
+  const sharedCaptionResult = runSkeleton7SharedCaptionCheck(postLoopFiles);
+  findings.push(...sharedCaptionResult.findings);
+
+  for (const [filePath, content] of Object.entries(sharedCaptionResult.updatedFiles)) {
+    updatedFiles[filePath] = content;
+  }
+
   return { findings, updatedFiles };
 }
 
@@ -2144,6 +2352,7 @@ export const __internal = {
   runSkeleton7DataSlotCheck,
   runSkeleton7FallbackHeadlineCheck,
   runSkeleton7CaptionDedupeCheck,
+  runSkeleton7SharedCaptionCheck,
   runSkeleton7CardGridHintCheck,
   isSkeleton7File,
   findChapterSpan,

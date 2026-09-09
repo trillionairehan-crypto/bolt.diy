@@ -16,7 +16,17 @@ const typescriptEslintPlugin = recommendedConfigs.find((config) => config.plugin
 
 export default [
   {
-    ignores: ['**/dist', '**/node_modules', '**/.wrangler', '**/bolt/build', '**/.history'],
+    ignores: [
+      '**/dist',
+      '**/node_modules',
+      '**/.wrangler',
+      '**/bolt/build',
+      '**/.history',
+      'tests/skeleton7-dom/.tmp/**',
+      'tests/skeleton7-dom/.bundled-*',
+      'tests/benchmark/.dist/**',
+      'tests/benchmark/results/**',
+    ],
   },
   ...recommendedConfigs,
   {
@@ -51,7 +61,10 @@ export default [
   },
   {
     files: [...tsFileExtensions, ...jsFileExtensions, '**/*.tsx'],
-    ignores: ['functions/*', 'electron/**/*'],
+    // tests/benchmark, tests/skeleton7-dom: esbuild가 번들해서 node로 직접 실행하는 독립
+    // 스크립트라 '~/' 별칭이 아니라 확장자 붙은 상대 import를 그대로 써야 한다(tsconfig exclude와
+    // 같은 이유).
+    ignores: ['functions/*', 'electron/**/*', 'tests/benchmark/**', 'tests/skeleton7-dom/**'],
     rules: {
       'no-restricted-imports': [
         'error',

@@ -38,6 +38,15 @@ vite.config.ts.timestamp-*.mjs
 .wrangler
 _worker.bundle
 
+# Supabase CLI local state
+supabase/.temp/
+
+# tests/skeleton7-dom, tests/benchmark: esbuild가 실행 시 만드는 번들/임시 렌더 결과물 — 스크립트
+# 소스만 커밋 대상, 매 실행마다 새로 생성됨
+tests/skeleton7-dom/.tmp/
+tests/skeleton7-dom/.bundled-*
+tests/benchmark/.dist/
+
 Modelfile
 modelfiles
 

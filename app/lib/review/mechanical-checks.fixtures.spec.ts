@@ -96,22 +96,27 @@ describe('mechanical-checks against captured 골격 7 생성물 (cafe, 2026-09-0
   });
 
   /*
-   * 실측(이 픽스처, 2026-09-04): "이미지 없음" 처리를 재사용하지 말라는 프롬프트 문구에도 불구하고
-   * PhotoSlot.tsx라는 공용 컴포넌트를 만들어 4개 챕터 전부에서 호출했다 — 렌더된 DOM에는 안내
-   * 문구가 4회 나오지만(inspect.json captionCount:4), 소스 문자열 자체는 PhotoSlot.tsx 안에 1번만
-   * 있다. runSkeleton7CaptionDedupeCheck는 파일별 리터럴 문자열 개수만 세므로 이 케이스를 못 잡는다
-   * — 알려진 사각지대. 여기서는 그 사각지대를 문서화만 하고 고치지는 않는다(별도 작업).
+   * "이미지 없음" 처리를 재사용하지 말라는 프롬프트 문구에도 불구하고 PhotoSlot.tsx라는 공용
+   * 컴포넌트를 만들어 4개 챕터 전부에서 호출한 실제 생성물. 렌더된 DOM에는 안내 문구가 4회
+   * 나오지만(tests/skeleton7-dom으로 2026-09-09 실측 확인) 소스 문자열 자체는 PhotoSlot.tsx
+   * 안에 1번만 있어 파일별 리터럴 검사(runSkeleton7CaptionDedupeCheck)로는 못 잡는다 — 대신
+   * runSkeleton7SharedCaptionCheck가 전체 파일셋에서 PhotoSlot의 JSX 호출 지점 4곳을 찾아
+   * 히어로 챕터 안의 호출 1곳만 남기고 나머지 3곳의 showCaption prop을 제거한다.
    */
-  it('KNOWN GAP: caption duplicated via a reused component (PhotoSlot.tsx) is invisible to the source-level dedupe check', () => {
+  it('dedupes the caption reused via a shared component (PhotoSlot.tsx) across chapters', () => {
     const appTsx = files['/home/project/src/App.tsx'];
     const photoSlot = files['/home/project/src/components/PhotoSlot.tsx'];
     const CAPTION = '사진을 보내주시면 여기에 넣어드릴게요';
 
     expect(appTsx.split(CAPTION).length - 1).toBe(0); // App.tsx 자체엔 리터럴이 없다
-    expect(photoSlot.split(CAPTION).length - 1).toBe(1); // PhotoSlot.tsx 안에 1번 — 재사용 컴포넌트 존재 자체가 문제
+    expect(photoSlot.split(CAPTION).length - 1).toBe(1); // PhotoSlot.tsx 안에 1번 — 재사용 컴포넌트
 
-    const { findings } = runMechanicalChecks(files, hue);
-    expect(findings.some((f) => f.rule === 'skeleton7-hero-caption-dedupe')).toBe(false); // 못 잡음 — 사각지대
+    const { findings, updatedFiles } = runMechanicalChecks(files, hue);
+    expect(findings.some((f) => f.rule === 'skeleton7-caption-dedupe-shared-component')).toBe(true);
+
+    const fixedAppTsx = updatedFiles['/home/project/src/App.tsx'] as string;
+    const showCaptionCount = fixedAppTsx.split('showCaption').length - 1;
+    expect(showCaptionCount).toBe(1); // 4곳 -> 히어로 1곳만 남음
   });
 
   it('does not detect a card-grid/.map() violation', () => {
