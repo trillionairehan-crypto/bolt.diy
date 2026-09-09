@@ -126,6 +126,10 @@ jobs:
         env:
           VITE_PLATFORM_SUPABASE_URL: ${{ secrets.VITE_PLATFORM_SUPABASE_URL }}
           VITE_PLATFORM_SUPABASE_ANON_KEY: ${{ secrets.VITE_PLATFORM_SUPABASE_ANON_KEY }}
+          # vite.config.ts define inlines this into the client bundle at build time — see
+          # app/entry.client.tsx's Sentry.init(). Without it here, the deployed browser bundle
+          # silently ships with client-side Sentry disabled (dsn: undefined, no throw).
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
       - name: Deploy to Cloudflare Pages
         run: pnpm exec wrangler pages deploy build/client --project-name=coralred --branch=coralred
