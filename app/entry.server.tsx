@@ -3,8 +3,17 @@ import { RemixServer } from '@remix-run/react';
 import { isbot } from 'isbot';
 import { renderToReadableStream } from 'react-dom/server';
 import { renderHeadToString } from 'remix-island';
+import * as Sentry from '@sentry/remix';
 import { Head } from './root';
 import { themeStore } from '~/lib/stores/theme';
+
+/*
+ * Catches loader/action errors Remix's own error boundary machinery handles internally — these
+ * never reach the onError below since they don't escape as a thrown render error. Relies on
+ * functions/_middleware.ts having already called Sentry.init (sentryPagesPlugin) for this request;
+ * this just reports into whatever client is active.
+ */
+export const handleError = Sentry.sentryHandleError;
 
 export default async function handleRequest(
   request: Request,
@@ -19,6 +28,7 @@ export default async function handleRequest(
     signal: request.signal,
     onError(error: unknown) {
       console.error(error);
+      Sentry.captureException(error);
       responseStatusCode = 500;
     },
   });

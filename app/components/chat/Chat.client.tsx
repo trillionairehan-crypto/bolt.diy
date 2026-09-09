@@ -1,4 +1,5 @@
 import { useStore } from '@nanostores/react';
+import * as Sentry from '@sentry/remix';
 import type { UIMessage, FileUIPart } from 'ai';
 import { DefaultChatTransport } from 'ai';
 import { useChat } from '@ai-sdk/react';
@@ -210,6 +211,9 @@ export const ChatImpl = memo(
      * long after recordGenerationUsed exists).
      */
     const generationChargeGateRef = useRef(createGenerationChargeGate(() => recordGenerationUsed()));
+
+    /** Sentry regression guard for the double-charge bug — see recordGenerationUsed. */
+    const lastChargeRef = useRef<{ chatId: string | undefined; at: number } | null>(null);
 
     /*
      * DOUBLE_CHARGE_FIX.md: tracks whether the CURRENTLY in-flight generation was armed for a real
@@ -692,7 +696,27 @@ export const ChatImpl = memo(
        * localStorage counter) with a timestamp, so a repro's console can show whether recordGenerationUsed
        * itself is invoked twice for one user action.
        */
-      logger.info('recordGenerationUsed: charging now', { at: Date.now() });
+      const now = Date.now();
+      logger.info('recordGenerationUsed: charging now', { at: now });
+
+      /*
+       * Sentry regression guard: the double-charge bug this file's other comments reference was a
+       * race between two independently-armed gates firing for what the user experienced as one
+       * turn. Two real charges landing seconds apart for the same chat is that signature — flag it
+       * instead of silently re-eating the same class of bug.
+       */
+      const cid = chatId.get();
+      const last = lastChargeRef.current;
+
+      if (last && last.chatId === cid && now - last.at < 5000) {
+        Sentry.captureMessage('double_deduction', {
+          level: 'warning',
+          tags: { chatId: cid },
+          extra: { chatId: cid, userId: authUserStore.get()?.id ?? null, delta: 2 },
+        });
+      }
+
+      lastChargeRef.current = { chatId: cid, at: now };
 
       try {
         await incrementV2GenerationsUsed();
@@ -997,6 +1021,11 @@ export const ChatImpl = memo(
       const attempts = chatStore.get().autoFixAttempts;
 
       if (attempts >= 2) {
+        Sentry.captureMessage('autofix_exhausted', {
+          level: 'warning',
+          extra: { chatId: chatId.get(), attempts },
+        });
+
         return;
       }
 

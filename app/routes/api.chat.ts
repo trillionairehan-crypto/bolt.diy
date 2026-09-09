@@ -1,4 +1,5 @@
 import { type ActionFunctionArgs } from '@remix-run/cloudflare';
+import * as Sentry from '@sentry/remix';
 import {
   createUIMessageStream,
   createUIMessageStreamResponse,
@@ -445,8 +446,11 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
                 // Enhanced error handling for common streaming issues
                 if (error.message?.includes('Invalid JSON response')) {
                   logger.error('Invalid JSON response detected - likely malformed API response');
+                  Sentry.captureException(error, { tags: { route: 'api.chat', kind: 'llm_parse_failure' } });
                 } else if (error.message?.includes('token')) {
                   logger.error('Token-related error detected - possible token limit exceeded');
+                } else {
+                  Sentry.captureException(error, { tags: { route: 'api.chat' } });
                 }
 
                 return;
@@ -524,6 +528,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
                 writer.merge(result.toUIMessageStream());
               } catch (retryError) {
                 logger.error('Retry attempt failed to start:', retryError);
+                Sentry.captureException(retryError, { tags: { route: 'api.chat', kind: 'stall_retry_failed' } });
                 writer.write({
                   type: 'error',
                   errorText: '응답 생성이 너무 오래 걸려 중단했어요. 다시 시도해주세요.',
@@ -591,6 +596,7 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
     return createUIMessageStreamResponse({ stream: uiMessageStream });
   } catch (error: any) {
     logger.error(error);
+    Sentry.captureException(error, { tags: { route: 'api.chat' }, extra: { chatId } });
 
     const errorResponse = {
       error: true,

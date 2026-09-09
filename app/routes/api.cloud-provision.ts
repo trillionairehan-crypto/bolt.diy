@@ -1,4 +1,5 @@
 import { type ActionFunctionArgs, json } from '@remix-run/cloudflare';
+import * as Sentry from '@sentry/remix';
 import { getCloudSupabaseClient } from '~/lib/cloud/cloudSupabaseClient';
 import { getPlatformUserId } from '~/lib/cloud/cloudPlatformAuth';
 import { provisionCloudApp, type ProvisionCloudAppResult } from '~/lib/cloud/cloudProvision';
@@ -74,6 +75,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
      * hashCloudAppToken throwing) — without this, an uncaught exception here had no logging of its own at all.
      */
     logger.error('unexpected exception', error instanceof Error ? error.message : String(error));
+    Sentry.captureException(error, { tags: { route: 'api.cloud-provision' }, extra: { userId } });
 
     return provisionFailureResponse('unexpected');
   }

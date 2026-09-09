@@ -16,6 +16,7 @@ export default defineConfig((config) => {
   return {
     define: {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      'process.env.SENTRY_DSN': JSON.stringify(process.env.SENTRY_DSN),
     },
     build: {
       target: 'esnext',

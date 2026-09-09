@@ -1,4 +1,5 @@
 import { type ActionFunctionArgs } from '@remix-run/cloudflare';
+import * as Sentry from '@sentry/remix';
 import { streamText } from '~/lib/.server/llm/stream-text';
 import type { IProviderSetting, ProviderInfo } from '~/types/model';
 import { generateText } from 'ai';
@@ -138,6 +139,7 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
       });
     } catch (error: unknown) {
       logger.error(error);
+      Sentry.captureException(error, { tags: { route: 'api.llmcall', mode: 'stream' }, extra: { chatId } });
 
       if (error instanceof Error && error.message?.includes('API key')) {
         throw new Response('Invalid or missing API key', {
@@ -260,6 +262,14 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
       const result = await generateText(finalParams);
       logger.info(`Generated response`);
 
+      if (!result.text || result.text.trim().length === 0) {
+        Sentry.captureMessage('llm_empty_result', {
+          level: 'warning',
+          tags: { route: 'api.llmcall', model: modelDetails.name, provider: providerName },
+          extra: { chatId, finishReason: result.finishReason },
+        });
+      }
+
       if (chatId) {
         const ctx = context.cloudflare?.ctx;
 
@@ -306,6 +316,7 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
       );
     } catch (error: unknown) {
       logger.error(error);
+      Sentry.captureException(error, { tags: { route: 'api.llmcall', mode: 'non-stream', model }, extra: { chatId } });
 
       const errorResponse = {
         error: true,

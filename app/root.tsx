@@ -10,6 +10,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ClientOnly } from 'remix-utils/client-only';
 import { cssTransition, ToastContainer } from 'react-toastify';
+import { captureRemixErrorBoundaryError } from '@sentry/remix';
 import { createScopedLogger } from './utils/logger';
 import { initGlobalErrorRecovery } from './utils/globalErrorRecovery';
 import { captureUtmFromUrl } from './utils/utm';
@@ -218,6 +219,7 @@ export function ErrorBoundary() {
 
   useEffect(() => {
     logger.error('Root route error boundary caught', error);
+    captureRemixErrorBoundaryError(error);
   }, [error]);
 
   if (is404) {
