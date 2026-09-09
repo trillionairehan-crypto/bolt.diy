@@ -34,5 +34,9 @@
     "**/.server/**/*.tsx",
     "**/.client/**/*.ts",
     "**/.client/**/*.tsx"
-  ]
+  ],
+  // tests/benchmark는 esbuild로 번들해서 node로 직접 실행한다(별칭 없는 .ts 확장자 상대 import
+  // 사용) — 프로젝트 tsc(vite가 빌드를 맡는 나머지 코드) 대상이 아니다. exclude를 명시하면 tsc의
+  // 기본 제외 목록(node_modules 등)이 사라지므로 여기서 같이 유지한다.
+  "exclude": ["node_modules", "tests/benchmark/**"]
 }
