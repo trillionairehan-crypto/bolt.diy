@@ -109,6 +109,7 @@ interface BaseChatProps {
   llmErrorAlert?: LlmErrorAlertType;
   clearLlmErrorAlert?: () => void;
   onRetryLlmError?: () => void;
+  onContinueGeneration?: () => void;
   data?: JSONValue[] | undefined;
   chatMode?: 'discuss' | 'build';
   setChatMode?: (mode: 'discuss' | 'build') => void;
@@ -170,6 +171,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       llmErrorAlert,
       clearLlmErrorAlert,
       onRetryLlmError,
+      onContinueGeneration,
       data,
       chatMode,
       setChatMode,
@@ -531,6 +533,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       alert={llmErrorAlert}
                       clearAlert={() => clearLlmErrorAlert?.()}
                       onRetry={onRetryLlmError}
+                      onContinue={onContinueGeneration}
                     />
                   )}
                 </div>

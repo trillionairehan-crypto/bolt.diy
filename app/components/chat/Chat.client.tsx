@@ -542,6 +542,10 @@ export const ChatImpl = memo(
         } else if (errorInfo.message.toLowerCase().includes('quota')) {
           errorType = 'quota';
           title = '사용량 초과';
+        } else if (errorInfo.message.includes('여기까지 만들었어요')) {
+          // 출시 블로커(2026-09-09) — api.chat.ts의 GENERATION_DURATION_CAP_MS 초과 시 메시지와 매칭.
+          errorType = 'duration_cap';
+          title = '생성 시간이 오래 걸려요';
         } else if (errorInfo.statusCode >= 500) {
           errorType = 'network';
           title = '서버 오류';
@@ -1226,6 +1230,16 @@ export const ChatImpl = memo(
         onRetryLlmError={() => {
           clearApiErrorAlert();
           regenerate().catch((error) => logger.error('LlmErrorAlert 다시 시도: regenerate() 실패', error));
+        }}
+        onContinueGeneration={() => {
+          /*
+           * 출시 블로커(2026-09-09) — regenerate()(처음부터 다시)가 아니라 새 사용자 메시지로
+           * "이어서" 보낸다. 지금까지 스트리밍된 파일은 워크벤치에 이미 반영돼 있어(정상 스트리밍과
+           * 동일 경로) 그대로 남고, 이 메시지는 일반 후속 생성과 똑같이 과금 대상이다 — 상한
+           * 초과분(errorType duration_cap)만 무과금이고 이어서 만드는 건 새 생성이라 정상 과금.
+           */
+          clearApiErrorAlert();
+          sendMessage?.({} as any, '방금 만들던 부분을 이어서 완료해줘.');
         }}
         data={progressAnnotations}
         chatMode={chatMode}

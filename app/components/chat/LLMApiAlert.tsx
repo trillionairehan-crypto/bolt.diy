@@ -6,10 +6,12 @@ interface Props {
   alert: LlmErrorAlertType;
   clearAlert: () => void;
   onRetry?: () => void;
+  onContinue?: () => void;
 }
 
-export default function LlmErrorAlert({ alert, clearAlert, onRetry }: Props) {
+export default function LlmErrorAlert({ alert, clearAlert, onRetry, onContinue }: Props) {
   const { title, description, provider, errorType } = alert;
+  const isDurationCap = errorType === 'duration_cap';
 
   const getErrorIcon = () => {
     switch (errorType) {
@@ -19,6 +21,8 @@ export default function LlmErrorAlert({ alert, clearAlert, onRetry }: Props) {
         return 'i-ph:clock-duotone';
       case 'quota':
         return 'i-ph:warning-circle-duotone';
+      case 'duration_cap':
+        return 'i-ph:hourglass-duotone';
       default:
         return 'i-ph:warning-duotone';
     }
@@ -32,6 +36,9 @@ export default function LlmErrorAlert({ alert, clearAlert, onRetry }: Props) {
         return `${provider}의 요청 한도를 초과했어요. 잠시 후 다시 시도해주세요.`;
       case 'quota':
         return `${provider}의 사용량을 초과했어요. 계정 한도를 확인해주세요.`;
+      case 'duration_cap':
+        // 서버가 보낸 문구("~까지 만들었어요. 이어서 만들까요?") 자체가 이미 사용자에게 보여줄 메시지 — 그대로 쓴다.
+        return description;
       default:
         return '잠시 문제가 있었어요. 다시 시도해주세요.';
     }
@@ -74,7 +81,8 @@ export default function LlmErrorAlert({ alert, clearAlert, onRetry }: Props) {
             >
               <p>{getErrorMessage()}</p>
 
-              {description && (
+              {/* duration_cap은 getErrorMessage()가 이미 description 자체를 보여주므로 중복 표시 안 함. */}
+              {description && !isDurationCap && (
                 <div className="text-xs text-bolt-elements-textSecondary p-2 bg-bolt-elements-background-depth-3 rounded mt-4 mb-4">
                   오류 상세: {description}
                 </div>
@@ -88,7 +96,23 @@ export default function LlmErrorAlert({ alert, clearAlert, onRetry }: Props) {
               transition={{ delay: 0.3 }}
             >
               <div className="flex gap-2">
-                {onRetry && (
+                {isDurationCap && onContinue && (
+                  <button
+                    onClick={onContinue}
+                    className={classNames(
+                      'px-2 py-1.5 rounded-md text-sm font-medium',
+                      'bg-bolt-elements-button-primary-background',
+                      'hover:bg-bolt-elements-button-primary-backgroundHover',
+                      'focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-bolt-elements-button-danger-background',
+                      'text-bolt-elements-button-primary-text',
+                      'flex items-center gap-1.5',
+                    )}
+                  >
+                    <div className="i-ph:arrow-right-duotone"></div>
+                    이어서 만들기
+                  </button>
+                )}
+                {!isDurationCap && onRetry && (
                   <button
                     onClick={onRetry}
                     className={classNames(

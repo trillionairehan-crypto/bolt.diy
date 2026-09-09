@@ -47,6 +47,16 @@ export function isReasoningModel(modelName: string): boolean {
 export const MAX_RESPONSE_SEGMENTS = 2;
 
 /*
+ * 출시 블로커(2026-09-09, chatId 2-1788939505241-0): 프로덕션에서 첫 생성이 5분+ 멈춤 —
+ * stream-recovery.ts의 45초 스톨 감지는 "청크가 아예 없을 때"만 발동해서, 느리게라도(또는
+ * 반복 루프성으로) 계속 청크가 나오는 생성은 못 잡는다(45초마다 updateActivity()가 계속
+ * 리셋됨). 이건 그 사각지대를 별도로 덮는 "총 소요시간" 상한 — 청크 활동과 무관하게 스트림
+ * 시작 이후 이 값을 넘으면 무조건 중단한다. 스톨 감지(45초 무활동, 1회 재시도)와는 독립적으로
+ * 동작 — 완전히 멈춘 스트림은 이미 스톨 감지가 이 값보다 훨씬 먼저(최대 90초) 잡는다.
+ */
+export const GENERATION_DURATION_CAP_MS = 3 * 60 * 1000;
+
+/*
  * Sonnet 5 / Opus 5 think adaptively by default even with no `thinking` param sent at all —
  * confirmed live via coralred.kr repro (2026-08-22): Anthropic opens a `content_block_start`
  * type "thinking" unprompted, and the silent thinking phase can run 45s+ with zero stream

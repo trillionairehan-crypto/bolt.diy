@@ -8,7 +8,12 @@ import {
   type UIMessage,
   type TextUIPart,
 } from 'ai';
-import { MAX_RESPONSE_SEGMENTS, MAX_TOKENS, type FileMap } from '~/lib/.server/llm/constants';
+import {
+  GENERATION_DURATION_CAP_MS,
+  MAX_RESPONSE_SEGMENTS,
+  MAX_TOKENS,
+  type FileMap,
+} from '~/lib/.server/llm/constants';
 import { CONTINUE_PROMPT } from '~/lib/common/prompts/prompts';
 import { streamText, type Messages, type StreamingOptions } from '~/lib/.server/llm/stream-text';
 import SwitchableStream from '~/lib/.server/llm/switchable-stream';
@@ -415,14 +420,61 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
 
         type StreamRun = { controller: AbortController; intentionallyAborted: boolean };
 
+        /*
+         * 출시 블로커(2026-09-09) 계측 — 스트림 시작 이후 경과시간·지금까지 생성된 파일 개수를
+         * give-up/상한초과 Sentry 이벤트에 같이 실어 보내려고 재시도를 가로질러(execute 스코프에)
+         * 둔다. accumulatedGeneratedText는 매 run(원본·재시도 각각)의 consumeRun 시작 시 리셋 —
+         * 재시도는 새 스트림을 처음부터 다시 받으므로 이전 run의 텍스트를 이어붙이면 안 된다.
+         */
+        const generationStartedAt = Date.now();
+        const requestedModel = usageLastUserMessage
+          ? extractPropertiesFromMessage(usageLastUserMessage).model
+          : 'unknown';
+        let accumulatedGeneratedText = '';
+
+        const elapsedGenerationSec = () => Math.round((Date.now() - generationStartedAt) / 100) / 10;
+        const countGeneratedFiles = () => (accumulatedGeneratedText.match(/<boltAction\s+type="file"/g) ?? []).length;
+
         const consumeRun = async (
           run: StreamRun,
           result: Awaited<ReturnType<typeof streamText>>,
           recovery: StreamRecoveryManager,
         ) => {
+          accumulatedGeneratedText = '';
+
           try {
             for await (const part of result.stream) {
               recovery.updateActivity();
+
+              if (part.type === 'text-delta') {
+                accumulatedGeneratedText += part.text;
+              }
+
+              if (!run.intentionallyAborted && Date.now() - generationStartedAt > GENERATION_DURATION_CAP_MS) {
+                logger.warn(
+                  `Generation exceeded ${GENERATION_DURATION_CAP_MS}ms total cap — stopping, keeping partial files`,
+                );
+                Sentry.captureMessage('chat generation duration cap exceeded', {
+                  level: 'warning',
+                  tags: { route: 'api.chat', event: 'duration_cap', model: requestedModel },
+                  extra: {
+                    chatId: chatId ?? 'unknown',
+                    elapsedSec: elapsedGenerationSec(),
+                    fileCount: countGeneratedFiles(),
+                  },
+                });
+
+                recovery.stop();
+                run.intentionallyAborted = true;
+                run.controller.abort();
+
+                writer.write({
+                  type: 'error',
+                  errorText: '시간이 오래 걸려서 여기까지 만들었어요. 이어서 만들까요?',
+                });
+
+                return;
+              }
 
               if (part.type === 'abort') {
                 /*
@@ -457,6 +509,16 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
               }
             }
             recovery.stop();
+
+            Sentry.captureMessage('chat generation stream finished', {
+              level: 'info',
+              tags: { route: 'api.chat', event: 'stream_end', model: requestedModel },
+              extra: {
+                chatId: chatId ?? 'unknown',
+                elapsedSec: elapsedGenerationSec(),
+                fileCount: countGeneratedFiles(),
+              },
+            });
           } catch (err) {
             if (!run.intentionallyAborted) {
               logger.error('Streaming loop failed:', err);
@@ -465,6 +527,13 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
         };
 
         let currentRun: StreamRun = { controller: new AbortController(), intentionallyAborted: false };
+
+        Sentry.captureMessage('chat generation stream started', {
+          level: 'info',
+          tags: { route: 'api.chat', event: 'stream_start', model: requestedModel },
+          extra: { chatId: chatId ?? 'unknown' },
+        });
+
         let result = await streamText(buildStreamTextParams(currentRun.controller.signal));
 
         const MAX_STALL_RETRIES = 1;
@@ -488,6 +557,16 @@ async function chatAction({ context, request }: ActionFunctionArgs) {
             onGiveUp: async () => {
               if (stallRetryCount >= MAX_STALL_RETRIES) {
                 logger.error('Stream recovery exhausted — ending stream with a clear error instead of hanging');
+
+                Sentry.captureMessage('chat generation gave up after stall retries', {
+                  level: 'error',
+                  tags: { route: 'api.chat', event: 'give_up', model: requestedModel },
+                  extra: {
+                    chatId: chatId ?? 'unknown',
+                    elapsedSec: elapsedGenerationSec(),
+                    fileCount: countGeneratedFiles(),
+                  },
+                });
 
                 currentRun.intentionallyAborted = true;
                 currentRun.controller.abort();

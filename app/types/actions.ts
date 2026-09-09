@@ -75,7 +75,7 @@ export interface LlmErrorAlertType {
   description: string;
   content?: string;
   provider?: string;
-  errorType?: 'authentication' | 'rate_limit' | 'quota' | 'network' | 'unknown';
+  errorType?: 'authentication' | 'rate_limit' | 'quota' | 'network' | 'duration_cap' | 'unknown';
 }
 
 export interface FileHistory {
