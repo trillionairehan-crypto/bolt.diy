@@ -131,8 +131,13 @@ jobs:
           # silently ships with client-side Sentry disabled (dsn: undefined, no throw).
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
+      # --branch must equal the Pages project's configured production branch (dashboard: Settings
+      # > Build > Branch control) — a deploy tagged with any other branch name lands as Preview,
+      # not Production. This job only runs on push to main (see `if:` above), so main is correct
+      # here; "coralred" (the project name, copy-pasted into --branch by mistake) never matched
+      # the project's production branch, so every CI deploy landed as Preview.
       - name: Deploy to Cloudflare Pages
-        run: pnpm exec wrangler pages deploy build/client --project-name=coralred --branch=coralred
+        run: pnpm exec wrangler pages deploy build/client --project-name=coralred --branch=main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
