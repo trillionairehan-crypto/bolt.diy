@@ -1,0 +1,30 @@
+{
+  "category": "first_gen",
+  "caseId": "a2",
+  "model": "claude-opus-5-thinking-on",
+  "task": "동네 빵집 소개 페이지",
+  "promptTokens": 0,
+  "completionTokens": 0,
+  "cacheReadTokens": 0,
+  "cacheWriteTokens": 0,
+  "costKrw": 0,
+  "elapsedSec": 100.9,
+  "mechanicalFindingsCount": 0,
+  "autoFixedCount": 0,
+  "httpStatus": 200,
+  "errorText": "응답 생성이 너무 오래 걸려 중단했어요. 다시 시도해주세요.",
+  "fileCount": 0,
+  "recordFile": "first_gen-a2-claude-opus-5-thinking-on.json",
+  "findings": [],
+  "responseText": "",
+  "files": {
+    "/home/project/package.json": "{\n  \"name\": \"coralred-app\",\n  \"private\": true,\n  \"version\": \"0.0.0\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"dev\": \"vite\",\n    \"build\": \"vite build\",\n    \"preview\": \"vite preview\"\n  },\n  \"dependencies\": {\n    \"lucide-react\": \"^0.485.0\",\n    \"react\": \"^18.3.1\",\n    \"react-dom\": \"^18.3.1\"\n  },\n  \"devDependencies\": {\n    \"@types/react\": \"^18.3.5\",\n    \"@types/react-dom\": \"^18.3.0\",\n    \"@vitejs/plugin-react\": \"^4.3.1\",\n    \"typescript\": \"^5.5.3\",\n    \"vite\": \"^5.4.2\"\n  }\n}\n",
+    "/home/project/vite.config.ts": "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\n\nexport default defineConfig({\n  plugins: [react()],\n});\n",
+    "/home/project/index.html": "<!doctype html>\n<html lang=\"ko\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>Coralred App</title>\n\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css\">\n    <link rel=\"stylesheet\" href=\"/coralred-ui.css\">\n  </head>\n  <body style=\"--hue: 33;\">\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.tsx\"></script>\n  </body>\n</html>\n",
+    "/home/project/src/main.tsx": "import { StrictMode } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport App from './App.tsx';\nimport './index.css';\n\ncreateRoot(document.getElementById('root')!).render(\n  <StrictMode>\n    <App />\n  </StrictMode>,\n);\n",
+    "/home/project/src/App.tsx": "import { Sparkles } from 'lucide-react';\n\nfunction App() {\n  return (\n    <div className=\"cr-page\">\n      <section className=\"cr-section cr-stack-16\">\n        <span className=\"cr-eyebrow\">CORALRED KIT</span>\n        <h1 className=\"cr-h1\">Start prompting (or editing) to see magic happen :)</h1>\n        <p className=\"cr-body\">\n          This starter uses the Coralred design kit — style everything with cr- classes and the\n          kit's CSS variables. Never raw colors, never arbitrary px sizes.\n        </p>\n        <button className=\"cr-btn\">\n          <Sparkles size={16} />\n          Get started\n        </button>\n      </section>\n    </div>\n  );\n}\n\nexport default App;\n",
+    "/home/project/src/index.css": "/* Project-specific custom styles go here.\n   The Coralred design kit (coralred-ui.css) is already loaded in index.html's <head> —\n   don't redeclare cr- classes or kit CSS variables (--hue, --accent, --bg, etc.) here. */\n",
+    "/home/project/public/coralred-ui.css": "[object Object]",
+    "/home/project/.bolt/prompt": "By default, this template uses the Coralred design kit (coralred-ui.css, already linked in index.html's <head>).\n\nUse ONLY cr- classes and the kit's CSS variables (--hue, --accent, --bg, --text, --border, etc.) for all styling. Do NOT use Tailwind classes — this template does not use Tailwind. Never write raw color values (hex/rgb/oklch) or arbitrary px sizes; everything comes from the kit.\n\n--hue is already set on <body> in index.html. Never change it, never add your own color logic on top of it.\n\nUse icons from lucide-react for logos.\n\nNever insert an external stock-photo or placeholder-service URL (Pexels, Unsplash, placehold.co, picsum.photos, or any other such service) for a photo slot the user hasn't supplied a real image for — an unverifiable external URL can go dead, get rate-limited, or serve the wrong image at any time, and you cannot see what it actually shows. Use the coralred image placeholder pattern instead (see the main system prompt's image_placeholder_rules): #FFF4EF background, a small inline SVG line-icon, and the caption \"사진을 보내주시면 여기에 넣어드릴게요\" for anything bigger than an 80px slot. Swap in a real photo only once the user actually attaches one.\n"
+  }
+}

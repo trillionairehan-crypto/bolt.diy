@@ -65,4 +65,6 @@ docs/instructions/Roadmap.md
 !/OVERNIGHT-REPORT.md
 !/OVERNIGHT-REPORT-2.md
 !/OVERNIGHT-REPORT-3.md
+# 모델 벤치마크 결과표 — 실제 요청된 산출물, 재실행 없이 이력으로 남겨야 함
+!tests/benchmark/results/**/*.md
 .qodo

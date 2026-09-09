@@ -1,0 +1,150 @@
+{
+  "category": "normal_edit",
+  "caseId": "b2",
+  "model": "claude-sonnet-5",
+  "task": "챕터 하나 더",
+  "promptTokens": 44344,
+  "completionTokens": 4732,
+  "cacheReadTokens": 25144,
+  "cacheWriteTokens": 0,
+  "costKrw": 127.05,
+  "elapsedSec": 38.5,
+  "mechanicalFindingsCount": 17,
+  "autoFixedCount": 15,
+  "httpStatus": 200,
+  "errorText": null,
+  "fileCount": 1,
+  "recordFile": "normal_edit-b2-claude-sonnet-5.json",
+  "findings": [
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 54,
+      "rule": "color-literal",
+      "message": "색상 리터럴 \"#FFF4EF\"를 var(--accent-soft)로 치환했습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 117,
+      "rule": "color-literal",
+      "message": "색상 리터럴 \"#FFF4EF\"를 var(--accent-soft)로 치환했습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 183,
+      "rule": "color-literal",
+      "message": "색상 리터럴 \"#FFF4EF\"를 var(--accent-soft)로 치환했습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 230,
+      "rule": "color-literal",
+      "message": "색상 리터럴 \"#FFF4EF\"를 var(--accent-soft)로 치환했습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 308,
+      "rule": "color-literal",
+      "message": "색상 리터럴 \"#FFF4EF\"를 var(--accent-soft)로 치환했습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 32,
+      "rule": "skeleton7-chapter-count",
+      "message": "골격 7 챕터(100vh 컨테이너)가 5개 감지됐습니다 — 정확히 4개(hero/ch1/ch2/ch3)여야 합니다. 자동수정하지 않았습니다.",
+      "autoFixed": false
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 78,
+      "rule": "line-height-too-tight",
+      "message": "line-height \"1.2\"가 font-size(48px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 127,
+      "rule": "line-height-too-tight",
+      "message": "line-height \"1.2\"가 font-size(56px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 194,
+      "rule": "line-height-too-tight",
+      "message": "line-height \"1.2\"가 font-size(56px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 240,
+      "rule": "line-height-too-tight",
+      "message": "line-height \"1.2\"가 font-size(56px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 319,
+      "rule": "line-height-too-tight",
+      "message": "line-height \"1.2\"가 font-size(56px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 36,
+      "rule": "viewport-height-100vh",
+      "message": "100vh를 100dvh로 바꿨습니다 — 모바일 브라우저 주소창만큼 100vh가 실제 화면보다 커서 하단이 잘릴 수 있습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 104,
+      "rule": "viewport-height-100vh",
+      "message": "100vh를 100dvh로 바꿨습니다 — 모바일 브라우저 주소창만큼 100vh가 실제 화면보다 커서 하단이 잘릴 수 있습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 160,
+      "rule": "viewport-height-100vh",
+      "message": "100vh를 100dvh로 바꿨습니다 — 모바일 브라우저 주소창만큼 100vh가 실제 화면보다 커서 하단이 잘릴 수 있습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 217,
+      "rule": "viewport-height-100vh",
+      "message": "100vh를 100dvh로 바꿨습니다 — 모바일 브라우저 주소창만큼 100vh가 실제 화면보다 커서 하단이 잘릴 수 있습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 273,
+      "rule": "viewport-height-100vh",
+      "message": "100vh를 100dvh로 바꿨습니다 — 모바일 브라우저 주소창만큼 100vh가 실제 화면보다 커서 하단이 잘릴 수 있습니다.",
+      "autoFixed": true
+    },
+    {
+      "file": "/home/project/src/App.tsx",
+      "line": 256,
+      "rule": "text-container-no-max-width",
+      "message": "본문 텍스트(약 82자)가 있는 <p>에 max-width가 없습니다 — 넓은 화면에서 한 줄이 너무 길어질 수 있습니다(줄 길이 80자 초과 위험). 부모 컨테이너가 이미 폭을 제한하는지 확인하세요.",
+      "autoFixed": false
+    }
+  ],
+  "responseText": "소개 페이지에 챕터를 하나 더 추가해드릴게요. 빵집 이야기에 자연스럽게 이어지도록 \"손님들과 함께 쌓아온 시간\" 챕터를 4번째로 넣고, 오시는 길을 5번째로 옮겼어요. 좌우 교대 배치도 그대로 유지했어요.\n\n<boltArtifact id=\"bakery-add-chapter\" title=\"빵집 소개 페이지 — 챕터 추가\">\n<boltAction type=\"file\" filePath=\"src/App.tsx\">import { useEffect, useRef, useState } from 'react';\nimport { Wheat, Croissant, Clock, MapPin, Phone, Users } from 'lucide-react';\n\nfunction useRevealOnView<T extends HTMLElement>() {\n  const ref = useRef<T | null>(null);\n  const [visible, setVisible] = useState(false);\n\n  useEffect(() => {\n    const node = ref.current;\n    if (!node) return;\n\n    const observer = new IntersectionObserver(\n      ([entry]) => {\n        if (entry.isIntersecting) {\n          setVisible(true);\n        }\n      },\n      { threshold: 0.3 },\n    );\n\n    observer.observe(node);\n    return () => observer.disconnect();\n  }, []);\n\n  return { ref, visible };\n}\n\nfunction Hero() {\n  const { ref, visible } = useRevealOnView<HTMLElement>();\n\n  return (\n    <section\n      ref={ref}\n      data-slot=\"hero\"\n      style={{\n        height: '100vh',\n        display: 'flex',\n        flexDirection: 'column',\n        justifyContent: 'flex-end',\n        position: 'relative',\n        background: 'var(--accent-soft)',\n        opacity: visible ? 1 : 0,\n        transform: visible ? 'translateY(0)' : 'translateY(24px)',\n        transition: 'opacity 600ms ease-out, transform 600ms ease-out',\n      }}\n    >\n      <div\n        style={{\n          position: 'absolute',\n          top: 0,\n          left: 0,\n          right: 0,\n          height: '60%',\n          background: '#FFF4EF',\n          display: 'flex',\n          flexDirection: 'column',\n          alignItems: 'center',\n          justifyContent: 'center',\n          gap: 'var(--space-16, 16px)',\n        }}\n      >\n        <svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--muted)\" strokeWidth=\"1.5\">\n          <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />\n          <circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\" />\n          <path d=\"M21 15l-5-5L5 21\" />\n        </svg>\n        <p className=\"cr-caption\" style={{ color: 'var(--muted)' }}>\n          사진을 보내주시면 여기에 넣어드릴게요\n        </p>\n      </div>\n\n      <div className=\"cr-page cr-stack-16\" style={{ paddingBottom: 'var(--space-24, 64px)' }}>\n        <span className=\"cr-eyebrow\">MILDO BAKERY</span>\n        <h1\n          style={{\n            fontFamily: \"'Noto Serif KR', serif\",\n            fontSize: '48px',\n            lineHeight: 1.2,\n            margin: 0,\n          }}\n        >\n          매일 아침, 갓 구운 빵 한 조각\n        </h1>\n        <p className=\"cr-body\">동네 골목에서 12년째 문 여는 작은 빵집, 밀도베이커리예요</p>\n        <div>\n          <button className=\"cr-btn\">\n            <Croissant size={16} />\n            메뉴 구경하기\n          </button>\n        </div>\n      </div>\n    </section>\n  );\n}\n\nfunction ChapterOne() {\n  const { ref, visible } = useRevealOnView<HTMLElement>();\n\n  return (\n    <section\n      ref={ref}\n      data-slot=\"ch1\"\n      style={{\n        height: '100vh',\n        display: 'grid',\n        gridTemplateColumns: '1fr 1fr',\n        alignItems: 'center',\n        background: 'var(--surface)',\n        opacity: visible ? 1 : 0,\n        transform: visible ? 'translateY(0)' : 'translateY(24px)',\n        transition: 'opacity 600ms ease-out, transform 600ms ease-out',\n      }}\n    >\n      <div\n        style={{\n          height: '100%',\n          background: '#FFF4EF',\n          display: 'flex',\n          alignItems: 'center',\n          justifyContent: 'center',\n        }}\n      >\n        <h2\n          style={{\n            fontFamily: \"'Noto Serif KR', serif\",\n            fontSize: '56px',\n            lineHeight: 1.2,\n            textAlign: 'center',\n            margin: 0,\n            padding: '0 32px',\n          }}\n        >\n          시그니처\n          <br />\n          소금빵\n        </h2>\n      </div>\n      <div className=\"cr-stack-16\" style={{ padding: '0 var(--space-24, 48px)' }}>\n        <Wheat size={28} color=\"var(--muted)\" />\n        <h3 className=\"cr-h2\" style={{ fontFamily: \"'Noto Serif KR', serif\" }}>\n          겉은 바삭, 속은 촉촉하게\n        </h3>\n        <p className=\"cr-body\">\n          국내산 밀가루와 발효 버터로 매일 새벽 반죽해요. 하루 200개 한정으로 구워서\n          오후 3시면 대부분 품절돼요.\n        </p>\n      </div>\n    </section>\n  );\n}\n\nfunction ChapterTwo() {\n  const { ref, visible } = useRevealOnView<HTMLElement>();\n\n  return (\n    <section\n      ref={ref}\n      data-slot=\"ch2\"\n      style={{\n        height: '100vh',\n        display: 'grid',\n        gridTemplateColumns: '1fr 1fr',\n        alignItems: 'center',\n        background: 'var(--surface)',\n        opacity: visible ? 1 : 0,\n        transform: visible ? 'translateY(0)' : 'translateY(24px)',\n        transition: 'opacity 600ms ease-out, transform 600ms ease-out',\n      }}\n    >\n      <div className=\"cr-stack-16\" style={{ padding: '0 var(--space-24, 48px)', order: 1 }}>\n        <Clock size={28} color=\"var(--muted)\" />\n        <h3 className=\"cr-h2\" style={{ fontFamily: \"'Noto Serif KR', serif\" }}>\n          느린 발효가 만드는 맛\n        </h3>\n        <p className=\"cr-body\">\n          모든 반죽은 저온에서 18시간 이상 발효해요. 시간이 오래 걸려도 빵 본연의\n          풍미를 지키는 방식을 고집하고 있어요.\n        </p>\n      </div>\n      <div\n        style={{\n          height: '100%',\n          background: '#FFF4EF',\n          display: 'flex',\n          alignItems: 'center',\n          justifyContent: 'center',\n          order: 2,\n        }}\n      >\n        <h2\n          style={{\n            fontFamily: \"'Noto Serif KR', serif\",\n            fontSize: '56px',\n            lineHeight: 1.2,\n            textAlign: 'center',\n            margin: 0,\n            padding: '0 32px',\n          }}\n        >\n          18시간\n          <br />\n          저온 발효\n        </h2>\n      </div>\n    </section>\n  );\n}\n\nfunction ChapterThree() {\n  const { ref, visible } = useRevealOnView<HTMLElement>();\n\n  return (\n    <section\n      ref={ref}\n      data-slot=\"ch3\"\n      style={{\n        height: '100vh',\n        display: 'grid',\n        gridTemplateColumns: '1fr 1fr',\n        alignItems: 'center',\n        background: 'var(--surface)',\n        opacity: visible ? 1 : 0,\n        transform: visible ? 'translateY(0)' : 'translateY(24px)',\n        transition: 'opacity 600ms ease-out, transform 600ms ease-out',\n      }}\n    >\n      <div\n        style={{\n          height: '100%',\n          background: '#FFF4EF',\n          display: 'flex',\n          alignItems: 'center',\n          justifyContent: 'center',\n        }}\n      >\n        <h2\n          style={{\n            fontFamily: \"'Noto Serif KR', serif\",\n            fontSize: '56px',\n            lineHeight: 1.2,\n            textAlign: 'center',\n            margin: 0,\n            padding: '0 32px',\n          }}\n        >\n          12년의\n          <br />\n          단골 이야기\n        </h2>\n      </div>\n      <div className=\"cr-stack-16\" style={{ padding: '0 var(--space-24, 48px)' }}>\n        <Users size={28} color=\"var(--muted)\" />\n        <h3 className=\"cr-h2\" style={{ fontFamily: \"'Noto Serif KR', serif\" }}>\n          동네와 함께 나이 들어가요\n        </h3>\n        <p className=\"cr-body\">\n          문을 연 첫날부터 찾아주신 손님이 이제는 자녀와 함께 오세요. 오래된 얼굴도,\n          새로운 얼굴도 반갑게 맞이하는 게 저희 원칙이에요.\n        </p>\n      </div>\n    </section>\n  );\n}\n\nfunction ChapterFour() {\n  const { ref, visible } = useRevealOnView<HTMLElement>();\n\n  return (\n    <section\n      ref={ref}\n      data-slot=\"ch4\"\n      style={{\n        height: '100vh',\n        display: 'grid',\n        gridTemplateColumns: '1fr 1fr',\n        alignItems: 'center',\n        background: 'var(--surface)',\n        opacity: visible ? 1 : 0,\n        transform: visible ? 'translateY(0)' : 'translateY(24px)',\n        transition: 'opacity 600ms ease-out, transform 600ms ease-out',\n      }}\n    >\n      <div className=\"cr-stack-16\" style={{ padding: '0 var(--space-24, 48px)', order: 1 }}>\n        <MapPin size={28} color=\"var(--muted)\" />\n        <h3 className=\"cr-h2\" style={{ fontFamily: \"'Noto Serif KR', serif\" }}>\n          동네 골목, 작은 문 하나\n        </h3>\n        <div className=\"cr-stack-8\">\n          <p className=\"cr-body\">서울시 마포구 연남동 223-14</p>\n          <p className=\"cr-caption\" style={{ color: 'var(--muted)' }}>\n            매일 오전 8시 — 오후 8시 (매주 월요일 휴무)\n          </p>\n        </div>\n        <div className=\"cr-row-8\">\n          <Phone size={16} color=\"var(--muted)\" />\n          <span className=\"cr-caption\">02-333-1204</span>\n        </div>\n        <div>\n          <button className=\"cr-btn outline\">\n            <MapPin size={16} />\n            지도에서 보기\n          </button>\n        </div>\n      </div>\n      <div\n        style={{\n          height: '100%',\n          background: '#FFF4EF',\n          display: 'flex',\n          alignItems: 'center',\n          justifyContent: 'center',\n          order: 2,\n        }}\n      >\n        <h2\n          style={{\n            fontFamily: \"'Noto Serif KR', serif\",\n            fontSize: '56px',\n            lineHeight: 1.2,\n            textAlign: 'center',\n            margin: 0,\n            padding: '0 32px',\n          }}\n        >\n          오시는 길\n        </h2>\n      </div>\n    </section>\n  );\n}\n\nfunction App() {\n  return (\n    <div>\n      <Hero />\n      <ChapterOne />\n      <ChapterTwo />\n      <ChapterThree />\n      <ChapterFour />\n    </div>\n  );\n}\n\nexport default App;\n</boltAction>\n</boltArtifact>\n\n5개 챕터 구성으로 늘어났어요 — 히어로 → 소금빵 → 저온 발효 → 단골 이야기 → 오시는 길.\n\n다음으로 이런 것도 해볼 수 있어요:\n- 사진 넣어서 실제 빵집 모습으로 채우기\n- 메뉴 목록 페이지 추가하기\n- 친구한테 공유하기",
+  "files": {
+    "/home/project/package.json": "{\n  \"name\": \"coralred-app\",\n  \"private\": true,\n  \"version\": \"0.0.0\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"dev\": \"vite\",\n    \"build\": \"vite build\",\n    \"preview\": \"vite preview\"\n  },\n  \"dependencies\": {\n    \"lucide-react\": \"^0.485.0\",\n    \"react\": \"^18.3.1\",\n    \"react-dom\": \"^18.3.1\"\n  },\n  \"devDependencies\": {\n    \"@types/react\": \"^18.3.5\",\n    \"@types/react-dom\": \"^18.3.0\",\n    \"@vitejs/plugin-react\": \"^4.3.1\",\n    \"typescript\": \"^5.5.3\",\n    \"vite\": \"^5.4.2\"\n  }\n}\n",
+    "/home/project/vite.config.ts": "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\n\nexport default defineConfig({\n  plugins: [react()],\n});\n",
+    "/home/project/index.html": "<!doctype html>\n<html lang=\"ko\">\n  <head>\n    <meta charset=\"UTF-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />\n    <title>밀도베이커리 — 동네 빵집</title>\n    <meta name=\"description\" content=\"매일 아침 굽는 동네 빵집, 밀도베이커리를 소개합니다.\" />\n\n    <meta property=\"og:title\" content=\"밀도베이커리 — 동네 빵집\" />\n    <meta property=\"og:description\" content=\"매일 아침 굽는 동네 빵집, 밀도베이커리를 소개합니다.\" />\n    <meta property=\"og:type\" content=\"website\" />\n\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+KR:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css\">\n    <link rel=\"stylesheet\" href=\"/coralred-ui.css\">\n  </head>\n  <body style=\"--hue: 33;\">\n    <div id=\"root\"></div>\n    <script type=\"module\" src=\"/src/main.tsx\"></script>\n  </body>\n</html>",
+    "/home/project/src/main.tsx": "import { StrictMode } from 'react';\nimport { createRoot } from 'react-dom/client';\nimport App from './App.tsx';\nimport './index.css';\n\ncreateRoot(document.getElementById('root')!).render(\n  <StrictMode>\n    <App />\n  </StrictMode>,\n);\n",
+    "/home/project/src/App.tsx": "import { useEffect, useRef, useState } from 'react';\nimport { Wheat, Croissant, Clock, MapPin, Phone, Users } from 'lucide-react';\n\nfunction useRevealOnView<T extends HTMLElement>() {\n  const ref = useRef<T | null>(null);\n  const [visible, setVisible] = useState(false);\n\n  useEffect(() => {\n    const node = ref.current;\n    if (!node) return;\n\n    const observer = new IntersectionObserver(\n      ([entry]) => {\n        if (entry.isIntersecting) {\n          setVisible(true);\n        }\n      },\n      { threshold: 0.3 },\n    );\n\n    observer.observe(node);\n    return () => observer.disconnect();\n  }, []);\n\n  return { ref, visible };\n}\n\nfunction Hero() {\n  const { ref, visible } = useRevealOnView<HTMLElement>();\n\n  return (\n    <section\n      ref={ref}\n      data-slot=\"hero\"\n      style={{\n        height: '100vh',\n        display: 'flex',\n        flexDirection: 'column',\n        justifyContent: 'flex-end',\n        position: 'relative',\n        background: 'var(--accent-soft)',\n        opacity: visible ? 1 : 0,\n        transform: visible ? 'translateY(0)' : 'translateY(24px)',\n        transition: 'opacity 600ms ease-out, transform 600ms ease-out',\n      }}\n    >\n      <div\n        style={{\n          position: 'absolute',\n          top: 0,\n          left: 0,\n          right: 0,\n          height: '60%',\n          background: '#FFF4EF',\n          display: 'flex',\n          flexDirection: 'column',\n          alignItems: 'center',\n          justifyContent: 'center',\n          gap: 'var(--space-16, 16px)',\n        }}\n      >\n        <svg width=\"32\" height=\"32\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"var(--muted)\" strokeWidth=\"1.5\">\n          <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" />\n          <circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\" />\n          <path d=\"M21 15l-5-5L5 21\" />\n        </svg>\n        <p className=\"cr-caption\" style={{ color: 'var(--muted)' }}>\n          사진을 보내주시면 여기에 넣어드릴게요\n        </p>\n      </div>\n\n      <div className=\"cr-page cr-stack-16\" style={{ paddingBottom: 'var(--space-24, 64px)' }}>\n        <span className=\"cr-eyebrow\">MILDO BAKERY</span>\n        <h1\n          style={{\n            fontFamily: \"'Noto Serif KR', serif\",\n            fontSize: '48px',\n            lineHeight: 1.2,\n            margin: 0,\n          }}\n        >\n          매일 아침, 갓 구운 빵 한 조각\n        </h1>\n        <p className=\"cr-body\">동네 골목에서 12년째 문 여는 작은 빵집, 밀도베이커리예요</p>\n        <div>\n          <button className=\"cr-btn\">\n            <Croissant size={16} />\n            메뉴 구경하기\n          </button>\n        </div>\n      </div>\n    </section>\n  );\n}\n\nfunction ChapterOne() {\n  const { ref, visible } = useRevealOnView<HTMLElement>();\n\n  return (\n    <section\n      ref={ref}\n      data-slot=\"ch1\"\n      style={{\n        height: '100vh',\n        display: 'grid',\n        gridTemplateColumns: '1fr 1fr',\n        alignItems: 'center',\n        background: 'var(--surface)',\n        opacity: visible ? 1 : 0,\n        transform: visible ? 'translateY(0)' : 'translateY(24px)',\n        transition: 'opacity 600ms ease-out, transform 600ms ease-out',\n      }}\n    >\n      <div\n        style={{\n          height: '100%',\n          background: '#FFF4EF',\n          display: 'flex',\n          alignItems: 'center',\n          justifyContent: 'center',\n        }}\n      >\n        <h2\n          style={{\n            fontFamily: \"'Noto Serif KR', serif\",\n            fontSize: '56px',\n            lineHeight: 1.2,\n            textAlign: 'center',\n            margin: 0,\n            padding: '0 32px',\n          }}\n        >\n          시그니처\n          <br />\n          소금빵\n        </h2>\n      </div>\n      <div className=\"cr-stack-16\" style={{ padding: '0 var(--space-24, 48px)' }}>\n        <Wheat size={28} color=\"var(--muted)\" />\n        <h3 className=\"cr-h2\" style={{ fontFamily: \"'Noto Serif KR', serif\" }}>\n          겉은 바삭, 속은 촉촉하게\n        </h3>\n        <p className=\"cr-body\">\n          국내산 밀가루와 발효 버터로 매일 새벽 반죽해요. 하루 200개 한정으로 구워서\n          오후 3시면 대부분 품절돼요.\n        </p>\n      </div>\n    </section>\n  );\n}\n\nfunction ChapterTwo() {\n  const { ref, visible } = useRevealOnView<HTMLElement>();\n\n  return (\n    <section\n      ref={ref}\n      data-slot=\"ch2\"\n      style={{\n        height: '100vh',\n        display: 'grid',\n        gridTemplateColumns: '1fr 1fr',\n        alignItems: 'center',\n        background: 'var(--surface)',\n        opacity: visible ? 1 : 0,\n        transform: visible ? 'translateY(0)' : 'translateY(24px)',\n        transition: 'opacity 600ms ease-out, transform 600ms ease-out',\n      }}\n    >\n      <div className=\"cr-stack-16\" style={{ padding: '0 var(--space-24, 48px)', order: 1 }}>\n        <Clock size={28} color=\"var(--muted)\" />\n        <h3 className=\"cr-h2\" style={{ fontFamily: \"'Noto Serif KR', serif\" }}>\n          느린 발효가 만드는 맛\n        </h3>\n        <p className=\"cr-body\">\n          모든 반죽은 저온에서 18시간 이상 발효해요. 시간이 오래 걸려도 빵 본연의\n          풍미를 지키는 방식을 고집하고 있어요.\n        </p>\n      </div>\n      <div\n        style={{\n          height: '100%',\n          background: '#FFF4EF',\n          display: 'flex',\n          alignItems: 'center',\n          justifyContent: 'center',\n          order: 2,\n        }}\n      >\n        <h2\n          style={{\n            fontFamily: \"'Noto Serif KR', serif\",\n            fontSize: '56px',\n            lineHeight: 1.2,\n            textAlign: 'center',\n            margin: 0,\n            padding: '0 32px',\n          }}\n        >\n          18시간\n          <br />\n          저온 발효\n        </h2>\n      </div>\n    </section>\n  );\n}\n\nfunction ChapterThree() {\n  const { ref, visible } = useRevealOnView<HTMLElement>();\n\n  return (\n    <section\n      ref={ref}\n      data-slot=\"ch3\"\n      style={{\n        height: '100vh',\n        display: 'grid',\n        gridTemplateColumns: '1fr 1fr',\n        alignItems: 'center',\n        background: 'var(--surface)',\n        opacity: visible ? 1 : 0,\n        transform: visible ? 'translateY(0)' : 'translateY(24px)',\n        transition: 'opacity 600ms ease-out, transform 600ms ease-out',\n      }}\n    >\n      <div\n        style={{\n          height: '100%',\n          background: '#FFF4EF',\n          display: 'flex',\n          alignItems: 'center',\n          justifyContent: 'center',\n        }}\n      >\n        <h2\n          style={{\n            fontFamily: \"'Noto Serif KR', serif\",\n            fontSize: '56px',\n            lineHeight: 1.2,\n            textAlign: 'center',\n            margin: 0,\n            padding: '0 32px',\n          }}\n        >\n          12년의\n          <br />\n          단골 이야기\n        </h2>\n      </div>\n      <div className=\"cr-stack-16\" style={{ padding: '0 var(--space-24, 48px)' }}>\n        <Users size={28} color=\"var(--muted)\" />\n        <h3 className=\"cr-h2\" style={{ fontFamily: \"'Noto Serif KR', serif\" }}>\n          동네와 함께 나이 들어가요\n        </h3>\n        <p className=\"cr-body\">\n          문을 연 첫날부터 찾아주신 손님이 이제는 자녀와 함께 오세요. 오래된 얼굴도,\n          새로운 얼굴도 반갑게 맞이하는 게 저희 원칙이에요.\n        </p>\n      </div>\n    </section>\n  );\n}\n\nfunction ChapterFour() {\n  const { ref, visible } = useRevealOnView<HTMLElement>();\n\n  return (\n    <section\n      ref={ref}\n      data-slot=\"ch4\"\n      style={{\n        height: '100vh',\n        display: 'grid',\n        gridTemplateColumns: '1fr 1fr',\n        alignItems: 'center',\n        background: 'var(--surface)',\n        opacity: visible ? 1 : 0,\n        transform: visible ? 'translateY(0)' : 'translateY(24px)',\n        transition: 'opacity 600ms ease-out, transform 600ms ease-out',\n      }}\n    >\n      <div className=\"cr-stack-16\" style={{ padding: '0 var(--space-24, 48px)', order: 1 }}>\n        <MapPin size={28} color=\"var(--muted)\" />\n        <h3 className=\"cr-h2\" style={{ fontFamily: \"'Noto Serif KR', serif\" }}>\n          동네 골목, 작은 문 하나\n        </h3>\n        <div className=\"cr-stack-8\">\n          <p className=\"cr-body\">서울시 마포구 연남동 223-14</p>\n          <p className=\"cr-caption\" style={{ color: 'var(--muted)' }}>\n            매일 오전 8시 — 오후 8시 (매주 월요일 휴무)\n          </p>\n        </div>\n        <div className=\"cr-row-8\">\n          <Phone size={16} color=\"var(--muted)\" />\n          <span className=\"cr-caption\">02-333-1204</span>\n        </div>\n        <div>\n          <button className=\"cr-btn outline\">\n            <MapPin size={16} />\n            지도에서 보기\n          </button>\n        </div>\n      </div>\n      <div\n        style={{\n          height: '100%',\n          background: '#FFF4EF',\n          display: 'flex',\n          alignItems: 'center',\n          justifyContent: 'center',\n          order: 2,\n        }}\n      >\n        <h2\n          style={{\n            fontFamily: \"'Noto Serif KR', serif\",\n            fontSize: '56px',\n            lineHeight: 1.2,\n            textAlign: 'center',\n            margin: 0,\n            padding: '0 32px',\n          }}\n        >\n          오시는 길\n        </h2>\n      </div>\n    </section>\n  );\n}\n\nfunction App() {\n  return (\n    <div>\n      <Hero />\n      <ChapterOne />\n      <ChapterTwo />\n      <ChapterThree />\n      <ChapterFour />\n    </div>\n  );\n}\n\nexport default App;",
+    "/home/project/src/index.css": "/* Project-specific custom styles go here.\n   The Coralred design kit (coralred-ui.css) is already loaded in index.html's <head> —\n   don't redeclare cr- classes or kit CSS variables (--hue, --accent, --bg, etc.) here. */\n",
+    "/home/project/public/coralred-ui.css": "[object Object]",
+    "/home/project/.bolt/prompt": "By default, this template uses the Coralred design kit (coralred-ui.css, already linked in index.html's <head>).\n\nUse ONLY cr- classes and the kit's CSS variables (--hue, --accent, --bg, --text, --border, etc.) for all styling. Do NOT use Tailwind classes — this template does not use Tailwind. Never write raw color values (hex/rgb/oklch) or arbitrary px sizes; everything comes from the kit.\n\n--hue is already set on <body> in index.html. Never change it, never add your own color logic on top of it.\n\nUse icons from lucide-react for logos.\n\nNever insert an external stock-photo or placeholder-service URL (Pexels, Unsplash, placehold.co, picsum.photos, or any other such service) for a photo slot the user hasn't supplied a real image for — an unverifiable external URL can go dead, get rate-limited, or serve the wrong image at any time, and you cannot see what it actually shows. Use the coralred image placeholder pattern instead (see the main system prompt's image_placeholder_rules): #FFF4EF background, a small inline SVG line-icon, and the caption \"사진을 보내주시면 여기에 넣어드릴게요\" for anything bigger than an 80px slot. Swap in a real photo only once the user actually attaches one.\n"
+  }
+}
