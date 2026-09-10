@@ -20,7 +20,7 @@ describe('question-bank data integrity', () => {
   });
 
   /*
-   * 2026-09-04: 모임·동호회를 순위·티어형(6)에서 명단·차감형(1)으로 옮기면서 골격6은 격자에 직접
+   * 2026-09-04: 모임·동호회를 순위·티어형(6)에서 명단·잔액형(1)으로 옮기면서 골격6은 격자에 직접
    * 매칭되는 항목이 없어졌다(의도된 상태 — 직접 입력에서 Haiku가 골라줄 수는 있음). "골고루 커버"는
    * 이제 필수 조건이 아니라 참고 지표라, 정확히 7종 전부를 요구하진 않되 최소 몇 종 이상은 커버하는지
    * 하한선만 남긴다.
@@ -60,7 +60,7 @@ describe('question-bank data integrity', () => {
   it('SKELETON_NAMES has exactly 7 entries, matching new-prompt.ts <app_skeletons> verbatim', () => {
     expect(Object.keys(SKELETON_NAMES)).toHaveLength(7);
     expect(Object.values(SKELETON_NAMES)).toEqual([
-      '명단·차감형',
+      '명단·잔액형',
       '예약·일정형',
       '거래·수지형',
       '목록·상세형',

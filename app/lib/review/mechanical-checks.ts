@@ -2221,6 +2221,60 @@ function runZeroOffsetChromaticShadowCheck(filePath: string, content: string): M
   return findings;
 }
 
+// --- 18. 요약 카드에 숫자만 있고 보조 문구 없음 (골격 1~6, 힌트 전용 — 휴리스틱) ---
+
+/*
+ * new-prompt.ts <app_skeletons> 요약 카드 규칙(D) + <external_data_and_metrics>의 "Numeric/metric
+ * cards" 규칙을 코드 레벨에서 보강한다. cr-card 안에 숫자가 있는데 cr-caption 클래스도, 대비/목표성
+ * 문구도 없으면 "숫자만 있는 카드"로 본다 — 텍스트 정규식 기반 휴리스틱이라 오탐 가능(예: 카드 안에
+ * 순수 라벨용 숫자가 우연히 들어간 경우)이지만, 판정이 필요한 값이라 자동수정 대신 힌트로만 남기고
+ * LLM 검토(reviewGeneratedApp.ts)가 실제로 고친다 — 골격 7(소개·홍보형)은 카드 자체가 없는 골격이라
+ * isSkeleton7File로 제외한다.
+ */
+const SUMMARY_CARD_OPEN_TAG_REGEX = /<(\w+)\b[^>]*\bclass(?:Name)?=(["'])[^"']*\bcr-card\b[^"']*\2[^>]*>/gi;
+const SUMMARY_CARD_METRIC_DIGIT_REGEX = /\d[\d,]*/;
+const SUMMARY_CARD_CAPTION_CLASS_REGEX = /\bcr-caption\b/;
+const SUMMARY_CARD_SUPPORT_TEXT_REGEX = /(대비|목표|전일|어제|지난|달성률|진행률|증가|감소|▲|▼)/;
+
+function runSummaryCardMissingContextHintCheck(filePath: string, content: string): MechanicalFinding[] {
+  if (!hasExtension(filePath, ['.tsx', '.jsx', '.html']) || isSkeleton7File(content)) {
+    return [];
+  }
+
+  const findings: MechanicalFinding[] = [];
+
+  for (const open of content.matchAll(SUMMARY_CARD_OPEN_TAG_REGEX)) {
+    const tagStart = open.index as number;
+    const tagName = open[1];
+    const span = findChapterSpan(content, tagStart, tagName);
+
+    if (!span) {
+      continue;
+    }
+
+    const cardText = content.slice(span.start, span.end);
+
+    if (!SUMMARY_CARD_METRIC_DIGIT_REGEX.test(cardText)) {
+      continue;
+    }
+
+    if (SUMMARY_CARD_CAPTION_CLASS_REGEX.test(cardText) || SUMMARY_CARD_SUPPORT_TEXT_REGEX.test(cardText)) {
+      continue;
+    }
+
+    findings.push({
+      file: filePath,
+      line: lineNumberAt(content, tagStart),
+      rule: 'summary-card-missing-context',
+      message:
+        '요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.',
+      autoFixed: false,
+    });
+  }
+
+  return findings;
+}
+
 // --- 오케스트레이션 ---
 
 /**
@@ -2283,6 +2337,7 @@ export function runMechanicalChecks(files: Record<string, string>, resolvedHue: 
     findings.push(...runExternalImageCheck(filePath, content));
     findings.push(...runStockImageDomainCheck(filePath, content));
     findings.push(...runSkeleton7CardGridHintCheck(filePath, content));
+    findings.push(...runSummaryCardMissingContextHintCheck(filePath, content));
     findings.push(...runSpacingGridCheck(filePath, content));
     findings.push(...runTextContainerMaxWidthCheck(filePath, content));
     findings.push(...runExpensiveTransitionCheck(filePath, content));
@@ -2354,6 +2409,7 @@ export const __internal = {
   runSkeleton7CaptionDedupeCheck,
   runSkeleton7SharedCaptionCheck,
   runSkeleton7CardGridHintCheck,
+  runSummaryCardMissingContextHintCheck,
   isSkeleton7File,
   findChapterSpan,
   findSkeleton7ChapterSpans,

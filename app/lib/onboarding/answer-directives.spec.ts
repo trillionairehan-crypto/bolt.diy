@@ -41,7 +41,7 @@ describe('buildSkeletonAndPerspectiveDirective', () => {
   });
 
   it('every skeleton name matches new-prompt.ts exactly (spot-check all 7)', () => {
-    expect(buildSkeletonAndPerspectiveDirective('team', 1)[0]).toContain('명단·차감형');
+    expect(buildSkeletonAndPerspectiveDirective('team', 1)[0]).toContain('명단·잔액형');
     expect(buildSkeletonAndPerspectiveDirective('team', 2)[0]).toContain('예약·일정형');
     expect(buildSkeletonAndPerspectiveDirective('solo', 3)[0]).toContain('거래·수지형');
     expect(buildSkeletonAndPerspectiveDirective('public', 4)[0]).toContain('목록·상세형');
