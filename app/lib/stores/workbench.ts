@@ -847,6 +847,20 @@ export class WorkbenchStore {
     return artifacts[id];
   }
 
+  /*
+   * 출시 블로커(2026-09-10) — P0 코드 내보내기 복원. 이 메서드 자체는 원본 bolt.diy부터 있었고
+   * 한 번도 안 지워졌다(잔재 정리 때 지워진 건 이걸 부르는 UI 버튼, Workbench.client.tsx —
+   * cd37599). 다만 메서드 안에 실제 버그 둘이 있었다:
+   *   1) `!dirent.isBinary`로 바이너리 파일(업로드 이미지 등)을 전부 건너뜀 — "이미지 자산 포함"
+   *      요구를 못 채움. isBinary 파일의 content는 files.ts#createFile이 이미 base64 문자열로
+   *      저장해두므로 JSZip의 {base64:true}로 그대로 추가.
+   *   2) 프로젝트에 실제 .env가 있으면(new-prompt.ts가 "내 Supabase 연결" 시 실제
+   *      VITE_SUPABASE_ANON_KEY 등을 그 파일에 쓰도록 지시함) 그대로 zip에 들어갔다 — "실제 키
+   *      제외, .env.example만" 요구를 어김. 실제 .env는 빼고, .env.example이 프로젝트에 없으면
+   *      .env의 값만 비워서 대신 넣는다(코랄레드 Cloud/내부 시크릿은 애초에 프로젝트 파일로 안
+   *      써지므로 — new-prompt.ts 236번째 줄 "NEVER create a .env entry for storage
+   *      credentials" — 여기서 걸러낼 대상은 사용자 자신의 Supabase 값뿐).
+   */
   async downloadZip() {
     const zip = new JSZip();
     const files = this.files.get();
@@ -858,25 +872,54 @@ export class WorkbenchStore {
     const timestampHash = Date.now().toString(36).slice(-6);
     const uniqueProjectName = `${projectName}_${timestampHash}`;
 
-    for (const [filePath, dirent] of Object.entries(files)) {
-      if (dirent?.type === 'file' && !dirent.isBinary) {
-        const relativePath = extractRelativePath(filePath);
+    const isRealEnvFile = (relativePath: string) => {
+      const base = relativePath.split('/').pop() ?? '';
+      return base === '.env' || (base.startsWith('.env.') && base !== '.env.example');
+    };
 
-        // split the path into segments
-        const pathSegments = relativePath.split('/');
+    const hasEnvExample = Object.keys(files).some(
+      (filePath) => extractRelativePath(filePath).split('/').pop() === '.env.example',
+    );
 
-        // if there's more than one segment, we need to create folders
-        if (pathSegments.length > 1) {
-          let currentFolder = zip;
+    const addToZip = (relativePath: string, content: string, options?: { base64: boolean }) => {
+      const pathSegments = relativePath.split('/');
 
-          for (let i = 0; i < pathSegments.length - 1; i++) {
-            currentFolder = currentFolder.folder(pathSegments[i])!;
-          }
-          currentFolder.file(pathSegments[pathSegments.length - 1], dirent.content);
-        } else {
-          // if there's only one segment, it's a file in the root
-          zip.file(relativePath, dirent.content);
+      if (pathSegments.length > 1) {
+        let currentFolder = zip;
+
+        for (let i = 0; i < pathSegments.length - 1; i++) {
+          currentFolder = currentFolder.folder(pathSegments[i])!;
         }
+        currentFolder.file(pathSegments[pathSegments.length - 1], content, options);
+      } else {
+        zip.file(relativePath, content, options);
+      }
+    };
+
+    for (const [filePath, dirent] of Object.entries(files)) {
+      if (dirent?.type !== 'file') {
+        continue;
+      }
+
+      const relativePath = extractRelativePath(filePath);
+
+      if (isRealEnvFile(relativePath)) {
+        // 실제 값은 절대 안 내보낸다 — .env.example이 프로젝트에 이미 있으면 그걸로 충분하니 스킵.
+        if (relativePath.endsWith('.env') && !hasEnvExample) {
+          const redacted = dirent.content
+            .split('\n')
+            .map((line) => (line.includes('=') && !line.trim().startsWith('#') ? `${line.split('=')[0]}=` : line))
+            .join('\n');
+          addToZip('.env.example', redacted);
+        }
+
+        continue;
+      }
+
+      if (dirent.isBinary) {
+        addToZip(relativePath, dirent.content, { base64: true });
+      } else {
+        addToZip(relativePath, dirent.content);
       }
     }
 

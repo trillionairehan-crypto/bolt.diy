@@ -167,29 +167,44 @@ export const DeployButton = ({
           {isDeploying && deployingTo === 'cloudflare' ? '배포 중...' : '배포하기'}
         </button>
 
-        {/* 개발자용 UI 정리 (overnight5) — Netlify/Vercel/GitHub/GitLab 내보내기 옵션은 개발자 모드에서만.
-            기본 화면은 Cloudflare 원클릭 배포만 남긴다. */}
-        {SHOW_DEV_TOOLS && (
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger
-              disabled={isDeploying || !activePreview || isStreaming}
-              aria-label="다른 방법으로 내보내기"
-              className="border-l border-[var(--on-accent)]/20 items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-2 py-1.5 bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:opacity-[0.85] outline-[var(--accent)] flex"
+        {/*
+         * P0 코드 소유권(2026-09-10) — "코드 내려받기"는 SHOW_DEV_TOOLS 게이트 밖에 둔다(항상
+         * 표시). 나머지(Netlify/Vercel/GitHub/GitLab 내보내기)는 개발자 모드에서만 그대로 유지
+         * (overnight5 — 기본 화면은 Cloudflare 원클릭 배포만 남기려던 의도). 캐럿 드롭다운 자체는
+         * 이제 항상 렌더 — 안에 있는 "코드 내려받기" 한 줄만 노출, 기본 배포 버튼 옆 작은 버튼이라
+         * 눈에 띄지 않는다.
+         */}
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger
+            disabled={isDeploying || isStreaming}
+            aria-label="다른 방법으로 내보내기"
+            className="border-l border-[var(--on-accent)]/20 items-center justify-center [&:is(:disabled,.disabled)]:cursor-not-allowed [&:is(:disabled,.disabled)]:opacity-60 px-2 py-1.5 bg-[var(--accent)] text-[var(--on-accent)] [&:not(:disabled,.disabled)]:hover:opacity-[0.85] outline-[var(--accent)] flex"
+          >
+            <span className={classNames('i-ph:caret-down transition-transform')} />
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content
+            className={classNames(
+              'z-[250] min-w-[220px]',
+              'bg-bolt-elements-background-depth-2',
+              'rounded-lg shadow-lg',
+              'border border-bolt-elements-borderColor',
+              'animate-in fade-in-0 zoom-in-95',
+              'py-1',
+            )}
+            sideOffset={5}
+            align="end"
+          >
+            <DropdownMenu.Item
+              className={itemClassName}
+              onClick={() => {
+                void workbenchStore.downloadZip();
+              }}
             >
-              <span className={classNames('i-ph:caret-down transition-transform')} />
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content
-              className={classNames(
-                'z-[250] min-w-[220px]',
-                'bg-bolt-elements-background-depth-2',
-                'rounded-lg shadow-lg',
-                'border border-bolt-elements-borderColor',
-                'animate-in fade-in-0 zoom-in-95',
-                'py-1',
-              )}
-              sideOffset={5}
-              align="end"
-            >
+              <span className="i-ph:download-simple" />
+              <span className="mx-auto">코드 내려받기 (.zip)</span>
+            </DropdownMenu.Item>
+
+            {SHOW_DEV_TOOLS && (
               <DropdownMenu.Sub>
                 <DropdownMenu.SubTrigger className={itemClassName}>
                   <span>다른 방법으로 내보내기</span>
@@ -289,9 +304,9 @@ export const DeployButton = ({
                   </DropdownMenu.SubContent>
                 </DropdownMenu.Portal>
               </DropdownMenu.Sub>
-            </DropdownMenu.Content>
-          </DropdownMenu.Root>
-        )}
+            )}
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
       </div>
 
       {/* GitHub Deployment Dialog */}
