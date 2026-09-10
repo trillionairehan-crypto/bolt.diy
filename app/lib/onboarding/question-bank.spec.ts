@@ -21,15 +21,17 @@ describe('question-bank data integrity', () => {
 
   /*
    * 2026-09-04: 모임·동호회를 순위·티어형(6)에서 명단·잔액형(1)으로 옮기면서 골격6은 격자에 직접
-   * 매칭되는 항목이 없어졌다(의도된 상태 — 직접 입력에서 Haiku가 골라줄 수는 있음). "골고루 커버"는
-   * 이제 필수 조건이 아니라 참고 지표라, 정확히 7종 전부를 요구하진 않되 최소 몇 종 이상은 커버하는지
-   * 하한선만 남긴다.
+   * 매칭되는 항목이 없어졌다(의도된 상태 — 직접 입력에서 Haiku가 골라줄 수는 있음). 2026-09-10:
+   * 카페·음식점을 소개·홍보형(7)에서 명단·잔액형(1)으로 옮기면서 골격7도 같은 이유로 격자에서
+   * 빠졌다 — 골격7은 요청 문장에 소개·홍보 명사가 있을 때 new-prompt.ts 1단계 판정으로만 나온다.
+   * "골고루 커버"는 이제 필수 조건이 아니라 참고 지표라, 정확히 7종 전부를 요구하진 않되 최소 몇 종
+   * 이상은 커버하는지 하한선만 남긴다.
    */
-  it('Q3_GRID covers most skeletons (골격6 순위·티어형은 격자에 직접 매칭되는 항목이 없어도 통과)', () => {
+  it('Q3_GRID covers most skeletons (골격6 순위·티어형·골격7 소개·홍보형은 격자에 직접 매칭되는 항목이 없어도 통과)', () => {
     const covered = new Set(Q3_GRID.map((item) => item.skeleton));
-    expect(covered.size).toBeGreaterThanOrEqual(6);
+    expect(covered.size).toBeGreaterThanOrEqual(5);
 
-    for (const skeleton of [1, 2, 3, 4, 5, 7] as const) {
+    for (const skeleton of [1, 2, 3, 4, 5] as const) {
       expect(covered.has(skeleton), `skeleton ${skeleton} uncovered`).toBe(true);
     }
   });
