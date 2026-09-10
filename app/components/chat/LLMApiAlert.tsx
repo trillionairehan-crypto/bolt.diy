@@ -12,7 +12,7 @@ interface Props {
 export default function LlmErrorAlert({ alert, clearAlert, onRetry, onContinue }: Props) {
   const { title, description, provider, errorType } = alert;
   const isDurationCap = errorType === 'duration_cap';
-  const isClientStall = errorType === 'client_stall';
+  const isClientStall = errorType === 'client_stall' || errorType === 'post_stream_stall';
 
   const getErrorIcon = () => {
     switch (errorType) {
@@ -26,6 +26,8 @@ export default function LlmErrorAlert({ alert, clearAlert, onRetry, onContinue }
         return 'i-ph:hourglass-duotone';
       case 'client_stall':
         return 'i-ph:wifi-slash-duotone';
+      case 'post_stream_stall':
+        return 'i-ph:hourglass-medium-duotone';
       default:
         return 'i-ph:warning-duotone';
     }
@@ -44,6 +46,9 @@ export default function LlmErrorAlert({ alert, clearAlert, onRetry, onContinue }
         return description;
       case 'client_stall':
         // Chat.client.tsx가 보낸 문구 그대로 — 재시도는 무과금.
+        return description;
+      case 'post_stream_stall':
+        // Chat.client.tsx가 보낸 문구 그대로 — 재시도는 남은 액션만 재실행, 새 생성 아니라 무과금.
         return description;
       default:
         return '잠시 문제가 있었어요. 다시 시도해주세요.';

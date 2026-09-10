@@ -1,6 +1,6 @@
 import { atom, map, type MapStore, type ReadableAtom, type WritableAtom } from 'nanostores';
 import type { EditorDocument, ScrollPosition } from '~/components/editor/codemirror/CodeMirrorEditor';
-import { ActionRunner } from '~/lib/runtime/action-runner';
+import { ActionRunner, type ActionStatus } from '~/lib/runtime/action-runner';
 import type { ActionCallbackData, ArtifactCallbackData } from '~/lib/runtime/message-parser';
 import { webcontainer } from '~/lib/webcontainer';
 import type { ITerminal } from '~/types/terminal';
@@ -652,6 +652,51 @@ export class WorkbenchStore {
 
   abortAllActions() {
     // TODO: what do we wanna do and how do we wanna recover from this?
+  }
+
+  /*
+   * 출시 블로커(2026-09-10) 대응 — 스트림은 끝났는데 액션 실행 큐가 안 끝난 케이스를 클라이언트
+   * 워치독(Chat.client.tsx)이 감지할 수 있도록 노출. 'start' 액션의 'running'은 정상 상태(dev
+   * server가 계속 떠 있는 것)라 Artifact.tsx의 allActionFinished 판정과 동일하게 예외 처리한다.
+   */
+  getUnsettledActions(): Array<{ artifactId: string; actionId: string; filePath?: string; status: ActionStatus }> {
+    const result: Array<{ artifactId: string; actionId: string; filePath?: string; status: ActionStatus }> = [];
+
+    for (const [artifactId, artifact] of Object.entries(this.artifacts.get())) {
+      for (const [actionId, action] of Object.entries(artifact.runner.actions.get())) {
+        const settled = action.status === 'complete' || (action.type === 'start' && action.status === 'running');
+
+        if (!settled) {
+          result.push({
+            artifactId,
+            actionId,
+            filePath: action.type === 'file' ? action.filePath : undefined,
+            status: action.status,
+          });
+        }
+      }
+    }
+
+    return result;
+  }
+
+  /*
+   * Retries every 'running'/'failed' action still stuck — no new LLM call, so no generation
+   * charge involved. Returns how many it retried.
+   */
+  retryUnsettledActions(): number {
+    let retried = 0;
+
+    for (const artifact of Object.values(this.artifacts.get())) {
+      for (const [actionId, action] of Object.entries(artifact.runner.actions.get())) {
+        if (action.status === 'running' || action.status === 'failed') {
+          artifact.runner.retryAction(actionId);
+          retried++;
+        }
+      }
+    }
+
+    return retried;
   }
 
   setReloadedMessages(messages: string[]) {

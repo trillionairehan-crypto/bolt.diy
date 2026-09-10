@@ -1,4 +1,5 @@
 import type { WebContainer } from '@webcontainer/api';
+import * as Sentry from '@sentry/remix';
 import { path as nodePath } from '~/utils/path';
 import { atom, map, type MapStore } from 'nanostores';
 import type { ActionAlert, BoltAction, DeployAlert, FileHistory, SupabaseAction, SupabaseAlert } from '~/types/actions';
@@ -10,6 +11,23 @@ import { LOCAL_PREVIEW_STORAGE_KEY, postFileToLocalPreviewServer } from '~/lib/s
 import { addMissingDependencies, extractKnownPackageImports } from './dependency-postprocess';
 
 const logger = createScopedLogger('ActionRunner');
+
+/*
+ * 출시 블로커(2026-09-10) 대응 — webcontainer.fs.writeFile이 응답 없이 멈추는 사례가 관측됨
+ * (FilesStore 워처는 파일이 실제로 쓰였다고 로그를 남기는데도 이 await 자체는 안 풀림, 즉
+ * WebContainer 워커/메시지 채널 쪽에서 응답이 유실된 것으로 보임 — 원인은 계측 전이라 미확정).
+ * 이 await는 #currentExecutionPromise 직렬 큐를 막고 있어서, 안 풀리면 이후 액션(빌드/start)도
+ * 전부 영원히 대기하고 완료 신호(라벨 전환·미리보기 오픈)도 영영 안 옴. 타임아웃으로 강제
+ * 실패시켜 큐를 풀고, 다음에 재현되면 원인 파악용 데이터(경로/크기/경과)가 Sentry에 남도록 함.
+ */
+const FILE_WRITE_TIMEOUT_MS = 20_000;
+
+class FileWriteTimeoutError extends Error {
+  constructor(relativePath: string) {
+    super(`Timed out writing file after ${FILE_WRITE_TIMEOUT_MS}ms: ${relativePath}`);
+    this.name = 'FileWriteTimeoutError';
+  }
+}
 
 export type ActionStatus = 'pending' | 'running' | 'complete' | 'aborted' | 'failed';
 
@@ -368,15 +386,72 @@ export class ActionRunner {
       }
     }
 
+    const writeStartedAt = Date.now();
+
     try {
-      await webcontainer.fs.writeFile(relativePath, content);
+      await this.#writeFileWithTimeout(webcontainer, relativePath, content);
       logger.debug(`File written ${relativePath}`);
     } catch (error) {
-      logger.error('Failed to write file\n\n', error);
+      if (error instanceof FileWriteTimeoutError) {
+        logger.error(error.message);
+        Sentry.captureMessage('webcontainer file write timeout', {
+          level: 'error',
+          tags: { route: 'action-runner', event: 'file_write_timeout' },
+          extra: {
+            filePath: relativePath,
+            contentLength: content.length,
+            elapsedMs: Date.now() - writeStartedAt,
+          },
+        });
+      } else {
+        logger.error('Failed to write file\n\n', error);
+      }
+
       throw error;
     }
 
     this.#mirrorFileToLocalPreviewServer(relativePath, content);
+  }
+
+  /*
+   * Races the real write against a timeout so a dropped WebContainer response can't wedge
+   * #currentExecutionPromise forever. If the timeout wins, the real write's own promise is left
+   * to settle on its own (WebContainer's API gives no way to cancel it) — a late resolve after
+   * this rejects is harmless, a late reject is just swallowed.
+   */
+  async #writeFileWithTimeout(webcontainer: WebContainer, relativePath: string, content: string): Promise<void> {
+    let timeoutId: NodeJS.Timeout;
+
+    const timeout = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => reject(new FileWriteTimeoutError(relativePath)), FILE_WRITE_TIMEOUT_MS);
+    });
+
+    try {
+      await Promise.race([webcontainer.fs.writeFile(relativePath, content), timeout]);
+    } finally {
+      clearTimeout(timeoutId!);
+    }
+  }
+
+  /*
+   * Re-runs one action that's stuck (status still 'running'/'pending') or ended in 'failed' —
+   * used by the client's post-stream stall recovery so a wedged action can be retried without a
+   * new LLM call (no regenerate(), so no generation charge involved).
+   */
+  retryAction(actionId: string) {
+    const action = this.actions.get()[actionId];
+
+    if (!action) {
+      return;
+    }
+
+    this.#updateAction(actionId, { status: 'pending', executed: false });
+
+    this.#currentExecutionPromise = this.#currentExecutionPromise
+      .then(() => this.#executeAction(actionId))
+      .catch((error) => {
+        logger.error('Retry action execution promise failed:', error);
+      });
   }
 
   /*

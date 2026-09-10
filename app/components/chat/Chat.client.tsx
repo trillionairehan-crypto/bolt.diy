@@ -261,6 +261,7 @@ export const ChatImpl = memo(
     const lastProgressAtRef = useRef<number>(Date.now());
     const lastMessageSignatureRef = useRef<string>('');
     const clientStallHandledRef = useRef(false);
+    const postStreamStallTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const {
       messages,
@@ -516,6 +517,70 @@ export const ChatImpl = memo(
 
       return () => clearInterval(interval);
     }, [isLoading]);
+
+    /*
+     * 출시 블로커(2026-09-10) — 90초 감시(위)는 isLoading 동안만 돈다. 스트림 자체는 정상
+     * 종료됐는데(과금까지 끝남) 그 뒤 액션 실행 큐(파일 write 등)가 안 끝나서 "만드는 중" 화면에
+     * 영원히 멈추는 케이스는 그 감시로 못 잡는다 — isLoading이 false로 꺾이는 순간부터 별도로
+     * 30초 재본다. workbenchStore.getUnsettledActions()가 직접 액션 상태를 보므로 pipelineStage
+     * 같은 파생 상태보다 신뢰도가 높다.
+     */
+    const POST_STREAM_STALL_TIMEOUT_MS = 30_000;
+
+    const checkPostStreamStall = useCallback(() => {
+      const unsettled = workbenchStore.getUnsettledActions();
+
+      if (unsettled.length === 0) {
+        return;
+      }
+
+      const totalActions = Object.values(workbenchStore.artifacts.get()).reduce(
+        (sum, artifact) => sum + Object.keys(artifact.runner.actions.get()).length,
+        0,
+      );
+      const completedActions = totalActions - unsettled.length;
+
+      logger.error('Post-stream action stall — stream finished but action queue never settled', { unsettled });
+
+      Sentry.captureMessage('post-stream action stall', {
+        level: 'error',
+        tags: { route: 'chat.client', event: 'post_stream_stall' },
+        extra: {
+          chatId: chatId.get() ?? 'unknown',
+          stuckFilePaths: unsettled.map((action) => action.filePath).filter(Boolean),
+          elapsedSec: Math.round(POST_STREAM_STALL_TIMEOUT_MS / 1000),
+          completedActions,
+          totalActions,
+        },
+      });
+
+      setLlmErrorAlert({
+        type: 'error',
+        title: '마무리가 안 끝났어요',
+        description: '화면은 다 만들었는데 마지막 정리가 안 끝났어요. 다시 시도해주세요.',
+        errorType: 'post_stream_stall',
+      });
+    }, []);
+
+    useEffect(() => {
+      if (isLoading) {
+        if (postStreamStallTimeoutRef.current) {
+          clearTimeout(postStreamStallTimeoutRef.current);
+          postStreamStallTimeoutRef.current = null;
+        }
+
+        return () => {};
+      }
+
+      postStreamStallTimeoutRef.current = setTimeout(checkPostStreamStall, POST_STREAM_STALL_TIMEOUT_MS);
+
+      return () => {
+        if (postStreamStallTimeoutRef.current) {
+          clearTimeout(postStreamStallTimeoutRef.current);
+          postStreamStallTimeoutRef.current = null;
+        }
+      };
+    }, [isLoading, checkPostStreamStall]);
 
     /*
      * 진행 단계 표시(빌드 → 코드 점검 → 화면 확인 → 마무리) — 도달한 최고 단계만 기록(뒤로 안
@@ -1364,6 +1429,26 @@ export const ChatImpl = memo(
         llmErrorAlert={llmErrorAlert}
         clearLlmErrorAlert={clearApiErrorAlert}
         onRetryLlmError={() => {
+          /*
+           * post_stream_stall: LLM 응답은 이미 다 왔고 로컬 액션 큐만 막힌 것 — regenerate()로
+           * 새로 생성하면 불필요한 재생성 + 잠재적 재과금 위험이라, 막힌 액션만 재실행한다. 새
+           * LLM 호출이 아니므로 generationChargeGate가 아예 관여하지 않는다(무과금).
+           */
+          if (llmErrorAlert?.errorType === 'post_stream_stall') {
+            clearApiErrorAlert();
+
+            const retried = workbenchStore.retryUnsettledActions();
+            logger.debug(`post_stream_stall 재시도: ${retried}개 액션 재실행`);
+
+            if (postStreamStallTimeoutRef.current) {
+              clearTimeout(postStreamStallTimeoutRef.current);
+            }
+
+            postStreamStallTimeoutRef.current = setTimeout(checkPostStreamStall, POST_STREAM_STALL_TIMEOUT_MS);
+
+            return;
+          }
+
           clearApiErrorAlert();
           regenerate().catch((error) => logger.error('LlmErrorAlert 다시 시도: regenerate() 실패', error));
         }}
