@@ -3,6 +3,8 @@
  * 별도 빌드 스텝 없음 — 그래서 상대 경로만 쓰고(별칭 ~/ 없음), 실제 앱 소스(getBaselineTemplate,
  * mechanical-checks)를 그대로 import해서 로직 중복을 피한다.
  */
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { getBaselineTemplate } from '../../app/utils/selectStarterTemplate.ts';
 import {
   runMechanicalChecks,
@@ -123,17 +125,33 @@ export function extractFilesFromAssistantText(text: string): SimpleFile[] {
 
 // --- 기준 프로젝트(첫 생성 시드) ---
 
-export function baselineFileMap(): FileMap {
-  const { assistantMessage: _assistantMessage } = getBaselineTemplate(FIXED_HUE);
-  void _assistantMessage;
+/*
+ * 출시 블로커 조사(2026-09-10)로 발견: coralredKit.ts가 `~design-handoff/coralred-ui.css?raw`로
+ * 킷 CSS를 읽는데, 이 harness는 esbuild로 번들해서 node로 직접 실행한다(bundleAndRun.cjs) — esbuild는
+ * Vite의 `?raw` 원문 로더 규칙을 모르고 조용히 빈 객체({})로 resolve해버려서, 템플릿 리터럴에 꽂히는
+ * 순간 문자열 "[object Object]"가 된다(에러도 안 남, esbuild가 unknown import를 에러 없이 빈 객체로
+ * 처리). 프로덕션(Vite/Remix)에서는 `?raw`가 정상 동작해 실제 생성물에는 영향 없다 — harness 전용
+ * 버그. 디스크에서 직접 읽어 대체한다.
+ */
+const REAL_CORALRED_UI_CSS = (() => {
+  try {
+    return readFileSync(path.resolve('design-handoff/coralred-ui.css'), 'utf-8');
+  } catch {
+    return null;
+  }
+})();
 
-  /*
-   * getBaselineTemplate는 assistantMessage 텍스트로 파일을 "표현"하지만, 실제로 필요한 건 그
-   * 파일 목록 자체다 — assistantMessage를 다시 파싱하는 대신 같은 함수가 내부적으로 쓰는 파일
-   * 배열을 재구성한다. getBaselineTemplate가 배열을 직접 반환하지 않으므로 텍스트에서 역파싱한다.
-   */
+export function baselineFileMap(): FileMap {
   const { assistantMessage } = getBaselineTemplate(FIXED_HUE);
   const files = extractFilesFromAssistantText(assistantMessage);
+
+  if (REAL_CORALRED_UI_CSS) {
+    for (const file of files) {
+      if (file.path.endsWith('public/coralred-ui.css') && file.content.trim() === '[object Object]') {
+        file.content = REAL_CORALRED_UI_CSS;
+      }
+    }
+  }
 
   return simpleFilesToFileMap(files);
 }
