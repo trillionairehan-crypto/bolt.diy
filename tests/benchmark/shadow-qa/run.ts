@@ -13,13 +13,14 @@
  *   node tests/skeleton7-dom/bundleAndRun.cjs tests/benchmark/shadow-qa/run.ts
  *
  * 필요 환경변수(.env):
- *   ANTHROPIC_API_KEY          — claude-sonnet-5 호출용. 없으면 그 모델 결과가 call_failed로 기록됨.
- *   OPENAI_API_KEY             — OpenAI 호출용. 없으면 마찬가지.
- *   SHADOW_QA_OPENAI_MODEL     — 기본값 'gpt-5.1'(미확정 추정치) — 실행 전 실제 계정에서 쓸 수
- *                                 있는 최신 모델 id로 덮어쓸 것.
- *   SHADOW_QA_BASE_URL         — "오늘 생성한 골격 1" 샘플을 새로 뽑을 dev 서버 주소.
- *                                 기본값 http://localhost:5173 — 서버가 안 떠 있으면 이 케이스만
- *                                 건너뛰고 기존 픽스처 3건은 그대로 진행한다.
+ *   ANTHROPIC_API_KEY, OPENAI_API_KEY, GEMINI_API_KEY — 없으면 그 provider를 쓰는 모델 결과가
+ *   call_failed로 기록됨(스크립트가 죽지 않고 나머지 모델/케이스는 계속 진행).
+ *
+ * 모델 구성(단가 포함)은 MODEL_CONFIGS(아래) 상수에 있다 — 2026-09-10 성민 지시로 확정된 값,
+ * env로 덮어쓰지 않는다. 바꾸려면 이 배열을 직접 수정한다.
+ *
+ * SHADOW_QA_BASE_URL — "오늘 생성한 골격 1" 샘플을 새로 뽑을 dev 서버 주소. 기본값
+ *   http://localhost:5173 — 서버가 안 떠 있으면 이 케이스만 건너뛰고 기존 픽스처 3건은 진행한다.
  */
 import { readFileSync, mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
@@ -37,9 +38,9 @@ import { callChat, userMessage, assistantMessage } from '../chatClient.ts';
 import { getBaselineTemplate } from '../../../app/utils/selectStarterTemplate.ts';
 import { buildVisualReviewSystemPrompt } from '../../../app/lib/common/prompts/review-checklist.ts';
 import type { FixtureRecord } from '../../skeleton7-dom/renderFixture.ts';
-import { captureScreenshots } from './screenshots.ts';
-import { callClaudeVisual, callOpenAiVisual } from './models.ts';
-import { normalizeVisualResult } from './normalize.ts';
+import { captureScreenshots, type CapturedScreenshots } from './screenshots.ts';
+import { callClaudeVisual, callOpenAiVisual, callGeminiVisual, type RawVisualCallResult } from './models.ts';
+import { normalizeVisualResult, type NormalizedResult } from './normalize.ts';
 import { printConsoleTable, writeHtmlReport, type ShadowQaCase } from './report.ts';
 
 /*
@@ -87,16 +88,81 @@ loadDotEnv();
 
 const BASE_URL = process.env.SHADOW_QA_BASE_URL ?? 'http://localhost:5173';
 const PROVIDER_NAME = 'Anthropic';
-const SKELETON1_TASK = '헬스장 회원 관리'; // 골격 1(명단·차감형)에 맞는 기존 벤치마크 A태스크 재사용.
-
-const CLAUDE_COST_PER_MTOK = { input: PRICING['claude-sonnet-5'].input, output: PRICING['claude-sonnet-5'].output };
+const SKELETON1_TASK = '동네 헬스장 회원 관리 앱'; // 골격 1(명단·차감형).
 
 /*
- * OpenAI 가격은 이 리포에 기존 참조가 없다 — 아는 값으로 단정하지 않고 env로만 받는다. 안 주면
- * 원가는 0으로 찍히고 리포트에 "가격 미설정" 각주가 남는다(추정치를 사실처럼 보여주지 않기 위함).
+ * 2026-09-10 성민 지시 — 검토층 비교용 모델 구성. 단가는 성민이 직접 준 값을 그대로 씀(웹검색
+ * 추정 아님). gpt-6-astra는 "품질 상한 확인용, 1건만"이라 onlyFirstCase로 제한 — 어느 케이스가
+ * 첫 번째인지는 main()의 최종 케이스 순서(골격1 신규 생성이 있으면 그게 첫 번째, 없으면 bakery)를
+ * 따른다.
  */
-const OPENAI_INPUT_PRICE = Number(process.env.SHADOW_QA_OPENAI_INPUT_PRICE_PER_MTOK ?? 0);
-const OPENAI_OUTPUT_PRICE = Number(process.env.SHADOW_QA_OPENAI_OUTPUT_PRICE_PER_MTOK ?? 0);
+interface ModelConfig {
+  key: string;
+  provider: 'claude' | 'openai' | 'gemini';
+  model: string;
+  inputPrice: number;
+  outputPrice: number;
+  onlyFirstCase?: boolean;
+}
+
+const MODEL_CONFIGS: ModelConfig[] = [
+  {
+    key: 'claude-sonnet-5',
+    provider: 'claude',
+    model: 'claude-sonnet-5',
+    inputPrice: PRICING['claude-sonnet-5'].input,
+    outputPrice: PRICING['claude-sonnet-5'].output,
+  },
+  { key: 'gpt-5.6-luna', provider: 'openai', model: 'gpt-5.6-luna', inputPrice: 0.2, outputPrice: 1.2 },
+  /*
+   * 성민이 준 'gemini-2.5-flash-lite'는 이 계정에서 404("no longer available to new users" —
+   * Google이 gemini-3.5-flash-lite로 이전 안내)라서 그 대체 모델로 교체. 단가도 $0.10/$0.40이
+   * 아니라 3.5-flash-lite 공식 단가($0.30/$2.50, ai.google.dev 확인)로 반영 — "최저가 후보" 취지는
+   * 유지하되 실제 원가는 이 값이 맞다.
+   */
+  {
+    key: 'gemini-3.5-flash-lite',
+    provider: 'gemini',
+    model: 'gemini-3.5-flash-lite',
+    inputPrice: 0.3,
+    outputPrice: 2.5,
+  },
+  { key: 'gpt-6-astra', provider: 'openai', model: 'gpt-6-astra', inputPrice: 10, outputPrice: 50, onlyFirstCase: true },
+];
+
+async function callModelConfig(
+  config: ModelConfig,
+  systemPrompt: string,
+  userText: string,
+  screenshots: CapturedScreenshots,
+): Promise<RawVisualCallResult> {
+  switch (config.provider) {
+    case 'claude':
+      return callClaudeVisual({
+        systemPrompt,
+        userText,
+        desktopBase64: screenshots.desktopBase64,
+        mobileBase64: screenshots.mobileBase64,
+        model: config.model,
+      });
+    case 'openai':
+      return callOpenAiVisual({
+        systemPrompt,
+        userText,
+        desktopDataUrl: screenshots.desktopDataUrl,
+        mobileDataUrl: screenshots.mobileDataUrl,
+        model: config.model,
+      });
+    case 'gemini':
+      return callGeminiVisual({
+        systemPrompt,
+        userText,
+        desktopBase64: screenshots.desktopBase64,
+        mobileBase64: screenshots.mobileBase64,
+        model: config.model,
+      });
+  }
+}
 
 const FIXTURES_DIR = path.resolve('tests/fixtures/generated');
 const FIXTURE_NAMES = ['bakery', 'portfolio', 'cafe'];
@@ -167,7 +233,7 @@ interface CaseInput {
   files: FixtureRecord;
 }
 
-async function buildCase(input: CaseInput): Promise<ShadowQaCase> {
+async function buildCase(input: CaseInput, isFirstCase: boolean): Promise<ShadowQaCase> {
   log(`케이스 시작: ${input.caseId}`);
 
   const checks = runChecks(input.files);
@@ -188,33 +254,27 @@ async function buildCase(input: CaseInput): Promise<ShadowQaCase> {
     `[골격 판정값]\n${mechanicalSummary}\n\n` +
     `[소스 파일 목록]\n${fileList.join('\n')}`;
 
-  log(`케이스 ${input.caseId}: claude-sonnet-5 호출`);
+  const results: Record<string, NormalizedResult> = {};
 
-  const claudeRaw = await callClaudeVisual({
-    systemPrompt,
-    userText,
-    desktopBase64: screenshots.desktopBase64,
-    mobileBase64: screenshots.mobileBase64,
-  });
+  for (const config of MODEL_CONFIGS) {
+    if (config.onlyFirstCase && !isFirstCase) {
+      continue;
+    }
 
-  log(`케이스 ${input.caseId}: OpenAI 호출`);
+    log(`케이스 ${input.caseId}: ${config.key} 호출`);
 
-  const openaiRaw = await callOpenAiVisual({
-    systemPrompt,
-    userText,
-    desktopDataUrl: screenshots.desktopDataUrl,
-    mobileDataUrl: screenshots.mobileDataUrl,
-  });
-
-  const claude = normalizeVisualResult('claude-sonnet-5', claudeRaw, CLAUDE_COST_PER_MTOK);
-  const openai = normalizeVisualResult(process.env.SHADOW_QA_OPENAI_MODEL ?? 'gpt-5.1', openaiRaw, {
-    input: OPENAI_INPUT_PRICE,
-    output: OPENAI_OUTPUT_PRICE,
-  });
+    const raw = await callModelConfig(config, systemPrompt, userText, screenshots);
+    results[config.key] = normalizeVisualResult(config.key, raw, {
+      input: config.inputPrice,
+      output: config.outputPrice,
+    });
+  }
 
   log(
-    `케이스 완료: ${input.caseId} — claude ${claude.verdict}(${claude.issues.length}건), ` +
-      `openai ${openai.verdict}(${openai.issues.length}건)`,
+    `케이스 완료: ${input.caseId} — ` +
+      Object.values(results)
+        .map((r) => `${r.model} ${r.verdict}(${r.issues.length}건)`)
+        .join(', '),
   );
 
   return {
@@ -224,8 +284,7 @@ async function buildCase(input: CaseInput): Promise<ShadowQaCase> {
     fileList,
     desktopDataUrl: screenshots.desktopDataUrl,
     mobileDataUrl: screenshots.mobileDataUrl,
-    claude,
-    openai,
+    results,
   };
 }
 
@@ -244,8 +303,8 @@ async function main() {
 
   const cases: ShadowQaCase[] = [];
 
-  for (const input of inputs) {
-    cases.push(await buildCase(input));
+  for (let i = 0; i < inputs.length; i++) {
+    cases.push(await buildCase(inputs[i], i === 0));
   }
 
   writeFileSync(path.join(RESULTS_DIR, 'raw-results.json'), JSON.stringify(cases, null, 2));
@@ -256,10 +315,9 @@ async function main() {
   printConsoleTable(cases);
 
   log(`완료 — ${cases.length}건. HTML: ${htmlPath}`);
-
-  if (!OPENAI_INPUT_PRICE && !OPENAI_OUTPUT_PRICE) {
-    log('참고: SHADOW_QA_OPENAI_*_PRICE_PER_MTOK 미설정 — OpenAI 원가는 0으로 찍혀 있음(실제 가격 아님).');
-  }
+  log(
+    `모델 구성: ${MODEL_CONFIGS.map((c) => `${c.key}($${c.inputPrice}/$${c.outputPrice}/1M${c.onlyFirstCase ? ', 1건만' : ''})`).join(', ')}`,
+  );
 }
 
 main().catch((error) => {

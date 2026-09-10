@@ -207,3 +207,97 @@ export async function callOpenAiVisual(opts: {
     httpStatus: response.status,
   };
 }
+
+/*
+ * pro 계열(gemini-pro-latest)은 이 Google 프로젝트에서 무료 티어 quota가 0이라 막혀서(2026-09-10
+ * 실측, 429 quota exceeded) flash 계열로 바꿈 — flash는 무료 티어가 있다(ai.google.dev/gemini-api/
+ * docs/pricing). 'gemini-flash-latest'는 Google이 제공하는 별칭으로 시점의 최신 Flash 모델(확인
+ * 시점 2026-09: gemini-3.8-flash)을 자동으로 가리킨다.
+ */
+const DEFAULT_GEMINI_MODEL = process.env.SHADOW_QA_GEMINI_MODEL ?? 'gemini-flash-latest';
+
+export async function callGeminiVisual(opts: {
+  systemPrompt: string;
+  userText: string;
+  desktopBase64: string;
+  mobileBase64: string;
+  model?: string;
+}): Promise<RawVisualCallResult> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  const model = opts.model ?? DEFAULT_GEMINI_MODEL;
+
+  if (!apiKey) {
+    return {
+      rawText: '',
+      latencyMs: 0,
+      inputTokens: 0,
+      outputTokens: 0,
+      httpStatus: 0,
+      errorText: 'GEMINI_API_KEY 없음 — .env에 추가 필요',
+    };
+  }
+
+  const t0 = performance.now();
+
+  let response: Response;
+
+  try {
+    response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: opts.systemPrompt }] },
+          contents: [
+            {
+              role: 'user',
+              parts: [
+                { text: opts.userText },
+                { inline_data: { mime_type: 'image/png', data: opts.desktopBase64 } },
+                { inline_data: { mime_type: 'image/png', data: opts.mobileBase64 } },
+              ],
+            },
+          ],
+          generationConfig: { maxOutputTokens: MAX_OUTPUT_TOKENS },
+        }),
+      },
+    );
+  } catch (error) {
+    return {
+      rawText: '',
+      latencyMs: Math.round(performance.now() - t0),
+      inputTokens: 0,
+      outputTokens: 0,
+      httpStatus: 0,
+      errorText: String((error as Error)?.message ?? error),
+    };
+  }
+
+  const latencyMs = Math.round(performance.now() - t0);
+  const body: any = await response.json().catch(() => null);
+
+  if (!response.ok || !body) {
+    return {
+      rawText: '',
+      latencyMs,
+      inputTokens: 0,
+      outputTokens: 0,
+      httpStatus: response.status,
+      errorText: JSON.stringify(body ?? {}).slice(0, 500),
+    };
+  }
+
+  const geminiText: string = (body.candidates?.[0]?.content?.parts ?? [])
+    .filter((part: any) => typeof part.text === 'string')
+    .map((part: any) => part.text)
+    .join('');
+
+  return {
+    rawText: geminiText,
+    latencyMs,
+    inputTokens: body.usageMetadata?.promptTokenCount ?? 0,
+    outputTokens: body.usageMetadata?.candidatesTokenCount ?? 0,
+    httpStatus: response.status,
+  };
+}
