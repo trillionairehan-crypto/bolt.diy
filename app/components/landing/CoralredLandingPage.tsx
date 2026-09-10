@@ -62,11 +62,16 @@ function LogoMark({ className }: { className?: string }) {
   );
 }
 
-// 목적지가 아직 없는 마케팅 정보 페이지 — 실제 라우트가 생기기 전까지의 자리 표시용 링크.
+/*
+ * 출시 블로커(2026-09-10) — 전부 '#'로 걸려 있어 클릭해도 제자리였다. 실제 라우트/섹션이 있는
+ * 셋만 연결한다: 제품은 /templates(템플릿 갤러리, 공개 라우트), 도움말은 /guide(이용 가이드,
+ * 실제 콘텐츠 있는 라우트), 기술과 보안은 이 페이지 자체의 신뢰 섹션(#security, 아래 trustReveal
+ * 블록)으로 스크롤 — 별도 라우트는 없지만 내용 자체는 이미 이 페이지에 있어서 새로 안 만들었다.
+ */
 const NAV_LINKS = [
-  { label: '제품', href: '#' },
-  { label: '기술과 보안', href: '#' },
-  { label: '도움말', href: '#' },
+  { label: '제품', href: '/templates' },
+  { label: '기술과 보안', href: '#security' },
+  { label: '도움말', href: '/guide' },
   { label: '요금제', href: '/pricing' },
 ];
 
@@ -159,6 +164,7 @@ export function CoralredLandingPage({ onEnter, loggedInPreview = false }: Coralr
       </section>
 
       <section
+        id="security"
         ref={trustReveal.ref}
         className={classNames(styles.infoBlock, styles.reveal, { [styles.revealVisible]: trustReveal.visible })}
       >
@@ -166,9 +172,6 @@ export function CoralredLandingPage({ onEnter, loggedInPreview = false }: Coralr
           <div className={styles.infoBlockText}>
             <div className={styles.infoBlockHeaderRow}>
               <h3 className={styles.infoBlockTitle}>만든 다음이 더 중요하니까</h3>
-              <a href="#" className={styles.infoBlockLink}>
-                기술과 보안 자세히
-              </a>
             </div>
             <ul className={classNames(styles.infoList, { [styles.revealVisible]: trustReveal.visible })}>
               {TRUST_LINES.map((line) => (
