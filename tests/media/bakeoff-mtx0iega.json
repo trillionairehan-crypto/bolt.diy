@@ -1,0 +1,97 @@
+{
+  "world": "neoclassical-painting",
+  "briefs": [
+    {
+      "title": "Oven Mouth — Baker From Behind",
+      "prompt": "Medium distance, eye level, the baker placed on the right vertical third with back fully to us, bending toward a brick oven mouth low right; face never shown, hands simplified around a long wooden peel. Flour handprints on the seat of a heavy canvas apron, one strap slipped. The oven glow is the only warm source besides a high slit window upper left through which a deep predawn ultramarine sky shows; the window light rakes across bare wooden shelves standing empty at the left, one shelf holding a single forgotten roll and a scatter of crumbs. A copper pot hangs edge-cut at the top right. Terracotta floor with a cracked tile and dropped salt. Accent pigment reserved for a folded cloth on the peel. Upper-left third stays open wall and sky. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+      "negative": "visible face, frontal pose, photographic skin, detailed realistic fingers, close-up portrait, centred figure, stainless steel appliances, fluorescent light, shelves fully stocked, text, lettering, signs, logos, watermarks, frame, border, cartoon or anime styling, 3D render"
+    }
+  ],
+  "models": [
+    "gemini-3.1-flash-image",
+    "gemini-3-pro-image",
+    "gpt-image-2.5-sunburst",
+    "gpt-image-2.5-flare",
+    "gpt-image-2"
+  ],
+  "results": [
+    {
+      "model": "gemini-3.1-flash-image",
+      "brief": "Oven Mouth — Baker From Behind",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx0iega/0-gemini-3.1-flash-image.jpg",
+      "ms": 10263,
+      "fable": 6,
+      "astra": 6.5,
+      "score": 6,
+      "tells": [
+        "render-look: smooth vector-like surfaces and flat wall/floor read as digital illustration, not oil",
+        "impossible detail: orange cloth hangs from the middle of the peel shaft with no reason, and the peel appears to pass through/behind the torso ambiguously",
+        "flawless too-perfect surfaces: stamped, razor-sharp flour handprints, pristine terracotta floor",
+        "uniform lighting with no shadow anchor: feet float, oven glow barely affects the figure",
+        "generic stock composition: props laid out like a diorama (window, shelf, oven) with no depth overlap"
+      ]
+    },
+    {
+      "model": "gemini-3-pro-image",
+      "brief": "Oven Mouth — Baker From Behind",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx0iega/0-gemini-3-pro-image.jpg",
+      "ms": 22224,
+      "fable": 6.5,
+      "astra": 6.8,
+      "score": 6.5,
+      "tells": [
+        "style drift: gilded frame edges visible left and right — it's a 'photo of a painting' mockup, not a hero image",
+        "melted detail: turned face is a smeared, featureless blob; oven door arch merges into the hood",
+        "flawless too-perfect surfaces: crisp stamped handprints, wax-smooth apron",
+        "generic stock composition: figure dead-centre-right with shelving as a flat backdrop",
+        "little room for a headline: dark wall band is cramped between window and shelves"
+      ]
+    },
+    {
+      "model": "gpt-image-2.5-sunburst",
+      "brief": "Oven Mouth — Baker From Behind",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx0iega/0-gpt-image-2.5-sunburst.jpg",
+      "ms": 36618,
+      "fable": 6.5,
+      "astra": 7.4,
+      "score": 6.5,
+      "tells": [
+        "text-like scribble: fake signature bottom-right",
+        "impossible detail: baker grips a short stub that does not connect to the peel actually sitting in the oven",
+        "oversaturation: oven fire blown to pure orange with no falloff",
+        "generic stock composition: too many props (jug, crate, bucket, cloth, shelf) filling every corner",
+        "subject too large/no headline room: figure and clutter leave only a small mid-wall patch for copy"
+      ]
+    },
+    {
+      "model": "gpt-image-2.5-flare",
+      "brief": "Oven Mouth — Baker From Behind",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx0iega/0-gpt-image-2.5-flare.jpg",
+      "ms": 22073,
+      "fable": 7.5,
+      "astra": 7.8,
+      "score": 7.5,
+      "tells": [
+        "flawless too-perfect surfaces: multiple identical crisp handprints on the apron",
+        "duplicated/ambiguous detail: cluster of leaning poles behind the baker reads as unexplained repeated shapes",
+        "melted detail: trouser hems and boots dissolve into vague dark masses",
+        "subject cropped: copper pot chopped at top edge"
+      ]
+    },
+    {
+      "model": "gpt-image-2",
+      "brief": "Oven Mouth — Baker From Behind",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx0iega/0-gpt-image-2.jpg",
+      "ms": 98143,
+      "fable": 7.5,
+      "astra": 8.2,
+      "score": 7.5,
+      "tells": [
+        "uniform lighting with weak shadow anchor: feet sit on the floor with almost no cast shadow despite strong oven glow",
+        "melted detail: left hand on the peel and the boots are indistinct smears",
+        "impossible detail: peel passes behind the torso yet reappears at the oven at an angle that doesn't quite line up",
+        "flawless surface: empty wall is uniformly rendered, no plaster damage or age"
+      ]
+    }
+  ]
+}

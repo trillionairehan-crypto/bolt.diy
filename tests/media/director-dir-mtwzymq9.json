@@ -1,0 +1,271 @@
+{
+  "job": "dir-mtwzymq9",
+  "world": "neoclassical-painting",
+  "brand": "밀도 — 연남동 소금빵집. 매일 새벽 네 시에 굽고 하루 세 번, 다 팔리면 문을 닫는다. 국산 밀·발효 버터·굵은 소금.",
+  "threshold": 8.5,
+  "refUrls": [],
+  "shots": [
+    {
+      "round": 1,
+      "index": 0,
+      "brief": {
+        "title": "Four A.M. Board — First Bake Still Life",
+        "prompt": "Table-height view, slightly below eye line, as if the painter sat on a low stool at the bakery bench. A scarred walnut board runs diagonally from lower right to upper centre, cut by the frame on the right, carrying eleven salt rolls set off-centre in the lower-right two-thirds; one roll is scorched black on its underside and turned to show it, two are pressed together where they proofed touching. Coarse grey sea-salt grains scattered across the wood, a puddle of browned butter leaking from one roll onto torn parchment. A chipped cream enamel bowl of soft fermented butter, spoon smear on its lip. A single tallow lamp out of frame upper left throws a long shadow of the bowl across the board. Rust-orange linen cloth in the foreground, edge-cut and blurred. Upper-left third: bare umber wall, empty. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "photographic realism, glossy plastic highlights, centred symmetric arrangement, perfectly uniform identical rolls, pristine untouched props, people or faces, text, lettering, signage, logos, watermarks, picture frame, borders, neon or modern kitchen equipment, cool blue-white light, digital render look"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzymq9/r1-0.jpg",
+      "costUsd": 0.094496,
+      "claude": {
+        "index": 0,
+        "score": 7.5,
+        "tells": [
+          "burnt roll reads as a rendering glitch rather than an intentional 'first bake' failure",
+          "salt/sugar grains float as uniform pale dots with no shadow contact",
+          "rolls have plastic, over-glossy glaze highlights",
+          "glaze puddle and paper scrap look pasted on, not integrated into the wood grain"
+        ],
+        "fix": "Reshoot with the charred roll replaced by one visibly under-proofed or cracked roll, kill the scattered grains, and add a raking window light from the left so each roll casts a hard shadow onto the board."
+      },
+      "astra": {
+        "index": 0,
+        "score": 7.5,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Replace the catalogue-like rows of rolls with a sparse, irregular grouping of five distinctly hand-shaped loaves, preserving the empty left third."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 1,
+      "index": 1,
+      "brief": {
+        "title": "Oven Mouth — Baker From Behind",
+        "prompt": "Medium distance, eye level, the baker placed on the right vertical third with back fully to us, bending toward a brick oven mouth low right; face never shown, hands simplified around a long wooden peel. Flour handprints on the seat of a heavy canvas apron, one strap slipped. The oven glow is the only warm source besides a high slit window upper left through which a deep predawn ultramarine sky shows; the window light rakes across bare wooden shelves standing empty at the left, one shelf holding a single forgotten roll and a scatter of crumbs. A copper pot hangs edge-cut at the top right. Terracotta floor with a cracked tile and dropped salt. Accent pigment reserved for a folded cloth on the peel. Upper-left third stays open wall and sky. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "visible face, frontal pose, photographic skin, detailed realistic fingers, close-up portrait, centred figure, stainless steel appliances, fluorescent light, shelves fully stocked, text, lettering, signs, logos, watermarks, frame, border, cartoon or anime styling, 3D render"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzymq9/r1-1.jpg",
+      "costUsd": 0.089701,
+      "claude": {
+        "index": 1,
+        "score": 8,
+        "tells": [
+          "peel extends behind the baker with a towel draped on the near end — grip and length are physically confusing",
+          "left foot amputated by the bottom edge",
+          "skin has a smooth CG render sheen rather than painterly stroke",
+          "apron straps cross in an impossible way at the shoulder"
+        ],
+        "fix": "Shorten the peel so both hands clearly hold its handle end, pull the camera back to include the feet, and let the oven glow be the only light so the back is half-lost in shadow."
+      },
+      "astra": {
+        "index": 1,
+        "score": 8.3,
+        "tells": [
+          "melted/duplicated/impossible details"
+        ],
+        "fix": "Paint the oven peel as one continuous wooden shaft with a clearly resolved connection to its blade, eliminating the ambiguous overlapping rods beside the right hand."
+      },
+      "score": 8
+    },
+    {
+      "round": 1,
+      "index": 2,
+      "brief": {
+        "title": "Marble Slab — Dough, Butter, Wheat",
+        "prompt": "Overhead-tilted view, roughly forty-five degrees down onto a veined grey marble slab that fills the lower two-thirds, its far corner cut by the frame. Six rolled dough spindles lie in a loose row along the lower right, one torn open with a bar of pale fermented butter half-tucked inside, another slightly misshapen and thinner than the rest. Flour dragged in fingermarks across the marble, a dusting of coarse salt in a small brass scale pan tipped on its side, weights scattered. A bundle of Korean wheat stalks bound with rust-orange string lies diagonally across the upper right, heads brittle, a few grains fallen. A worn boxwood rolling pin, handle darkened by years of grip, exits frame lower left. Light falls hard from upper left through an unseen shutter, throwing the wheat's shadow long. Upper-left third: bare marble and shadow, uncluttered. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "hands or people in frame, photographic macro look, clean flour-free surface, identical machine-formed dough, plastic wrap, modern utensils, bright even lighting, centred flat-lay symmetry, text, lettering, signage, logos, watermarks, frame, border, CGI gloss"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzymq9/r1-2.jpg",
+      "costUsd": 0.09163,
+      "claude": {
+        "index": 2,
+        "score": 6.5,
+        "tells": [
+          "woman's hands at bottom edge are malformed and inconsistent in scale with her head",
+          "figure's viewpoint contradicts the top-down table perspective — she appears to lie on the slab",
+          "six dough rolls are near-duplicates in a mechanical row; the split one with butter inside is an impossible detail",
+          "flour smears look like brush-smudge overlay, not powder on marble",
+          "subject spread thin — no single anchor"
+        ],
+        "fix": "Remove the figure entirely (or show only forearms and hands from the bottom edge at correct scale), reduce to three dough pieces of differing shape, and light from a single low window on the left."
+      },
+      "astra": {
+        "index": 2,
+        "score": 6.8,
+        "tells": [
+          "generic stock composition",
+          "melted/duplicated/impossible details"
+        ],
+        "fix": "Replace the evenly spaced, similarly curled dough tubes with three visibly different preparation stages: a flattened sheet, a butter-filled fold, and a finished roll."
+      },
+      "score": 6.5
+    },
+    {
+      "round": 1,
+      "index": 3,
+      "brief": {
+        "title": "Sold Out — Doorway At Dusk",
+        "prompt": "Medium distance from inside the shop looking toward an open doorway set on the right vertical third. Beyond it, deep ultramarine evening sky over indistinct rooftops of a Yeonnam alley rendered as soft umber masses. A woven willow basket lies tipped on the worn oak counter in the lower right, empty but for three rolls' worth of crumbs and a few salt grains; a single last roll rests on a crumpled cloth beside it, its crust cracked along one side. A gilded brass door latch catches the last light. A small painted figure, back turned, carries a paper-wrapped bundle away up the alley, already half in shadow. Light enters low from the upper left through a side window, raking across the counter's scratches and a dropped receipt-sized scrap of blank parchment. Accent pigment only on the cloth. Upper-left third: plain plaster wall, open. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "visible face, large foreground figure, photographic street scene, modern signage or shop signs, cars, streetlights, neon, full basket of bread, centred doorway, symmetrical composition, text, lettering, logos, watermarks, frame, border, digital painting gloss, anime styling"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzymq9/r1-3.jpg",
+      "costUsd": 0.090129,
+      "claude": {
+        "index": 3,
+        "score": 8,
+        "tells": [
+          "buildings outside the door are melted rounded blobs with no architecture",
+          "door hardware duplicated — two latch plates plus a handle at inconsistent heights",
+          "sky an oversaturated flat ultramarine",
+          "door frame perspective doesn't agree with the tabletop"
+        ],
+        "fix": "Replace the exterior with a legible cobbled lane and one plain wall, keep a single brass latch, and warm the dusk sky toward violet so the interior candle light reads as the key."
+      },
+      "astra": {
+        "index": 3,
+        "score": 7.3,
+        "tells": [
+          "melted/duplicated/impossible details",
+          "style drift from the requested world"
+        ],
+        "fix": "Replace the amorphous, bread-like buildings outside with crisply constructed period masonry and believable rooflines, keeping the departing customer subordinate."
+      },
+      "score": 7.3
+    },
+    {
+      "round": 2,
+      "index": 0,
+      "brief": {
+        "title": "First Bake — Raking Window, Seven Rolls",
+        "prompt": "Bench height, camera just below the tabletop edge as if seated on a stool across from the baker's board. A single shuttered window low on the left is the only source; it rakes across the walnut board so every roll throws a hard, distinct shadow rightward onto the wood. Seven salt rolls sit in the lower-right two-thirds, not in a row: two touching where they proofed together, one under-proofed and tight with a raw split down its spine, one flattened where it was dropped. Crusts are matte, dusty ochre with only the pressed-in coarse salt catching light — no glaze sheen. No loose grains on the board; salt lives in a small chipped pewter dish, edge-cut lower left. Torn parchment is tucked beneath the rolls, its edge lifting, a butter stain soaked into the paper and darkening the wood beneath. A cream enamel butter crock, lid off, knife smear on its rim. Rust-orange linen cloth bunched in the foreground, out of focus, half out of frame. Upper-left third: bare umber plaster receding into shadow. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no charred or black rolls, no scattered salt or sugar grains floating without shadows, no glossy or wet glaze highlights, no pasted-looking paper or puddles, no uniform soft light, no centred symmetric arrangement, no identical duplicate rolls, no text, no logos, no frame, no photographic people"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzymq9/r2-0.jpg",
+      "costUsd": 0.09835,
+      "claude": {
+        "index": 0,
+        "score": 8,
+        "tells": [
+          "only six rolls visible against a seven-roll brief",
+          "front-left roll has a melted double-lobe seam where two forms fuse",
+          "enamel mug and parchment sheet read anachronistic for the neoclassical world",
+          "salt crystals oversized, near-plastic highlights",
+          "rolls slightly too uniform in colour and scoring"
+        ],
+        "fix": "Reshoot with exactly seven irregular rolls in a loose pyramid, replace enamel mug with a glazed stoneware pot, and vary the crust colour so no two rolls match."
+      },
+      "astra": {
+        "index": 0,
+        "score": 6.8,
+        "tells": [
+          "generic stock composition — bread pile, butter crock, scattered salt and rust-colored cloth form a familiar artisan-bakery arrangement",
+          "style drift from the requested world — reads as Dutch-inspired food photography with an aged-paint overlay rather than neoclassical painting"
+        ],
+        "fix": "Arrange the seven rolls in a restrained, frieze-like composition with crisp painted contours and sculptural window light instead of a rustic product pile."
+      },
+      "score": 6.8
+    },
+    {
+      "round": 2,
+      "index": 1,
+      "brief": {
+        "title": "Oven Mouth — Baker in Full, Lit Only by Embers",
+        "prompt": "Medium-wide, eye level, pulled back far enough that the baker stands whole from clogs to crown, placed on the right vertical third with back squarely to us, bending toward a low brick oven mouth. The oven's ember glow is the sole light: it lands on the hands, forearms and the front of the apron, while the back and shoulders fall into deep umber shadow, edges dissolving into the wall. Both simplified hands grip the handle end of a short wooden peel — no longer than the baker's arm span — its blade just inside the oven with two rolls on it. One plain canvas apron with a single neck loop and a tie at the back, flour handprint on the hip, hem frayed. Both feet visible on a terracotta floor with one cracked tile and a dusting of flour. Bare wooden shelves stand at left, empty but for a forgotten roll and crumbs. A copper pot edge-cut top right. Accent pigment only on a folded cloth over the peel's handle. Upper-left third: dark wall, one thin slit of predawn ultramarine, otherwise open. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no visible face, no long peel extending behind the figure, no towel on the near end of the peel, no cropped or amputated feet, no crossed or doubled apron straps, no smooth CG skin sheen, no second light source competing with the oven, no photographic person, no text, no logos, no frame"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzymq9/r2-1.jpg",
+      "costUsd": 0.092547,
+      "claude": {
+        "index": 1,
+        "score": 7,
+        "tells": [
+          "key light on the figure comes from front-left, not from the oven — contradicts 'lit only by embers'",
+          "cool blue window adds a second light source the brief excluded",
+          "peel handle disappears behind the hips and re-emerges at the far hand at an implausible angle",
+          "shorts under apron and torn hem drift toward costume/illustration rather than period painting",
+          "copper pan cropped hard at top-right frame edge"
+        ],
+        "fix": "Kill the window, make the oven mouth the sole source so the baker is rim-lit from the right with his face in shadow, and keep the peel fully visible in one continuous line."
+      },
+      "astra": {
+        "index": 1,
+        "score": 7.8,
+        "tells": [
+          "style drift from the requested world — the theatrical orange-and-blue treatment and softly modeled baker lean toward historical storybook illustration rather than disciplined neoclassical painting"
+        ],
+        "fix": "Render the baker with firmer anatomical drawing and restrained earth pigments, letting the ember light fall sharply into genuine darkness."
+      },
+      "score": 7
+    },
+    {
+      "round": 2,
+      "index": 2,
+      "brief": {
+        "title": "Marble Slab — Three Doughs, Forearms Only",
+        "prompt": "Camera tilted about forty degrees down onto a veined grey marble slab that fills the lower two-thirds, its far corner cut by the frame. A single low window off left is the only source, skimming across the marble so flour reads as a thin, uneven powder with soft edges, thickest where a palm dragged it, thinning to nothing. Three pieces of dough only, each different: one tight spindle rolled and ready in the lower right, one still a flat triangle with a cold bar of pale fermented butter laid across its wide end, one half-rolled and lopsided. Two forearms enter from the bottom edge at true scale, rolled linen cuffs dusted white, simplified hands mid-roll on the lopsided piece — no head, no torso. A small brass scale pan sits upright with a mound of coarse salt, one weight beside it. A worn boxwood rolling pin, handle darkened by grip, exits frame lower left. Wheat stalks bound with rust-orange string lie along the upper right, one head broken. Upper-left third: bare marble sliding into shadow. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no head or face, no full figure lying across the slab, no malformed or extra fingers, no hands out of scale with the arms, no six identical dough rolls in a row, no torn roll with butter inside, no brush-smudge flour overlay, no tipped scale with scattered weights, no second light source, no text, no logos, no frame"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzymq9/r2-2.jpg",
+      "costUsd": 0.092126,
+      "claude": {
+        "index": 2,
+        "score": 6.5,
+        "tells": [
+          "flat navy void top-left with no wall or depth — render-look",
+          "steep top-down angle alien to neoclassical picture-making",
+          "hands slightly rubbery, right hand fingers merge into dough edge",
+          "dough puddles with no gravity or fold logic — melted look",
+          "laminated croissant triangle and rolled log are anachronistic and read as stock food styling",
+          "cluttered prop layout leaves no clean headline field"
+        ],
+        "fix": "Drop the camera to slab level, give the background a lit plaster wall, remove the croissant props, and show the forearms pushing a single dough with knuckle tension and flour dust catching a raking window light."
+      },
+      "astra": {
+        "index": 2,
+        "score": 5.8,
+        "tells": [
+          "centred-symmetric subject — paired forearms converge on the centrally placed dough",
+          "plastic/over-glossy highlights — the hands and forearms have conspicuously smooth, polished modeling",
+          "generic stock composition — overhead preparation scene with decoratively arranged wheat, salt and rolling pin",
+          "style drift from the requested world — contemporary recipe flat-lay staging remains dominant beneath the simulated painting texture"
+        ],
+        "fix": "Recompose from an oblique tabletop viewpoint with the working forearms entering from one side, using matte, anatomically articulated brushwork."
+      },
+      "score": 5.8
+    },
+    {
+      "round": 2,
+      "index": 3,
+      "brief": {
+        "title": "Sold Out — Doorway, Candle Inside, Lane Outside",
+        "prompt": "Medium distance from inside the empty shop, floor and counter perspective agreeing with the doorway, which sits on the right vertical third and opens onto a legible cobbled lane: one plain lime-washed wall opposite, a downpipe, a single step. The dusk sky above is ultramarine warmed to violet and kept low in the frame; the key light is a lone candle in a brass stick on the counter, lower left of the door, so the interior glows ochre and the lane reads cool and dim. On the worn oak counter a willow basket lies tipped, empty but for crumbs; one last roll rests on a crumpled rust-orange cloth, its crust cracked along one side, matte. One brass door latch only, catching candlelight. A small painted figure, back turned, walks away up the lane with a paper-wrapped bundle, already half lost in shadow. Counter scratches and a blank scrap of parchment near the frame's bottom edge, cut off. Upper-left third: plain plaster wall, dim and open. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no melted or blob-shaped buildings, no duplicated latches or handles, no flat oversaturated sky, no door frame perspective that contradicts the counter, no visible face on the figure, no shop sign or lettering, no glossy roll glaze, no daylight competing with the candle, no photographic people, no text, no logos, no frame"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzymq9/r2-3.jpg",
+      "costUsd": 0.097024,
+      "claude": {
+        "index": 3,
+        "score": 7,
+        "tells": [
+          "modern suited man and cast-iron drainpipe break the neoclassical world",
+          "twilight sky oversaturated toward violet",
+          "candle flame and glow slightly too clean and symmetrical",
+          "paper on table edge is a loose text-like scribble element",
+          "exterior painted in a different, brighter palette than interior — style drift between halves"
+        ],
+        "fix": "Recast the passer-by in period coat and hat, remove the drainpipe, and desaturate the lane to a cool grey-blue so the candle interior is the only warm mass."
+      },
+      "astra": {
+        "index": 3,
+        "score": 7.2,
+        "tells": [
+          "generic stock composition — tipped basket, isolated roll, draped cloth and candle feel assembled as a nostalgic bakery vignette",
+          "style drift from the requested world — candlelit domestic genre painting and picturesque alley scenery outweigh neoclassical structure and figure treatment"
+        ],
+        "fix": "Replace the decorative foreground vignette with an empty counter and organize the doorway and departing customer into a severe, clearly drawn neoclassical tableau."
+      },
+      "score": 7
+    }
+  ],
+  "costUsd": 0.7460030000000001
+}

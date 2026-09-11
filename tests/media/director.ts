@@ -43,6 +43,26 @@ function argValue(flag: string): string | undefined {
 const CLAUDE_MODEL = 'claude-fable-5-1';
 const ASTRA_MODEL = 'gpt-6-astra';
 
+/** gpt-image-2.5-flare 등 OpenAI 이미지 API — 회화·수채·잉크 세계관의 기본 생성기(베이크오프에서 인물 +1점). */
+async function openaiImage(
+  env: Record<string, string>,
+  model: string,
+  prompt: string,
+): Promise<{ bytes: Uint8Array; mimeType: string }> {
+  const res = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${env.OPENAI_API_KEY}` },
+    body: JSON.stringify({ model, prompt, n: 1, size: '1536x1024', quality: 'high', output_format: 'jpeg' }),
+  });
+  const body = (await res.json()) as { data?: Array<{ b64_json?: string }>; error?: { message?: string } };
+
+  if (!res.ok || !body.data?.[0]?.b64_json) {
+    throw new Error(`${model}: ${res.status} ${body.error?.message || ''}`);
+  }
+
+  return { bytes: new Uint8Array(Buffer.from(body.data[0].b64_json, 'base64')), mimeType: 'image/jpeg' };
+}
+
 interface Brief {
   title: string;
   prompt: string;
@@ -169,6 +189,8 @@ Rules that separate award-grade stills from generic AI output:
 - Light: one motivated source with a real shadow anchor. Avoid uniform soft light and plastic specular highlights.
 - Texture over gloss: matte, dust, crumbs, grain. Colour restrained.
 - Nothing that reads as a render when the world is photographic. No text, no logos, no watermarks. No photoreal people (painted or illustrated figures only if the world allows, faces turned away or small).
+- OBJECT BUDGET: at most 3 distinct objects/props per frame, never a crowd or a row of identical items (generators clone them), never packaging with printed text, never visible hands unless the world is painted and hands are simplified. Fewer things, rendered perfectly, beats more things.
+- REVISION RULE: when revising after jury notes, only SUBTRACT or SIMPLIFY (remove the failing prop, reduce object count, lower complexity of lighting). Never add new props to fix a problem.
 Write in English. Return JSON only.`;
 
 const CRITIC_SYSTEM = `You are a jury member for a web design award, judging hero photography/illustration. Score each image 0-10 where 9+ means it would pass unnoticed as a commissioned editorial shot on a Site-of-the-Day winner, 8 = good but one visible tell, 7 = competent stock, ≤6 = obvious AI/generic.
@@ -235,12 +257,13 @@ async function main() {
   const world = getWorld(worldId);
   const n = Number(argValue('--n') || 4);
   const rounds = Number(argValue('--rounds') || 3);
-  const threshold = Number(argValue('--threshold') || 8.5);
+  const threshold = Number(argValue('--threshold') || world.targetScore);
+  const samples = Number(argValue('--samples') || world.samples);
   const accent = argValue('--accent') || '#b45309';
   const brand =
     argValue('--brand') ||
     '밀도 — 연남동 소금빵집. 매일 새벽 네 시에 굽고 하루 세 번, 다 팔리면 문을 닫는다. 국산 밀·발효 버터·굵은 소금.';
-  const critic = (argValue('--critic') || 'claude') as 'claude' | 'both';
+  const critic = (argValue('--critic') || 'both') as 'claude' | 'both';
   const refUrls = (argValue('--ref') || '').split(',').filter(Boolean);
   const r2 = readR2Config(env as never);
 
@@ -260,17 +283,26 @@ async function main() {
 
     const roundShots: Shot[] = [];
 
-    for (const [i, brief] of briefs.entries()) {
-      const image = await generateGeminiImage({
-        apiKey: env.GOOGLE_GENERATIVE_AI_API_KEY,
-        prompt: brief.prompt,
-        aspectRatio: '16:9',
-        references,
-      });
-      const url = await putR2Object(r2, `media/director/${job}/r${round}-${i}.jpg`, image.bytes, image.mimeType);
-      cost += image.costUsd;
-      roundShots.push({ round, index: i, brief, url, costUsd: image.costUsd });
-      console.log(`  [${i}] ${brief.title} → ${url}`);
+    // 세계관별 생성기 + 브리프당 samples 장(생성 편차를 선별로 이용)
+    let idx = 0;
+
+    for (const brief of briefs) {
+      for (let k = 0; k < samples; k++) {
+        const image =
+          world.generator === 'gpt-image-2.5-flare' && env.OPENAI_API_KEY
+            ? { ...(await openaiImage(env, world.generator, brief.prompt)), costUsd: 0.1 }
+            : await generateGeminiImage({
+                apiKey: env.GOOGLE_GENERATIVE_AI_API_KEY,
+                prompt: brief.prompt,
+                aspectRatio: '16:9',
+                references,
+              });
+        const url = await putR2Object(r2, `media/director/${job}/r${round}-${idx}.jpg`, image.bytes, image.mimeType);
+        cost += image.costUsd;
+        roundShots.push({ round, index: idx, brief, url, costUsd: image.costUsd });
+        console.log(`  [${idx}] ${brief.title} #${k} → ${url}`);
+        idx++;
+      }
     }
 
     const c1 = await critique(env, world, roundShots, 'claude');
@@ -301,15 +333,13 @@ async function main() {
       break;
     }
 
-    briefs = await writeBriefs(env, world, brand, n, accent, {
-      briefs,
-      critiques: c1.map((c) => ({
-        ...c,
-        ...(c2?.find((x) => x.index === c.index) && {
-          score: Math.min(c.score, c2.find((x) => x.index === c.index)!.score),
-        }),
-      })),
+    // 브리프별 최고 샘플의 심사만 AD에게 넘긴다(빼기/단순화 규칙으로 고치게)
+    const perBrief = briefs.map((brief, bi) => {
+      const best = roundShots.filter((s) => s.brief === brief).sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0];
+
+      return { index: bi, score: best?.score ?? 0, tells: best?.claude?.tells ?? [], fix: best?.claude?.fix ?? '' };
     });
+    briefs = await writeBriefs(env, world, brand, n, accent, { briefs, critiques: perBrief });
   }
 
   const best = [...shots].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).slice(0, 3);

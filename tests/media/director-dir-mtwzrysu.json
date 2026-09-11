@@ -1,0 +1,254 @@
+{
+  "job": "dir-mtwzrysu",
+  "world": "photo-editorial",
+  "brand": "밀도 — 연남동 소금빵집. 매일 새벽 네 시에 굽고 하루 세 번, 다 팔리면 문을 닫는다. 국산 밀·발효 버터·굵은 소금.",
+  "threshold": 8.5,
+  "refUrls": [],
+  "shots": [
+    {
+      "round": 1,
+      "index": 0,
+      "brief": {
+        "title": "Four A.M. Rack — First Bake Cooling",
+        "prompt": "Camera at tabletop height, 80mm f/2.8, focus on the second roll from the front. A scratched steel cooling rack sits in the lower-right two-thirds, holding nine salt breads; the nearest one is cut by the bottom edge of the frame. One roll at the back is a shade too dark on its heel. Cultured butter has leaked from the bases and re-set into amber pools on crumpled baking parchment, translucent at the edges. Coarse salt crystals scattered unevenly, a few fallen through the rack onto the raw plywood work bench. Window light rakes from the left, throwing long soft shadows of the rack bars across the parchment. Bench shows flour smudges and an old knife score. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "hands, bakers, people, text or lettering on parchment or packaging, logos, glossy CGI butter, perfectly uniform rolls, centred symmetric arrangement, flash highlights, neon colours, dark moody grading, oven interior, watermark, border"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzrysu/r1-0.jpg",
+      "costUsd": 0.087843,
+      "claude": {
+        "index": 0,
+        "score": 7.5,
+        "tells": [
+          "slightly waxy/over-smooth crust with plastic highlights on the roll skins",
+          "rack-to-parchment relationship is ambiguous: rolls sit on wires while caramel puddles read as if poured directly on the paper with no drip path through the grid",
+          "near-identical duplicated roll shapes and salt clusters across the rack",
+          "generic overhead-diagonal food-stock composition"
+        ],
+        "fix": "Shoot at eye level from the rack's short end with a single hard window light, let one roll break the row and show caramel actually strung down a wire onto the paper."
+      },
+      "astra": {
+        "index": 0,
+        "score": 7.5,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Shoot the rack under a single bakery task light against a dark working kitchen so the scene reads as 4 a.m., not a rustic daylight stock shoot."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 1,
+      "index": 1,
+      "brief": {
+        "title": "Three Ingredients — Wheat, Butter, Salt",
+        "prompt": "Top-down, slightly off-axis so the scene reads left to right with weight in the lower-right. A brown paper flour sack torn open along one corner, Korean wheat flour spilling in a soft drift with a thumb-shaped dent left in it. Beside it a half block of cultured butter on greaseproof paper, wrapper folded back, one clean knife cut and one ragged one. A small chipped white enamel bowl of coarse grey-white salt, rim rust showing where the enamel has flaked. A worn wooden butter knife enters from the right edge, half out of frame. Surface is a pale stone slab with a hairline crack. Light from the left gives every salt crystal a tiny shadow. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "printed text on the flour sack or butter wrapper, brand marks, hands, people, pristine unbroken block of butter, flour piled in a perfect cone, symmetrical trio layout, saturated colours, plastic-looking wrapper, flash, watermark, border"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzrysu/r1-1.jpg",
+      "costUsd": 0.091967,
+      "claude": {
+        "index": 1,
+        "score": 8,
+        "tells": [
+          "flour mound has an impossible crater/hollow in its centre that doesn't correspond to the bag's pour direction",
+          "butter block edges and wrapper folds read slightly too clean/rendered against the grainy film look of the concrete"
+        ],
+        "fix": "Re-pour the flour so it spills naturally from the bag mouth in a fan, and drag the knife once through the butter to leave a real smear on the paper."
+      },
+      "astra": {
+        "index": 1,
+        "score": 7,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Replace the deliberately tipped flour bag and decorative spill with a partially used weighing bowl showing actual preparation residue, retaining the empty left third."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 2,
+      "brief": {
+        "title": "Torn Open — Butter Crumb and Caramel Base",
+        "prompt": "Eye-level, 80mm at f/2.8, the frame filled from the right by a single salt bread pulled apart, focus on the torn interior. Open, glossy, thread-like crumb with a hollow where the butter core melted out; the base is a thin, lacquered, almost burnt caramel from pooled butter, slightly stuck to the parchment it was lifted from. A few coarse salt grains cling to the crust, one has fallen and rolled toward the camera, soft out of focus. Plate is a matte grey stoneware saucer with a faint glaze crawl, sitting on a linen cloth with a pressed fold line. Steam not present — this is fifteen minutes out, just set. Left window light shows the sheen inside the crumb and leaves the right side falling gently into shadow. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "hands holding the bread, people, knife-clean slice instead of a tear, artificial steam, glossy over-saturated butter, roll centred in frame, deep black shadows, neon or cool colour cast, any lettering, watermark, border"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzrysu/r1-2.jpg",
+      "costUsd": 0.089643,
+      "claude": {
+        "index": 2,
+        "score": 7,
+        "tells": [
+          "crumb structure is inconsistent between the two halves — left half shows concentric croissant-like swirl around a tunnel, right half shows a dense stringy melt with no matching layers",
+          "interior strands look rendered/cotton-candy-like rather than baked gluten",
+          "plate surface too flawless and uniformly matte",
+          "subject too large and cropped hard against the right frame edge"
+        ],
+        "fix": "Pull back so the whole torn roll fits with air on the right, and use a real torn roll so both halves share the same visible layer structure and a single melted-butter pocket."
+      },
+      "astra": {
+        "index": 2,
+        "score": 6.5,
+        "tells": [
+          "plastic/over-glossy highlights",
+          "melted/duplicated/impossible details"
+        ],
+        "fix": "Photograph a freshly torn roll with irregular, mostly matte crumb fibers and clearly separated halves rather than the glossy, cheese-like membrane bridging these faces."
+      },
+      "score": 6.5
+    },
+    {
+      "round": 1,
+      "index": 3,
+      "brief": {
+        "title": "Sold Out — The Empty Tray",
+        "prompt": "Shot from a low three-quarter angle across a shop counter, 80mm f/2.8. A shallow pine display tray, edges darkened from years of butter, lined with parchment that is now stained in nine oily circles where the rolls sat. Only crumbs, flakes of crust and a scatter of coarse salt remain. A pair of worn stainless tongs lies diagonally across the tray, jaws open, entering from the lower-right corner. Behind, softly out of focus, a folded linen cloth and an empty paper bag stack. The tray is pushed to the right third; the counter top is oiled oak with cup rings. Late-morning window light from the left rakes across the parchment so the grease stains glow faintly amber. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "sold-out sign or any written notice, price tags, hands, customers, people, full tray of bread, clean new parchment, centred tray, sterile white studio counter, flash, neon, cool blue grading, watermark, border"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzrysu/r1-3.jpg",
+      "costUsd": 0.092329,
+      "claude": {
+        "index": 3,
+        "score": 8.5,
+        "tells": [
+          "ring stains on the wood table appear to echo the tray's round stains a little too conveniently",
+          "paper bag stack edges are slightly too uniform"
+        ],
+        "fix": "Add one real cooling-rack shadow or a stray roll wrapper on the tray so the emptiness reads as a moment just after service rather than a staged still."
+      },
+      "astra": {
+        "index": 3,
+        "score": 8,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Use a genuinely depleted service tray with irregular, overlapping grease traces instead of the conspicuously tidy grid of round impressions."
+      },
+      "score": 8
+    },
+    {
+      "round": 2,
+      "index": 0,
+      "brief": {
+        "title": "Four A.M. Rack — First Bake, Eye Level",
+        "prompt": "Camera set at rack height looking straight down the short end of a scratched steel cooling rack, so the wires converge away from the lens; 80mm at f/2.8, focus on the third roll back. Rack occupies the lower-right, its nearest wire cut by the bottom edge. Eight salt breads in an uneven line — one has slumped sideways and broken the row, one is smaller and paler, one heel is a shade too dark. Crusts are dry and matte, finely blistered with a hairline crackle and a faint dusting of flour; no sheen except where butter has soaked the base. A single thread of caramelised butter has run from one roll down a wire and re-set on the crumpled parchment below as a small amber pool with a visible drip path. Coarse salt scattered unevenly, a few grains fallen through the grid. Raw plywood bench with an old knife score and a scorched patch. A low dawn window on the left throws the wire shadows long across the paper. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "waxy or plastic specular highlights on crusts, identical cloned roll shapes or salt clusters, caramel pools with no drip path from rack to paper, overhead diagonal stock composition, centred rack, text, signage, people, hands, flash, neon, 3D render look"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzrysu/r2-0.jpg",
+      "costUsd": 0.093733,
+      "claude": {
+        "index": 0,
+        "score": 6.5,
+        "tells": [
+          "melted/duplicated/impossible details: back row of rolls repeats as near-identical stacked clones; front roll has a wrinkled melted flap fused to the rack",
+          "inconsistent bake within one batch: matte pale rolls beside deep-glossy lacquered ones on the same rack, over-glossy highlights on the dark ones",
+          "rack geometry drifts: wire spacing and frame bars don't stay parallel, parchment appears both under and through the wires",
+          "generic stock composition: rolls-on-rack-by-window is the default bread shot"
+        ],
+        "fix": "Shoot 5 rolls max, all from one bake with matching egg-wash tone, and let the rack sit cleanly on the parchment with even wire spacing; keep the caramel drip."
+      },
+      "astra": {
+        "index": 0,
+        "score": 6.3,
+        "tells": [
+          "melted/duplicated/impossible details — the amber drip beneath the front roll has an implausible suspended-puddle shape and reads as syrup rather than baking residue",
+          "generic stock composition — the deliberately arranged procession of salted rolls feels styled rather than observed"
+        ],
+        "fix": "Shoot an irregularly loaded rack at actual rack height under predawn bakery lighting, with no hanging amber drip."
+      },
+      "score": 6.3
+    },
+    {
+      "round": 2,
+      "index": 1,
+      "brief": {
+        "title": "Three Ingredients — Wheat, Butter, Salt",
+        "prompt": "Low three-quarter angle across a pale stone slab, 80mm at f/4, weight in the lower-right, the slab's far edge softening into the window. A brown paper flour sack lies on its side against the right frame edge, mouth torn, Korean wheat flour spilling from the mouth in a single natural fan toward the camera, ridged where it landed, a fine haze of flour drifting onto the slab's near edge. In front of it a half block of cultured butter on greaseproof paper, wrapper creased and greasy-translucent where it touched; a wooden knife has been dragged once through the block leaving a real smear across the paper and a curl of butter on the blade, the knife handle cut by the right edge. A small chipped white enamel bowl of coarse grey-white salt, rim rusting where the enamel flaked, a few crystals spilled onto the flour. The slab has a hairline crack with flour caught in it. Left light gives every salt crystal its own shadow. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "flour mound with a crater or hollow, flour piled away from the bag mouth, razor-clean butter edges or wrapper folds, printed bag labels or text, hands, people, flash, neon, glossy render surfaces, centred symmetric layout"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzrysu/r2-1.jpg",
+      "costUsd": 0.093375,
+      "claude": {
+        "index": 1,
+        "score": 6,
+        "tells": [
+          "text-like scribbles: the large label glyphs are rotated/garbled pseudo-Hangul and the small print is illegible noise",
+          "render-look: flour spill has smooth, parallel combed ridges and a clean fan edge instead of dusty scatter",
+          "flawless too-perfect surfaces: butter block edges and plaster tabletop read as CG material, the table crack looks painted on",
+          "style drift: over-designed craft bag prop pulls it toward a product render rather than a working bakery"
+        ],
+        "fix": "Turn the flour bag so the label is out of frame or blank kraft, knock the bag over so flour dusts irregularly with a real puff, and shoot on a floured wood table with visible use."
+      },
+      "astra": {
+        "index": 1,
+        "score": 7.2,
+        "tells": [
+          "generic stock composition — the spilled flour, pristine butter curl, distressed bowl and rustic knife form a familiar baking-stock tableau"
+        ],
+        "fix": "Photograph the three ingredients midway through weighing on a working bakery bench, replacing the decorative flour spill with incidental handling traces."
+      },
+      "score": 6
+    },
+    {
+      "round": 2,
+      "index": 2,
+      "brief": {
+        "title": "Torn Open — One Roll, Two Halves",
+        "prompt": "Eye level, 80mm at f/2.8, pulled back so a single salt bread torn in two sits in the lower-right third with clear air on the right side of the frame. Both halves come from the same roll, torn not cut, laid a few centimetres apart with the tear faces angled toward camera; each shows the same loose spiral of thin rolled sheets and one shared hollow pocket where the butter core melted out. Crumb is soft, irregular, slightly translucent from butter, with small glossy spots only where butter pooled, not an overall sheen. The base is a thin lacquered caramel with a fleck of parchment still stuck to it. Plate is a matte grey stoneware saucer with a small chip at the rim and an iron speck in the glaze, on linen with a pressed fold line and a scatter of crust flakes. One coarse salt grain has rolled toward the lens, soft and out of focus. Fifteen minutes out of the oven, just set. Left window light catches the torn edge and lets the far half fall gently into shadow. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "mismatched crumb structure between halves, croissant swirl on one side and stringy melt on the other, cotton-candy or rendered strands, flawless uniform plate, subject cropped hard against the right edge, steam, hands, people, text, flash, neon"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzrysu/r2-2.jpg",
+      "costUsd": 0.093678,
+      "claude": {
+        "index": 2,
+        "score": 5.5,
+        "tells": [
+          "impossible details: both torn halves present a full spiral cross-section to camera, which cannot happen when one roll is pulled apart",
+          "duplicated details: the two halves are near mirror copies with the same central hole and same crumb structure",
+          "melted details: the gooey strand bridging the halves and the flat sliced (not torn) faces contradict the 'torn open' brief",
+          "centred-symmetric subject: plate and halves sit dead centre, leaving only weak headline space"
+        ],
+        "fix": "Tear a real roll, place one half torn-face toward camera and the other rotated away showing crust, shift the plate to the right third and leave the linen empty on the left."
+      },
+      "astra": {
+        "index": 2,
+        "score": 7.1,
+        "tells": [
+          "generic stock composition — two upright halves presented face-forward on linen against a softly blurred houseplant background feel like lifestyle stock"
+        ],
+        "fix": "Lay one freshly torn half on its crust and angle the other toward the light, preserving ragged crumb strands instead of presenting two upright cross-sections."
+      },
+      "score": 5.5
+    },
+    {
+      "round": 2,
+      "index": 3,
+      "brief": {
+        "title": "Sold Out — Just After the Third Bake",
+        "prompt": "Low three-quarter angle across a shop counter, 80mm at f/2.8, focus on the near edge of a shallow pine display tray pushed into the right third, its rim darkened by years of butter. Parchment lining stained in nine uneven oily circles, one smeared where a roll was dragged off; only crust flakes, crumbs and a scatter of coarse salt remain. A single crumpled plain glassine wrapper lies half-open on the tray, one edge lifting. Worn stainless tongs enter diagonally from the lower-right corner, jaws open, a crumb caught in one jaw. The grid shadow of an empty cooling rack, stacked out of frame to the left, falls across the parchment. Counter is oiled oak with a single old cup ring far to the left, offset and unrelated to the tray. Behind, soft, an irregular stack of plain brown paper bags, one bag torn at the mouth and leaning, and a butter-stained tea towel hung over the counter edge. Late-morning window light from the left makes the grease stains glow faintly amber. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "wood ring stains that echo the tray's stain pattern, perfectly uniform bag stack edges, sold-out signs or chalkboards or any lettering, printed wrappers, any remaining whole rolls, hands, people, flash, neon, glossy render surfaces, centred tray"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtwzrysu/r2-3.jpg",
+      "costUsd": 0.092603,
+      "claude": {
+        "index": 3,
+        "score": 7.5,
+        "tells": [
+          "melted details: the tongs' arms merge and the scalloped tips are inconsistent (one tip thicker, edges not matching)",
+          "too-uniform surfaces: grease rings are equally round and equally toned, like stamped shapes rather than baked-off residue"
+        ],
+        "fix": "Reshoot with real tongs laid at an angle so both arms read clearly, and let the grease marks vary in size and burn intensity with real crumbs caught in the parchment folds."
+      },
+      "astra": {
+        "index": 3,
+        "score": 8.1,
+        "tells": [
+          "generic stock composition — the conspicuous cup ring, decorative tissue and neatly legible grease circles make the aftermath feel art-directed"
+        ],
+        "fix": "Photograph an untouched sold-out tray immediately after service, retaining uneven liner displacement and overlapping grease traces rather than arranging the remnants."
+      },
+      "score": 7.5
+    }
+  ],
+  "costUsd": 0.735171
+}

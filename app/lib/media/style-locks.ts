@@ -39,6 +39,15 @@ export interface World {
 
   /** 사용자 B등급 사진에 기본 적용할 트리트먼트 */
   treatment: 'none' | 'mono' | 'duotone' | 'halftone' | 'grain' | 'blur' | 'detail' | 'circle';
+
+  /**
+   * 생성기·목표 점수(2026-09-11 베이크오프 + 사용자 결정). 심사 척도 = Fable+Astra 이중 심사 최소값, 실제 수상작 사진 9.0으로 캘리브레이션.
+   * 실사·제품·브루탈: gemini-3.1-flash(평균 최고·최저가·10초) N=8 선별, 목표 8.5 — 그 위는 비효율, 실사 9+는 사용자 실사진으로.
+   * 회화·수채·잉크: gpt-image-2.5-flare(인물 +1점) N=4 선별, 목표 9.0 — 생성기가 잘하는 영역이라 9+를 노린다.
+   */
+  generator: 'gemini-3.1-flash-image' | 'gpt-image-2.5-flare';
+  samples: number;
+  targetScore: number;
 }
 
 const NO_PEOPLE = 'No people, no faces, no hands, no body parts anywhere in the frame.';
@@ -66,6 +75,9 @@ export const WORLDS: World[] = [
     motion:
       'Steam or dust drifting slowly in the light beam, sunlight sliding a few centimeters across the surface, everything else perfectly still.',
     treatment: 'grain',
+    generator: 'gemini-3.1-flash-image',
+    samples: 8,
+    targetScore: 8.5,
   },
   {
     id: 'neoclassical-painting',
@@ -85,6 +97,9 @@ export const WORLDS: World[] = [
     motion:
       'Animate as a living painting: figures move slowly and gracefully, fabric and leaves sway gently, golden light drifts across marble. Keep the painted brushwork, glazed surfaces and craquelure identical in every frame; no photorealism.',
     treatment: 'none',
+    generator: 'gpt-image-2.5-flare',
+    samples: 4,
+    targetScore: 9.0,
   },
   {
     id: 'watercolor-illustration',
@@ -104,6 +119,9 @@ export const WORLDS: World[] = [
     motion:
       'The watercolor breathes: pigment blooms spread a little, paper grain shimmers, the subject sways as if the sheet is gently lifted. Paper stays white, no new objects appear.',
     treatment: 'none',
+    generator: 'gpt-image-2.5-flare',
+    samples: 4,
+    targetScore: 9.0,
   },
   {
     id: 'product-3d',
@@ -124,6 +142,9 @@ export const WORLDS: World[] = [
     motion:
       'The object rotates slowly a quarter turn and drifts as if floating, specular highlights sliding across its surface, backdrop gradient breathing; camera locked.',
     treatment: 'detail',
+    generator: 'gemini-3.1-flash-image',
+    samples: 8,
+    targetScore: 8.5,
   },
   {
     id: 'mono-brutal',
@@ -144,6 +165,9 @@ export const WORLDS: World[] = [
     motion:
       'Halftone grain crawls subtly, the flash light flickers once, the spot-color element pulses gently; harsh cuts to black are not allowed.',
     treatment: 'halftone',
+    generator: 'gemini-3.1-flash-image',
+    samples: 8,
+    targetScore: 8.5,
   },
   {
     id: 'ink-graphic-novel',
@@ -165,6 +189,9 @@ export const WORLDS: World[] = [
     motion:
       'The panel breathes like a motion comic: a slow push-in on the dominant shape, ink hatching shimmers, the spot-color area pulses once; nothing new is drawn; camera otherwise locked.',
     treatment: 'halftone',
+    generator: 'gpt-image-2.5-flare',
+    samples: 4,
+    targetScore: 9.0,
   },
 ];
 

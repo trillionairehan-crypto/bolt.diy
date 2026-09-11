@@ -1,0 +1,177 @@
+{
+  "world": "photo-editorial",
+  "briefs": [
+    {
+      "title": "Sold Out — The Empty Tray",
+      "prompt": "Shot from a low three-quarter angle across a shop counter, 80mm f/2.8. A shallow pine display tray, edges darkened from years of butter, lined with parchment that is now stained in nine oily circles where the rolls sat. Only crumbs, flakes of crust and a scatter of coarse salt remain. A pair of worn stainless tongs lies diagonally across the tray, jaws open, entering from the lower-right corner. Behind, softly out of focus, a folded linen cloth and an empty paper bag stack. The tray is pushed to the right third; the counter top is oiled oak with cup rings. Late-morning window light from the left rakes across the parchment so the grease stains glow faintly amber. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+      "negative": "sold-out sign or any written notice, price tags, hands, customers, people, full tray of bread, clean new parchment, centred tray, sterile white studio counter, flash, neon, cool blue grading, watermark, border"
+    },
+    {
+      "title": "Four A.M. Rack — First Bake Cooling",
+      "prompt": "Camera at tabletop height, 80mm f/2.8, focus on the second roll from the front. A scratched steel cooling rack sits in the lower-right two-thirds, holding nine salt breads; the nearest one is cut by the bottom edge of the frame. One roll at the back is a shade too dark on its heel. Cultured butter has leaked from the bases and re-set into amber pools on crumpled baking parchment, translucent at the edges. Coarse salt crystals scattered unevenly, a few fallen through the rack onto the raw plywood work bench. Window light rakes from the left, throwing long soft shadows of the rack bars across the parchment. Bench shows flour smudges and an old knife score. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+      "negative": "hands, bakers, people, text or lettering on parchment or packaging, logos, glossy CGI butter, perfectly uniform rolls, centred symmetric arrangement, flash highlights, neon colours, dark moody grading, oven interior, watermark, border"
+    }
+  ],
+  "models": [
+    "gemini-3.1-flash-image",
+    "gemini-3-pro-image",
+    "gpt-image-2.5-sunburst",
+    "gpt-image-2.5-flare",
+    "gpt-image-2"
+  ],
+  "results": [
+    {
+      "model": "gemini-3.1-flash-image",
+      "brief": "Sold Out — The Empty Tray",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx08br0/0-gemini-3.1-flash-image.jpg",
+      "ms": 13624,
+      "fable": 7.5,
+      "astra": 7.8,
+      "score": 7.5,
+      "tells": [
+        "water-ring stains on table read as stamped decals, too crisp and evenly spaced",
+        "grease circles on parchment too uniform in size/tone, stock-styled mess",
+        "paper-bag stack top-right has soft, slightly melted edges",
+        "hazy warm bloom flattens shadow anchor under tray"
+      ]
+    },
+    {
+      "model": "gemini-3-pro-image",
+      "brief": "Sold Out — The Empty Tray",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx08br0/0-gemini-3-pro-image.jpg",
+      "ms": 19666,
+      "fable": 6.5,
+      "astra": 6.5,
+      "score": 6.5,
+      "tells": [
+        "ring stains drawn as dark pen-like outlines, physically implausible",
+        "tongs geometry ambiguous — arms don't resolve into one coherent tool",
+        "tray corner/base perspective slightly off against table edge",
+        "cropped tight, little clean room for a headline",
+        "overwarm saturation in the caramel residue"
+      ]
+    },
+    {
+      "model": "gpt-image-2.5-sunburst",
+      "brief": "Sold Out — The Empty Tray",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx08br0/0-gpt-image-2.5-sunburst.jpg",
+      "ms": 41193,
+      "fable": 7,
+      "astra": 8.2,
+      "score": 7,
+      "tells": [
+        "generic 'cozy bakery' stock composition (dried flowers, striped towel, kraft bags all ticked)",
+        "oversaturated honey-toned HDR glow, render-look",
+        "crumbs scattered too evenly across tray and table like particle spray",
+        "tongs arms near right edge don't clearly resolve into two",
+        "background shelf details mushy and vague"
+      ]
+    },
+    {
+      "model": "gpt-image-2.5-flare",
+      "brief": "Sold Out — The Empty Tray",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx08br0/0-gpt-image-2.5-flare.jpg",
+      "ms": 23756,
+      "fable": 7,
+      "astra": 7.7,
+      "score": 7,
+      "tells": [
+        "apparent third tong arm exiting frame lower right — duplicated detail",
+        "tong heads blobby and over-thick, low-detail metal",
+        "ring stains on table inconsistent shapes, bottom one smeared",
+        "salt crystals too uniform and evenly distributed",
+        "kraft-bag stack rendered as accordion pleats"
+      ]
+    },
+    {
+      "model": "gpt-image-2",
+      "brief": "Sold Out — The Empty Tray",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx08br0/0-gpt-image-2.jpg",
+      "ms": 91215,
+      "fable": 6.5,
+      "astra": 6.8,
+      "score": 6.5,
+      "tells": [
+        "tongs clearly have three arms — duplicated/impossible object",
+        "grease circles laid in a near-perfect grid, identical tone — flawless too-perfect surface",
+        "tray front edge and parchment appear slightly warped/bowed",
+        "uniform flat lighting, weak shadow anchor",
+        "ring stains random and disconnected from any object placement"
+      ]
+    },
+    {
+      "model": "gemini-3.1-flash-image",
+      "brief": "Four A.M. Rack — First Bake Cooling",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx08br0/1-gemini-3.1-flash-image.jpg",
+      "ms": 12655,
+      "fable": 7.5,
+      "astra": 7.1,
+      "score": 7.1,
+      "tells": [
+        "rack wires read as clean chrome render rather than a used bakery rack",
+        "rolls have smooth, slightly rubbery dough surfaces with little crumb/blister texture",
+        "caramel puddles sit oddly bright and glassy on parchment",
+        "generic stock composition (rack angled into frame from right, window light)"
+      ]
+    },
+    {
+      "model": "gemini-3-pro-image",
+      "brief": "Four A.M. Rack — First Bake Cooling",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx08br0/1-gemini-3-pro-image.jpg",
+      "ms": 21328,
+      "fable": 8,
+      "astra": 7.7,
+      "score": 7.7,
+      "tells": [
+        "burnt roll shows three unnaturally round dark blotches instead of a real scorch gradient",
+        "front-left rack corner has wires that cross/bend in a physically confusing way"
+      ]
+    },
+    {
+      "model": "gpt-image-2.5-sunburst",
+      "brief": "Four A.M. Rack — First Bake Cooling",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx08br0/1-gpt-image-2.5-sunburst.jpg",
+      "ms": 35824,
+      "fable": 7,
+      "astra": 6.5,
+      "score": 6.5,
+      "tells": [
+        "oversaturated orange-gold rolls with over-glossy highlights",
+        "rack grid is irregular/inconsistent, legs and frame don't resolve",
+        "prop clutter (dried flowers, salt bowl, striped napkin) is generic food-stock styling",
+        "render-look on the crumpled parchment and caramel"
+      ]
+    },
+    {
+      "model": "gpt-image-2.5-flare",
+      "brief": "Four A.M. Rack — First Bake Cooling",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx08br0/1-gpt-image-2.5-flare.jpg",
+      "ms": 21765,
+      "fable": 7,
+      "astra": 7,
+      "score": 7,
+      "tells": [
+        "plastic/over-glossy egg-wash highlights on every roll",
+        "oversaturated warm cast across table and bread",
+        "rack wires unevenly spaced and too thin, frame corners don't line up",
+        "flawless uniform sugar crystals, no dough imperfections"
+      ]
+    },
+    {
+      "model": "gpt-image-2",
+      "brief": "Four A.M. Rack — First Bake Cooling",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx08br0/1-gpt-image-2.jpg",
+      "ms": 96406,
+      "fable": 6.5,
+      "astra": 6.9,
+      "score": 6.5,
+      "tells": [
+        "rolls are near-duplicate shapes with uniform rubbery surface texture",
+        "flat, uniform lighting with no shadow anchor under the rack or rolls",
+        "render-look on the textured beige tabletop",
+        "dark back roll has an unexplained uniform brown skin, not a real scorch",
+        "generic stock composition"
+      ]
+    }
+  ]
+}
