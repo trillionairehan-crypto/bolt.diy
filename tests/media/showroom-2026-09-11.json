@@ -1,0 +1,77 @@
+{
+  "photo-editorial": {
+    "stills": [
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/still-mtwykf6u-0.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/still-mtwykpyk-1.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/still-mtwykzx9-2.jpg"
+    ],
+    "picked": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/still-mtwykpyk-1.jpg",
+    "video": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/hero-mtwyytrr.mp4",
+    "usage": {
+      "completion_tokens": 108900
+    }
+  },
+  "neoclassical-painting": {
+    "stills": [
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/neoclassical-painting/still-mtwylalt-0.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/neoclassical-painting/still-mtwylnoa-1.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/neoclassical-painting/still-mtwylze2-2.jpg"
+    ],
+    "picked": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/neoclassical-painting/still-mtwylnoa-1.jpg",
+    "video": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/neoclassical-painting/hero-mtwz2k0c.mp4",
+    "usage": {
+      "completion_tokens": 108900
+    }
+  },
+  "watercolor-illustration": {
+    "stills": [
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/watercolor-illustration/still-mtwymb3l-0.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/watercolor-illustration/still-mtwymjrj-1.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/watercolor-illustration/still-mtwymtd7-2.jpg"
+    ],
+    "picked": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/watercolor-illustration/still-mtwymb3l-0.jpg",
+    "video": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/watercolor-illustration/hero-mtwz58zm.mp4",
+    "usage": {
+      "completion_tokens": 108900
+    }
+  },
+  "product-3d": {
+    "stills": [
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/product-3d/still-mtwyn1uk-0.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/product-3d/still-mtwynawg-1.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/product-3d/still-mtwynjk5-2.jpg"
+    ],
+    "picked": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/product-3d/still-mtwynawg-1.jpg",
+    "video": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/product-3d/hero-mtwz7wx4.mp4",
+    "usage": {
+      "completion_tokens": 108900
+    }
+  },
+  "mono-brutal": {
+    "stills": [
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-brutal/still-mtwyntd1-0.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-brutal/still-mtwyo1mu-1.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-brutal/still-mtwyofre-2.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-brutal/still-mtwyvgww-0.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-brutal/still-mtwyvoae-1.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-brutal/still-mtwyvvjq-2.jpg"
+    ],
+    "picked": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-brutal/still-mtwyvoae-1.jpg",
+    "video": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-brutal/hero-mtwyzyel.mp4",
+    "usage": {
+      "completion_tokens": 108900
+    }
+  },
+  "mono-color": {
+    "stills": [
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-color/still-mtwyop4r-0.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-color/still-mtwyoze0-1.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-color/still-mtwyp7k4-2.jpg"
+    ],
+    "picked": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-color/still-mtwyop4r-0.jpg",
+    "video": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-color/hero-mtwzask5.mp4",
+    "usage": {
+      "completion_tokens": 108900
+    }
+  }
+}

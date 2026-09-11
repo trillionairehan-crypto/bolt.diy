@@ -1,0 +1,74 @@
+[
+  {
+    "id": "pear",
+    "title": "Pear (pear.no) — 릴스 Dc4v9Q9vnTg, 르네상스 회화 스크롤 시퀀스",
+    "url": "https://pear.no/",
+    "ok": true,
+    "rafPerSec": 4,
+    "scrollTriggers": null,
+    "gsap": false,
+    "lenis": false,
+    "locomotive": false,
+    "canvases": 5,
+    "videosPlaying": 1,
+    "idleMotion": 0.019,
+    "hoverDiff": 0.035,
+    "inertia": 0.455,
+    "scrollDelta": 294,
+    "elements": {
+      "normal": 3,
+      "parallax": 0,
+      "pinned": 51,
+      "fixed": 6
+    },
+    "docHeight": 42800,
+    "journeyChange": 0.267
+  },
+  {
+    "id": "edolus",
+    "title": "Edolus — 릴스 Db3660RxnYu, PlayCanvas WebGL 여정",
+    "url": "https://edolus.com/",
+    "ok": true,
+    "rafPerSec": 2,
+    "scrollTriggers": null,
+    "gsap": true,
+    "lenis": false,
+    "locomotive": false,
+    "canvases": 1,
+    "videosPlaying": 1,
+    "idleMotion": 0.1,
+    "inertia": 0.421,
+    "scrollDelta": 0,
+    "elements": {
+      "note": "scroll did not move (snap/hijack/short page)",
+      "delta": 0
+    },
+    "docHeight": 800,
+    "journeyChange": 0.05
+  },
+  {
+    "id": "alche",
+    "title": "Alche Studio — 릴스 DbLgANVRgZ_, 3D 글리치 타이포",
+    "url": "https://alche.studio/",
+    "ok": true,
+    "rafPerSec": 6,
+    "scrollTriggers": null,
+    "gsap": false,
+    "lenis": true,
+    "locomotive": false,
+    "canvases": 3,
+    "videosPlaying": 0,
+    "idleMotion": 0.001,
+    "hoverDiff": 0,
+    "inertia": 0.025,
+    "scrollDelta": 400,
+    "elements": {
+      "normal": 0,
+      "parallax": 0,
+      "pinned": 59,
+      "fixed": 1
+    },
+    "docHeight": 20260,
+    "journeyChange": 0
+  }
+]

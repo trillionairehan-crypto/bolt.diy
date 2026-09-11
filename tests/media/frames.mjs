@@ -19,7 +19,7 @@ const endpoint = `https://${env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com/
 
 const b = await chromium.launch();
 const p = await b.newPage({ viewport: { width: WIDTH, height: Math.round(WIDTH * 9 / 16) } });
-await p.setContent(`<body style="margin:0;background:#000"><video id="v" src="${VIDEO}" muted playsinline crossorigin="anonymous" style="width:${WIDTH}px;height:${Math.round(WIDTH * 9 / 16)}px;object-fit:cover"></video></body>`);
+await p.setContent(`<body style="margin:0;background:#000"><video id="v" src="${VIDEO}" muted playsinline style="width:${WIDTH}px;height:${Math.round(WIDTH * 9 / 16)}px;object-fit:cover"></video></body>`);
 await p.waitForFunction(() => document.getElementById('v').readyState >= 2, null, { timeout: 60000 });
 const dur = await p.evaluate(() => document.getElementById('v').duration);
 const urls = [];

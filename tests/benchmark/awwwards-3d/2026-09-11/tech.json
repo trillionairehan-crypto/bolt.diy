@@ -219,5 +219,485 @@
     "scripts": 16,
     "requests": 106,
     "hasWebGLCanvas": true
+  },
+  {
+    "id": "chasing-the-moment",
+    "url": "https://chasing-the-moment.byholm.co",
+    "ok": false,
+    "error": "page.goto: Timeout 40000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://chasing-the-moment.byholm.co/\", waiting un"
+  },
+  {
+    "id": "arstraumur-electronic-music",
+    "url": "https://arstraumur.music",
+    "ok": true,
+    "tech": [
+      "webgl-other"
+    ],
+    "scripts": 7,
+    "requests": 328,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "nexstudio",
+    "url": "https://nexstudio.tech",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 13,
+    "requests": 19,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "melius",
+    "url": "https://www.melius.com",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 69,
+    "requests": 133,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "mad-dogs-design-concept",
+    "url": "https://maddogs.cosmos.studio",
+    "ok": true,
+    "tech": [
+      "nuxt"
+    ],
+    "scripts": 89,
+    "requests": 746,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "rapidkert",
+    "url": "https://rapidkert.com",
+    "ok": true,
+    "tech": [
+      "webgl-other"
+    ],
+    "scripts": 1,
+    "requests": 5,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "graffico-office",
+    "url": "https://office.graffico.it",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 18,
+    "requests": 76,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "colonia-zacamil",
+    "url": "https://coloniazacamil.com",
+    "ok": true,
+    "tech": [
+      "nuxt"
+    ],
+    "scripts": 14,
+    "requests": 76,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "aardvark-book-club",
+    "url": "https://aardvarkbookclub.com",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "barba",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 15,
+    "requests": 174,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "hobro-digital",
+    "url": "https://hobro.digital",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "lottie",
+      "splitting"
+    ],
+    "scripts": 28,
+    "requests": 152,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "leonardo-moreira",
+    "url": "https://leonardomoreira.com.br",
+    "ok": true,
+    "tech": [],
+    "scripts": 1,
+    "requests": 98,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "lidar-drone-scanning",
+    "url": "https://drone.riotters.com",
+    "ok": true,
+    "tech": [
+      "rive",
+      "next"
+    ],
+    "scripts": 15,
+    "requests": 34,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "moves-you-portfolio",
+    "url": "http://www.laurens.art",
+    "ok": true,
+    "tech": [
+      "three",
+      "spline"
+    ],
+    "scripts": 19,
+    "requests": 74,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "riangle-v5",
+    "url": "https://riangle.com",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 44,
+    "requests": 59,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "loop-creative-studio",
+    "url": "https://loop-agency.framer.website",
+    "ok": true,
+    "tech": [
+      "framer-motion"
+    ],
+    "scripts": 21,
+    "requests": 40,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "tamas-olajos-ai-filmmaker",
+    "url": "https://tamasolajos.com",
+    "ok": true,
+    "tech": [],
+    "scripts": 1,
+    "requests": 18,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "code-precision",
+    "url": "https://codeprecision.com",
+    "ok": true,
+    "tech": [
+      "video-lib"
+    ],
+    "scripts": 33,
+    "requests": 96,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "sharplink",
+    "url": "https://www.sharplink.com",
+    "ok": true,
+    "tech": [
+      "nuxt",
+      "unity"
+    ],
+    "scripts": 54,
+    "requests": 98,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "samu-clima",
+    "url": "https://www.samuclima.com",
+    "ok": true,
+    "tech": [
+      "three",
+      "gsap",
+      "wix",
+      "video-lib"
+    ],
+    "scripts": 60,
+    "requests": 148,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "ruben-marcus-portfolio",
+    "url": "https://rubenmarcus.dev",
+    "ok": true,
+    "tech": [
+      "astro",
+      "svelte"
+    ],
+    "scripts": 42,
+    "requests": 77,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "direct-design-agency",
+    "url": "https://wearedirect.co",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "barba",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 11,
+    "requests": 87,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "oxigen",
+    "url": "https://www.oxigen.sa",
+    "ok": true,
+    "tech": [
+      "three",
+      "lenis"
+    ],
+    "scripts": 19,
+    "requests": 27,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "peregrine-2",
+    "url": "https://peregrine.sk",
+    "ok": true,
+    "tech": [
+      "swiper",
+      "wordpress",
+      "jquery"
+    ],
+    "scripts": 20,
+    "requests": 120,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "tiltoootilt",
+    "url": "https://tiltoootilt.tote.co.jp",
+    "ok": true,
+    "tech": [
+      "three",
+      "gsap",
+      "lenis",
+      "swiper"
+    ],
+    "scripts": 1,
+    "requests": 144,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "gustavo-batista-developer",
+    "url": "https://gustavobatista.dev",
+    "ok": true,
+    "tech": [
+      "jquery"
+    ],
+    "scripts": 5,
+    "requests": 52,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "butter",
+    "url": "https://www.butter.video",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 58,
+    "requests": 97,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "shaky-love",
+    "url": "https://myshaky.com",
+    "ok": true,
+    "tech": [],
+    "scripts": 5,
+    "requests": 34,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "zeroz-brand-site",
+    "url": "https://otsuka-air.jp",
+    "ok": true,
+    "tech": [
+      "astro"
+    ],
+    "scripts": 59,
+    "requests": 353,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "web-tactics",
+    "url": "https://webtactics.org",
+    "ok": true,
+    "tech": [
+      "three",
+      "lenis"
+    ],
+    "scripts": 17,
+    "requests": 55,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "the-state-of-the-gallery",
+    "url": "https://mesh3d.gallery",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 56,
+    "requests": 90,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "void-messenger",
+    "url": "https://void.sbs",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 26,
+    "requests": 96,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "rezonbio",
+    "url": "https://portfolio.widehue.co",
+    "ok": true,
+    "tech": [],
+    "scripts": 0,
+    "requests": 1,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "sobha-privy-collection",
+    "url": "https://sobha-privy-collection.com",
+    "ok": true,
+    "tech": [
+      "jquery"
+    ],
+    "scripts": 33,
+    "requests": 121,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "studio-ka-il",
+    "url": "http://kail.studio",
+    "ok": true,
+    "tech": [],
+    "scripts": 1,
+    "requests": 175,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "modelfy-3d",
+    "url": "https://modelfy.art",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 50,
+    "requests": 89,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "product-designer-portfolio-5",
+    "url": "https://pleurat.com",
+    "ok": true,
+    "tech": [
+      "react",
+      "tailwind"
+    ],
+    "scripts": 15,
+    "requests": 57,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "saifullah-dev",
+    "url": "https://www.saifullah.dev",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 33,
+    "requests": 43,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "saffron",
+    "url": "https://saffron-griflan.netlify.app",
+    "ok": true,
+    "tech": [
+      "nuxt",
+      "tailwind"
+    ],
+    "scripts": 26,
+    "requests": 370,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "selkirk-omni-paddle",
+    "url": "https://www.selkirk.com",
+    "ok": true,
+    "tech": [
+      "rive",
+      "shopify"
+    ],
+    "scripts": 217,
+    "requests": 377,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "moto-finance",
+    "url": "https://www.moto-card.com",
+    "ok": true,
+    "tech": [
+      "three",
+      "gsap",
+      "lenis",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 12,
+    "requests": 36,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "meer-mohsin",
+    "url": "https://www.meermohsin.me",
+    "ok": true,
+    "tech": [],
+    "scripts": 1,
+    "requests": 18,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "lucerra",
+    "url": "https://lucerra.co",
+    "ok": true,
+    "tech": [
+      "nuxt"
+    ],
+    "scripts": 67,
+    "requests": 134,
+    "hasWebGLCanvas": true
   }
 ]

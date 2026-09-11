@@ -1,0 +1,34 @@
+[
+  {
+    "id": "pear",
+    "url": "https://pear.no/",
+    "ok": true,
+    "tech": [],
+    "scripts": 1,
+    "requests": 15,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "edolus",
+    "url": "https://edolus.com/",
+    "ok": true,
+    "tech": [
+      "webgl-other",
+      "gsap"
+    ],
+    "scripts": 8,
+    "requests": 102,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "alche",
+    "url": "https://alche.studio/",
+    "ok": true,
+    "tech": [
+      "astro"
+    ],
+    "scripts": 9,
+    "requests": 57,
+    "hasWebGLCanvas": true
+  }
+]
