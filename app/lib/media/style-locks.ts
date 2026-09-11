@@ -42,10 +42,11 @@ export interface World {
 
   /**
    * 생성기·목표 점수(2026-09-11 베이크오프 + 사용자 결정). 심사 척도 = Fable+Astra 이중 심사 최소값, 실제 수상작 사진 9.0으로 캘리브레이션.
-   * 실사·제품·브루탈: gemini-3.1-flash(평균 최고·최저가·10초) N=8 선별, 목표 8.5 — 그 위는 비효율, 실사 9+는 사용자 실사진으로.
+   * 실사·제품·브루탈: Seedream 5.0 Pro(베이크오프 정면 비교 +1.0, 평균 7.6 vs flash 7.0, 45~85초, $0.075) N=8 선별, 목표 8.5.
+   * 실측 상한(2026-09-11, 이중 심사 min): 실사 8.0 — 8.5 미달. 실사 세계관은 사용자 실사진 우선, 생성은 8.0 보조.
    * 회화·수채·잉크: gpt-image-2.5-flare(인물 +1점) N=4 선별, 목표 9.0 — 생성기가 잘하는 영역이라 9+를 노린다.
    */
-  generator: 'gemini-3.1-flash-image' | 'gpt-image-2.5-flare';
+  generator: 'gemini-3.1-flash-image' | 'gpt-image-2.5-flare' | 'dola-seedream-5-0-pro-260628';
   samples: number;
   targetScore: number;
 }
@@ -75,7 +76,7 @@ export const WORLDS: World[] = [
     motion:
       'Steam or dust drifting slowly in the light beam, sunlight sliding a few centimeters across the surface, everything else perfectly still.',
     treatment: 'grain',
-    generator: 'gemini-3.1-flash-image',
+    generator: 'dola-seedream-5-0-pro-260628',
     samples: 8,
     targetScore: 8.5,
   },
@@ -142,7 +143,7 @@ export const WORLDS: World[] = [
     motion:
       'The object rotates slowly a quarter turn and drifts as if floating, specular highlights sliding across its surface, backdrop gradient breathing; camera locked.',
     treatment: 'detail',
-    generator: 'gemini-3.1-flash-image',
+    generator: 'dola-seedream-5-0-pro-260628',
     samples: 8,
     targetScore: 8.5,
   },
@@ -165,7 +166,7 @@ export const WORLDS: World[] = [
     motion:
       'Halftone grain crawls subtly, the flash light flickers once, the spot-color element pulses gently; harsh cuts to black are not allowed.',
     treatment: 'halftone',
-    generator: 'gemini-3.1-flash-image',
+    generator: 'dola-seedream-5-0-pro-260628',
     samples: 8,
     targetScore: 8.5,
   },

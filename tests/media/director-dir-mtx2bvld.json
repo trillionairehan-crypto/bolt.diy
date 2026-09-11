@@ -1,0 +1,270 @@
+{
+  "job": "dir-mtx2bvld",
+  "world": "photo-editorial",
+  "brand": "밀도 — 연남동 소금빵집. 매일 새벽 네 시에 굽고 하루 세 번, 다 팔리면 문을 닫는다. 국산 밀·발효 버터·굵은 소금.",
+  "threshold": 8.5,
+  "refUrls": [],
+  "shots": [
+    {
+      "round": 1,
+      "index": 0,
+      "brief": {
+        "title": "07:00 — First bake, low in the frame",
+        "prompt": "07:00. Lower-right salt-roll: torn-tip, scorched-seam, crumbs. Foreground-cropped chipped-bowl; ash-table. 80mm takes precedence. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "People, faces, hands, body parts; text, lettering, signs, logos, watermarks, borders; additional rolls, repeated bread, extra props, packaging, visible lighting equipment; centred or symmetrical arrangements, floating food, overhead views; steam from cooled bread; varnish-like glaze, evenly spaced salt, excessive salt, plastic highlights, orange-heavy grading, neon, CGI surfaces. Keep the bowl empty and the upper-left third free of objects and crumbs. Do not substitute a 90mm or 50mm lens for the locked 80mm."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx2bvld/r1-0.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 0,
+        "score": 7,
+        "tells": [
+          "roll segments read as separate pieces, melted seam",
+          "window blown to pure white, no detail",
+          "bowl awkwardly cropped, adds nothing",
+          "crust texture smoothed, render-ish"
+        ],
+        "fix": "Move the window into soft focus with texture and shoot one intact roll, drop the bowl."
+      },
+      "astra": {
+        "index": 0,
+        "score": 8.1,
+        "tells": [
+          "Oversized foreground plate competes with the low-set bread.",
+          "Blown window becomes more prominent than the subject."
+        ],
+        "fix": "Remove the foreground plate, retaining the low camera and directional sunlight."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 1,
+      "brief": {
+        "title": "07:00 — First bake, low in the frame",
+        "prompt": "07:00. Lower-right salt-roll: torn-tip, scorched-seam, crumbs. Foreground-cropped chipped-bowl; ash-table. 80mm takes precedence. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "People, faces, hands, body parts; text, lettering, signs, logos, watermarks, borders; additional rolls, repeated bread, extra props, packaging, visible lighting equipment; centred or symmetrical arrangements, floating food, overhead views; steam from cooled bread; varnish-like glaze, evenly spaced salt, excessive salt, plastic highlights, orange-heavy grading, neon, CGI surfaces. Keep the bowl empty and the upper-left third free of objects and crumbs. Do not substitute a 90mm or 50mm lens for the locked 80mm."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx2bvld/r1-1.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 1,
+        "score": 8,
+        "tells": [
+          "two competing light stripes, ambiguous key direction",
+          "crumbs too evenly scattered, staged",
+          "torn crumb slightly cotton-like"
+        ],
+        "fix": "Block the second sun stripe so one key from top-left reads cleanly."
+      },
+      "astra": {
+        "index": 1,
+        "score": 7.4,
+        "tells": [
+          "Generic stock composition: torn bread, arranged crumbs, rustic pottery.",
+          "Exaggerated plate damage feels art-directed rather than incidental.",
+          "Subject sits too high for the low-frame brief."
+        ],
+        "fix": "Reframe with a 50mm lens so the bread occupies only the bottom third, preserving the anchored sunlight shadow."
+      },
+      "score": 7.4
+    },
+    {
+      "round": 1,
+      "index": 2,
+      "brief": {
+        "title": "07:00 — First bake, low in the frame",
+        "prompt": "07:00. Lower-right salt-roll: torn-tip, scorched-seam, crumbs. Foreground-cropped chipped-bowl; ash-table. 80mm takes precedence. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "People, faces, hands, body parts; text, lettering, signs, logos, watermarks, borders; additional rolls, repeated bread, extra props, packaging, visible lighting equipment; centred or symmetrical arrangements, floating food, overhead views; steam from cooled bread; varnish-like glaze, evenly spaced salt, excessive salt, plastic highlights, orange-heavy grading, neon, CGI surfaces. Keep the bowl empty and the upper-left third free of objects and crumbs. Do not substitute a 90mm or 50mm lens for the locked 80mm."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx2bvld/r1-2.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 2,
+        "score": 7.5,
+        "tells": [
+          "roll end segment looks detached, impossible join",
+          "specular sheen slightly plastic",
+          "bowl clipped at bottom edge distracts"
+        ],
+        "fix": "Reshape the roll so the spiral is continuous and frame the bowl in or out."
+      },
+      "astra": {
+        "index": 2,
+        "score": 8,
+        "tells": [
+          "Generic stock composition: pristine roll beside strategically chipped pottery."
+        ],
+        "fix": "Replace the decorative plate with a barely visible, genuinely used baking tray while retaining the low viewpoint and hard back-left key."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 1,
+      "index": 3,
+      "brief": {
+        "title": "07:00 — First bake, low in the frame",
+        "prompt": "07:00. Lower-right salt-roll: torn-tip, scorched-seam, crumbs. Foreground-cropped chipped-bowl; ash-table. 80mm takes precedence. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "People, faces, hands, body parts; text, lettering, signs, logos, watermarks, borders; additional rolls, repeated bread, extra props, packaging, visible lighting equipment; centred or symmetrical arrangements, floating food, overhead views; steam from cooled bread; varnish-like glaze, evenly spaced salt, excessive salt, plastic highlights, orange-heavy grading, neon, CGI surfaces. Keep the bowl empty and the upper-left third free of objects and crumbs. Do not substitute a 90mm or 50mm lens for the locked 80mm."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx2bvld/r1-3.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 3,
+        "score": 8,
+        "tells": [
+          "scorch marks look painted on",
+          "film grain uniform and digital",
+          "plate occupies too much foreground"
+        ],
+        "fix": "Pull the plate back and let real bake blistering replace the drawn char."
+      },
+      "astra": {
+        "index": 3,
+        "score": 8.2,
+        "tells": [
+          "Oversized foreground plate weakens otherwise deliberate diagonal framing.",
+          "Generic rustic-food styling lacks a specific bakery identity."
+        ],
+        "fix": "Remove the plate and retain the diagonal sunlight, dark contact shadow, and unevenly baked crust."
+      },
+      "score": 8
+    },
+    {
+      "round": 1,
+      "index": 4,
+      "brief": {
+        "title": "08:00 — Last roll against the right edge",
+        "prompt": "08:00. Right-edge salt-roll: torn-tip, blistered-crust, crumbs. Foreground-cropped frayed-linen; limestone-table. 80mm takes precedence. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "People, faces, hands, body parts; text, lettering, signs, logos, watermarks, borders; plates, bowls, knives, butter blocks, packaging, additional rolls, visible lighting equipment; centred compositions, symmetrical linen folds, floating food, overhead views; steam from cooled bread; glossy glaze, uniform salt distribution, polished stone, synthetic fabric, oversaturation, neon, render-like surfaces. Keep the upper-left limestone uninterrupted; confine crumbs and the torn bread fragment to the roll’s immediate footprint. Do not substitute a 90mm or 50mm lens for the locked 80mm."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx2bvld/r1-4.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 4,
+        "score": 8,
+        "tells": [
+          "foreground linen dissolves into blurred mush",
+          "crust layers a touch too smooth",
+          "light band edge unnaturally straight"
+        ],
+        "fix": "Stop down slightly so the linen has fibre, and soften the shadow edge."
+      },
+      "astra": {
+        "index": 4,
+        "score": 8.5,
+        "tells": [
+          "Generic stock styling: foreground linen and decorative crumb scatter."
+        ],
+        "fix": "Remove the foreground linen, keeping the edge placement, low camera, and single hard sunlight key."
+      },
+      "score": 8
+    },
+    {
+      "round": 1,
+      "index": 5,
+      "brief": {
+        "title": "08:00 — Last roll against the right edge",
+        "prompt": "08:00. Right-edge salt-roll: torn-tip, blistered-crust, crumbs. Foreground-cropped frayed-linen; limestone-table. 80mm takes precedence. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "People, faces, hands, body parts; text, lettering, signs, logos, watermarks, borders; plates, bowls, knives, butter blocks, packaging, additional rolls, visible lighting equipment; centred compositions, symmetrical linen folds, floating food, overhead views; steam from cooled bread; glossy glaze, uniform salt distribution, polished stone, synthetic fabric, oversaturation, neon, render-like surfaces. Keep the upper-left limestone uninterrupted; confine crumbs and the torn bread fragment to the roll’s immediate footprint. Do not substitute a 90mm or 50mm lens for the locked 80mm."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx2bvld/r1-5.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 5,
+        "score": 8,
+        "tells": [
+          "crust blistering repetitively uniform",
+          "frayed linen threads too tidy",
+          "roll not truly against the right edge"
+        ],
+        "fix": "Push the roll another 10% right and vary the surface bubbling."
+      },
+      "astra": {
+        "index": 5,
+        "score": 7.6,
+        "tells": [
+          "Generic stock composition: pristine pastry paired with frayed linen.",
+          "Over-glossy crust blisters give the surface a lacquered appearance."
+        ],
+        "fix": "Photograph an unglazed roll in the same directional sunlight to replace lacquered highlights with dry crust texture."
+      },
+      "score": 7.6
+    },
+    {
+      "round": 1,
+      "index": 6,
+      "brief": {
+        "title": "08:00 — Last roll against the right edge",
+        "prompt": "08:00. Right-edge salt-roll: torn-tip, blistered-crust, crumbs. Foreground-cropped frayed-linen; limestone-table. 80mm takes precedence. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "People, faces, hands, body parts; text, lettering, signs, logos, watermarks, borders; plates, bowls, knives, butter blocks, packaging, additional rolls, visible lighting equipment; centred compositions, symmetrical linen folds, floating food, overhead views; steam from cooled bread; glossy glaze, uniform salt distribution, polished stone, synthetic fabric, oversaturation, neon, render-like surfaces. Keep the upper-left limestone uninterrupted; confine crumbs and the torn bread fragment to the roll’s immediate footprint. Do not substitute a 90mm or 50mm lens for the locked 80mm."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx2bvld/r1-6.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 6,
+        "score": 7.5,
+        "tells": [
+          "subject too large, little headline room",
+          "torn crumb reads as cotton fibre",
+          "hot specular highlights on crust",
+          "linen a soft blob on right"
+        ],
+        "fix": "Pull back to a 50mm equivalent so the roll sits right with clear space left."
+      },
+      "astra": {
+        "index": 6,
+        "score": 7.3,
+        "tells": [
+          "Subject too large; close crop sacrifices the last-roll isolation.",
+          "Over-glossy crust blisters compete with the torn interior.",
+          "Foreground linen obscures the subject's lower-right silhouette."
+        ],
+        "fix": "Move the camera back until the roll occupies the rightmost third, retaining the hard upper-left key and visible contact shadow."
+      },
+      "score": 7.3
+    },
+    {
+      "round": 1,
+      "index": 7,
+      "brief": {
+        "title": "08:00 — Last roll against the right edge",
+        "prompt": "08:00. Right-edge salt-roll: torn-tip, blistered-crust, crumbs. Foreground-cropped frayed-linen; limestone-table. 80mm takes precedence. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "People, faces, hands, body parts; text, lettering, signs, logos, watermarks, borders; plates, bowls, knives, butter blocks, packaging, additional rolls, visible lighting equipment; centred compositions, symmetrical linen folds, floating food, overhead views; steam from cooled bread; glossy glaze, uniform salt distribution, polished stone, synthetic fabric, oversaturation, neon, render-like surfaces. Keep the upper-left limestone uninterrupted; confine crumbs and the torn bread fragment to the roll’s immediate footprint. Do not substitute a 90mm or 50mm lens for the locked 80mm."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx2bvld/r1-7.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 7,
+        "score": 7.5,
+        "tells": [
+          "torn end smeared, crumb structure melted",
+          "gloss highlights plastic",
+          "roll centred-right, not against right edge",
+          "crust bubble pattern repeats"
+        ],
+        "fix": "Shift roll hard right, matte the glaze and reshoot the torn end in real focus."
+      },
+      "astra": {
+        "index": 7,
+        "score": 7.7,
+        "tells": [
+          "Generic stock composition: three-quarter pastry portrait on rustic linen.",
+          "Subject too large for an isolated right-edge hero.",
+          "Glossy, uniformly golden crust feels commercially beautified."
+        ],
+        "fix": "Widen the framing to place the roll within the rightmost third, preserving the believable sunlight direction and fabric contact shadow."
+      },
+      "score": 7.5
+    }
+  ],
+  "costUsd": 0.6
+}
