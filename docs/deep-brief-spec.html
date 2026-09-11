@@ -1,0 +1,285 @@
+<title>Coralred 딥 브리프</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{--paper:#F4F3EE;--card:#FFFFFF;--ink:#14171A;--muted:#5F6772;--line:#D9D9D0;--soft:#ECEBE3;--accent:#B23A1E;--accent-ink:#fff;--tint:#F6E6E0;--ok:#1F5E48;--ok-tint:#E2EEE8;--gold:#8A6A16;--gold-tint:#F3EAD0;
+--display:"Familjen Grotesk","IBM Plex Sans KR",system-ui,sans-serif;--body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Consolas,monospace}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#121416;--card:#191C1F;--ink:#EAEBE6;--muted:#9AA2AA;--line:#2B3035;--soft:#20252A;--accent:#F0866A;--accent-ink:#1a0e0a;--tint:#33211B;--ok:#6CC39C;--ok-tint:#1B2A23;--gold:#D9B45A;--gold-tint:#2E2814}}
+:root[data-theme="dark"]{--paper:#121416;--card:#191C1F;--ink:#EAEBE6;--muted:#9AA2AA;--line:#2B3035;--soft:#20252A;--accent:#F0866A;--accent-ink:#1a0e0a;--tint:#33211B;--ok:#6CC39C;--ok-tint:#1B2A23;--gold:#D9B45A;--gold-tint:#2E2814}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.65;padding-inline:clamp(16px,4vw,48px);padding-block:0 96px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);letter-spacing:-0.01em;text-wrap:balance;margin:0}
+h1{font-size:clamp(40px,7vw,80px);line-height:.98;font-weight:700}
+h2{font-size:clamp(24px,3.2vw,34px);line-height:1.1;margin:0 0 16px;padding-top:12px;border-top:2px solid var(--ink)}
+h3{font-size:18px;font-family:var(--body);font-weight:600;margin:28px 0 8px}
+p{margin:0 0 12px;max-width:72ch}.lead{font-size:17px;max-width:64ch}
+section{margin-top:64px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+header{padding-block:56px 28px;border-bottom:1px solid var(--line)}
+header .sub{font-size:18px;max-width:60ch;margin-top:18px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:20px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.toc{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:22px;font-size:13px}.toc a{text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 10px}.toc a:hover{color:var(--ink);border-color:var(--ink)}
+a{color:inherit;text-decoration-color:var(--line);text-underline-offset:3px}a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;background:var(--card)}th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{font-weight:600;font-size:12px;color:var(--muted);background:var(--soft);position:sticky;top:0}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);margin-top:12px}.tablewrap table{min-width:760px}
+td .q{font-weight:600}td .t{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 7px;border:1px solid var(--line);border-radius:999px;color:var(--muted);white-space:nowrap}.pill.req{border-color:var(--accent);color:var(--accent)}.pill.opt{border-color:var(--line)}
+.callout{border-left:3px solid var(--accent);background:var(--tint);padding:14px 18px;margin:18px 0}.callout.ok{border-color:var(--ok);background:var(--ok-tint)}.callout.gold{border-color:var(--gold);background:var(--gold-tint)}.callout p:last-child{margin:0}
+.principles{counter-reset:p;list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px}.principles li{background:var(--card);border:1px solid var(--line);padding:12px 16px 12px 52px;position:relative}.principles li::before{counter-increment:p;content:counter(p,decimal-leading-zero);position:absolute;left:14px;top:12px;font-family:var(--mono);font-size:12px;color:var(--accent)}
+.chapters{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:16px}.chapters div{background:var(--card);padding:14px}.chapters b{font-family:var(--display);font-size:22px;display:block}.chapters small{color:var(--muted);display:block;margin-top:4px;font-size:12.5px}
+pre{background:var(--card);border:1px solid var(--line);padding:14px 16px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.55;margin:12px 0}
+code{font-family:var(--mono);font-size:.92em;background:var(--soft);padding:1px 5px;border-radius:3px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px 36px}
+ul.small{font-size:13.5px;max-width:72ch}
+.flow{display:grid;gap:8px;margin-top:12px}.flow div{display:grid;grid-template-columns:40px 1fr;gap:12px;background:var(--card);border:1px solid var(--line);padding:10px 14px;font-size:14px}.flow .i{font-family:var(--mono);color:var(--accent);font-size:12px;padding-top:3px}
+footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);font-family:var(--mono)}
+@media (max-width:640px){.tablewrap table{min-width:640px}}
+</style>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Coralred · 온보딩 v2 스펙 · 2026-09-11</div>
+  <h1>딥 브리프</h1>
+  <p class="sub">"어떤 일을 하시나요"를 묻던 5문항을 버리고, 사이트 하나를 수상작 수준으로 만들기 위해 필요한 모든 것을 사용자에게 직접 묻는다. 길어도 된다. 대신 모든 답이 결과의 어느 부분을 결정하는지 화면에 보인다.</p>
+  <div class="meta"><span>7챕터 · 24문항 (필수 14 · 선택 10)</span><span>예상 12~18분</span><span>출력 = Direction Sheet JSON 1개</span><span>기존 Q1·Q2·Q4는 마지막 챕터로 이동</span></div>
+  <nav class="toc" aria-label="목차"><a href="#why">원칙</a><a href="#flow">흐름</a><a href="#questions">문항</a><a href="#sheet">Direction Sheet</a><a href="#mapping">결정 규칙</a><a href="#photo">사진 등급</a><a href="#ui">UI 규칙</a><a href="#accept">수용 기준</a><a href="#build">구현 순서</a></nav>
+</header>
+
+<section id="why">
+  <h2>원칙</h2>
+  <p class="lead">CSSDA 수상작 90개 분석의 결론: 점수를 가르는 건 기술이 아니라 <b>한 아이디어의 일관성</b>이다. 일관성은 규칙이 보장한다. 규칙이 못 하는 건 "이 브랜드의 아이디어 하나"를 정하는 일 — 그걸 브리프가 사용자에게서 뽑아낸다.</p>
+  <ol class="principles">
+    <li><b>애매한 질문 금지.</b> 모든 문항은 Direction Sheet의 필드 하나 이상에 직접 매핑된다. 매핑 없는 질문은 삭제한다. 화면에도 "이 답은 → 히어로 장면"처럼 용도를 표기한다.</li>
+    <li><b>보여주고 고르게 한다.</b> 스타일·팔레트·모션 강도는 글자가 아니라 미리보기 이미지·짧은 영상으로 고른다. 사용자는 형용사를 못 고르지만 그림은 고른다.</li>
+    <li><b>사실만 받는다.</b> 숫자·주소·시간·가격·상호는 사용자가 준 것만 쓴다. 없으면 그 섹션을 통째로 뺀다. 가짜 숫자·가짜 로고 = 즉시 하위권(Numa 8.07).</li>
+    <li><b>미디어는 여기서 끝난다.</b> 사진 업로드·등급 판정·부족분 생성 결정까지 브리프 안에서 완료. 생성 단계에서는 미디어에 대해 아무것도 판단하지 않는다.</li>
+    <li><b>결정론.</b> 같은 브리프 → 같은 Direction Sheet. 매핑 규칙에 LLM을 쓰지 않는다(카피 다듬기 제외). 재생성해도 아트디렉션은 흔들리지 않는다.</li>
+    <li><b>인물 규칙.</b> 실사 인물은 사용자 사진만. 생성 인물은 회화·일러스트 스타일 락일 때만 허용(2026-09-11 결정), 얼굴 클로즈업 없음.</li>
+    <li><b>길이는 나중에 줄인다.</b> 지금은 품질 우선. 선택 문항은 "건너뛰기"가 있고 건너뛴 값은 결정 규칙의 기본값으로 채워진다.</li>
+  </ol>
+</section>
+
+<section id="flow">
+  <h2>흐름 — 7챕터</h2>
+  <div class="chapters">
+    <div><b>A</b>정체<small>4문항 · 아이디어 하나</small></div>
+    <div><b>B</b>세계관<small>5문항 · 스타일 락·색·서체</small></div>
+    <div><b>C</b>재료<small>4문항 · 사진·영상·로고</small></div>
+    <div><b>D</b>증거·카피<small>4문항 · 숫자·선언문·연락</small></div>
+    <div><b>E</b>연출<small>3문항 · 모션·3D·소리</small></div>
+    <div><b>F</b>기능<small>3문항 · 기존 Q1·Q2·Q4</small></div>
+    <div><b>G</b>확인<small>1화면 · 요약 카드</small></div>
+  </div>
+  <div class="flow">
+    <div><span class="i">A</span><span>브랜드가 무엇이고, 한 장면으로 그리면 무엇인지. 여기서 <b>원형(archetype)</b>과 <b>히어로 장면</b>이 정해진다.</span></div>
+    <div><span class="i">B</span><span>세계관 스타일(실사/회화/일러스트/오브젝트/에디토리얼)을 그림으로 고르고, 색 하나, 무드 단어, 레퍼런스 링크. <b>스타일 락·팔레트·서체 프리셋</b>이 정해진다.</span></div>
+    <div><span class="i">C</span><span>샷리스트대로 사진 업로드 → 즉시 등급(A/B/C) → 부족 슬롯은 "생성으로 채움" 표시. 로고·영상·기존 사이트. <b>슬롯 배정표</b>가 정해진다.</span></div>
+    <div><span class="i">D</span><span>숫자 증거, 선언문, 연락·위치·시간, 상호 표기. <b>카피 사실표</b>가 정해진다.</span></div>
+    <div><span class="i">E</span><span>모션 강도·3D 씬·소리. <b>킷 파라미터</b>가 정해진다.</span></div>
+    <div><span class="i">F</span><span>누가 쓰나·저장·연동(기존 Q1·Q2·Q4). 앱 기능 결정. 디자인과 무관하므로 맨 뒤.</span></div>
+    <div><span class="i">G</span><span>"이렇게 만들게요" 요약 카드: 원형·팔레트·서체·히어로 장면 문장·슬롯표·생성 예정 미디어와 비용. 수정 → 해당 챕터로 점프. 확인 → 생성 시작.</span></div>
+  </div>
+</section>
+
+<section id="questions">
+  <h2>문항 24개</h2>
+  <p class="lead">각 행: 화면에 나오는 질문 문구 그대로 · 입력 방식 · 매핑되는 Direction Sheet 필드 · 결과에 미치는 영향. <span class="pill req">필수</span> <span class="pill opt">선택(기본값 있음)</span></p>
+
+  <h3>A. 정체</h3>
+  <div class="tablewrap"><table>
+    <tr><th style="width:36px">#</th><th style="width:34%">질문(화면 문구)</th><th>입력</th><th>→ 필드</th><th>결과에 미치는 영향</th></tr>
+    <tr><td class="mono">A1 <span class="pill req">필수</span></td><td><span class="q">무엇을 하는 곳인가요?</span><br><span class="t">격자 12 + 직접 입력. 기존 Q3 승계</span></td><td>단일 선택 + 자유 입력(20자)</td><td><code>industry</code>, <code>industryFree</code></td><td>샷리스트 기본값, 산업 모티프, 원형 후보 제한</td></tr>
+    <tr><td class="mono">A2 <span class="pill req">필수</span></td><td><span class="q">손님이 당신 가게를 한 문장으로 말한다면 뭐라고 할까요?</span><br><span class="t">예시 5개 노출: "매일 새벽 네 시에 굽는 소금빵집" / "예약이 두 달 밀린 동네 미용실"…</span></td><td>자유 서술 1~2문장(120자)</td><td><code>idea.sentence</code></td><td>히어로 헤드라인 원문, 선언문 재료. 이 문장이 사이트 전체의 "아이디어 하나"</td></tr>
+    <tr><td class="mono">A3 <span class="pill req">필수</span></td><td><span class="q">그 문장을 한 장면으로 그린다면 — 무엇이 보이나요?</span><br><span class="t">"새벽 어둠 속 오븐 불빛과 김이 오르는 빵" 같은 예시 3개. 사람 말고 사물·공간·빛으로</span></td><td>자유 서술(160자) + 선택지 6개(오브젝트 클로즈업 / 공간 와이드 / 손과 재료 / 재료만 / 도시·풍경 / 추상)</td><td><code>idea.scene</code>, <code>idea.sceneType</code></td><td>히어로 이미지·영상 프롬프트의 주어. 원형 결정의 핵심 입력</td></tr>
+    <tr><td class="mono">A4 <span class="pill opt">선택</span></td><td><span class="q">이 사이트가 딱 하나만 해야 한다면?</span></td><td>단일 선택: 전화·예약 / 방문·길찾기 / 구매 / 문의·상담 / 포트폴리오 감상 / 채용</td><td><code>goal</code></td><td>CTA 문구·위치, 연락 섹션 구성, 골격(7 vs 앱형) 분기</td></tr>
+  </table></div>
+
+  <h3>B. 세계관</h3>
+  <div class="tablewrap"><table>
+    <tr><th style="width:36px">#</th><th style="width:34%">질문</th><th>입력</th><th>→ 필드</th><th>영향</th></tr>
+    <tr><td class="mono">B1 <span class="pill req">필수</span></td><td><span class="q">어떤 세계관이 마음에 드나요?</span><br><span class="t">6장 미리보기 카드(같은 빵집을 6가지로 렌더한 실제 생성 이미지). 글자 설명 최소</span></td><td>단일 선택: <b>실사 에디토리얼</b> / <b>신고전주의 회화</b>(Pear) / <b>수채·일러스트</b>(100 Lost Species) / <b>제품 오브젝트 3D</b>(The Watch) / <b>흑백 브루탈</b>(Aspen) / <b>단색 컬러 월드</b>(/zeroz)</td><td><code>world.styleLock</code></td><td>이미지·영상 프롬프트 STYLE_LOCK 문자열, 인물 허용 여부(회화·일러스트만), 트리트먼트 기본값, 원형</td></tr>
+    <tr><td class="mono">B2 <span class="pill req">필수</span></td><td><span class="q">색은 하나만 고르세요.</span><br><span class="t">12색 칩 + "사진에서 뽑기"(C1 업로드 후 자동 추출 3개 제안) + 직접 HEX</span></td><td>단일 색</td><td><code>palette.accent</code>, <code>palette.source</code></td><td>--accent, 듀오톤·하이라이트·CTA. 라이트/다크는 B1 스타일에서 결정(사용자에게 안 묻는다)</td></tr>
+    <tr><td class="mono">B3 <span class="pill req">필수</span></td><td><span class="q">느낌을 세 단어로. 그리고 절대 아닌 세 단어.</span><br><span class="t">칩 24개(따뜻한·정직한·고요한·대담한·장인·현대적·고전적·유쾌한·엄격한·부드러운…) + 직접 입력</span></td><td>3개 + 3개</td><td><code>mood.yes[]</code>, <code>mood.no[]</code></td><td>카피 톤, 서체 프리셋 보정(고전적→serif, 대담한→compact), 프롬프트 형용사, 금지 요소</td></tr>
+    <tr><td class="mono">B4 <span class="pill opt">선택</span></td><td><span class="q">좋아하는 사이트·인스타·영상 링크를 붙여 주세요. 몇 개든.</span><br><span class="t">붙이면 자동 캡처 썸네일 + "여기서 뭐가 좋았나요?" 칩(색/움직임/사진/글자/분위기)</span></td><td>URL 목록 + 칩</td><td><code>refs[]</code> {url, liked[]}</td><td>원형 보정(사이트 실측 tech/motion 스크립트로 자동 분류), 모션 강도 기본값</td></tr>
+    <tr><td class="mono">B5 <span class="pill opt">선택</span></td><td><span class="q">글자 분위기는요?</span><br><span class="t">같은 한글 헤드라인을 3벌로 렌더한 카드. 기본값은 B1·B3에서 자동</span></td><td>단일: 그로테스크 / 세리프 강조 / 컴팩트</td><td><code>type.preset</code></td><td>킷 <code>.ck-type-*</code> 프리셋, 상호 워드마크 서체</td></tr>
+  </table></div>
+
+  <h3>C. 재료</h3>
+  <div class="tablewrap"><table>
+    <tr><th style="width:36px">#</th><th style="width:34%">질문</th><th>입력</th><th>→ 필드</th><th>영향</th></tr>
+    <tr><td class="mono">C1 <span class="pill req">필수</span></td><td><span class="q">사진을 올려 주세요. 이 4장이 있으면 가장 좋아요.</span><br><span class="t">A1 산업의 샷리스트 4칸(히어로 / 디테일 / 공간 / 소재)을 빈 프레임으로 보여주고 칸마다 촬영 팁 1줄("창가 자연광, 배경 비우기"). 한 칸에 여러 장 가능. 폰 사진 환영</span></td><td>이미지 업로드(무제한, 칸 지정 선택)</td><td><code>media.uploads[]</code> {id, slot?, grade, metrics}</td><td>업로드 즉시 등급(A/B/C) 표시. A·B → 슬롯 사용(B는 트리트먼트), C → "증거용 썸네일로만 사용". 빈 슬롯 → 생성</td></tr>
+    <tr><td class="mono">C2 <span class="pill req">필수</span></td><td><span class="q">비어 있는 칸은 우리가 만들어 드릴까요?</span><br><span class="t">B1 세계관으로 이 가게를 어떻게 그릴지 미리보기 1장(캐시된 유사 예시). 인물 없음 안내(회화·일러스트는 인물 가능)</span></td><td>예/아니오 + 인물 포함 여부(회화·일러스트일 때만 노출)</td><td><code>media.generate</code>, <code>media.allowPaintedPeople</code></td><td>생성 슬롯 결정, 프롬프트 인물 절</td></tr>
+    <tr><td class="mono">C3 <span class="pill opt">선택</span></td><td><span class="q">로고나 상호 이미지가 있나요? 없으면 글자로 만들어요.</span></td><td>SVG/PNG 업로드 또는 없음</td><td><code>brand.logo</code>, <code>brand.nameKo</code>, <code>brand.nameEn</code></td><td>내비 로고, 푸터 워드마크(영문 있으면 영문 우선)</td></tr>
+    <tr><td class="mono">C4 <span class="pill opt">선택</span></td><td><span class="q">영상이 있나요? 5초짜리 폰 영상도 좋아요.</span></td><td>mp4/mov 업로드</td><td><code>media.videos[]</code></td><td>히어로 루프 후보. 없으면 Seedance 생성</td></tr>
+  </table></div>
+
+  <h3>D. 증거·카피</h3>
+  <div class="tablewrap"><table>
+    <tr><th style="width:36px">#</th><th style="width:34%">질문</th><th>입력</th><th>→ 필드</th><th>영향</th></tr>
+    <tr><td class="mono">D1 <span class="pill opt">선택</span></td><td><span class="q">자랑할 수 있는 숫자가 있나요? 최대 3개.</span><br><span class="t">"하루 200개 / 14시간 발효 / 2011년부터". 없으면 이 섹션은 사이트에 안 나옵니다(가짜 숫자 금지)</span></td><td>숫자 + 단위 + 라벨 ×3</td><td><code>proof.numbers[]</code></td><td>BigNumber 섹션 유무·내용</td></tr>
+    <tr><td class="mono">D2 <span class="pill req">필수</span></td><td><span class="q">손님에게 꼭 하고 싶은 말 한 문장.</span><br><span class="t">A2와 다름: A2는 남이 하는 말, D2는 내가 하는 말. 예시 3개</span></td><td>자유(80자)</td><td><code>copy.statement</code></td><td>선언문 섹션(TextReveal). 다듬기만 LLM, 뜻은 유지</td></tr>
+    <tr><td class="mono">D3 <span class="pill req">필수</span></td><td><span class="q">연락·위치·시간.</span></td><td>주소, 전화, 운영시간, 휴무, 인스타/카카오 채널, 주차 메모</td><td><code>contact.*</code></td><td>Contact 섹션. 비어 있는 행은 안 나옴</td></tr>
+    <tr><td class="mono">D4 <span class="pill opt">선택</span></td><td><span class="q">챕터로 보여줄 이야기 3개.</span><br><span class="t">"재료 / 발효 / 굽기"처럼 제목 + 한 줄. 비우면 A3·산업 모티프로 자동</span></td><td>제목(12자) + 본문(60자) ×3</td><td><code>chapters[]</code></td><td>PinnedChapters 텍스트, 각 챕터 이미지 프롬프트 주어</td></tr>
+  </table></div>
+
+  <h3>E. 연출</h3>
+  <div class="tablewrap"><table>
+    <tr><th style="width:36px">#</th><th style="width:34%">질문</th><th>입력</th><th>→ 필드</th><th>영향</th></tr>
+    <tr><td class="mono">E1 <span class="pill req">필수</span></td><td><span class="q">움직임은 어느 정도?</span><br><span class="t">3개 짧은 영상 카드(같은 페이지를 조용/보통/영화로)</span></td><td>단일: 조용 / 보통 / 영화</td><td><code>motion.level</code></td><td>조용=리빌만·스냅 없음, 보통=핀 챕터+마퀴, 영화=스크롤 시퀀스+셰이더 히어로+스냅</td></tr>
+    <tr><td class="mono">E2 <span class="pill opt">선택</span></td><td><span class="q">3D 장면을 넣을까요?</span><br><span class="t">씬 라이브러리 미리보기(유리 오브젝트 / 파티클 스트림 / 3D 타이포 / 대리석 홀…). 산업·세계관에 맞는 것만 노출</span></td><td>단일 또는 없음</td><td><code>scene3d</code></td><td>킷 3D 씬 선택 + 파라미터(색·텍스처·상호)</td></tr>
+    <tr><td class="mono">E3 <span class="pill opt">선택</span></td><td><span class="q">소리를 켤까요?</span></td><td>없음 / 앰비언트(클릭 후 재생)</td><td><code>sound</code></td><td>"sound on" 토글 UI 유무</td></tr>
+  </table></div>
+
+  <h3>F. 기능(기존 문항 승계)</h3>
+  <div class="tablewrap"><table>
+    <tr><th style="width:36px">#</th><th style="width:34%">질문</th><th>입력</th><th>→ 필드</th><th>영향</th></tr>
+    <tr><td class="mono">F1 <span class="pill req">필수</span></td><td>누가 쓰나요? (Q1)</td><td>나 혼자 / 직원과 / 손님도</td><td><code>app.audience</code></td><td>기존 perspective 지시문 그대로</td></tr>
+    <tr><td class="mono">F2 <span class="pill req">필수</span></td><td>데이터를 저장할까요? (Q2)</td><td>Cloud / 없음 / Supabase</td><td><code>app.storage</code></td><td>기존 그대로</td></tr>
+    <tr><td class="mono">F3 <span class="pill opt">선택</span></td><td>필요한 연동 (Q4, 수요조사)</td><td>다중</td><td><code>app.integrations[]</code></td><td>DB 저장만(기존 그대로)</td></tr>
+  </table></div>
+  <div class="callout gold"><p><b>삭제되는 것:</b> Q5 팔레트 9종 선택(B2로 대체 — 색 하나만), Q3의 "추천 팔레트" 배지. <b>이동:</b> Q1·Q2·Q4는 디자인과 무관하므로 F로 뒤로. <b>추가:</b> 나머지 전부.</p></div>
+</section>
+
+<section id="sheet">
+  <h2>Direction Sheet</h2>
+  <p class="lead">브리프의 유일한 출력. 이후 프롬프트·킷·미디어 생성은 이 객체만 읽는다. 사용자 답(<code>brief</code>)과 규칙이 계산한 결정(<code>decided</code>)을 분리해 저장한다 — 규칙이 바뀌면 <code>decided</code>만 재계산.</p>
+<pre>interface DirectionSheet {
+  version: 2;
+  brief: {                      // 사용자 답 원본 (A~F)
+    industry: string; industryFree?: string;
+    idea: { sentence: string; scene: string; sceneType: 'object'|'space'|'hands'|'material'|'landscape'|'abstract' };
+    goal?: 'call'|'visit'|'buy'|'inquiry'|'portfolio'|'hire';
+    world: { styleLock: 'photo-editorial'|'neoclassical-painting'|'watercolor-illustration'|'product-3d'|'mono-brutal'|'mono-color' };
+    palette: { accent: string; source: 'chip'|'photo'|'hex' };
+    mood: { yes: string[]; no: string[] };
+    refs: Array&lt;{ url: string; liked: Array&lt;'color'|'motion'|'photo'|'type'|'mood'&gt;; measured?: RefMetrics }&gt;;
+    type?: { preset: 'grotesk'|'serif'|'compact' };
+    media: { uploads: Upload[]; videos: Upload[]; generate: boolean; allowPaintedPeople: boolean };
+    brand: { nameKo: string; nameEn?: string; logo?: Upload };
+    proof: { numbers: Array&lt;{ value: number; unit: string; label: string }&gt; };
+    copy: { statement: string };
+    contact: { address?: string; phone?: string; hours?: string; closed?: string; instagram?: string; kakao?: string; parking?: string };
+    chapters?: Array&lt;{ title: string; body: string }&gt;;
+    motion: { level: 'quiet'|'normal'|'cinema' };
+    scene3d?: 'none'|'glass-cluster'|'particle-stream'|'type-glitch'|'marble-hall'|'orbit-object'|'shader-hero';
+    sound: 'none'|'ambient';
+    app: { audience: Q1Value; storage: Q2Value; integrations: string[] };
+  };
+  decided: {                    // 규칙이 계산 (LLM 없음)
+    archetype: 'product-story'|'light-editorial'|'brutal-grid'|'agency-showcase'|'painted-sequence'|'illustrated-archive'|'color-world'|'typo-editorial';
+    skeleton: 7 | SkeletonId;
+    theme: 'light'|'dark'; accentHex: string; surfaceHex: string; textHex: string;
+    typePreset: 'grotesk'|'serif'|'compact';
+    styleLockPrompt: string;    // 이미지·영상 STYLE_LOCK 전체 문자열
+    peoplePolicy: 'none'|'painted-only'|'user-photos-only';
+    shotList: Array&lt;{ slot: 'hero'|'ch1'|'ch2'|'ch3'|'detail'|'space'; prompt: string; source: 'upload'|'generate'; uploadId?: string; treatment: Treatment }&gt;;
+    video: { source: 'upload'|'seedance'|'none'; prompt?: string; mode: 'loop'|'sequence' };
+    sequence?: { frames: number; prompt: string };   // painted-sequence 원형일 때
+    kit: { pinChapters: boolean; textReveal: boolean; marquee: boolean; snap: boolean; preloader: boolean; cursor: boolean; wordmark: boolean; scene3d: string|null; soundToggle: boolean };
+    sections: Array&lt;'hero'|'statement'|'chapters'|'numbers'|'marquee'|'gallery'|'contact'&gt;;  // 증거 없으면 numbers 제외
+    copy: { headline: string; sub: string; statement: string; cta: string; chapters: Array&lt;{ eyebrow: string; title: string; body: string }&gt; };
+    estimate: { images: number; videos: number; usd: number; seconds: number };
+  };
+  promptAdditions: string[];    // 기존 GenerationDirectives 호환 — new-prompt.ts로 흘러가는 문장들
+}</pre>
+</section>
+
+<section id="mapping">
+  <h2>결정 규칙 (brief → decided)</h2>
+  <div class="grid2">
+    <div>
+      <h3>원형(archetype)</h3>
+      <div class="tablewrap"><table>
+        <tr><th>조건(위에서부터 첫 일치)</th><th>원형</th></tr>
+        <tr><td>styleLock = neoclassical-painting</td><td>painted-sequence (Pear)</td></tr>
+        <tr><td>styleLock = watercolor-illustration</td><td>illustrated-archive (100 Lost Species)</td></tr>
+        <tr><td>styleLock = product-3d 또는 sceneType = object &amp; industry ∈ {shopping, cafe, beauty}</td><td>product-story (The Watch·NOTA)</td></tr>
+        <tr><td>styleLock = mono-brutal 또는 industry ∈ {freelance, clinic-b2b}</td><td>brutal-grid (Aspen)</td></tr>
+        <tr><td>styleLock = mono-color</td><td>color-world (/zeroz)</td></tr>
+        <tr><td>industry = freelance &amp; goal = portfolio</td><td>agency-showcase (Revelatio)</td></tr>
+        <tr><td>sceneType ∈ {space, landscape} 또는 industry = realestate</td><td>light-editorial (Lidar·Cula)</td></tr>
+        <tr><td>media.uploads 전부 C등급 &amp; generate = false</td><td>typo-editorial (Triadic) — 이미지 없이 타이포로</td></tr>
+        <tr><td>그 외</td><td>light-editorial</td></tr>
+      </table></div>
+      <h3>테마·서체</h3>
+      <ul class="small">
+        <li><b>theme:</b> painting·brutal·illustrated·product = light. mono-color = accent 명도로(L&lt;50 → dark). photo-editorial = 히어로 사진 평균 명도로. 사용자에게 묻지 않음(수상작 76% 라이트).</li>
+        <li><b>typePreset:</b> B5 답 우선. 없으면 painting → serif, brutal·fitness·agency → compact, 그 외 grotesk. mood.yes에 '고전적' 있으면 serif, '대담한' 있으면 compact.</li>
+        <li><b>accent 보정:</b> 회화 = 채도 -20% 명도 -10%(안료 느낌). brutal = 형광 유지. 텍스트·서피스는 accent에서 OKLCH로 파생.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>미디어·슬롯</h3>
+      <ul class="small">
+        <li><b>peoplePolicy:</b> styleLock ∈ {painting, illustration} &amp; allowPaintedPeople → painted-only. 그 외 none. 사용자 사진 속 실사 인물은 항상 허용(user-photos-only).</li>
+        <li><b>슬롯 배정:</b> 각 슬롯에 A등급 업로드 있으면 그것, 없으면 B등급 + 트리트먼트(산업별 기본: 식음 grain, 서비스 mono, 공간 duotone), 없으면 generate=true일 때 생성, 아니면 슬롯 비움 → 섹션 축소.</li>
+        <li><b>styleLockPrompt:</b> 세계관별 고정 문자열(painterly.ts STYLE 등 6종) + accent 힌트 + mood.yes 형용사 2개 + mood.no 부정절.</li>
+        <li><b>video:</b> C4 있으면 upload. 없으면 motion ≠ quiet → seedance(loop). painted-sequence면 mode=sequence(5초 → 프레임 60장 스크럽).</li>
+        <li><b>estimate:</b> 생성 슬롯 수 × $0.09 + 영상 × $0.15 (+ 시퀀스 3회 생성 후 선택 × $0.45). G 확인 화면에 표시.</li>
+      </ul>
+      <h3>킷·섹션·카피</h3>
+      <ul class="small">
+        <li><b>motion.level:</b> quiet = reveal만, snap off, marquee off · normal = pinChapters + marquee + preloader · cinema = + sequence/shader hero + snap + cursor.</li>
+        <li><b>sections:</b> hero, statement(D2), chapters(D4 또는 자동 3), numbers(D1 ≥ 2개일 때만), marquee(normal 이상), contact. 갤러리는 A등급 업로드 ≥ 6장일 때만.</li>
+        <li><b>copy:</b> headline = A2를 12~14자 × 2줄로 다듬기(LLM, 뜻 유지, 느낌표 금지). sub = A3 한 줄. statement = D2. cta = goal별 고정 문구. 챕터 eyebrow는 영문 모노(Dough/Ferment/Bake) 자동.</li>
+        <li><b>refs.measured:</b> URL마다 tech/motion 스크립트 실측(idle·journey·pinned·webgl). 결과가 cinema급이면 motion 기본값을 한 단계 올린다.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="photo">
+  <h2>사진 등급 (브라우저 canvas, 서버 호출 없음)</h2>
+  <div class="tablewrap"><table>
+    <tr><th>지표</th><th>계산</th><th>A</th><th>B</th><th>C</th></tr>
+    <tr><td>해상도</td><td>긴 변 px</td><td>≥ 2400</td><td>1600~2399</td><td>&lt; 1600</td></tr>
+    <tr><td>선명도</td><td>그레이스케일 라플라시안 분산(축소 640px)</td><td>≥ 120</td><td>60~119</td><td>&lt; 60</td></tr>
+    <tr><td>노출</td><td>히스토그램 0~5 / 250~255 비율</td><td>각 &lt; 2%</td><td>&lt; 6%</td><td>≥ 6%</td></tr>
+    <tr><td>색 편차</td><td>R/G/B 평균 차(형광등 누런끼)</td><td>&lt; 12</td><td>12~30 → 트리트먼트로 해결</td><td>—</td></tr>
+    <tr><td>잡동사니</td><td>Canny 엣지 밀도(중앙 60% 영역)</td><td>&lt; 0.08</td><td>0.08~0.16 → detail 크롭</td><td>&gt; 0.16</td></tr>
+    <tr><td>텍스트·워터마크·날짜</td><td>Gemini vision 1회 질문(선택, 서버) 또는 건너뜀</td><td>없음</td><td>—</td><td>있음</td></tr>
+  </table></div>
+  <p class="small" style="margin-top:8px">최종 등급 = 최악 지표 기준. B는 "쓸 수 있음, 트리트먼트 적용"이고 C는 "히어로·챕터 불가, 증거 썸네일만". 화면에는 등급과 이유 한 줄("배경이 어수선해요 → 디테일 크롭으로 씁니다")과 다시 찍기 팁을 같이 보여준다.</p>
+</section>
+
+<section id="ui">
+  <h2>UI 규칙</h2>
+  <ul class="small">
+    <li>한 화면 한 질문. 상단에 챕터 진행(A~G)과 "이 답은 → ○○에 쓰입니다" 라벨.</li>
+    <li>선택지는 가능한 한 이미지·영상 카드. 카드는 같은 가상의 빵집을 각 옵션으로 렌더한 실제 생성물(캐시).</li>
+    <li>선택 문항은 "건너뛰기 — 기본값: ○○" 버튼으로 기본값을 미리 보여준다.</li>
+    <li>자동 저장(localStorage + 로그인 시 서버). 새로고침해도 이어서.</li>
+    <li>G 요약 카드: 원형 이름, 팔레트 칩, 서체 샘플(한글 헤드라인), 히어로 장면 문장, 슬롯표(업로드/생성), 예상 비용·시간. 각 항목 클릭 → 해당 챕터로.</li>
+    <li>모바일에서도 완주 가능(사진 업로드는 모바일이 오히려 주 경로).</li>
+    <li>길이 최적화는 나중: 지금은 누락 없이. 완주율·챕터별 이탈은 로그로 남긴다.</li>
+  </ul>
+</section>
+
+<section id="accept">
+  <h2>수용 기준</h2>
+  <ol class="small" style="max-width:72ch">
+    <li>브리프 완료 시 <code>decided</code> 필수 필드 100% 채움(스키마 검증 통과).</li>
+    <li>같은 <code>brief</code> 입력 → 바이트 동일 <code>decided</code>(카피 LLM 다듬기 제외). 단위 테스트로 고정.</li>
+    <li>24문항 전부 Direction Sheet 필드에 매핑됨. 매핑 없는 문항 0.</li>
+    <li>사진 등급기가 실제 폰 사진 30장 세트에서 사람 판정과 80% 이상 일치.</li>
+    <li>세계관 6종 × 산업 12종 조합에서 styleLockPrompt·shotList가 전부 생성되고 실사 인물 절이 없음.</li>
+    <li>G 요약 카드의 예상 비용이 실제 과금과 ±20% 이내.</li>
+    <li>생성물이 CSSDA 실측표 통과: 헤딩 ≥ 90px/400, idle ≥ 0.03, journey 0.35~0.6, 핀 ≥ 3(normal 이상), 쿠키 배너 0, 가짜 숫자 0.</li>
+  </ol>
+</section>
+
+<section id="build">
+  <h2>구현 순서</h2>
+  <div class="flow">
+    <div><span class="i">1</span><span><code>app/lib/onboarding/brief-schema.ts</code> — DirectionSheet 타입 + zod 스키마 + 기본값. <code>question-bank.ts</code>에 A~E 문항 정의 추가(F는 기존 Q1·Q2·Q4 재사용).</span></div>
+    <div><span class="i">2</span><span><code>app/lib/onboarding/direction-sheet.ts</code> — <code>decide(brief): decided</code> 순수 함수 + spec 테스트(결정론·원형 표·섹션 규칙). <code>answer-directives.ts</code>는 <code>promptAdditions</code>만 이 시트에서 뽑도록 축소.</span></div>
+    <div><span class="i">3</span><span><code>app/lib/media/photo-grade.ts</code> — 브라우저 canvas 등급기 + 30장 픽스처 테스트.</span></div>
+    <div><span class="i">4</span><span><code>app/lib/media/style-locks.ts</code> — 세계관 6종 STYLE_LOCK 문자열(painterly.ts STYLE 승격) + 산업 12종 샷리스트 확장. <code>skeleton7-image-set.ts</code>가 시트의 shotList를 그대로 받도록 변경.</span></div>
+    <div><span class="i">5</span><span><code>PromptClarification.tsx</code> → 챕터형 <code>DeepBrief.tsx</code>(A~G). 선택지 카드 이미지는 <code>public/brief/</code>에 사전 생성 캐시.</span></div>
+    <div><span class="i">6</span><span>킷 연결: <code>decided.kit</code> → 시네마틱 킷 props, <code>decided.archetype</code> → 데모 App 템플릿 8종. painted-sequence용 <code>ScrollSequence</code> 컴포넌트(프레임 스크럽) 추가.</span></div>
+    <div><span class="i">7</span><span>실측 게이트: 생성 후 <code>motion.mjs</code>/헤딩 검사로 수용 기준 7번 자동 판정. 실패 시 재생성 아닌 파라미터 보정(핀 수·헤딩 px).</span></div>
+  </div>
+  <div class="callout ok"><p><b>사용자가 결정할 것:</b> ① 세계관 6종 이름·순서(위 표) ② 챕터 F를 브리프 안에 둘지, 생성 직전 별도 화면으로 뺄지 ③ 미리보기 카드용 가상 브랜드(빵집 "밀도"로 통일 제안) ④ 회화 인물 허용 기본값 = 켬.</p></div>
+</section>
+<footer>근거: CSSDA 90개 실측(tests/benchmark/cssda), 릴스 7개 식별(Pear·Edolus·Alche…), 회화 스틸+Seedance 실험(paint-mtwxsa5k, cmpmtwxt34b). 기존 온보딩: app/lib/onboarding/question-bank.ts · answer-directives.ts · PromptClarification.tsx</footer>
+</div>

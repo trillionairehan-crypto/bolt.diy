@@ -73,7 +73,8 @@ async function runOne(
       imageUrl,
       durationSec: 5,
       loop,
-      prompt: buildLoopMotionPrompt(argValue('--industry') || '카페·음식점'),
+      // --prompt 로 모션 프롬프트를 통째로 바꿀 수 있다(회화 스타일 시퀀스 실험용). 기본은 산업별 루프 프롬프트.
+      prompt: argValue('--prompt') || buildLoopMotionPrompt(argValue('--industry') || '카페·음식점'),
     });
     const createMs = Date.now() - started;
     console.log(`[${provider.name}] task ${taskId} created in ${createMs}ms`);
