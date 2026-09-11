@@ -137,14 +137,15 @@ describe('direction-sheet: 결정 규칙', () => {
     expect(decide({ ...base, world: { styleLock: 'neoclassical-painting' } }).typePreset).toBe('serif');
   });
 
-  it('테마: 회화·실사·브루탈 = light, 단색 월드는 accent 명도로', () => {
+  it('테마: 회화·브루탈·그래픽노블 = light, 실사만 어두운 강조색/무드로 dark 변형', () => {
     expect(decide(base).theme).toBe('light');
+    expect(decide({ ...base, palette: { accent: '#1a0a05', source: 'hex' } }).theme).toBe('dark');
+    expect(decide({ ...base, mood: { yes: ['어두운'], no: [] } }).theme).toBe('dark');
     expect(
-      decide({ ...base, world: { styleLock: 'mono-color' }, palette: { accent: '#1a0a05', source: 'hex' } }).theme,
-    ).toBe('dark');
-    expect(
-      decide({ ...base, world: { styleLock: 'mono-color' }, palette: { accent: '#f5d0a9', source: 'hex' } }).theme,
+      decide({ ...base, world: { styleLock: 'ink-graphic-novel' }, palette: { accent: '#1a0a05', source: 'hex' } })
+        .theme,
     ).toBe('light');
+    expect(decideArchetype({ ...base, world: { styleLock: 'ink-graphic-novel' } })).toBe('graphic-novel');
   });
 
   it('promptAdditions: 브랜드·아이디어·세계관·섹션·선언문 포함, 숫자 없으면 증거 줄 없음', () => {

@@ -4,6 +4,7 @@
  *
  * 근거: CSSDA 수상작 90개 실측 + 릴스 7개 식별(2026-09-11). 각 세계관은 실제 상위 수상작 하나를 기준으로 삼는다.
  * 인물 정책(2026-09-11 사용자 결정): 실사 인물은 사용자 사진만. 생성 인물은 회화·일러스트 세계관에서만, 얼굴 클로즈업 없이.
+ * 2026-09-11 밤: '단색 컬러 월드'(AI 트로프, 사용자 판정 최악) → '잉크 그래픽 노블'(Santioni 9.5)로 교체. 다크는 월드가 아니라 실사 에디토리얼의 테마 변형(규칙이 명도로 결정).
  */
 
 export type WorldId =
@@ -12,7 +13,7 @@ export type WorldId =
   | 'watercolor-illustration'
   | 'product-3d'
   | 'mono-brutal'
-  | 'mono-color';
+  | 'ink-graphic-novel';
 
 export type PeoplePolicy = 'none' | 'painted-only';
 
@@ -145,23 +146,25 @@ export const WORLDS: World[] = [
     treatment: 'halftone',
   },
   {
-    id: 'mono-color',
-    label: '단색 컬러 월드',
-    reference: '/zeroz 8.67 · Volt 8.77 · Orgnzm 8.67',
-    theme: 'dark',
-    peoplePolicy: 'none',
-    typePreset: 'grotesk',
+    id: 'ink-graphic-novel',
+    label: '잉크 그래픽 노블',
+    reference: 'Santioni Spirits 9.5 (WOTM)',
+    theme: 'light',
+    peoplePolicy: 'painted-only',
+    typePreset: 'compact',
     styleLock: (accent) =>
       [
-        `An entire world rendered in one hue: every surface, the backdrop, the light and the object are shades and tints of ${accent}, from near-black to near-white of that same hue.`,
-        'Glossy 3D-like surfaces, soft volumetric glow, floating geometric shapes and the hero object suspended in the color field.',
-        NO_PEOPLE,
-        NO_TEXT,
+        'Hand-inked graphic-novel panel: confident brush-and-nib line work, cross-hatched shadows, flat fills in only three inks — paper white, black, and one spot color close to ' +
+          accent +
+          ' — no gradients, no photographic texture.',
+        'Bold graphic composition with a single dominant shape and generous empty paper; halftone dots only in shadows.',
+        'Figures, if any, are drawn characters at medium distance, faces simplified to a few strokes, never photographic.',
+        'No speech bubbles, no lettering, no panel borders, no watermarks.',
         HEADLINE_ROOM,
       ].join(' '),
     motion:
-      'Shapes and the hero object drift and rotate slowly in the color field, volumetric glow pulses, a soft particle haze moves; camera locked.',
-    treatment: 'duotone',
+      'The panel breathes like a motion comic: a slow push-in on the dominant shape, ink hatching shimmers, the spot-color area pulses once; nothing new is drawn; camera otherwise locked.',
+    treatment: 'halftone',
   },
 ];
 

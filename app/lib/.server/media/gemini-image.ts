@@ -39,6 +39,9 @@ export interface GeminiImageInput {
 
   /** 레퍼런스 이미지(체이닝). 있으면 프롬프트 앞에 이미지 파트로 붙는다. */
   reference?: { bytes: Uint8Array; mimeType: string };
+
+  /** 스타일 앵커 레퍼런스(여러 장). 체이닝 reference 뒤에 붙는다 — "이 결로 찍어라"용, 내용 복제용 아님. */
+  references?: Array<{ bytes: Uint8Array; mimeType: string }>;
   model?: string;
   timeoutMs?: number;
   signal?: AbortSignal;
@@ -112,6 +115,10 @@ export async function generateGeminiImage(input: GeminiImageInput): Promise<Gemi
 
   if (input.reference) {
     parts.push({ inlineData: { mimeType: input.reference.mimeType, data: bytesToBase64(input.reference.bytes) } });
+  }
+
+  for (const ref of input.references ?? []) {
+    parts.push({ inlineData: { mimeType: ref.mimeType, data: bytesToBase64(ref.bytes) } });
   }
 
   parts.push({ text: input.prompt });

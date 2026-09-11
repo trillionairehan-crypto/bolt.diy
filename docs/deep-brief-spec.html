@@ -48,6 +48,7 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line);font-si
 <section id="why">
   <h2>원칙</h2>
   <p class="lead">CSSDA 수상작 90개 분석의 결론: 점수를 가르는 건 기술이 아니라 <b>한 아이디어의 일관성</b>이다. 일관성은 규칙이 보장한다. 규칙이 못 하는 건 "이 브랜드의 아이디어 하나"를 정하는 일 — 그걸 브리프가 사용자에게서 뽑아낸다.</p>
+  <div class="callout warn"><p><b>2026-09-11 밤 개정.</b> ① 제품 원칙 전환: "사용자 우선"이 아니라 <b>"결과 우선 — 우리가 정하고 사용자는 확인한다"</b>. 세계관·서체·팔레트·모션은 규칙이 결정, 사용자 입력은 사실(사진·숫자·상호·연락)과 아이디어 한 문장에 집중. ② B1은 고정 카드 6장으로 방향만 잡고, 규칙이 고른 상위 3개 세계관을 <b>사용자 브랜드로 개인화 생성</b>(AD 루프, 2~3분, ≈$2)해 G에서 확정. ③ 미디어 생성은 <b>AD 루프</b>(GPT-6 Astra 브리프 → 생성기 → Fable+Astra 이중 심사 → 8.5 미만 재시도, 오브젝트 예산 3개·글자·손 금지) — 생성기는 베이크오프로 세계관별 고정. ④ '단색 컬러 월드' 삭제 → '잉크 그래픽 노블'(Santioni 9.5). 다크는 실사 에디토리얼의 테마 변형.</p></div>
   <ol class="principles">
     <li><b>애매한 질문 금지.</b> 모든 문항은 Direction Sheet의 필드 하나 이상에 직접 매핑된다. 매핑 없는 질문은 삭제한다. 화면에도 "이 답은 → 히어로 장면"처럼 용도를 표기한다.</li>
     <li><b>보여주고 고르게 한다.</b> 스타일·팔레트·모션 강도는 글자가 아니라 미리보기 이미지·짧은 영상으로 고른다. 사용자는 형용사를 못 고르지만 그림은 고른다.</li>
@@ -97,7 +98,7 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line);font-si
   <h3>B. 세계관</h3>
   <div class="tablewrap"><table>
     <tr><th style="width:36px">#</th><th style="width:34%">질문</th><th>입력</th><th>→ 필드</th><th>영향</th></tr>
-    <tr><td class="mono">B1 <span class="pill req">필수</span></td><td><span class="q">어떤 세계관이 마음에 드나요?</span><br><span class="t">6장 미리보기 카드(같은 빵집을 6가지로 렌더한 실제 생성 이미지). 글자 설명 최소</span></td><td>단일 선택: <b>실사 에디토리얼</b> / <b>신고전주의 회화</b>(Pear) / <b>수채·일러스트</b>(100 Lost Species) / <b>제품 오브젝트 3D</b>(The Watch) / <b>흑백 브루탈</b>(Aspen) / <b>단색 컬러 월드</b>(/zeroz)</td><td><code>world.styleLock</code></td><td>이미지·영상 프롬프트 STYLE_LOCK 문자열, 인물 허용 여부(회화·일러스트만), 트리트먼트 기본값, 원형</td></tr>
+    <tr><td class="mono">B1 <span class="pill req">필수</span></td><td><span class="q">어떤 세계관이 마음에 드나요?</span><br><span class="t">6장 미리보기 카드(같은 빵집을 6가지로 렌더한 실제 생성 이미지). 글자 설명 최소</span></td><td>단일 선택: <b>실사 에디토리얼</b> / <b>신고전주의 회화</b>(Pear) / <b>수채·일러스트</b>(100 Lost Species) / <b>제품 오브젝트 3D</b>(The Watch) / <b>흑백 브루탈</b>(Aspen) / <b>잉크 그래픽 노블</b>(Santioni Spirits 9.5)</td><td><code>world.styleLock</code></td><td>이미지·영상 프롬프트 STYLE_LOCK 문자열, 인물 허용 여부(회화·일러스트만), 트리트먼트 기본값, 원형</td></tr>
     <tr><td class="mono">B2 <span class="pill req">필수</span></td><td><span class="q">색은 하나만 고르세요.</span><br><span class="t">12색 칩 + "사진에서 뽑기"(C1 업로드 후 자동 추출 3개 제안) + 직접 HEX</span></td><td>단일 색</td><td><code>palette.accent</code>, <code>palette.source</code></td><td>--accent, 듀오톤·하이라이트·CTA. 라이트/다크는 B1 스타일에서 결정(사용자에게 안 묻는다)</td></tr>
     <tr><td class="mono">B3 <span class="pill req">필수</span></td><td><span class="q">느낌을 세 단어로. 그리고 절대 아닌 세 단어.</span><br><span class="t">칩 24개(따뜻한·정직한·고요한·대담한·장인·현대적·고전적·유쾌한·엄격한·부드러운…) + 직접 입력</span></td><td>3개 + 3개</td><td><code>mood.yes[]</code>, <code>mood.no[]</code></td><td>카피 톤, 서체 프리셋 보정(고전적→serif, 대담한→compact), 프롬프트 형용사, 금지 요소</td></tr>
     <tr><td class="mono">B4 <span class="pill opt">선택</span></td><td><span class="q">좋아하는 사이트·인스타·영상 링크를 붙여 주세요. 몇 개든.</span><br><span class="t">붙이면 자동 캡처 썸네일 + "여기서 뭐가 좋았나요?" 칩(색/움직임/사진/글자/분위기)</span></td><td>URL 목록 + 칩</td><td><code>refs[]</code> {url, liked[]}</td><td>원형 보정(사이트 실측 tech/motion 스크립트로 자동 분류), 모션 강도 기본값</td></tr>
@@ -149,7 +150,7 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line);font-si
     industry: string; industryFree?: string;
     idea: { sentence: string; scene: string; sceneType: 'object'|'space'|'hands'|'material'|'landscape'|'abstract' };
     goal?: 'call'|'visit'|'buy'|'inquiry'|'portfolio'|'hire';
-    world: { styleLock: 'photo-editorial'|'neoclassical-painting'|'watercolor-illustration'|'product-3d'|'mono-brutal'|'mono-color' };
+    world: { styleLock: 'photo-editorial'|'neoclassical-painting'|'watercolor-illustration'|'product-3d'|'mono-brutal'|'ink-graphic-novel' };
     palette: { accent: string; source: 'chip'|'photo'|'hex' };
     mood: { yes: string[]; no: string[] };
     refs: Array&lt;{ url: string; liked: Array&lt;'color'|'motion'|'photo'|'type'|'mood'&gt;; measured?: RefMetrics }&gt;;
@@ -166,7 +167,7 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line);font-si
     app: { audience: Q1Value; storage: Q2Value; integrations: string[] };
   };
   decided: {                    // 규칙이 계산 (LLM 없음)
-    archetype: 'product-story'|'light-editorial'|'brutal-grid'|'agency-showcase'|'painted-sequence'|'illustrated-archive'|'color-world'|'typo-editorial';
+    archetype: 'product-story'|'light-editorial'|'brutal-grid'|'agency-showcase'|'painted-sequence'|'illustrated-archive'|'graphic-novel'|'typo-editorial';
     skeleton: 7 | SkeletonId;
     theme: 'light'|'dark'; accentHex: string; surfaceHex: string; textHex: string;
     typePreset: 'grotesk'|'serif'|'compact';
@@ -195,7 +196,7 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line);font-si
         <tr><td>styleLock = watercolor-illustration</td><td>illustrated-archive (100 Lost Species)</td></tr>
         <tr><td>styleLock = product-3d 또는 sceneType = object &amp; industry ∈ {shopping, cafe, beauty}</td><td>product-story (The Watch·NOTA)</td></tr>
         <tr><td>styleLock = mono-brutal 또는 industry ∈ {freelance, clinic-b2b}</td><td>brutal-grid (Aspen)</td></tr>
-        <tr><td>styleLock = mono-color</td><td>color-world (/zeroz)</td></tr>
+        <tr><td>styleLock = ink-graphic-novel</td><td>graphic-novel (Santioni)</td></tr>
         <tr><td>industry = freelance &amp; goal = portfolio</td><td>agency-showcase (Revelatio)</td></tr>
         <tr><td>sceneType ∈ {space, landscape} 또는 industry = realestate</td><td>light-editorial (Lidar·Cula)</td></tr>
         <tr><td>media.uploads 전부 C등급 &amp; generate = false</td><td>typo-editorial (Triadic) — 이미지 없이 타이포로</td></tr>
@@ -203,7 +204,7 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line);font-si
       </table></div>
       <h3>테마·서체</h3>
       <ul class="small">
-        <li><b>theme:</b> painting·brutal·illustrated·product = light. mono-color = accent 명도로(L&lt;50 → dark). photo-editorial = 히어로 사진 평균 명도로. 사용자에게 묻지 않음(수상작 76% 라이트).</li>
+        <li><b>theme:</b> painting·brutal·illustrated·product·graphic-novel = light. photo-editorial 만 다크 변형: 강조색 명도 L&lt;0.35 또는 무드 '어두운' → dark(Cipher Digital·HACKFIRST). 사용자에게 묻지 않음(수상작 76% 라이트).</li>
         <li><b>typePreset:</b> B5 답 우선. 없으면 painting → serif, brutal·fitness·agency → compact, 그 외 grotesk. mood.yes에 '고전적' 있으면 serif, '대담한' 있으면 compact.</li>
         <li><b>accent 보정:</b> 회화 = 채도 -20% 명도 -10%(안료 느낌). brutal = 형광 유지. 텍스트·서피스는 accent에서 OKLCH로 파생.</li>
       </ul>
@@ -211,7 +212,7 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line);font-si
     <div>
       <h3>미디어·슬롯</h3>
       <ul class="small">
-        <li><b>peoplePolicy:</b> styleLock ∈ {painting, illustration} &amp; allowPaintedPeople → painted-only. 그 외 none. 사용자 사진 속 실사 인물은 항상 허용(user-photos-only).</li>
+        <li><b>peoplePolicy:</b> styleLock ∈ {painting, illustration, graphic-novel} &amp; allowPaintedPeople → painted-only. 그 외 none. 사용자 사진 속 실사 인물은 항상 허용(user-photos-only).</li>
         <li><b>슬롯 배정:</b> 각 슬롯에 A등급 업로드 있으면 그것, 없으면 B등급 + 트리트먼트(산업별 기본: 식음 grain, 서비스 mono, 공간 duotone), 없으면 generate=true일 때 생성, 아니면 슬롯 비움 → 섹션 축소.</li>
         <li><b>styleLockPrompt:</b> 세계관별 고정 문자열(painterly.ts STYLE 등 6종) + accent 힌트 + mood.yes 형용사 2개 + mood.no 부정절.</li>
         <li><b>video:</b> C4 있으면 upload. 없으면 motion ≠ quiet → seedance(loop). painted-sequence면 mode=sequence(5초 → 프레임 60장 스크럽).</li>

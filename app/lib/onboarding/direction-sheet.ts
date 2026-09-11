@@ -58,8 +58,8 @@ export function decideArchetype(brief: Brief): Archetype {
     return 'brutal-grid';
   }
 
-  if (w === 'mono-color') {
-    return 'color-world';
+  if (w === 'ink-graphic-novel') {
+    return 'graphic-novel';
   }
 
   if (brief.idea.sceneType === 'object' && isIndustry(brief, 'shopping', 'cafe', 'beauty')) {
@@ -103,8 +103,9 @@ export function decideTypePreset(brief: Brief, world: World): TypePreset {
 
 /** 회화·브루탈은 항상 라이트, 단색 월드는 accent 명도로, 실사는 히어로 사진 명도로(없으면 라이트). 사용자에게 묻지 않는다. */
 export function decideTheme(brief: Brief, world: World): 'light' | 'dark' {
-  if (world.id === 'mono-color') {
-    return luminance(brief.palette.accent) < 0.5 ? 'dark' : 'light';
+  // 실사 에디토리얼만 다크 변형이 있다: 강조색이 어둡거나 무드에 '어두운'이 있으면 다크(Cipher Digital·HACKFIRST 문법).
+  if (world.id === 'photo-editorial' && (luminance(brief.palette.accent) < 0.35 || brief.mood.yes.includes('어두운'))) {
+    return 'dark';
   }
 
   return world.theme;

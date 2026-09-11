@@ -54,7 +54,7 @@ const SUBJECT: Record<WorldId, string> = {
   // 1차(price tag)는 글자 없는 주황 덩어리로 렌더돼 결함처럼 보였다 → 색 포인트를 "빵 하나의 크러스트"로 바꾼다.
   'mono-brutal':
     'A stack of salt-bread rolls shot top-down on a black steel tray, one roll broken open, coarse salt scattered; exactly one roll keeps its natural burnt-orange crust color while everything else is monochrome.',
-  'mono-color':
+  'ink-graphic-novel':
     'A salt-bread roll suspended in a world made entirely of burnt-orange tones, floating geometric slabs and a soft glowing sphere behind it.',
 };
 

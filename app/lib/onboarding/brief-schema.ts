@@ -100,7 +100,7 @@ export type Archetype =
   | 'agency-showcase'
   | 'painted-sequence'
   | 'illustrated-archive'
-  | 'color-world'
+  | 'graphic-novel'
   | 'typo-editorial';
 export type Section = 'hero' | 'statement' | 'chapters' | 'numbers' | 'marquee' | 'gallery' | 'contact';
 
