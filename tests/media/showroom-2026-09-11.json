@@ -73,5 +73,17 @@
     "usage": {
       "completion_tokens": 108900
     }
+  },
+  "ink-graphic-novel": {
+    "stills": [
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/ink-graphic-novel/still-mtx3xd1l-0.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/ink-graphic-novel/still-mtx3xrl6-1.jpg",
+      "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/ink-graphic-novel/still-mtx3y72o-2.jpg"
+    ],
+    "picked": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/ink-graphic-novel/still-mtx3xrl6-1.jpg",
+    "video": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/ink-graphic-novel/hero-mtx43iz0.mp4",
+    "usage": {
+      "completion_tokens": 109586
+    }
   }
 }

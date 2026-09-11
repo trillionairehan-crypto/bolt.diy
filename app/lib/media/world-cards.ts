@@ -51,6 +51,7 @@ export const WORLD_CARDS: Record<WorldId, WorldCardMedia> = {
   'ink-graphic-novel': {
     // 2026-09-12 생성(gpt-image-2.5-flare, 3장 중 1) — 왼쪽 종이 여백이 헤드라인 자리.
     still: `${R2}/ink-graphic-novel/still-mtx3xrl6-1.jpg`,
+    video: `${R2}/ink-graphic-novel/hero-mtx43iz0.mp4`,
     ink: 'dark',
     headline: '오븐 앞,\n한 사람',
     sub: '붓 몇 획의 인물과 잉크 그림자. 만화 한 컷이 살아 움직이는 세계.',

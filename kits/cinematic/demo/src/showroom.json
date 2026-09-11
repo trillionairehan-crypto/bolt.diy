@@ -118,14 +118,15 @@
     "sub": "흑백 망점 위에 색 하나. 단호한 세계."
   },
   {
-    "id": "mono-color",
-    "label": "단색 컬러 월드",
-    "reference": "/zeroz 8.67 · Volt 8.77",
-    "theme": "dark",
-    "typePreset": "grotesk",
-    "still": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-color/still-mtwyop4r-0.jpg",
-    "video": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-color/hero-mtwzask5.mp4",
-    "headline": "오븐 속\n한 가지 색",
-    "sub": "온 세상이 한 색. 빛과 오브젝트가 떠다니는 세계."
+    "id": "ink-graphic-novel",
+    "label": "잉크 그래픽 노블",
+    "reference": "Santioni Spirits 9.5 (WOTM)",
+    "theme": "light",
+    "typePreset": "compact",
+    "still": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/ink-graphic-novel/still-mtx3xrl6-1.jpg",
+    "video": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/ink-graphic-novel/hero-mtx43iz0.mp4",
+    "headline": "오븐 앞,\n한 사람",
+    "sub": "붓 몇 획의 인물과 잉크 그림자. 만화 한 컷이 살아 움직이는 세계.",
+    "ink": "dark"
   }
 ]

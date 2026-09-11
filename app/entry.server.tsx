@@ -80,7 +80,14 @@ export default async function handleRequest(
 
   responseHeaders.set('Content-Type', 'text/html');
 
-  responseHeaders.set('Cross-Origin-Embedder-Policy', 'require-corp');
+  /*
+   * COEP require-corp 는 WebContainer(SharedArrayBuffer) 때문에 필요하지만, /brief 미리보기는 WebContainer 를 쓰지 않고
+   * R2 공개 버킷 미디어(CORP 헤더 없음)를 그대로 보여줘야 하므로 이 경로만 제외한다.
+   */
+  if (!new URL(request.url).pathname.startsWith('/brief')) {
+    responseHeaders.set('Cross-Origin-Embedder-Policy', 'require-corp');
+  }
+
   responseHeaders.set('Cross-Origin-Opener-Policy', 'same-origin');
 
   return new Response(body, {
