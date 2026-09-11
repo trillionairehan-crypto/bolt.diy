@@ -1065,12 +1065,9 @@ export const ChatImpl = memo(
        * 골격 7 이미지 세트 — 골격 7이 기본값이면 생성과 동시에 시작(LLM 생성 안에 끝난다), 아니면
        * 재료만 기억해 생성물이 골격 7로 나올 때 시작한다. 주입은 자동 검토 뒤(applySkeleton7Images).
        */
-      const mediaChatId = chatId.get();
-
-      if (mediaChatId && directives.industry) {
+      if (directives.industry) {
         const palette = getActivePalette();
         const jobInput = {
-          chatId: mediaChatId,
           industry: directives.industry,
           prompt: finalPrompt.split(ONBOARDING_ADDITIONS_MARKER)[0].trim(),
           accentHex: palette.accent,

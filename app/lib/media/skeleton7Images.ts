@@ -1,4 +1,5 @@
 import { workbenchStore } from '~/lib/stores/workbench';
+import { chatId as chatIdAtom, ensureChatId } from '~/lib/persistence';
 import { selectReviewableEntries } from '~/utils/reviewGeneratedApp';
 import { createScopedLogger } from '~/utils/logger';
 import { injectSkeleton7Images, type Skeleton7ImageUrls } from './injectSkeleton7Images';
@@ -19,7 +20,6 @@ import { isSkeleton7File } from '~/lib/review/mechanical-checks';
 const logger = createScopedLogger('Skeleton7Images');
 
 export interface Skeleton7ImageJobInput {
-  chatId: string;
   industry: string;
   prompt: string;
   accentHex: string;
@@ -27,7 +27,6 @@ export interface Skeleton7ImageJobInput {
 }
 
 interface PendingJob {
-  chatId: string;
   promise: Promise<Skeleton7ImageUrls | null>;
 }
 
@@ -36,7 +35,19 @@ const REQUEST_TIMEOUT_MS = 250_000;
 let pending: PendingJob | null = null;
 let lastInput: Skeleton7ImageJobInput | null = null;
 
+/*
+ * 실측(2026-09-11): 온보딩이 끝나는 시점(handleClarificationComplete)에 chatId 아톰은 아직 undefined다 —
+ * PromptClarification의 saveOnboardingResponse가 ensureChatId()를 await 없이 돌리기 때문. 그래서 chatId는
+ * 호출부에서 받지 않고 요청 직전에 여기서 직접 확정한다.
+ */
 async function requestImageSet(input: Skeleton7ImageJobInput): Promise<Skeleton7ImageUrls | null> {
+  const chatId = (await ensureChatId().catch(() => undefined)) ?? chatIdAtom.get();
+
+  if (!chatId) {
+    logger.warn('image set skipped — no chatId');
+    return null;
+  }
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
@@ -44,7 +55,7 @@ async function requestImageSet(input: Skeleton7ImageJobInput): Promise<Skeleton7
     const response = await fetch('/api/media-images', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(input),
+      body: JSON.stringify({ ...input, chatId }),
       signal: controller.signal,
     });
 
@@ -65,15 +76,16 @@ async function requestImageSet(input: Skeleton7ImageJobInput): Promise<Skeleton7
   }
 }
 
-/** 생성 시작 직후 호출 — 결과는 기다리지 않는다. 같은 chatId로 이미 진행 중이면 다시 시작하지 않는다. */
+/** 생성 시작 직후 호출 — 결과는 기다리지 않는다. 이미 진행 중이면 다시 시작하지 않는다. */
 export function startSkeleton7ImageJob(input: Skeleton7ImageJobInput): void {
   lastInput = input;
 
-  if (pending && pending.chatId === input.chatId) {
+  if (pending) {
     return;
   }
 
-  pending = { chatId: input.chatId, promise: requestImageSet(input) };
+  logger.info('image set job started', { industry: input.industry });
+  pending = { promise: requestImageSet(input) };
 }
 
 /** 골격 7 기본값이 아닐 때 — 시작은 안 하고 재료만 기억해둔다(생성물이 골격 7로 나오면 그때 시작). */
@@ -95,6 +107,8 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
     if (pending) {
       logger.info('generated app is not skeleton 7 — discarding pre-started image set');
       pending = null;
+    } else {
+      logger.info('generated app is not skeleton 7 — nothing to inject');
     }
 
     return null;
@@ -102,9 +116,11 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
 
   if (!pending) {
     if (!lastInput) {
+      logger.warn('skeleton 7 detected but no onboarding context — image set skipped');
       return null;
     }
 
+    logger.info('skeleton 7 detected after generation — starting image set now');
     startSkeleton7ImageJob(lastInput);
   }
 
