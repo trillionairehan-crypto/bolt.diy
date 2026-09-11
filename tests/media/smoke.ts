@@ -39,10 +39,6 @@ async function main() {
   const apiKey = env.GOOGLE_GENERATIVE_AI_API_KEY;
   const r2 = readR2Config(env);
 
-  if (!apiKey) {
-    throw new Error('GOOGLE_GENERATIVE_AI_API_KEY missing');
-  }
-
   if (!r2) {
     throw new Error(
       'R2 env incomplete (CLOUDFLARE_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_BASE_URL)',
@@ -50,7 +46,24 @@ async function main() {
   }
 
   const full = process.argv.includes('--full');
+  const r2Only = process.argv.includes('--r2-only');
   const started = Date.now();
+
+  if (r2Only) {
+    // Gemini 없이 R2 자격증명·버킷·공개 URL만 확인: 1KB 텍스트 PUT → 공개 URL HEAD.
+    const key = `media/smoke/${started}-ping.txt`;
+    const url = await putR2Object(r2, key, new TextEncoder().encode(`ping ${started}`), 'text/plain');
+    const head = await fetch(url, { method: 'HEAD' });
+    console.log('r2 put ok', url);
+    console.log('public HEAD', head.status, head.headers.get('content-type'));
+    console.log('total ms', Date.now() - started);
+
+    return;
+  }
+
+  if (!apiKey) {
+    throw new Error('GOOGLE_GENERATIVE_AI_API_KEY missing');
+  }
 
   if (full) {
     const set = await generateSkeleton7ImageSet(
