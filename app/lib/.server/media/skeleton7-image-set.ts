@@ -1,4 +1,5 @@
 import { generateGeminiImage, type GeminiImageResult } from './gemini-image';
+import { generateSeedreamImage } from './seedream-image';
 import { putR2Object, r2PublicUrl, type R2Config } from './r2';
 import { pickShotList } from '~/lib/media/shotlist';
 
@@ -28,7 +29,19 @@ export interface Skeleton7ImageSetInput {
   /** 팔레트 액센트 hex — 색감 고정에 힌트로만 쓴다. */
   accentHex: string;
   darkPalette: boolean;
+
+  /**
+   * 딥 브리프 Direction Sheet(decided) 에서 온 연출 — 있으면 기본 STYLE_LOCK·샷리스트 대신 쓴다.
+   * shots 는 슬롯별 프롬프트 주어(ShotPlan.prompt), styleLockPrompt 는 세계관 STYLE_LOCK + 무드 + 인물 절.
+   * 없는 슬롯은 기본 샷리스트로 채운다.
+   */
+  direction?: {
+    styleLockPrompt: string;
+    shots: Partial<Record<Skeleton7Slot, string>>;
+  };
 }
+
+export type ImageProvider = 'gemini' | 'seedream';
 
 export interface Skeleton7ImageSet {
   images: Record<Skeleton7Slot, string>;
@@ -43,6 +56,11 @@ export interface Skeleton7ImageSetDeps {
   apiKey: string;
   r2: R2Config;
   signal?: AbortSignal;
+
+  /** 기본 gemini(프로덕션 그대로). seedream 은 IMAGE_PROVIDER=seedream + ARK_API_KEY 일 때만. */
+  provider?: ImageProvider;
+  arkApiKey?: string;
+  seedreamModel?: string;
 }
 
 /*
@@ -61,21 +79,39 @@ const STYLE_LOCK = (accentHex: string, dark: boolean) =>
     'No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks.',
   ].join(' ');
 
+function styleLockFor(input: Skeleton7ImageSetInput): string {
+  return input.direction?.styleLockPrompt || STYLE_LOCK(input.accentHex, input.darkPalette);
+}
+
+function subjectFor(slot: Skeleton7Slot, input: Skeleton7ImageSetInput): string {
+  return input.direction?.shots[slot] || pickShotList(input.industry)[slot];
+}
+
 function buildHeroPrompt(input: Skeleton7ImageSetInput): string {
   return [
     `Hero photograph for a Korean small business website. Business: ${input.industry}. What the owner asked for: "${input.prompt}".`,
-    pickShotList(input.industry).hero,
-    STYLE_LOCK(input.accentHex, input.darkPalette),
+    subjectFor('hero', input),
+    styleLockFor(input),
   ].join('\n');
 }
 
 function buildChapterPrompt(slot: Exclude<Skeleton7Slot, 'hero'>, input: Skeleton7ImageSetInput): string {
   return [
     `Continue the same photo series as the reference image (same place, same palette, same light). Business: ${input.industry}.`,
-    pickShotList(input.industry)[slot],
+    subjectFor(slot, input),
     'Match the reference image exactly in color grading, lighting, and texture. Different subject and framing, same world.',
-    STYLE_LOCK(input.accentHex, input.darkPalette),
+    styleLockFor(input),
   ].join('\n');
+}
+
+/** 슬롯별 최종 프롬프트 — 테스트·로그용. 생성 경로와 같은 함수를 쓴다. */
+export function buildSkeleton7Prompts(input: Skeleton7ImageSetInput): Record<Skeleton7Slot, string> {
+  return {
+    hero: buildHeroPrompt(input),
+    ch1: buildChapterPrompt('ch1', input),
+    ch2: buildChapterPrompt('ch2', input),
+    ch3: buildChapterPrompt('ch3', input),
+  };
 }
 
 /*
@@ -109,14 +145,24 @@ export async function generateSkeleton7ImageSet(
   let model = '';
   let previous: GeminiImageResult | null = null;
 
+  const useSeedream = deps.provider === 'seedream' && !!deps.arkApiKey;
+
   for (const slot of SKELETON7_SLOTS) {
-    const result = await generateGeminiImage({
-      apiKey: deps.apiKey,
-      prompt: slot === 'hero' ? buildHeroPrompt(input) : buildChapterPrompt(slot, input),
-      aspectRatio: slot === 'hero' ? '16:9' : '4:3',
-      reference: previous ? { bytes: previous.bytes, mimeType: previous.mimeType } : undefined,
-      signal: deps.signal,
-    });
+    const prompt = slot === 'hero' ? buildHeroPrompt(input) : buildChapterPrompt(slot, input);
+    const aspectRatio = slot === 'hero' ? '16:9' : '4:3';
+    const reference: { bytes: Uint8Array; mimeType: string } | undefined = previous
+      ? { bytes: previous.bytes, mimeType: previous.mimeType }
+      : undefined;
+    const result: GeminiImageResult = useSeedream
+      ? await generateSeedreamImage({
+          apiKey: deps.arkApiKey!,
+          model: deps.seedreamModel,
+          prompt,
+          aspectRatio,
+          references: reference ? [reference] : undefined,
+          signal: deps.signal,
+        })
+      : await generateGeminiImage({ apiKey: deps.apiKey, prompt, aspectRatio, reference, signal: deps.signal });
 
     images[slot] = await putR2Object(deps.r2, skeleton7ObjectKey(input.jobId, slot), result.bytes, result.mimeType);
 

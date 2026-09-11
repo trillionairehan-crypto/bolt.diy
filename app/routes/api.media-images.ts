@@ -4,7 +4,14 @@ import { getPlatformUserId } from '~/lib/cloud/cloudPlatformAuth';
 import { recordMessageUsageInBackground } from '~/lib/cloud/messageUsage';
 import { GeminiImageError } from '~/lib/.server/media/gemini-image';
 import { R2UploadError, r2PublicUrl, readR2Config } from '~/lib/.server/media/r2';
-import { JOB_ID_REGEX, generateSkeleton7ImageSet, skeleton7ImageUrls } from '~/lib/.server/media/skeleton7-image-set';
+import {
+  JOB_ID_REGEX,
+  SKELETON7_SLOTS,
+  generateSkeleton7ImageSet,
+  skeleton7ImageUrls,
+  type ImageProvider,
+  type Skeleton7ImageSetInput,
+} from '~/lib/.server/media/skeleton7-image-set';
 import { defaultVideoProviderName, getVideoProvider, type VideoEnv } from '~/lib/.server/media/video';
 import { createScopedLogger } from '~/utils/logger';
 
@@ -25,9 +32,32 @@ interface MediaImagesBody {
   prompt?: string;
   accentHex?: string;
   darkPalette?: boolean;
+
+  /** 딥 브리프 Direction Sheet(decided) — styleLockPrompt + 슬롯별 샷 프롬프트. 없으면 기존 기본 STYLE_LOCK. */
+  direction?: { styleLockPrompt?: string; shots?: Record<string, string> };
 }
 
 const MAX_PROMPT_CHARS = 600;
+const MAX_DIRECTION_CHARS = 1500;
+
+function readDirection(raw: MediaImagesBody['direction']): Skeleton7ImageSetInput['direction'] | undefined {
+  if (!raw || typeof raw !== 'object' || typeof raw.styleLockPrompt !== 'string' || !raw.styleLockPrompt.trim()) {
+    return undefined;
+  }
+
+  const shots: Partial<Record<(typeof SKELETON7_SLOTS)[number], string>> = {};
+
+  for (const slot of SKELETON7_SLOTS) {
+    const v = raw.shots?.[slot];
+
+    if (typeof v === 'string' && v.trim()) {
+      shots[slot] = v.trim().slice(0, MAX_DIRECTION_CHARS);
+    }
+  }
+
+  return { styleLockPrompt: raw.styleLockPrompt.trim().slice(0, MAX_DIRECTION_CHARS), shots };
+}
+
 const MAX_INDUSTRY_CHARS = 80;
 const TOTAL_TIMEOUT_MS = 240_000;
 
@@ -86,6 +116,13 @@ export async function action({ request, context }: ActionFunctionArgs) {
   const accentHex =
     typeof body.accentHex === 'string' && /^#[0-9a-fA-F]{6}$/.test(body.accentHex) ? body.accentHex : '#FF5330';
   const darkPalette = body.darkPalette === true;
+  const direction = readDirection(body.direction);
+
+  // 공급자 스위치 — 기본 gemini(프로덕션 불변). IMAGE_PROVIDER=seedream + ARK_API_KEY 일 때만 Seedream.
+  const providerEnv = env?.IMAGE_PROVIDER || process.env.IMAGE_PROVIDER;
+  const arkApiKey = env?.ARK_API_KEY || process.env.ARK_API_KEY;
+  const provider: ImageProvider = providerEnv === 'seedream' && arkApiKey ? 'seedream' : 'gemini';
+  const seedreamModel = env?.SEEDREAM_MODEL || process.env.SEEDREAM_MODEL;
 
   if (!chatId || !industry || !prompt) {
     return json({ error: 'chatId, industry, prompt required' }, { status: 400 });
@@ -97,12 +134,14 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   try {
     const set = await generateSkeleton7ImageSet(
-      { jobId, chatId, industry, prompt, accentHex, darkPalette },
-      { apiKey, r2, signal: controller.signal },
+      { jobId, chatId, industry, prompt, accentHex, darkPalette, direction },
+      { apiKey, r2, signal: controller.signal, provider, arkApiKey, seedreamModel },
     );
 
     logger.info('image set generated', {
       chatId,
+      provider,
+      directed: !!direction,
       model: set.model,
       costUsd: set.costUsd,
       elapsedMs: set.elapsedMs,
