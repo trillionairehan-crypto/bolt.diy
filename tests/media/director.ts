@@ -85,6 +85,7 @@ interface Shot {
   costUsd: number;
   gen?: string;
   editedFrom?: number;
+  repairedFrom?: number;
   claude?: Critique;
   astra?: Critique;
   score?: number;
@@ -105,6 +106,125 @@ async function fetchBytes(url: string): Promise<{ bytes: Uint8Array; mimeType: s
 }
 
 import { existsSync, readdirSync } from 'node:fs';
+import { deflateSync } from 'node:zlib';
+
+// ---- ④ 수리 루프: 결함 bbox → 마스크 inpaint 1회 (inpaint.ts 검증: 6.5/7 → 8.5/8, 2회째는 하락) ----
+function crc32(buf: Uint8Array): number {
+  let c = ~0;
+
+  for (const b of buf) {
+    c ^= b;
+
+    for (let k = 0; k < 8; k++) {
+      c = (c >>> 1) ^ (0xedb88320 & -(c & 1));
+    }
+  }
+
+  return ~c >>> 0;
+}
+
+function pngChunk(type: string, data: Uint8Array): Uint8Array {
+  const t = Buffer.from(type, 'ascii');
+  const len = Buffer.alloc(4);
+  len.writeUInt32BE(data.length);
+
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE(crc32(Buffer.concat([t, Buffer.from(data)])));
+
+  return Buffer.concat([len, t, Buffer.from(data), crc]);
+}
+
+function buildMask(width: number, height: number, bbox: [number, number, number, number], pad = 0.04): Uint8Array {
+  const [bx, by, bw, bh] = bbox;
+  const x0 = Math.max(0, Math.floor((bx - pad) * width));
+  const y0 = Math.max(0, Math.floor((by - pad) * height));
+  const x1 = Math.min(width, Math.ceil((bx + bw + pad) * width));
+  const y1 = Math.min(height, Math.ceil((by + bh + pad) * height));
+  const raw = Buffer.alloc((width * 4 + 1) * height);
+
+  for (let y = 0; y < height; y++) {
+    const row = y * (width * 4 + 1);
+
+    for (let x = 0; x < width; x++) {
+      const i = row + 1 + x * 4;
+      raw[i + 3] = x >= x0 && x < x1 && y >= y0 && y < y1 ? 0 : 255;
+    }
+  }
+
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr[8] = 8;
+  ihdr[9] = 6;
+
+  return new Uint8Array(
+    Buffer.concat([
+      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+      pngChunk('IHDR', ihdr),
+      pngChunk('IDAT', deflateSync(raw)),
+      pngChunk('IEND', new Uint8Array(0)),
+    ]),
+  );
+}
+
+function jpegSize(b: Uint8Array): { width: number; height: number } {
+  let i = 2;
+
+  while (i < b.length) {
+    if (b[i] !== 0xff) {
+      i++;
+      continue;
+    }
+
+    const marker = b[i + 1];
+
+    if (marker >= 0xc0 && marker <= 0xc3) {
+      return { height: (b[i + 5] << 8) | b[i + 6], width: (b[i + 7] << 8) | b[i + 8] };
+    }
+
+    i += 2 + ((b[i + 2] << 8) | b[i + 3]);
+  }
+
+  throw new Error('not a baseline jpeg');
+}
+
+const LOCATE_SYSTEM = `You are a retoucher's assistant. Given a hero image, find the ONE region whose rendering most betrays it as AI-generated (melted texture, plastic gloss, impossible join, duplicated detail). Return JSON only: {"bbox":[x,y,w,h],"problem":"...","instruction":"one sentence telling an inpainting model what to paint there instead, photographic, matching the surrounding light"} where bbox values are fractions of image width/height (0..1), tight around the defect with a little context.`;
+
+interface Locate {
+  bbox: [number, number, number, number];
+  problem: string;
+  instruction: string;
+}
+
+async function openaiInpaint(
+  env: Record<string, string>,
+  model: string,
+  prompt: string,
+  image: { bytes: Uint8Array; mimeType: string },
+  mask: Uint8Array,
+): Promise<{ bytes: Uint8Array; mimeType: string }> {
+  const form = new FormData();
+  form.append('model', model);
+  form.append('prompt', prompt);
+  form.append('size', '1536x1024');
+  form.append('quality', 'high');
+  form.append('output_format', 'jpeg');
+  form.append('image[]', new Blob([image.bytes], { type: image.mimeType }), 'image.jpg');
+  form.append('mask', new Blob([mask], { type: 'image/png' }), 'mask.png');
+
+  const res = await fetch('https://api.openai.com/v1/images/edits', {
+    method: 'POST',
+    headers: { authorization: `Bearer ${env.OPENAI_API_KEY}` },
+    body: form,
+  });
+  const body = (await res.json()) as { data?: Array<{ b64_json?: string }>; error?: { message?: string } };
+
+  if (!res.ok || !body.data?.[0]?.b64_json) {
+    throw new Error(`${model} inpaint: ${res.status} ${body.error?.message || ''}`);
+  }
+
+  return { bytes: new Uint8Array(Buffer.from(body.data[0].b64_json, 'base64')), mimeType: 'image/jpeg' };
+}
 
 /** 로컬 파일 또는 URL */
 async function loadImage(src: string): Promise<{ bytes: Uint8Array; mimeType: string }> {
@@ -376,6 +496,7 @@ async function main() {
   const references = await Promise.all([...refUrls, ...anchorFiles].map(loadImage));
   const gens = (argValue('--gens') || world.generator).split(',');
   const editTop = Number(argValue('--edit') || 0);
+  const repairTop = Number(argValue('--repair') || 0);
   console.log(`anchors ${references.length} · generators ${gens.join(',')} · samples ${samples} · edit top ${editTop}`);
 
   const shots: Shot[] = [];
@@ -546,6 +667,78 @@ async function main() {
         });
         roundShots.push(...edited);
         shots.push(...edited);
+        writeFileSync(
+          `tests/media/director-${job}.json`,
+          JSON.stringify({ job, world: world.id, brand, threshold, refUrls, shots, costUsd: cost }, null, 2),
+        );
+      }
+    }
+
+    // ④ 수리 루프 — 7.0 이상·임계 미만 상위 repairTop 장: Fable가 결함 bbox → 마스크 inpaint 1회 → 재심사
+    if (repairTop > 0 && env.OPENAI_API_KEY) {
+      const candidates = roundShots
+        .filter((s) => (s.score ?? 0) >= 7.0 && (s.score ?? 0) < threshold && !s.repairedFrom)
+        .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+        .slice(0, repairTop);
+      const repaired: Shot[] = [];
+
+      for (const s of candidates) {
+        try {
+          const src = await fetchBytes(s.url);
+          const locate = extractJson<Locate>(
+            await claude(env, LOCATE_SYSTEM, [
+              {
+                type: 'text',
+                text: `World: ${world.label}. Jury tells: ${((s.claude ?? s.astra)?.tells || []).join('; ')}`,
+              },
+              { type: 'image', source: { type: 'base64', media_type: src.mimeType, data: toBase64(src.bytes) } },
+            ]),
+          );
+          const { width, height } = jpegSize(src.bytes);
+          const mask = buildMask(width, height, locate.bbox);
+          const img = await openaiInpaint(
+            env,
+            'gpt-image-2.5-flare',
+            `${locate.instruction} Match the surrounding lighting, grain and colour exactly; change nothing outside the masked area.`,
+            src,
+            mask,
+          );
+          const url = await putR2Object(
+            r2,
+            `media/director/${job}/r${round}-${idx}-repair.jpg`,
+            img.bytes,
+            img.mimeType,
+          );
+          cost += 0.1;
+          repaired.push({ round, index: idx, brief: s.brief, url, costUsd: 0.1, gen: s.gen, repairedFrom: s.index });
+          console.log(`  [${idx}] repair of ${s.index} (${s.score}) — ${locate.problem.slice(0, 70)} → ${url}`);
+          idx++;
+        } catch (error) {
+          console.log(`  repair of ${s.index} failed: ${String((error as Error).message).slice(0, 100)}`);
+        }
+      }
+
+      if (repaired.length) {
+        let p1: Critique[] = [];
+
+        try {
+          p1 = await critique(env, world, repaired, 'claude');
+        } catch {
+          /* astra only */
+        }
+
+        const p2 = await critique(env, world, repaired, 'astra');
+
+        repaired.forEach((s, i) => {
+          s.claude = p1.find((c) => c.index === i);
+          s.astra = p2.find((c) => c.index === i);
+          s.score = Math.min(s.claude?.score ?? 10, s.astra?.score ?? 10);
+          console.log(
+            `  [${s.index}] repaired score ${s.score} (fable ${s.claude?.score ?? '-'} / astra ${s.astra?.score ?? '-'}) from ${s.repairedFrom} tells: ${((s.claude ?? s.astra)?.tells || []).join('; ')}`,
+          );
+        });
+        roundShots.push(...repaired);
+        shots.push(...repaired);
         writeFileSync(
           `tests/media/director-${job}.json`,
           JSON.stringify({ job, world: world.id, brand, threshold, refUrls, shots, costUsd: cost }, null, 2),

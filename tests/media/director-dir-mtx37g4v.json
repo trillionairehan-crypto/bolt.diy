@@ -1,0 +1,335 @@
+{
+  "job": "dir-mtx37g4v",
+  "world": "photo-editorial",
+  "brand": "밀도 — 연남동 소금빵집. 매일 새벽 네 시에 굽고 하루 세 번, 다 팔리면 문을 닫는다. 국산 밀·발효 버터·굵은 소금.",
+  "threshold": 8.5,
+  "refUrls": [],
+  "shots": [
+    {
+      "round": 1,
+      "index": 0,
+      "brief": {
+        "title": "07:00 — The First Bake",
+        "prompt": "At 07:00, frame saltbread lower-right: scorched-seam, uneven-salt, foreground-cropped torn-heel; frayed-linen beneath. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or body parts; no text, logos, packaging, watermarks or borders. No additional rolls, plate, knife, butter dish or salt bowl: only the saltbread, its torn heel and supporting linen. No artificial steam from this cooled first bake. No uniform salt placement, flawless crust, varnish-like glaze, floating food, synthetic surfaces or CGI appearance. No centred arrangement, overhead view, clutter in the upper-left headline area, orange cast, neon or flash. No independent secondary light source; fill is reflected window light. No substitution for the series-locked 80mm medium-format lens."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx37g4v/r1-0.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 0,
+        "score": 8,
+        "tells": [
+          "salt crystals read as ice/plastic beads",
+          "frayed linen edge dissolves into fibrous mush",
+          "roll layers unnaturally smooth, no flake texture"
+        ],
+        "fix": "Shoot a real laminated roll; drop salt to fine flakes and let the linen edge hold a crisp, in-focus weave."
+      },
+      "astra": {
+        "index": 0,
+        "score": 8.3,
+        "tells": [
+          "Generic bread-on-linen styling lacks a distinctive bakery context."
+        ],
+        "fix": "Replace the decorative linen with a visibly used baking tray, preserving the hard directional key and anchored shadow."
+      },
+      "score": 8
+    },
+    {
+      "round": 1,
+      "index": 1,
+      "brief": {
+        "title": "07:00 — The First Bake",
+        "prompt": "At 07:00, frame saltbread lower-right: scorched-seam, uneven-salt, foreground-cropped torn-heel; frayed-linen beneath. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or body parts; no text, logos, packaging, watermarks or borders. No additional rolls, plate, knife, butter dish or salt bowl: only the saltbread, its torn heel and supporting linen. No artificial steam from this cooled first bake. No uniform salt placement, flawless crust, varnish-like glaze, floating food, synthetic surfaces or CGI appearance. No centred arrangement, overhead view, clutter in the upper-left headline area, orange cast, neon or flash. No independent secondary light source; fill is reflected window light. No substitution for the series-locked 80mm medium-format lens."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx37g4v/r1-1.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 1,
+        "score": 7,
+        "tells": [
+          "wall brightest behind subject while roll lit from front-left",
+          "no clear contact shadow, roll floats on cloth",
+          "ambiguous dark blob left, blurred cup right",
+          "glossy plastic sheen on crust"
+        ],
+        "fix": "Kill the back-wall hotspot and cut a single hard window key from camera-right so the roll casts a real shadow toward the mug."
+      },
+      "astra": {
+        "index": 1,
+        "score": 7.8,
+        "tells": [
+          "Generic stock composition: pristine roll beside a glowing window.",
+          "Bright window dominates the frame more than the bread."
+        ],
+        "fix": "Reframe at counter height with a 50mm lens, excluding the bright window while retaining its motivated side light."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 2,
+      "brief": {
+        "title": "07:00 — The First Bake",
+        "prompt": "At 07:00, frame saltbread lower-right: scorched-seam, uneven-salt, foreground-cropped torn-heel; frayed-linen beneath. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or body parts; no text, logos, packaging, watermarks or borders. No additional rolls, plate, knife, butter dish or salt bowl: only the saltbread, its torn heel and supporting linen. No artificial steam from this cooled first bake. No uniform salt placement, flawless crust, varnish-like glaze, floating food, synthetic surfaces or CGI appearance. No centred arrangement, overhead view, clutter in the upper-left headline area, orange cast, neon or flash. No independent secondary light source; fill is reflected window light. No substitution for the series-locked 80mm medium-format lens."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx37g4v/r1-2.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 2,
+        "score": 8,
+        "tells": [
+          "croissant lamination pasted onto a round bun",
+          "torn crumb looks like cotton wool",
+          "salt crystals read as clear ice"
+        ],
+        "fix": "Pick one bread type; keep the tear but rake the key lower so the crumb shows real air pockets, not fluff."
+      },
+      "astra": {
+        "index": 2,
+        "score": 8.2,
+        "tells": [
+          "Subject too large; right edge nearly clips the loaf."
+        ],
+        "fix": "Move the camera back 15% while preserving the torn crumb, left headline space, and directional sunlight."
+      },
+      "score": 8
+    },
+    {
+      "round": 1,
+      "index": 3,
+      "brief": {
+        "title": "07:00 — The First Bake",
+        "prompt": "At 07:00, frame saltbread lower-right: scorched-seam, uneven-salt, foreground-cropped torn-heel; frayed-linen beneath. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or body parts; no text, logos, packaging, watermarks or borders. No additional rolls, plate, knife, butter dish or salt bowl: only the saltbread, its torn heel and supporting linen. No artificial steam from this cooled first bake. No uniform salt placement, flawless crust, varnish-like glaze, floating food, synthetic surfaces or CGI appearance. No centred arrangement, overhead view, clutter in the upper-left headline area, orange cast, neon or flash. No independent secondary light source; fill is reflected window light. No substitution for the series-locked 80mm medium-format lens."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx37g4v/r1-3.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 3,
+        "score": 7.5,
+        "tells": [
+          "torn end melted, no visible crumb structure",
+          "subject cropped by right edge, too large",
+          "layer seams look drawn, not baked"
+        ],
+        "fix": "Pull back to 85mm, place the roll fully in frame right-third and re-tear so the interior shows honeycomb crumb."
+      },
+      "astra": {
+        "index": 3,
+        "score": 8.5,
+        "tells": [
+          "Subject too large; rear end exits the right edge."
+        ],
+        "fix": "Widen the framing enough to include the rear tip, retaining the low viewpoint and crisp contact shadow."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 1,
+      "index": 4,
+      "brief": {
+        "title": "07:00 — The First Bake",
+        "prompt": "At 07:00, frame saltbread lower-right: scorched-seam, uneven-salt, foreground-cropped torn-heel; frayed-linen beneath. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or body parts; no text, logos, packaging, watermarks or borders. No additional rolls, plate, knife, butter dish or salt bowl: only the saltbread, its torn heel and supporting linen. No artificial steam from this cooled first bake. No uniform salt placement, flawless crust, varnish-like glaze, floating food, synthetic surfaces or CGI appearance. No centred arrangement, overhead view, clutter in the upper-left headline area, orange cast, neon or flash. No independent secondary light source; fill is reflected window light. No substitution for the series-locked 80mm medium-format lens."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx37g4v/r1-4.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 4,
+        "score": 6.5,
+        "tells": [
+          "light band on cloth disagrees with roll's highlight direction",
+          "subject pushed off right edge, torn end cut",
+          "hazy, low-contrast render look",
+          "torn end is a smooth blob"
+        ],
+        "fix": "Match the window direction to the roll's highlights and move subject in from the edge; add contrast to the key."
+      },
+      "astra": {
+        "index": 4,
+        "score": 7.3,
+        "tells": [
+          "Subject too large; torn end is cut off twice.",
+          "Shallow focus obscures the cropped end's most interesting texture."
+        ],
+        "fix": "Pull back and focus on the torn end at f/5.6, keeping its entire outline inside the frame."
+      },
+      "score": 6.5
+    },
+    {
+      "round": 1,
+      "index": 5,
+      "brief": {
+        "title": "07:00 — The First Bake",
+        "prompt": "At 07:00, frame saltbread lower-right: scorched-seam, uneven-salt, foreground-cropped torn-heel; frayed-linen beneath. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or body parts; no text, logos, packaging, watermarks or borders. No additional rolls, plate, knife, butter dish or salt bowl: only the saltbread, its torn heel and supporting linen. No artificial steam from this cooled first bake. No uniform salt placement, flawless crust, varnish-like glaze, floating food, synthetic surfaces or CGI appearance. No centred arrangement, overhead view, clutter in the upper-left headline area, orange cast, neon or flash. No independent secondary light source; fill is reflected window light. No substitution for the series-locked 80mm medium-format lens."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx37g4v/r1-5.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 5,
+        "score": 7,
+        "tells": [
+          "washed, flat contrast despite hard light band",
+          "torn interior is featureless paste",
+          "frayed cloth edge smeared under roll",
+          "huge empty foreground, subject small"
+        ],
+        "fix": "Expose for the highlights so the sun band bites; lift the roll 20% larger and give the tear real strands."
+      },
+      "astra": {
+        "index": 5,
+        "score": 7.9,
+        "tells": [
+          "Generic stock composition: diagonal bread against window-light geometry.",
+          "Torn foreground end falls outside the useful focus plane."
+        ],
+        "fix": "Focus on the exposed crumb at f/5.6 while retaining the single back-left key and lower-right shadow."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 6,
+      "brief": {
+        "title": "07:00 — The First Bake",
+        "prompt": "At 07:00, frame saltbread lower-right: scorched-seam, uneven-salt, foreground-cropped torn-heel; frayed-linen beneath. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or body parts; no text, logos, packaging, watermarks or borders. No additional rolls, plate, knife, butter dish or salt bowl: only the saltbread, its torn heel and supporting linen. No artificial steam from this cooled first bake. No uniform salt placement, flawless crust, varnish-like glaze, floating food, synthetic surfaces or CGI appearance. No centred arrangement, overhead view, clutter in the upper-left headline area, orange cast, neon or flash. No independent secondary light source; fill is reflected window light. No substitution for the series-locked 80mm medium-format lens."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx37g4v/r1-6.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 6,
+        "score": 7,
+        "tells": [
+          "subject too large, macro leaves no headline room",
+          "torn crumb reads as wet cotton fibre",
+          "layers over-glossy like glaze",
+          "cloth texture melts at lower left"
+        ],
+        "fix": "Back off to a three-quarter view with the roll in the lower right and matte the crust sheen."
+      },
+      "astra": {
+        "index": 6,
+        "score": 7.1,
+        "tells": [
+          "Subject too large; bread crowds the bottom and right edges.",
+          "No generous headline area remains beyond the upper-left corner.",
+          "Blurred foreground fragment blocks the bread's torn opening."
+        ],
+        "fix": "Shoot a wider 50mm composition with both bread pieces on the right and the left third clear."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 7,
+      "brief": {
+        "title": "07:00 — The First Bake",
+        "prompt": "At 07:00, frame saltbread lower-right: scorched-seam, uneven-salt, foreground-cropped torn-heel; frayed-linen beneath. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or body parts; no text, logos, packaging, watermarks or borders. No additional rolls, plate, knife, butter dish or salt bowl: only the saltbread, its torn heel and supporting linen. No artificial steam from this cooled first bake. No uniform salt placement, flawless crust, varnish-like glaze, floating food, synthetic surfaces or CGI appearance. No centred arrangement, overhead view, clutter in the upper-left headline area, orange cast, neon or flash. No independent secondary light source; fill is reflected window light. No substitution for the series-locked 80mm medium-format lens."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx37g4v/r1-7.jpg",
+      "costUsd": 0.075,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "claude": {
+        "index": 7,
+        "score": 7.5,
+        "tells": [
+          "scorch marks painted on as black smears",
+          "torn end cropped and shapeless at right edge",
+          "linen fray turns into stringy noodles"
+        ],
+        "fix": "Remove the fake char streaks, keep the whole roll inside frame, and let the fray fall out of focus."
+      },
+      "astra": {
+        "index": 7,
+        "score": 7.7,
+        "tells": [
+          "Subject too large; foreground fragment is clipped by the bottom.",
+          "Foreground crumb is blurred while the less-informative crust stays sharp."
+        ],
+        "fix": "Back up 20% and place the detached crumb beside the roll in the same focus plane."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 1,
+      "index": 8,
+      "brief": {
+        "title": "07:00 — The First Bake",
+        "prompt": "At 07:00, frame saltbread lower-right: scorched-seam, uneven-salt, foreground-cropped torn-heel; frayed-linen beneath. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or body parts; no text, logos, packaging, watermarks or borders. No additional rolls, plate, knife, butter dish or salt bowl: only the saltbread, its torn heel and supporting linen. No artificial steam from this cooled first bake. No uniform salt placement, flawless crust, varnish-like glaze, floating food, synthetic surfaces or CGI appearance. No centred arrangement, overhead view, clutter in the upper-left headline area, orange cast, neon or flash. No independent secondary light source; fill is reflected window light. No substitution for the series-locked 80mm medium-format lens."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx37g4v/r1-8-repair.jpg",
+      "costUsd": 0.1,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "repairedFrom": 0,
+      "claude": {
+        "index": 0,
+        "score": 6.5,
+        "tells": [
+          "Salt crystals oversized, glassy, plastic-looking",
+          "Croissant too smooth and tubular; no real lamination flakes",
+          "Cast shadow shape blobby, doesn't match roll silhouette",
+          "Uniform dotted crust texture reads as render"
+        ],
+        "fix": "Reshoot with a real laminated croissant showing flaky layers, finer salt flakes, and a shadow that matches the object outline."
+      },
+      "astra": {
+        "index": 0,
+        "score": 8,
+        "tells": [
+          "Unusually uniform, jewel-like salt crystals feel artificially styled.",
+          "Generic bread-on-linen composition lacks a distinctive editorial detail."
+        ],
+        "fix": "Replace the decorative salt coverage with a sparse, irregular scattering, preserving the convincing hard sunlight and leftward contact shadow."
+      },
+      "score": 6.5
+    },
+    {
+      "round": 1,
+      "index": 9,
+      "brief": {
+        "title": "07:00 — The First Bake",
+        "prompt": "At 07:00, frame saltbread lower-right: scorched-seam, uneven-salt, foreground-cropped torn-heel; frayed-linen beneath. \"Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.\" \"Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.\" Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or body parts; no text, logos, packaging, watermarks or borders. No additional rolls, plate, knife, butter dish or salt bowl: only the saltbread, its torn heel and supporting linen. No artificial steam from this cooled first bake. No uniform salt placement, flawless crust, varnish-like glaze, floating food, synthetic surfaces or CGI appearance. No centred arrangement, overhead view, clutter in the upper-left headline area, orange cast, neon or flash. No independent secondary light source; fill is reflected window light. No substitution for the series-locked 80mm medium-format lens."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx37g4v/r1-9-repair.jpg",
+      "costUsd": 0.1,
+      "gen": "dola-seedream-5-0-pro-260628",
+      "repairedFrom": 2,
+      "claude": {
+        "index": 1,
+        "score": 7,
+        "tells": [
+          "Crumb interior melted/mushy with no defined cell structure",
+          "Backlit top edge but tear face evenly lit—light directions conflict",
+          "Weak contact shadow beneath loaf on linen",
+          "Glassy, translucent salt crystals again"
+        ],
+        "fix": "Keep the single window key but let the torn face fall into shadow with a subtle bounce, and add a real contact shadow under the loaf."
+      },
+      "astra": {
+        "index": 1,
+        "score": 8.7,
+        "tells": [
+          "Familiar rustic bread-on-linen styling borders on premium stock."
+        ],
+        "fix": "Include a cropped, flour-marked baker’s hand setting down the loaf, retaining the low camera angle, upper-left headline space, and directional sunlight."
+      },
+      "score": 7
+    }
+  ],
+  "costUsd": 0.7999999999999999
+}
