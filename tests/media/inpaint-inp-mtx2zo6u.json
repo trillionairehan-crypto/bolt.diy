@@ -1,0 +1,42 @@
+{
+  "job": "inp-mtx2zo6u",
+  "src": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx2bvld/r1-3.jpg",
+  "locate": {
+    "bbox": [
+      0.6,
+      0.43,
+      0.3,
+      0.42
+    ],
+    "problem": "The croissant body reads as a smooth, plastic-glossy rolled tube rather than laminated pastry — the wraps have no flaky layered edges, the surface is uniformly waxy with no blistering, and the dark 'char' spots sit on top like painted smudges with no baked texture around them.",
+    "instruction": "Paint a real baked croissant surface here: crisp golden-brown lamination with thin flaky shattered layers visible along each wrap edge, matte-to-slightly-glossy egg-washed crust with small blisters and irregular browning, and natural darker caramelised ridges instead of painted spots, lit by the same warm low sunlight from the upper right with soft shadow falling toward the lower left onto the grey weathered wood."
+  },
+  "scores": [
+    {
+      "index": 0,
+      "score": 6,
+      "tells": [
+        "croissant lacks lamination, smooth bread-roll texture",
+        "random black char marks look painted",
+        "torn end reads waxy and undefined"
+      ]
+    },
+    {
+      "index": 1,
+      "score": 8,
+      "tells": [
+        "lamination spirals slightly too uniform",
+        "tip end merges into flat blob"
+      ]
+    },
+    {
+      "index": 2,
+      "score": 7.5,
+      "tells": [
+        "blistered glaze pattern reads slightly synthetic",
+        "left end layers run inconsistent direction",
+        "crumbs near base look smeared"
+      ]
+    }
+  ]
+}

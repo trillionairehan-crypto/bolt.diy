@@ -1,0 +1,40 @@
+{
+  "job": "inp-mtx33qqw",
+  "src": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx2bvld/r1-4.jpg",
+  "locate": {
+    "bbox": [
+      0.82,
+      0.5,
+      0.16,
+      0.23
+    ],
+    "problem": "The torn end of the croissant shows a smooth, rubbery concentric spiral like a rolled tube of clay rather than the airy, shredded honeycomb of laminated pastry; the edge is too clean and the interior has no crumb texture.",
+    "instruction": "Paint a torn croissant end with irregular, flaky laminated layers and an open airy honeycomb interior of thin translucent dough sheets, ragged buttery crumb edges catching the warm low sunlight from the upper right, matching the golden crust tones and soft shadow on the stone surface."
+  },
+  "scores": [
+    {
+      "index": 0,
+      "score": 6,
+      "tells": [
+        "torn end is smooth spiral, no laminated honeycomb",
+        "body reads as uniform rolled tube",
+        "blister pattern too evenly distributed"
+      ]
+    },
+    {
+      "index": 1,
+      "score": 8,
+      "tells": [
+        "flaky shards slightly over-rendered and repetitive"
+      ]
+    },
+    {
+      "index": 2,
+      "score": 7.5,
+      "tells": [
+        "crumb interior slightly waxy and low-detail",
+        "torn edge outline a bit soft against shadow"
+      ]
+    }
+  ]
+}

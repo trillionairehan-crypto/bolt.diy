@@ -1,0 +1,32 @@
+{
+  "world": "neoclassical-painting",
+  "briefs": [
+    {
+      "title": "Four O’Clock, First Bake",
+      "prompt": "At 4:05 a.m., take an 80mm f/2.8 medium-format viewpoint, slightly above the counter. Keep only one Korean-wheat salt roll, a chipped ivory plate with rubbed gilding, and an ochre linen fold cut by the bottom edge. Set the plate low on the right third. Preserve the uneven seam and overbrowned tip; paint crust matte, with three unequal salt fragments embedded rather than scattered. Cultured butter leaves a dull stain underneath. One unseen upper-left bakery lamp casts a grounded shadow down-right; the distant ultramarine opening contributes no fill. Omit all figures and statuary. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+      "negative": "No people, forearms, hands, statues, balustrades, extra bread, utensils, or packaging. No lacquered pastry, plastic highlights, floating plate, repeated salt sprinkles, scattered crystal field, secondary light source, or photographic rendering. No centred arrangement, busy headline area, text, letters, signs, logos, watermarks, frame, or border."
+    }
+  ],
+  "models": [
+    "dola-seedream-5-0-pro-260628"
+  ],
+  "results": [
+    {
+      "model": "dola-seedream-5-0-pro-260628",
+      "brief": "Four O’Clock, First Bake",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx2arkr/0-dola-seedream-5-0-pro-260628.jpg",
+      "ms": 74460,
+      "fable": 7,
+      "astra": 7.1,
+      "score": 7,
+      "tells": [
+        "melted/impossible details: pastry is a hybrid of smooth bun, cracked roll and croissant spiral — layer logic doesn't hold across the three segments",
+        "flawless too-perfect surfaces: blue backdrop is a digital-airbrush gradient with no brushwork, glaze or wall texture — reads as a render backdrop rather than a painted ground",
+        "plastic/over-glossy highlights: melted-butter pool is a glossy, vector-like yellow blob with rubbery edges, inconsistent with the matte canvas treatment elsewhere",
+        "duplicated/odd details: two arbitrary plate 'chips' (front-right and left rim) look like generator artefacts rather than intentional wear; salt-like crystals on top float without indentation",
+        "text-like scribbles: meaningless orange streaks on the cloth at lower-left that resolve into nothing",
+        "oversaturation / style drift: saturated ultramarine + tangerine complementary scheme is far more contemporary-graphic than a neoclassical palette (would expect muted umbers, warm greys, controlled chiaroscuro)"
+      ]
+    }
+  ]
+}

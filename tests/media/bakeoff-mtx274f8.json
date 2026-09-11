@@ -1,0 +1,47 @@
+{
+  "world": "neoclassical-painting",
+  "briefs": [
+    {
+      "title": "Four O’Clock, First Bake",
+      "prompt": "At 4:05 a.m., take an 80mm f/2.8 medium-format viewpoint, slightly above the counter. Keep only one Korean-wheat salt roll, a chipped ivory plate with rubbed gilding, and an ochre linen fold cut by the bottom edge. Set the plate low on the right third. Preserve the uneven seam and overbrowned tip; paint crust matte, with three unequal salt fragments embedded rather than scattered. Cultured butter leaves a dull stain underneath. One unseen upper-left bakery lamp casts a grounded shadow down-right; the distant ultramarine opening contributes no fill. Omit all figures and statuary. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+      "negative": "No people, forearms, hands, statues, balustrades, extra bread, utensils, or packaging. No lacquered pastry, plastic highlights, floating plate, repeated salt sprinkles, scattered crystal field, secondary light source, or photographic rendering. No centred arrangement, busy headline area, text, letters, signs, logos, watermarks, frame, or border."
+    }
+  ],
+  "models": [
+    "dola-seedream-5-0-pro-260628",
+    "gpt-image-2.5-flare"
+  ],
+  "results": [
+    {
+      "model": "dola-seedream-5-0-pro-260628",
+      "brief": "Four O’Clock, First Bake",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx274f8/0-dola-seedream-5-0-pro-260628.jpg",
+      "ms": 84419,
+      "fable": 7.5,
+      "astra": 6.5,
+      "score": 6.5,
+      "tells": [
+        "impossible detail: the blue opening reads neither as door nor window — flat unlit blue with no depth, frame widths mismatched left vs right, sill meets the table edge with no spatial logic",
+        "uniform lighting on the wall with no fall-off; only the tablecloth carries a real shadow",
+        "odd artifacts: unexplained orange smear on the cloth, over-large sugar-like 'salt' crystals sitting on top rather than baked in",
+        "style drift: reads as Morandi/Hammershøi-flavoured modern realism rather than neoclassical painting — no classical motif, glazing or chiaroscuro depth"
+      ]
+    },
+    {
+      "model": "gpt-image-2.5-flare",
+      "brief": "Four O’Clock, First Bake",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx274f8/0-gpt-image-2.5-flare.jpg",
+      "ms": 19542,
+      "fable": 7,
+      "astra": 8,
+      "score": 7,
+      "tells": [
+        "render/photo look where a painting was intended: the roll and glaze puddle are crisp, photographic and over-glossy against a soft painted background — reads as a composite",
+        "plastic/over-glossy highlights on the crust and the buttery pool on the plate",
+        "lighting inconsistency: night/moon scene yet the bread is lit by a strong unexplained warm frontal-left source; the roll casts almost no anchoring shadow on the plate",
+        "oversaturated orange drape in the corner competes with the subject and is cropped awkwardly",
+        "plate is centred on the ledge with the bread dead-centre on it — stock food-shot placement"
+      ]
+    }
+  ]
+}

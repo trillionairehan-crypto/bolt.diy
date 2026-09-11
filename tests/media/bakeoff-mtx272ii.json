@@ -1,0 +1,84 @@
+{
+  "world": "photo-editorial",
+  "briefs": [
+    {
+      "title": "First Bake, First Light",
+      "prompt": "Shoot the four-a.m. bake at 7:10 a.m., once daylight reaches the bench. Set one salt roll on a scratched, dull aluminium baking tray, low in the right-hand third; crop the tray’s nearest corner through the bottom edge. Work at bench height, medium-format 80mm at f/4. Keep the roll’s uneven seam and slightly scorched tip visible, with coarse salt embedded irregularly in the crust. The tray casts a grounded shadow to the right. Leave the upper-left bench bare. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+      "negative": "Additional rolls, utensils, linen, butter dishes, ingredient bowls, printed packaging, people or body parts, text, lettering, logos, watermarks, borders, centred symmetry, floating bread, glossy glaze, artificial steam, excessive salt, orange colour cast, neon, flash, multiple light sources, CGI surfaces."
+    },
+    {
+      "title": "First Bake, First Light",
+      "prompt": "Shoot the four-a.m. bake at 7:10 a.m., once daylight reaches the bench. Set one salt roll on a scratched, dull aluminium baking tray, low in the right-hand third; crop the tray’s nearest corner through the bottom edge. Work at bench height, medium-format 80mm at f/4. Keep the roll’s uneven seam and slightly scorched tip visible, with coarse salt embedded irregularly in the crust. The tray casts a grounded shadow to the right. Leave the upper-left bench bare. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+      "negative": "Additional rolls, utensils, linen, butter dishes, ingredient bowls, printed packaging, people or body parts, text, lettering, logos, watermarks, borders, centred symmetry, floating bread, glossy glaze, artificial steam, excessive salt, orange colour cast, neon, flash, multiple light sources, CGI surfaces."
+    }
+  ],
+  "models": [
+    "dola-seedream-5-0-pro-260628",
+    "gemini-3.1-flash-image"
+  ],
+  "results": [
+    {
+      "model": "dola-seedream-5-0-pro-260628",
+      "brief": "First Bake, First Light",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx272ii/0-dola-seedream-5-0-pro-260628.jpg",
+      "ms": 55051,
+      "fable": 7.5,
+      "astra": 8,
+      "score": 7.5,
+      "tells": [
+        "melted/impossible details: roll reads as a crescent roll but with a bun-like rounded end and rubbery, unlaminated 'layers' that don't behave like real dough",
+        "plastic/over-glossy highlights on the spiral end and tray rim",
+        "flawless too-perfect surfaces: tray and counter are unnaturally clean for a 'first bake', crumbs feel placed",
+        "salt crystals oversized and oddly distributed, some sitting on the crescent's rolled seam where they wouldn't stick",
+        "subject slightly too small for a hero at this crop; heavy blur on left third reads as synthetic depth-of-field"
+      ]
+    },
+    {
+      "model": "gemini-3.1-flash-image",
+      "brief": "First Bake, First Light",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx272ii/0-gemini-3.1-flash-image.jpg",
+      "ms": 11057,
+      "fable": 6.5,
+      "astra": 7,
+      "score": 6.5,
+      "tells": [
+        "generic stock composition: rustic wood table + stone wall + blown window is the default 'artisan bakery' mood-board frame",
+        "melted/impossible details: the scoring ear is smeared and the crust seam doesn't follow a believable score line; crumb underneath not visible where it should be",
+        "salt on a sourdough boule plus scattered salt on the tray is a semantic mismatch (style drift from a real bake)",
+        "subject too small relative to tray and frame; loaf sits dead-center vertically",
+        "uniform soft lighting with weak shadow anchor under the loaf; tray rim perspective at the far left corner looks slightly off",
+        "crust surface too smooth/waxy for a real blistered sourdough"
+      ]
+    },
+    {
+      "model": "dola-seedream-5-0-pro-260628",
+      "brief": "First Bake, First Light",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx272ii/1-dola-seedream-5-0-pro-260628.jpg",
+      "ms": 45500,
+      "fable": 8,
+      "astra": 8,
+      "score": 8,
+      "tells": [
+        "flawless too-perfect surface on the pastry — crust is waxy-smooth like a moulded dinner roll, lamination reads as soft blobs rather than baked layers",
+        "slightly plastic/over-glossy highlight on the tip and top roll",
+        "melted detail: the second fold where layers should spiral is an ambiguous smooth ridge"
+      ]
+    },
+    {
+      "model": "gemini-3.1-flash-image",
+      "brief": "First Bake, First Light",
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/bakeoff/mtx272ii/1-gemini-3.1-flash-image.jpg",
+      "ms": 11354,
+      "fable": 7.5,
+      "astra": 7,
+      "score": 7,
+      "tells": [
+        "generic stock composition (pastry-on-sheet-pan-on-butcher-block, blurred kitchen)",
+        "melted/ambiguous pastry structure — left tip fold is a smooth lobe with no spiral, layering unclear",
+        "subject too small for a hero; tray dominates while the bake is a mid-frame lump",
+        "weak shadow anchor — only a faint contact shadow despite window light",
+        "headline room is compromised by busy wood grain and the tray occupying the clean area"
+      ]
+    }
+  ]
+}

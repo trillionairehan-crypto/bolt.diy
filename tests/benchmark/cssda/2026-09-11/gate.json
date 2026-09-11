@@ -1,0 +1,74 @@
+[
+  {
+    "id": "50008",
+    "title": "/ WOTM AUG Santioni Spirits",
+    "url": "https://santionispirits.com/",
+    "ok": true,
+    "frames": [
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\50008-0.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\50008-1.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\50008-2.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\50008-3.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\50008-4.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\50008-5.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\50008-6.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\50008-7.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\50008-8.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\50008-9.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\50008-10.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\50008-11.jpg"
+    ],
+    "loadMs": 12466,
+    "gate": "key+click",
+    "gate2": "key+click",
+    "canvases": 1
+  },
+  {
+    "id": "49386",
+    "title": "/ WOTM JUL 100 Lost Species",
+    "url": "https://www.100lostspecies.com/",
+    "ok": true,
+    "frames": [
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49386-0.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49386-1.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49386-2.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49386-3.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49386-4.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49386-5.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49386-6.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49386-7.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49386-8.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49386-9.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49386-10.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49386-11.jpg"
+    ],
+    "loadMs": 8088,
+    "gate": "locator:/^enter$/i",
+    "gate2": "key+click",
+    "canvases": 0
+  },
+  {
+    "id": "49579",
+    "title": "Icare — A WorldLabs Showcase",
+    "url": "https://www.icare-game.world/",
+    "ok": true,
+    "frames": [
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49579-0.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49579-1.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49579-2.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49579-3.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49579-4.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49579-5.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49579-6.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49579-7.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49579-8.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49579-9.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49579-10.jpg",
+      "tests\\benchmark\\cssda\\2026-09-11\\gate\\49579-11.jpg"
+    ],
+    "loadMs": 7082,
+    "gate": "key+click",
+    "gate2": "key+click",
+    "canvases": 5
+  }
+]

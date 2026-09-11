@@ -1,0 +1,41 @@
+{
+  "job": "inp-mtx31q5z",
+  "src": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/inpaint/inp-mtx2zo6u/0.jpg",
+  "locate": {
+    "bbox": [
+      0.56,
+      0.3,
+      0.26,
+      0.36
+    ],
+    "problem": "The croissant's middle segment reads as an impossible join: a smooth, glossy, unbroken glazed lobe on the left melts abruptly into a band of paper-thin concentric laminations that wrap like a stacked spiral of ribbon, too regular and tube-like, with no torn or crumbly transitions between the two textures.",
+    "instruction": "Paint a realistic baked croissant mid-section with irregular, torn, slightly separated puff-pastry layers of varying thickness, small blistered air pockets and a few crumbly broken flakes at the edges, keeping the deep amber caramelized top and lighter blonde underside, lit by the same warm low sun from the upper left with soft shadow underneath on the weathered wood."
+  },
+  "scores": [
+    {
+      "index": 0,
+      "score": 7.5,
+      "tells": [
+        "lamination bands too uniform, wrapped-tube look at left end",
+        "crust ridges lack irregular flake tearing"
+      ]
+    },
+    {
+      "index": 1,
+      "score": 6.5,
+      "tells": [
+        "left end forms separate ambiguous lobe with mushy layers",
+        "torn face geometry unclear, crumb honeycomb too regular",
+        "glaze highlights slightly plastic"
+      ]
+    },
+    {
+      "index": 2,
+      "score": 7.5,
+      "tells": [
+        "exposed crumb slightly too uniform in cell size",
+        "left tip curls into vague folded flap"
+      ]
+    }
+  ]
+}
