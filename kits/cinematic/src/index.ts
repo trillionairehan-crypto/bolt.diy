@@ -7,6 +7,7 @@ export { TextReveal, type TextRevealProps } from './TextReveal';
 export { BigNumber, type BigNumberProps } from './BigNumber';
 export { Marquee, type MarqueeProps } from './Marquee';
 export { Wordmark, type WordmarkProps } from './Wordmark';
+export { ScrollSequence, type ScrollSequenceProps } from './ScrollSequence';
 export { Contact, type ContactProps, type ContactRow } from './Contact';
 export { Nav, type NavProps } from './Nav';
 export { Preloader, type PreloaderProps } from './Preloader';
