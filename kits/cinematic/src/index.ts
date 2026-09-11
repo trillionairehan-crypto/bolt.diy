@@ -1,6 +1,12 @@
 export { HeroScene, type HeroSceneProps } from './HeroScene';
 export { ScrollChapter, type ScrollChapterProps } from './ScrollChapter';
+export { PinnedChapters, type PinnedChaptersProps, type PinnedChapter } from './PinnedChapters';
 export { MediaStage, type MediaStageProps } from './MediaStage';
+export { MediaTreatment, type MediaTreatmentProps, type Treatment } from './MediaTreatment';
+export { TextReveal, type TextRevealProps } from './TextReveal';
+export { BigNumber, type BigNumberProps } from './BigNumber';
+export { Marquee, type MarqueeProps } from './Marquee';
+export { Wordmark, type WordmarkProps } from './Wordmark';
 export { Contact, type ContactProps, type ContactRow } from './Contact';
 export { Nav, type NavProps } from './Nav';
 export { Preloader, type PreloaderProps } from './Preloader';

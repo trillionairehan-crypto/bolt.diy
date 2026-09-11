@@ -72,9 +72,16 @@ export function useSmoothScroll(options: SmoothScrollOptions | boolean = true): 
       const max = document.documentElement.scrollHeight - window.innerHeight;
 
       if (scenes.length > 1 && max > 0) {
+        // 핀 챕터(data-ck-snap-steps=N)는 내부 단계마다 스냅 지점을 둔다 — 없으면 고정 구간 한가운데서 양끝으로 튄다.
+        const points = scenes.flatMap((el) => {
+          const steps = Number(el.dataset.ckSnapSteps || 1);
+          const step = steps > 1 ? (el.offsetHeight - window.innerHeight) / (steps - 1) : 0;
+
+          return Array.from({ length: steps }, (_, i) => Math.min(1, (el.offsetTop + step * i) / max));
+        });
         snapTrigger = ScrollTrigger.create({
           snap: {
-            snapTo: scenes.map((el) => Math.min(1, el.offsetTop / max)),
+            snapTo: points,
             duration: { min: 0.25, max: 0.7 },
             delay: 0.05,
             ease: 'power2.out',

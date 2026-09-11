@@ -72,7 +72,7 @@ export function Preloader({ brand, minMs = 1100 }: PreloaderProps) {
         padding: 'var(--ck-gutter)',
       }}
     >
-      <span style={{ fontFamily: 'var(--ck-font-display)', fontSize: 'var(--ck-display-md)', fontWeight: 600 }}>{brand}</span>
+      <span style={{ fontFamily: 'var(--ck-font-display)', fontSize: 'var(--ck-display-md)', fontWeight: 'var(--ck-display-weight)' as unknown as number }}>{brand}</span>
       <span ref={counter} style={{ fontFamily: 'var(--ck-font-mono)', fontSize: 'var(--ck-display-lg)', fontVariantNumeric: 'tabular-nums' }}>
         000
       </span>

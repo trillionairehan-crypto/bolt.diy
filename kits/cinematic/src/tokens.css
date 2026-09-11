@@ -1,6 +1,13 @@
 /*
- * 시네마틱 킷 토큰. 코랄레드 킷 변수(--accent, --bg, --text …)가 있으면 그걸 받고, 없으면 폴백.
- * 레퍼런스(landonorris.com·lusion.co) 공통: 색 2~3개, 서체 2개, 거대 타이포 — 그 규칙을 값으로 고정한다.
+ * 시네마틱 킷 토큰 v0.2. 코랄레드 킷 변수(--accent, --bg, --text …)가 있으면 그걸 받고, 없으면 폴백.
+ *
+ * 값의 근거 = CSSDA 수상작 90개 실측(tests/benchmark/cssda/2026-09-11): 최대 헤딩 중앙값 90px(p75 146px), 굵기 400 지배적,
+ * 라이트 배경 76%, 서체 2벌(그로테스크 대제목 + 모노 라벨). 한글은 같은 px에서 라틴보다 무겁고 크게 보여 85~90%로 잡는다.
+ *
+ * 서체 프리셋(페이지 루트 클래스로 선택, 사용자에게 묻지 않고 산업·무드로 결정):
+ *   (기본)            그로테스크 — Pretendard 300~400 + 라틴/숫자는 Familjen Grotesk(한글 글리프가 없어 글자 단위로 자동 폴백)
+ *   .ck-type-serif    세리프 강조 — 본문은 그대로, 디스플레이만 Noto Serif KR + Instrument Serif. 뷰티·식음·교육·웨딩
+ *   .ck-type-compact  컴팩트 — Wanted Sans 500~600, 자간 더 촘촘. 스포츠·에이전시·브루탈 그리드
  */
 :root {
   --ck-accent: var(--accent, #ff5330);
@@ -8,20 +15,47 @@
   --ck-surface: var(--surface, #1a1816);
   --ck-text: var(--text, #f5f1ea);
   --ck-muted: var(--muted, #b8b0a4);
-  --ck-line: rgba(255, 255, 255, 0.12);
+  --ck-line: color-mix(in srgb, var(--ck-text) 14%, transparent);
 
-  --ck-font-display: 'Noto Serif KR', 'Apple SD Gothic Neo', serif;
-  --ck-font-body: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
-  --ck-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --ck-font-latin: 'Familjen Grotesk', 'Inter', system-ui, sans-serif;
+  --ck-font-ko: 'Pretendard Variable', 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --ck-font-display: var(--ck-font-latin), var(--ck-font-ko);
+  --ck-font-body: var(--ck-font-ko);
+  --ck-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
 
-  --ck-display-xl: clamp(48px, 8vw, 128px);
-  --ck-display-lg: clamp(36px, 5vw, 72px);
-  --ck-display-md: clamp(28px, 3.2vw, 44px);
-  --ck-body: clamp(16px, 1.15vw, 19px);
+  --ck-display-weight: 400;
+  --ck-display-tracking: -0.02em;
+  --ck-display-leading: 1.08;
+
+  /* 라틴 기준 96~130px, 한글은 그 85~90% */
+  --ck-display-xl: clamp(44px, 7.2vw, 112px);
+  --ck-display-lg: clamp(34px, 4.6vw, 72px);
+  --ck-display-md: clamp(26px, 2.8vw, 40px);
+  --ck-display-statement: clamp(28px, 3.6vw, 56px);
+  --ck-number: clamp(56px, 8vw, 136px);
+  --ck-body: clamp(16px, 1.1vw, 18px);
   --ck-eyebrow: 12px;
 
   --ck-gutter: clamp(20px, 5vw, 96px);
   --ck-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ck-type-serif {
+  --ck-font-display: 'Instrument Serif', 'Noto Serif KR', 'Apple Myungjo', serif;
+  --ck-display-weight: 400;
+  --ck-display-tracking: -0.01em;
+  --ck-display-leading: 1.12;
+}
+
+.ck-type-compact,
+.ck-page--bold {
+  --ck-font-latin: 'Wanted Sans Variable', 'Wanted Sans', 'Familjen Grotesk', sans-serif;
+  --ck-font-ko: 'Wanted Sans Variable', 'Wanted Sans', 'Pretendard Variable', 'Pretendard', sans-serif;
+  --ck-font-display: var(--ck-font-latin), var(--ck-font-ko);
+  --ck-font-body: var(--ck-font-ko);
+  --ck-display-weight: 600;
+  --ck-display-tracking: -0.035em;
+  --ck-display-leading: 1.0;
 }
 
 html.ck-lenis,
@@ -29,27 +63,25 @@ html.ck-lenis body {
   height: auto;
 }
 
-/* 굵은 산세리프 디스플레이 변형(wearebrand.io 결) — 세리프 대신 Black 웨이트, 자간 더 촘촘. */
-.ck-page--bold {
-  --ck-font-display: 'Noto Sans KR', 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
-}
-
-.ck-page--bold .ck-display {
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  line-height: 1.0;
-}
-
 .ck-page {
   background: var(--ck-bg);
   color: var(--ck-text);
   font-family: var(--ck-font-body);
   font-size: var(--ck-body);
-  line-height: 1.6;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0; /* 한글 본문 음수 자간 금지 */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
 }
 
+.ck-page p {
+  max-width: 34em; /* 한글 본문 한 줄 30~36자 */
+}
+
+/* 눈썹 — 영문·숫자·시간·위치 라벨은 모노 대문자. 한글 라벨은 .ck-eyebrow--ko */
 .ck-eyebrow {
   font-family: var(--ck-font-mono);
   font-size: var(--ck-eyebrow);
@@ -58,13 +90,24 @@ html.ck-lenis body {
   color: var(--ck-accent);
 }
 
+.ck-eyebrow--ko {
+  font-family: var(--ck-font-body);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: none;
+}
+
 .ck-display {
   font-family: var(--ck-font-display);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 1.08;
+  font-weight: var(--ck-display-weight);
+  letter-spacing: var(--ck-display-tracking);
+  line-height: var(--ck-display-leading);
   text-wrap: balance;
+  word-break: keep-all; /* 어절 중간 줄바꿈 금지 */
+  overflow-wrap: anywhere;
+  hyphens: none;
   margin: 0;
+  font-feature-settings: 'ss01', 'cv11';
 }
 
 .ck-display--xl {
@@ -79,6 +122,39 @@ html.ck-lenis body {
   font-size: var(--ck-display-md);
 }
 
+.ck-display--statement {
+  font-size: var(--ck-display-statement);
+  line-height: 1.22;
+  letter-spacing: -0.015em;
+  max-width: 24em;
+  text-wrap: pretty;
+}
+
+/* 대문자 장치의 한글 대체 — 한 줄 안의 굵기 대비 / 크기 대비 */
+.ck-em {
+  font-weight: 600;
+}
+
+.ck-em--big {
+  font-size: 1.6em;
+  line-height: 0.9;
+  vertical-align: -0.08em;
+}
+
+.ck-em--dim {
+  color: var(--ck-muted);
+  font-weight: inherit;
+}
+
+/* 숫자는 항상 라틴 서체 + 고정폭 숫자 */
+.ck-num {
+  font-family: var(--ck-font-latin), var(--ck-font-ko);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--ck-display-weight);
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+}
+
 .ck-btn {
   display: inline-flex;
   align-items: center;
@@ -87,7 +163,7 @@ html.ck-lenis body {
   border-radius: 999px;
   background: var(--ck-accent);
   color: #fff;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
   transition: transform 400ms var(--ck-ease), background 300ms;
 }
@@ -115,9 +191,108 @@ html.ck-reduced .ck-reveal {
   transition: opacity 900ms var(--ck-ease), transform 900ms var(--ck-ease);
 }
 
+/* 텍스트 리빌 — 단어는 inline-block(keep-all 유지), 글자는 그 안에서 stagger */
+.ck-split-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.ck-split-char {
+  display: inline-block;
+}
+
+/* 마퀴 */
+.ck-marquee {
+  overflow: hidden;
+  white-space: nowrap;
+  border-top: 1px solid var(--ck-line);
+  border-bottom: 1px solid var(--ck-line);
+  padding-block: 18px;
+}
+
+.ck-marquee__track {
+  display: inline-flex;
+  gap: 0;
+  animation: ck-marquee var(--ck-marquee-duration, 28s) linear infinite;
+  will-change: transform;
+}
+
+.ck-marquee__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  padding-inline: 0.5em;
+  font-family: var(--ck-font-display);
+  font-size: var(--ck-display-lg);
+  font-weight: var(--ck-display-weight);
+  letter-spacing: var(--ck-display-tracking);
+  color: var(--ck-muted);
+}
+
+.ck-marquee__item--em {
+  color: var(--ck-text);
+  font-weight: 600;
+}
+
+.ck-marquee__dot {
+  color: var(--ck-accent);
+}
+
+@keyframes ck-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* 핀 챕터 미디어 크로스페이드 */
+.ck-pin-media {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 700ms var(--ck-ease);
+}
+
+.ck-pin-media[data-active='true'] {
+  opacity: 1;
+}
+
+.ck-pin-text {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 500ms var(--ck-ease), transform 500ms var(--ck-ease);
+  pointer-events: none;
+}
+
+.ck-pin-text[data-active='true'] {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+/* 인덱스 목록은 숨기지 않고 흐리게 */
+li.ck-pin-text {
+  opacity: 0.38;
+  transform: none;
+  pointer-events: auto;
+}
+
+li.ck-pin-text[data-active='true'] {
+  opacity: 1;
+  color: var(--ck-accent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ck-reveal {
     opacity: 1;
     transform: none;
+  }
+
+  .ck-marquee__track {
+    animation: none;
+  }
+
+  .ck-pin-media,
+  .ck-pin-text {
+    transition: none;
   }
 }
