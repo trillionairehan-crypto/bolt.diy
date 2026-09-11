@@ -1,5 +1,6 @@
 import { generateGeminiImage, type GeminiImageResult } from './gemini-image';
 import { putR2Object, r2PublicUrl, type R2Config } from './r2';
+import { pickShotList } from '~/lib/media/shotlist';
 
 /**
  * 골격 7(소개·홍보형) 이미지 세트 — 히어로 1장을 먼저 만들고, 그 결과를 레퍼런스로 ch1 → ch2 → ch3를
@@ -61,21 +62,15 @@ const STYLE_LOCK = (accentHex: string, dark: boolean) =>
 function buildHeroPrompt(input: Skeleton7ImageSetInput): string {
   return [
     `Hero photograph for a Korean small business website. Business: ${input.industry}. What the owner asked for: "${input.prompt}".`,
-    'Wide establishing shot that shows the place or the craft at its best moment.',
+    pickShotList(input.industry).hero,
     STYLE_LOCK(input.accentHex, input.darkPalette),
   ].join('\n');
 }
 
-const CHAPTER_SUBJECTS: Record<Exclude<Skeleton7Slot, 'hero'>, string> = {
-  ch1: 'Close-up detail of the signature product, service, or craft — hands at work or the product itself.',
-  ch2: 'The space or atmosphere customers experience — interior, seating, tools, or workspace, mid-distance.',
-  ch3: 'A welcoming closing image — entrance, storefront, table setting, or a finished result ready for a customer.',
-};
-
 function buildChapterPrompt(slot: Exclude<Skeleton7Slot, 'hero'>, input: Skeleton7ImageSetInput): string {
   return [
     `Continue the same photo series as the reference image (same place, same palette, same light). Business: ${input.industry}.`,
-    CHAPTER_SUBJECTS[slot],
+    pickShotList(input.industry)[slot],
     'Match the reference image exactly in color grading, lighting, and texture. Different subject and framing, same world.',
     STYLE_LOCK(input.accentHex, input.darkPalette),
   ].join('\n');

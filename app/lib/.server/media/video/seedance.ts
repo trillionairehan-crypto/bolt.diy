@@ -72,13 +72,17 @@ export function createSeedanceProvider(config: SeedanceConfig): VideoProvider {
     async createTask(input: VideoTaskInput) {
       // 실측: 2.5는 i2v에서 --camerafixed를 거부한다("camera_fixed … must be empty") — 카메라 고정은 프롬프트 문장으로만.
       const text = `${input.prompt || DEFAULT_LOOP_PROMPT} --duration ${input.durationSec} --ratio adaptive --resolution ${resolution} --watermark false`;
-      const body = {
-        model: input.model || model,
-        content: [
-          { type: 'text', text },
-          { type: 'image_url', image_url: { url: input.imageUrl }, role: 'first_frame' },
-        ],
-      };
+      const content: Array<Record<string, unknown>> = [
+        { type: 'text', text },
+        { type: 'image_url', image_url: { url: input.imageUrl }, role: 'first_frame' },
+      ];
+
+      if (input.loop) {
+        // 첫·끝 프레임을 같은 이미지로 — 루프 이음새가 사라진다(ModelArk 첫+끝 프레임 I2V).
+        content.push({ type: 'image_url', image_url: { url: input.imageUrl }, role: 'last_frame' });
+      }
+
+      const body = { model: input.model || model, content };
 
       const response = await fetch(`${baseUrl}/contents/generations/tasks`, {
         method: 'POST',

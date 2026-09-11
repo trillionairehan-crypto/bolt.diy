@@ -96,7 +96,7 @@ export function createKlingProvider(config: KlingConfig): VideoProvider {
     model,
 
     async createTask(input: VideoTaskInput) {
-      const body = {
+      const body: Record<string, unknown> = {
         model_name: input.model || model,
         image: input.imageUrl,
         prompt: input.prompt || DEFAULT_LOOP_PROMPT,
@@ -104,6 +104,11 @@ export function createKlingProvider(config: KlingConfig): VideoProvider {
         duration: String(input.durationSec),
         cfg_scale: 0.5,
       };
+
+      if (input.loop && mode === 'pro') {
+        // 끝 프레임 지정(image_tail)은 pro 모드에서만 받는다 — std는 프롬프트 문장으로만 루프를 노린다.
+        body.image_tail = input.imageUrl;
+      }
 
       const response = await fetch(`${baseUrl}/v1/videos/image2video`, {
         method: 'POST',

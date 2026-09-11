@@ -3,6 +3,7 @@ import { chatId as chatIdAtom, ensureChatId } from '~/lib/persistence';
 import { selectReviewableEntries } from '~/utils/reviewGeneratedApp';
 import { createScopedLogger } from '~/utils/logger';
 import { injectSkeleton7Images, type Skeleton7ImageUrls } from './injectSkeleton7Images';
+import { buildLoopMotionPrompt } from './shotlist';
 import { isSkeleton7File } from '~/lib/review/mechanical-checks';
 
 /**
@@ -177,7 +178,9 @@ export async function prepareSkeleton7Images(input: Skeleton7ImageJobInput): Pro
 
   if (video) {
     // 히어로 이미지가 R2에 올라간 뒤에야 영상을 만들 수 있다 — 이미지 세트 완료에 체이닝.
-    job.videoPromise = job.promise.then((result) => (result?.hero ? runVideoJob(jobId, result.hero, video) : null));
+    job.videoPromise = job.promise.then((result) =>
+      result?.hero ? runVideoJob(jobId, result.hero, video, input.industry) : null,
+    );
   }
 
   pending = job;
@@ -186,14 +189,25 @@ export async function prepareSkeleton7Images(input: Skeleton7ImageJobInput): Pro
 }
 
 /** POST로 작업을 만들고 GET으로 폴링, 완료되면 서버가 R2에 복사한 URL을 돌려준다. 실패·타임아웃은 null. */
-async function runVideoJob(jobId: string, heroImageUrl: string, video: ReservedVideo): Promise<string | null> {
+async function runVideoJob(
+  jobId: string,
+  heroImageUrl: string,
+  video: ReservedVideo,
+  industry: string,
+): Promise<string | null> {
   const chatId = chatIdAtom.get() ?? '';
 
   try {
     const created = await fetch('/api/media-video', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jobId, imageUrl: heroImageUrl, provider: video.provider }),
+      body: JSON.stringify({
+        jobId,
+        imageUrl: heroImageUrl,
+        provider: video.provider,
+        prompt: buildLoopMotionPrompt(industry),
+        loop: true,
+      }),
     });
 
     if (!created.ok) {

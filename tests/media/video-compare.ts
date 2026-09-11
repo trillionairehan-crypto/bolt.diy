@@ -13,6 +13,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { readR2Config } from '~/lib/.server/media/r2';
 import { getVideoProvider, type VideoProvider, type VideoProviderName } from '~/lib/.server/media/video';
 import { copyVideoToR2 } from '~/lib/.server/media/video/store';
+import { buildLoopMotionPrompt } from '~/lib/media/shotlist';
 
 const DEFAULT_IMAGE =
   'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/smoke-1789109212936/1789109212936-hero.jpg';
@@ -67,7 +68,13 @@ async function runOne(
   const started = Date.now();
 
   try {
-    const { taskId } = await provider.createTask({ imageUrl, durationSec: 5 });
+    const loop = !process.argv.includes('--no-loop');
+    const { taskId } = await provider.createTask({
+      imageUrl,
+      durationSec: 5,
+      loop,
+      prompt: buildLoopMotionPrompt(argValue('--industry') || '카페·음식점'),
+    });
     const createMs = Date.now() - started;
     console.log(`[${provider.name}] task ${taskId} created in ${createMs}ms`);
 

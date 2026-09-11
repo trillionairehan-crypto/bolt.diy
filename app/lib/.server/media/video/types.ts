@@ -15,6 +15,9 @@ export interface VideoTaskInput {
 
   /** 공급자별 모델 id 덮어쓰기(없으면 env 기본값). */
   model?: string;
+
+  /** 같은 이미지를 마지막 프레임으로도 줘서 이음새 없는 루프를 노린다(공급자가 지원할 때만). */
+  loop?: boolean;
 }
 
 export type VideoTaskStatus = 'queued' | 'running' | 'succeeded' | 'failed';

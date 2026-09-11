@@ -45,7 +45,7 @@ function resolveProvider(env: Record<string, string | undefined>, requested: unk
 export async function action({ request, context }: ActionFunctionArgs) {
   const env = readEnv(context);
 
-  let body: { jobId?: string; imageUrl?: string; provider?: string; prompt?: string; model?: string };
+  let body: { jobId?: string; imageUrl?: string; provider?: string; prompt?: string; model?: string; loop?: boolean };
 
   try {
     body = await request.json();
@@ -72,6 +72,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
       prompt: typeof body.prompt === 'string' ? body.prompt.slice(0, 500) : undefined,
       durationSec: 5,
       model: typeof body.model === 'string' ? body.model.slice(0, 80) : undefined,
+      loop: body.loop !== false,
     });
 
     logger.info('video task created', { provider: name, model: provider.model, taskId, jobId });
