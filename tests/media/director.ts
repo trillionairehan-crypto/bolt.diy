@@ -147,6 +147,33 @@ async function openaiEdit(
   return { bytes: new Uint8Array(Buffer.from(body.data[0].b64_json, 'base64')), mimeType: 'image/jpeg' };
 }
 
+/** ByteDance Seedream 5.0 Pro (ModelArk) — ARK_API_KEY, 16:9, 레퍼런스 앵커는 image[] 로 동봉(스타일 참조) */
+async function seedreamImage(
+  env: Record<string, string>,
+  model: string,
+  prompt: string,
+  refs: Array<{ bytes: Uint8Array; mimeType: string }> = [],
+): Promise<{ bytes: Uint8Array; mimeType: string }> {
+  const body: Record<string, unknown> = { model, prompt, size: '2048x1152', response_format: 'url', watermark: false };
+
+  if (refs.length) {
+    body.image = refs.slice(0, 4).map((r) => `data:${r.mimeType};base64,${Buffer.from(r.bytes).toString('base64')}`);
+  }
+
+  const res = await fetch('https://ark.ap-southeast.bytepluses.com/api/v3/images/generations', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${env.ARK_API_KEY}` },
+    body: JSON.stringify(body),
+  });
+  const data = (await res.json()) as { data?: Array<{ url?: string }>; error?: { message?: string } };
+
+  if (!res.ok || !data.data?.[0]?.url) {
+    throw new Error(`${model}: ${res.status} ${data.error?.message || JSON.stringify(data).slice(0, 160)}`);
+  }
+
+  return fetchBytes(data.data[0].url);
+}
+
 function extractJson<T>(text: string): T {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
   const raw = fenced ? fenced[1] : text;
@@ -376,6 +403,14 @@ async function main() {
     let idx = 0;
 
     const generate = async (gen: string, prompt: string) => {
+      if (/seedream/.test(gen)) {
+        const refPrompt = references.length
+          ? `Use the attached images only as a reference for lighting, colour grading, texture and composition style — do not copy their content. ${prompt}`
+          : prompt;
+
+        return { ...(await seedreamImage(env, gen, refPrompt, references)), costUsd: 0.075 };
+      }
+
       if (gen.startsWith('gpt-image')) {
         const refPrompt = references.length
           ? `Use the attached images only as a reference for lighting, colour grading, texture and composition style — do not copy their content. ${prompt}`

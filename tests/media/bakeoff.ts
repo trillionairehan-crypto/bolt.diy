@@ -182,7 +182,7 @@ async function seedreamImage(
   const res = await fetch('https://ark.ap-southeast.bytepluses.com/api/v3/images/generations', {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${env.ARK_API_KEY}` },
-    body: JSON.stringify({ model, prompt, size: '2K', response_format: 'url', watermark: false }),
+    body: JSON.stringify({ model, prompt, size: '2048x1152', response_format: 'url', watermark: false }),
   });
   const body = (await res.json()) as {
     data?: Array<{ url?: string; b64_json?: string }>;
@@ -285,7 +285,7 @@ async function main() {
               aspectRatio: '16:9',
               model,
             })
-          : model.startsWith('seedream')
+          : /^(dola-)?seedream/.test(model)
             ? await seedreamImage(env, model, brief.prompt)
             : model.startsWith('flux')
               ? await fluxImage(env, model, brief.prompt)
