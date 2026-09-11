@@ -28,14 +28,25 @@ export interface Skeleton7ImageJobInput {
   darkPalette: boolean;
 }
 
+interface ReservedVideo {
+  provider: string;
+  url: string;
+}
+
 interface PendingJob {
   jobId: string;
   urls: Skeleton7ImageUrls;
+  video?: ReservedVideo;
   promise: Promise<Skeleton7ImageUrls | null>;
+
+  /** 히어로 영상 — 이미지 세트가 끝난 뒤 시작, 완료 시 R2 URL. 공급자 미설정이면 undefined. */
+  videoPromise?: Promise<string | null>;
 }
 
 const RESERVE_TIMEOUT_MS = 8_000;
 const REQUEST_TIMEOUT_MS = 250_000;
+const VIDEO_POLL_INTERVAL_MS = 10_000;
+const VIDEO_POLL_TIMEOUT_MS = 8 * 60_000;
 
 let pending: PendingJob | null = null;
 let lastInput: Skeleton7ImageJobInput | null = null;
@@ -51,7 +62,7 @@ function newJobId(): string {
   return `j${Date.now().toString(36)}-${rand}`;
 }
 
-async function reserveUrls(jobId: string): Promise<Skeleton7ImageUrls | null> {
+async function reserveUrls(jobId: string): Promise<{ images: Skeleton7ImageUrls; video?: ReservedVideo } | null> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), RESERVE_TIMEOUT_MS);
 
@@ -68,9 +79,9 @@ async function reserveUrls(jobId: string): Promise<Skeleton7ImageUrls | null> {
       return null;
     }
 
-    const data = (await response.json()) as { images?: Skeleton7ImageUrls };
+    const data = (await response.json()) as { images?: Skeleton7ImageUrls; video?: ReservedVideo };
 
-    return data.images ?? null;
+    return data.images ? { images: data.images, video: data.video } : null;
   } catch (error) {
     logger.warn('reserve errored', error);
     return null;
@@ -126,11 +137,19 @@ export interface PreparedSkeleton7Images {
   promptLines: string[];
 }
 
-function buildPromptLines(urls: Skeleton7ImageUrls): string[] {
-  return [
+function buildPromptLines(urls: Skeleton7ImageUrls, video?: ReservedVideo): string[] {
+  const lines = [
     `사진 4장(사용자가 준 실제 URL — 반드시 이 URL 그대로 <img src>에 쓴다, 다른 이미지 URL이나 플레이스홀더 금지): 히어로 전면 배경 = ${urls.hero} · 챕터 1 = ${urls.ch1} · 챕터 2 = ${urls.ch2} · 챕터 3 = ${urls.ch3}`,
     '사진이 있으므로 코랄 틴트 플레이스홀더 박스와 "사진을 보내주시면 여기에 넣어드릴게요" 문구는 어디에도 쓰지 않는다. 히어로는 이미지를 전면(objectFit cover, 100vh)으로 깔고 그 위에 어두운 그라데이션과 흰 헤드라인을 올린다. 챕터 1~3은 각 이미지를 4:3 비율로 캡션 옆에 놓는다(loading="lazy", alt는 업종에 맞는 짧은 설명).',
   ];
+
+  if (video) {
+    lines.push(
+      `히어로 영상(사용자가 준 무음 5초 루프, URL = ${video.url}): 히어로 배경을 <video src="${video.url}" poster="${urls.hero}" autoPlay muted loop playsInline style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />로 깐다 — 단 window.matchMedia('(min-width: 768px)')가 참일 때만 video를 렌더하고, 모바일에서는 같은 자리에 히어로 이미지 <img>만 쓴다(useState+useEffect로 판별). 영상은 준비 중일 수 있으니 poster를 반드시 넣는다.`,
+    );
+  }
+
+  return lines;
 }
 
 /**
@@ -141,20 +160,93 @@ export async function prepareSkeleton7Images(input: Skeleton7ImageJobInput): Pro
   lastInput = input;
 
   if (pending) {
-    return { urls: pending.urls, promptLines: buildPromptLines(pending.urls) };
+    return { urls: pending.urls, promptLines: buildPromptLines(pending.urls, pending.video) };
   }
 
   const jobId = newJobId();
-  const urls = await reserveUrls(jobId);
+  const reserved = await reserveUrls(jobId);
 
-  if (!urls || !urls.hero) {
+  if (!reserved || !reserved.images.hero) {
     return null;
   }
 
-  logger.info('image set job started', { jobId, industry: input.industry });
-  pending = { jobId, urls, promise: requestImageSet(jobId, input) };
+  const { images: urls, video } = reserved;
+  logger.info('image set job started', { jobId, industry: input.industry, video: video?.provider ?? 'none' });
 
-  return { urls, promptLines: buildPromptLines(urls) };
+  const job: PendingJob = { jobId, urls, video, promise: requestImageSet(jobId, input) };
+
+  if (video) {
+    // 히어로 이미지가 R2에 올라간 뒤에야 영상을 만들 수 있다 — 이미지 세트 완료에 체이닝.
+    job.videoPromise = job.promise.then((result) => (result?.hero ? runVideoJob(jobId, result.hero, video) : null));
+  }
+
+  pending = job;
+
+  return { urls, promptLines: buildPromptLines(urls, video) };
+}
+
+/** POST로 작업을 만들고 GET으로 폴링, 완료되면 서버가 R2에 복사한 URL을 돌려준다. 실패·타임아웃은 null. */
+async function runVideoJob(jobId: string, heroImageUrl: string, video: ReservedVideo): Promise<string | null> {
+  const chatId = chatIdAtom.get() ?? '';
+
+  try {
+    const created = await fetch('/api/media-video', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobId, imageUrl: heroImageUrl, provider: video.provider }),
+    });
+
+    if (!created.ok) {
+      logger.warn('video task create failed', created.status);
+      return null;
+    }
+
+    const { taskId } = (await created.json()) as { taskId?: string };
+
+    if (!taskId) {
+      return null;
+    }
+
+    logger.info('video task created', { provider: video.provider, taskId });
+
+    const started = Date.now();
+
+    while (Date.now() - started < VIDEO_POLL_TIMEOUT_MS) {
+      await new Promise((resolve) => setTimeout(resolve, VIDEO_POLL_INTERVAL_MS));
+
+      const params = new URLSearchParams({ jobId, taskId, provider: video.provider, chatId });
+      const polled = await fetch(`/api/media-video?${params.toString()}`);
+
+      if (!polled.ok) {
+        logger.warn('video poll failed', polled.status);
+        return null;
+      }
+
+      const state = (await polled.json()) as { status?: string; url?: string; costUsd?: number; error?: string };
+
+      if (state.status === 'succeeded' && state.url) {
+        logger.info('video ready', {
+          provider: video.provider,
+          url: state.url,
+          costUsd: state.costUsd,
+          elapsedMs: Date.now() - started,
+        });
+        return state.url;
+      }
+
+      if (state.status === 'failed') {
+        logger.warn('video task failed', state.error);
+        return null;
+      }
+    }
+
+    logger.warn('video poll timeout');
+
+    return null;
+  } catch (error) {
+    logger.warn('video job errored', error);
+    return null;
+  }
 }
 
 /** 골격 7 기본값이 아닐 때 — 시작은 안 하고 재료만 기억해둔다(생성물이 골격 7로 나오면 그때 시작). */
@@ -169,16 +261,35 @@ export interface ApplyResult {
   mode: 'prompted' | 'injected';
 }
 
-function addCacheBuster(content: string, urls: Skeleton7ImageUrls, stamp: number): string {
-  let next = content;
+/*
+ * LLM이 URL을 직접 썼는데 파일(이미지·영상)이 미리보기보다 늦게 올라온 경우, src가 바뀌지 않으면 브라우저가
+ * 다시 요청하지 않는다. URL 뒤에 ?v=를 붙여 파일을 한 번 다시 써서 HMR로 다시 그리게 한다. 이미 ?v=가
+ * 붙은 URL은 건너뛴다(멱등).
+ */
+async function bustUrls(urls: string[]): Promise<string[]> {
+  const stamp = Date.now();
+  const filesWritten: string[] = [];
 
-  for (const url of Object.values(urls)) {
-    if (url) {
-      next = next.split(url).join(`${url}?v=${stamp}`);
+  for (const [filePath, file] of selectReviewableEntries(workbenchStore.files.get())) {
+    let next = file.content;
+
+    for (const url of urls) {
+      if (next.includes(url) && !next.includes(`${url}?v=`)) {
+        next = next.split(url).join(`${url}?v=${stamp}`);
+      }
+    }
+
+    if (next !== file.content) {
+      await workbenchStore.writeFileDirect(filePath, next);
+      filesWritten.push(filePath);
     }
   }
 
-  return next;
+  if (filesWritten.length > 0) {
+    workbenchStore.resetAllFileModifications();
+  }
+
+  return filesWritten;
 }
 
 export async function applySkeleton7Images(): Promise<ApplyResult | null> {
@@ -225,20 +336,18 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
   const filesWritten: string[] = [];
 
   if (alreadyPrompted) {
-    // LLM이 URL을 직접 썼다 — 이미지가 미리보기보다 늦게 올라왔을 수 있으니 캐시버스터로 한 번 다시 그린다.
-    const stamp = Date.now();
+    filesWritten.push(...(await bustUrls(Object.values(urls).filter((url): url is string => Boolean(url)))));
 
-    for (const [filePath, file] of reviewable) {
-      if (!file.content.includes(urls.hero as string) || file.content.includes(`?v=`)) {
-        continue;
-      }
+    // 영상은 이미지보다 1~5분 늦다 — 기다리지 않고, 준비되면 그 URL만 한 번 더 다시 그린다.
+    if (job.videoPromise && job.video) {
+      const videoUrl = job.video.url;
 
-      await workbenchStore.writeFileDirect(filePath, addCacheBuster(file.content, urls, stamp));
-      filesWritten.push(filePath);
-    }
-
-    if (filesWritten.length > 0) {
-      workbenchStore.resetAllFileModifications();
+      void job.videoPromise.then(async (ready) => {
+        if (ready) {
+          const written = await bustUrls([videoUrl]);
+          logger.info('video applied', { filesWritten: written });
+        }
+      });
     }
 
     const summary: ApplyResult = { filesWritten, injected: [], missing: [], mode: 'prompted' };

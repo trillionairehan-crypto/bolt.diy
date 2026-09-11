@@ -3,8 +3,9 @@ import * as Sentry from '@sentry/remix';
 import { getPlatformUserId } from '~/lib/cloud/cloudPlatformAuth';
 import { recordMessageUsageInBackground } from '~/lib/cloud/messageUsage';
 import { GeminiImageError } from '~/lib/.server/media/gemini-image';
-import { R2UploadError, readR2Config } from '~/lib/.server/media/r2';
+import { R2UploadError, r2PublicUrl, readR2Config } from '~/lib/.server/media/r2';
 import { JOB_ID_REGEX, generateSkeleton7ImageSet, skeleton7ImageUrls } from '~/lib/.server/media/skeleton7-image-set';
+import { defaultVideoProviderName, getVideoProvider, type VideoEnv } from '~/lib/.server/media/video';
 import { createScopedLogger } from '~/utils/logger';
 
 const logger = createScopedLogger('api.media-images');
@@ -60,7 +61,23 @@ export async function action({ request, context }: ActionFunctionArgs) {
   }
 
   if (body.reserve === true) {
-    return json({ jobId, images: skeleton7ImageUrls(r2, jobId) });
+    /*
+     * 영상 공급자가 설정돼 있으면 히어로 영상 URL도 미리 정해 준다 — 키 `media/{jobId}/hero-{provider}.mp4`는
+     * api.media-video.ts가 완료 시 쓰는 키와 같아야 한다. 프롬프트에 <video src>로 먼저 들어가고, 파일은 나중에 생긴다.
+     */
+    const videoEnv = {
+      VIDEO_PROVIDER: env?.VIDEO_PROVIDER || process.env.VIDEO_PROVIDER,
+      ARK_API_KEY: env?.ARK_API_KEY || process.env.ARK_API_KEY,
+      KLING_API_KEY: env?.KLING_API_KEY || process.env.KLING_API_KEY,
+      KLING_ACCESS_KEY: env?.KLING_ACCESS_KEY || process.env.KLING_ACCESS_KEY,
+      KLING_SECRET_KEY: env?.KLING_SECRET_KEY || process.env.KLING_SECRET_KEY,
+    } satisfies VideoEnv;
+    const providerName = defaultVideoProviderName(videoEnv);
+    const video = getVideoProvider(providerName, videoEnv)
+      ? { provider: providerName, url: r2PublicUrl(r2, `media/${jobId}/hero-${providerName}.mp4`) }
+      : undefined;
+
+    return json({ jobId, images: skeleton7ImageUrls(r2, jobId), video });
   }
 
   const chatId = typeof body.chatId === 'string' ? body.chatId.trim() : '';
