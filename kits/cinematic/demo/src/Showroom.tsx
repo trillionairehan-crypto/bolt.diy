@@ -18,6 +18,8 @@ interface WorldCard {
   frames?: string[];
   headline: string;
   sub: string;
+  /** 밝은 종이 배경(수채)은 흰 글자가 안 읽힌다 → ink: 'dark' 로 검정 글자 + 그라데이션 없음 */
+  ink?: 'light' | 'dark';
 }
 
 const CARDS = showroom as WorldCard[];
@@ -45,16 +47,18 @@ export default function Showroom() {
         {CARDS.map((card) => {
           const typeClass = card.typePreset === 'serif' ? 'ck-type-serif' : card.typePreset === 'compact' ? 'ck-type-compact' : '';
           const dark = card.theme === 'dark';
+          const inkDark = card.ink === 'dark';
+          const fg = inkDark ? 'var(--ck-text)' : '#fff';
           const chosen = active === card.id;
           const text = (
             <div style={{ display: 'grid', gap: '16px', maxWidth: '1100px' }}>
-              <span className="ck-eyebrow" style={{ color: dark ? 'var(--ck-accent)' : '#fff' }}>
+              <span className="ck-eyebrow" style={{ color: dark || inkDark ? 'var(--ck-accent)' : '#fff' }}>
                 {card.label} · {card.reference}
               </span>
-              <h2 className="ck-display ck-display--xl" style={{ maxWidth: '14ch', color: '#fff' }}>
+              <h2 className="ck-display ck-display--xl" style={{ maxWidth: '14ch', color: fg }}>
                 {card.headline}
               </h2>
-              <p style={{ margin: 0, maxWidth: '34em', color: 'rgba(255,255,255,0.86)' }}>{card.sub}</p>
+              <p style={{ margin: 0, maxWidth: '34em', color: fg, opacity: 0.86 }}>{card.sub}</p>
               <div>
                 <button type="button" className="ck-btn" data-cursor="hover" onClick={() => setActive(chosen ? null : card.id)} style={{ border: 0, cursor: 'pointer' }}>
                   {chosen ? '선택됨 ✓' : '이 세계관으로'}
@@ -82,7 +86,7 @@ export default function Showroom() {
             >
               <img src={card.still} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: -2 }} />
               {card.video ? <video src={card.video} poster={card.still} autoPlay muted loop playsInline style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: -2 }} /> : null}
-              <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.62) 100%)' }} />
+              {inkDark ? null : <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.62) 100%)' }} />}
               {text}
             </section>
           );
