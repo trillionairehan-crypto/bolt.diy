@@ -14,6 +14,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { generateGeminiImage } from '~/lib/.server/media/gemini-image';
 import { putR2Object, readR2Config } from '~/lib/.server/media/r2';
 import { getWorld, type WorldId } from '~/lib/media/style-locks';
+import { getLook, lookToPrompt, pickLook, type LookId } from '~/lib/media/look-bibles';
 
 function loadEnv(): Record<string, string> {
   const env: Record<string, string> = { ...(process.env as Record<string, string>) };
@@ -245,16 +246,19 @@ Rules that separate award-grade stills from generic AI output:
 - Texture over gloss: matte, dust, crumbs, grain. Colour restrained.
 - Nothing that reads as a render when the world is photographic. No text, no logos, no watermarks. No photoreal people (painted or illustrated figures only if the world allows, faces turned away or small).
 - OBJECT BUDGET: at most 3 distinct objects/props per frame, never a crowd or a row of identical items (generators clone them), never packaging with printed text, never visible hands unless the world is painted and hands are simplified. Fewer things, rendered perfectly, beats more things.
+- MEDIUM UNITY: in a painted/illustrated world every element, including food and props, must be rendered in that medium — never a photoreal object pasted onto a painted background. ERA GUARD: every object must plausibly exist in the world's era (no electric lamps, plastic, modern packaging in a neoclassical scene).
 - REVISION RULE: when revising after jury notes, only SUBTRACT or SIMPLIFY (remove the failing prop, reduce object count, lower complexity of lighting). Never add new props to fix a problem.
 Write in English. Return JSON only.`;
 
 const CRITIC_SYSTEM = `You are a jury member for a web design award, judging hero photography/illustration. Score each image 0-10 where 9+ means it would pass unnoticed as a commissioned editorial shot on a Site-of-the-Day winner, 8 = good but one visible tell, 7 = competent stock, ≤6 = obvious AI/generic.
+Also judge cinematography like a DP: is there ONE motivated key light with a believable ratio and a real contact/anchor shadow? Is the light quality (hard/soft) consistent with its source? Is the camera height and focal length deliberate? Flat, sourceless, multi-directional or 'everything evenly lit' lighting is a tell.
 Check these AI tells and list every one that applies: centred-symmetric subject; plastic/over-glossy highlights; flawless too-perfect surfaces; generic stock composition; uniform lighting with no shadow anchor; melted/duplicated/impossible details; wrong hands or text-like scribbles; oversaturation; render-look where a photo was intended; no room for a headline; subject too small or too large; style drift from the requested world.
 Be harsh. Return JSON only: [{"index":0,"score":7.5,"tells":["..."],"fix":"one concrete instruction for the next shot"}]`;
 
 async function writeBriefs(
   env: Record<string, string>,
   world: ReturnType<typeof getWorld>,
+  look: ReturnType<typeof getLook>,
   brand: string,
   n: number,
   accent: string,
@@ -263,6 +267,7 @@ async function writeBriefs(
   const text = [
     `Brand: ${brand}`,
     `World / style lock (must be obeyed verbatim in every prompt): ${world.styleLock(accent)}`,
+    `Cinematography look (obey every line — this is how a DP would light and frame it; quote the Light and Camera lines inside each prompt): ${lookToPrompt(look)}`,
     `People policy: ${world.peoplePolicy === 'none' ? 'no people at all' : 'painted/illustrated figures allowed, faces turned away or small'}`,
     prior
       ? `Previous round briefs and jury critiques (fix every tell, keep what scored well):\n${prior.briefs.map((b, i) => `#${i} ${b.title}\nPROMPT: ${b.prompt}\nJURY: score ${prior.critiques[i]?.score} tells ${JSON.stringify(prior.critiques[i]?.tells)} fix: ${prior.critiques[i]?.fix}`).join('\n\n')}`
@@ -347,7 +352,18 @@ async function main() {
   console.log(`anchors ${references.length} · generators ${gens.join(',')} · samples ${samples} · edit top ${editTop}`);
 
   const shots: Shot[] = [];
-  let briefs = await writeBriefs(env, world, brand, n, accent);
+  const lookId =
+    (argValue('--look') as LookId) ||
+    pickLook(
+      world.id,
+      (argValue('--mood') || '').split(',').filter(Boolean),
+      world.theme,
+      /빵|카페|음식|food|bakery/i.test(brand),
+    );
+  const look = getLook(lookId);
+  console.log(`look ${look.id} — ${look.label}`);
+
+  let briefs = await writeBriefs(env, world, look, brand, n, accent);
   let cost = 0;
   const started = Date.now();
 
@@ -519,7 +535,7 @@ async function main() {
         fix: (best?.claude ?? best?.astra)?.fix ?? '',
       };
     });
-    briefs = await writeBriefs(env, world, brand, n, accent, { briefs, critiques: perBrief });
+    briefs = await writeBriefs(env, world, look, brand, n, accent, { briefs, critiques: perBrief });
   }
 
   const best = [...shots].sort((a, b) => (b.score ?? 0) - (a.score ?? 0)).slice(0, 3);
