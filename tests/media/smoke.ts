@@ -68,6 +68,7 @@ async function main() {
   if (full) {
     const set = await generateSkeleton7ImageSet(
       {
+        jobId: `smoke-${started}`,
         chatId: `smoke-${started}`,
         industry: '카페·음식점',
         prompt: '동네 소금빵 전문 빵집 소개 페이지',

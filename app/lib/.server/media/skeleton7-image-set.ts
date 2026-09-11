@@ -1,5 +1,5 @@
 import { generateGeminiImage, type GeminiImageResult } from './gemini-image';
-import { putR2Object, type R2Config } from './r2';
+import { putR2Object, r2PublicUrl, type R2Config } from './r2';
 
 /**
  * 골격 7(소개·홍보형) 이미지 세트 — 히어로 1장을 먼저 만들고, 그 결과를 레퍼런스로 ch1 → ch2 → ch3를
@@ -11,7 +11,11 @@ import { putR2Object, type R2Config } from './r2';
 export const SKELETON7_SLOTS = ['hero', 'ch1', 'ch2', 'ch3'] as const;
 export type Skeleton7Slot = (typeof SKELETON7_SLOTS)[number];
 
+export const JOB_ID_REGEX = /^[a-z0-9][a-z0-9-]{7,63}$/;
+
 export interface Skeleton7ImageSetInput {
+  /** 클라이언트가 생성 전에 미리 정한 잡 id — R2 키가 여기서 결정돼 URL을 프롬프트에 먼저 넣을 수 있다. */
+  jobId: string;
   chatId: string;
 
   /** 업종 라벨(예: "카페·음식점") 또는 사용자가 직접 입력한 업종 원문. */
@@ -40,13 +44,18 @@ export interface Skeleton7ImageSetDeps {
   signal?: AbortSignal;
 }
 
+/*
+ * 실측(2026-09-11, 4장 세트 1회): "clean negative space on one side"를 모델이 매번 "오른쪽 1/3을 흐린 벽으로
+ * 가림"으로 해석해 4장에 같은 장치가 반복됐다. 여백 지시를 빼고 전경 가림을 명시적으로 금지한다.
+ */
 const STYLE_LOCK = (accentHex: string, dark: boolean) =>
   [
     'Editorial photography, one cohesive series.',
     `Color grading: warm neutral base with a single accent hue close to ${accentHex}, low saturation, no neon.`,
     `Lighting: soft natural window light, ${dark ? 'moody low-key' : 'bright airy'}, gentle shadows, no harsh flash.`,
-    'Texture: subtle film grain, matte surfaces, shallow depth of field.',
-    'Composition: clean negative space on one side for a headline overlay. No text, no letters, no logos, no watermarks, no people looking at the camera.',
+    'Texture: subtle film grain, matte surfaces, shallow depth of field on the subject only.',
+    'Composition: full frame, nothing blurred or blocking the foreground edges, no walls or pillars cutting the frame.',
+    'No text, no letters, no signs, no logos, no watermarks, no people looking at the camera.',
   ].join(' ');
 
 function buildHeroPrompt(input: Skeleton7ImageSetInput): string {
@@ -72,22 +81,23 @@ function buildChapterPrompt(slot: Exclude<Skeleton7Slot, 'hero'>, input: Skeleto
   ].join('\n');
 }
 
-function extensionFor(mimeType: string): string {
-  if (mimeType === 'image/jpeg') {
-    return 'jpg';
-  }
-
-  if (mimeType === 'image/webp') {
-    return 'webp';
-  }
-
-  return 'png';
+/*
+ * 키는 잡 id + 슬롯으로 결정적이다 — 생성 전에 URL을 알아야 프롬프트에 "사용자 제공 사진"으로 넘길 수 있다.
+ * 확장자는 실제 mime과 무관하게 .jpg로 고정(R2가 저장된 Content-Type으로 서빙하므로 png가 와도 브라우저는
+ * 정상 표시한다).
+ */
+export function skeleton7ObjectKey(jobId: string, slot: Skeleton7Slot): string {
+  return `media/${jobId}/${slot}.jpg`;
 }
 
-export function skeleton7ObjectKey(chatId: string, slot: Skeleton7Slot, stamp: number, ext: string): string {
-  const safeChat = chatId.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 64);
+export function skeleton7ImageUrls(r2: R2Config, jobId: string): Record<Skeleton7Slot, string> {
+  const urls = {} as Record<Skeleton7Slot, string>;
 
-  return `media/${safeChat}/${stamp}-${slot}.${ext}`;
+  for (const slot of SKELETON7_SLOTS) {
+    urls[slot] = r2PublicUrl(r2, skeleton7ObjectKey(jobId, slot));
+  }
+
+  return urls;
 }
 
 export async function generateSkeleton7ImageSet(
@@ -95,7 +105,6 @@ export async function generateSkeleton7ImageSet(
   deps: Skeleton7ImageSetDeps,
 ): Promise<Skeleton7ImageSet> {
   const started = Date.now();
-  const stamp = started;
   const images = {} as Record<Skeleton7Slot, string>;
   let promptTokens = 0;
   let outputTokens = 0;
@@ -112,8 +121,7 @@ export async function generateSkeleton7ImageSet(
       signal: deps.signal,
     });
 
-    const key = skeleton7ObjectKey(input.chatId, slot, stamp, extensionFor(result.mimeType));
-    images[slot] = await putR2Object(deps.r2, key, result.bytes, result.mimeType);
+    images[slot] = await putR2Object(deps.r2, skeleton7ObjectKey(input.jobId, slot), result.bytes, result.mimeType);
 
     promptTokens += result.promptTokens;
     outputTokens += result.outputTokens;

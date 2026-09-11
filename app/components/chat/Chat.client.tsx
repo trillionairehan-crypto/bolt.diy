@@ -45,7 +45,12 @@ import { createGenerationChargeGate } from '~/lib/generationChargeGate';
 import { authUserStore } from '~/lib/stores/auth';
 import { buildFixPrompt } from '~/utils/buildFixPrompt';
 import { reviewGeneratedApp } from '~/utils/reviewGeneratedApp';
-import { applySkeleton7Images, rememberSkeleton7Context, startSkeleton7ImageJob } from '~/lib/media/skeleton7Images';
+import {
+  applySkeleton7Images,
+  looksLikeShowcasePrompt,
+  prepareSkeleton7Images,
+  rememberSkeleton7Context,
+} from '~/lib/media/skeleton7Images';
 import { getActivePalette } from '~/lib/palettes';
 import { setSidebarOpen } from '~/lib/stores/sidebar';
 import type { ProgressAnnotation } from '~/types/context';
@@ -1026,7 +1031,7 @@ export const ChatImpl = memo(
     };
 
     // Called by PromptClarification once the user finishes answering (or skips) — resumes generation.
-    const handleClarificationComplete = (finalPrompt: string, directives: GenerationDirectives) => {
+    const handleClarificationComplete = async (finalPrompt: string, directives: GenerationDirectives) => {
       setClarifyingPrompt(null);
 
       /*
@@ -1059,27 +1064,36 @@ export const ChatImpl = memo(
         setDesignScheme(designSchemeOverride);
       }
 
-      generateNewApp(finalPrompt, designSchemeOverride);
-
       /*
-       * 골격 7 이미지 세트 — 골격 7이 기본값이면 생성과 동시에 시작(LLM 생성 안에 끝난다), 아니면
-       * 재료만 기억해 생성물이 골격 7로 나올 때 시작한다. 주입은 자동 검토 뒤(applySkeleton7Images).
+       * 골격 7 이미지 세트 — 소개·홍보형일 가능성이 있으면(온보딩 매핑이 7이거나 요청 문장에 소개·홍보 류
+       * 단어) 생성 전에 R2 URL 4개를 예약해 프롬프트에 "사용자 제공 사진"으로 넣고, 이미지 생성은 LLM
+       * 생성과 동시에 돌린다. 아니면 재료만 기억해 생성물이 골격 7로 나올 때 시작한다(정규식 주입 폴백).
        */
+      let promptToSend = finalPrompt;
+
       if (directives.industry) {
         const palette = getActivePalette();
+        const userPrompt = finalPrompt.split(ONBOARDING_ADDITIONS_MARKER)[0].trim();
         const jobInput = {
           industry: directives.industry,
-          prompt: finalPrompt.split(ONBOARDING_ADDITIONS_MARKER)[0].trim(),
+          prompt: userPrompt,
           accentHex: palette.accent,
           darkPalette: palette.dark,
         };
 
-        if (directives.skeleton === 7) {
-          startSkeleton7ImageJob(jobInput);
+        if (directives.skeleton === 7 || looksLikeShowcasePrompt(userPrompt)) {
+          const prepared = await prepareSkeleton7Images(jobInput);
+
+          if (prepared) {
+            const separator = finalPrompt.includes(ONBOARDING_ADDITIONS_MARKER) ? '\n' : ONBOARDING_ADDITIONS_MARKER;
+            promptToSend = `${finalPrompt}${separator}${prepared.promptLines.map((line) => `- ${line}`).join('\n')}`;
+          }
         } else {
           rememberSkeleton7Context(jobInput);
         }
       }
+
+      generateNewApp(promptToSend, designSchemeOverride);
     };
 
     /**

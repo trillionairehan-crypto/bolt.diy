@@ -4,7 +4,7 @@ import { getPlatformUserId } from '~/lib/cloud/cloudPlatformAuth';
 import { recordMessageUsageInBackground } from '~/lib/cloud/messageUsage';
 import { GeminiImageError } from '~/lib/.server/media/gemini-image';
 import { R2UploadError, readR2Config } from '~/lib/.server/media/r2';
-import { generateSkeleton7ImageSet } from '~/lib/.server/media/skeleton7-image-set';
+import { JOB_ID_REGEX, generateSkeleton7ImageSet, skeleton7ImageUrls } from '~/lib/.server/media/skeleton7-image-set';
 import { createScopedLogger } from '~/utils/logger';
 
 const logger = createScopedLogger('api.media-images');
@@ -16,6 +16,9 @@ const logger = createScopedLogger('api.media-images');
  */
 
 interface MediaImagesBody {
+  /** true면 생성 없이 jobId에 대한 공개 URL 4개만 돌려준다(프롬프트에 먼저 넣기 위함). */
+  reserve?: boolean;
+  jobId?: string;
   chatId?: string;
   industry?: string;
   prompt?: string;
@@ -50,6 +53,16 @@ export async function action({ request, context }: ActionFunctionArgs) {
     return json({ error: 'invalid body' }, { status: 400 });
   }
 
+  const jobId = typeof body.jobId === 'string' && JOB_ID_REGEX.test(body.jobId) ? body.jobId : '';
+
+  if (!jobId) {
+    return json({ error: 'jobId required' }, { status: 400 });
+  }
+
+  if (body.reserve === true) {
+    return json({ jobId, images: skeleton7ImageUrls(r2, jobId) });
+  }
+
   const chatId = typeof body.chatId === 'string' ? body.chatId.trim() : '';
   const industry = typeof body.industry === 'string' ? body.industry.trim().slice(0, MAX_INDUSTRY_CHARS) : '';
   const prompt = typeof body.prompt === 'string' ? body.prompt.trim().slice(0, MAX_PROMPT_CHARS) : '';
@@ -67,7 +80,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
 
   try {
     const set = await generateSkeleton7ImageSet(
-      { chatId, industry, prompt, accentHex, darkPalette },
+      { jobId, chatId, industry, prompt, accentHex, darkPalette },
       { apiKey, r2, signal: controller.signal },
     );
 
