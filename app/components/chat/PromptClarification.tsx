@@ -96,6 +96,9 @@ export default function PromptClarification({ initialPrompt, onComplete }: Promp
       parts.push({ promptAdditions: [`업종: ${finalQ3.raw}`] });
     }
 
+    const industryLabel = finalQ3?.raw ?? Q3_GRID.find((item) => item.id === finalQ3?.gridItemId)?.label;
+    parts.push({ skeleton: finalQ3?.skeleton ?? null, industry: industryLabel });
+
     const merged = mergeDirectives(parts);
     const built =
       merged.promptAdditions.length > 0

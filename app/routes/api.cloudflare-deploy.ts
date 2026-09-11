@@ -5,8 +5,10 @@ import {
   injectMadeWithBadge,
   type CloudflareDeployFile,
 } from '~/lib/services/cloudflarePages';
+import * as Sentry from '@sentry/remix';
 import { getPlatformUserId } from '~/lib/cloud/cloudPlatformAuth';
 import { isProjectOwnedByOther } from '~/lib/deployedAppOwnership';
+import { collectMediaUrls, verifyMediaUrls } from '~/lib/.server/media/verifyMediaUrls';
 
 interface DeployRequestBody {
   projectName: string;
@@ -100,6 +102,27 @@ export async function action({ request, context }: ActionFunctionArgs) {
     });
   } catch {
     return json({ error: '파일 데이터가 손상됐어요. 다시 빌드한 뒤 시도해주세요.' }, { status: 400 });
+  }
+
+  // 생성된 이미지(R2)가 실제로 열리는지 배포 전에 확인 — 깨진 이미지를 배포하느니 막는다.
+  const mediaBaseUrl = context?.cloudflare?.env?.R2_PUBLIC_BASE_URL || process.env.R2_PUBLIC_BASE_URL;
+
+  if (mediaBaseUrl) {
+    const mediaUrls = collectMediaUrls(deployFiles, mediaBaseUrl);
+
+    if (mediaUrls.length > 0) {
+      const check = await verifyMediaUrls(mediaUrls);
+
+      if (check.broken.length > 0) {
+        Sentry.captureMessage('deploy blocked: generated image URL unreachable', {
+          level: 'warning',
+          tags: { route: 'api.cloudflare-deploy', event: 'media_url_broken' },
+          extra: { projectName, broken: check.broken },
+        });
+
+        return json({ error: '앱에 넣은 이미지를 아직 불러올 수 없어요. 잠시 후 다시 시도해주세요.' }, { status: 409 });
+      }
+    }
   }
 
   try {

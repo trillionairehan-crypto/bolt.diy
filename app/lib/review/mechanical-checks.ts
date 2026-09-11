@@ -976,7 +976,7 @@ const CH7_VH_MARKER_REGEX = /100vh/gi;
 const CH7_DETECT_MIN_VH = 2;
 const CH7_HERO_CAPTION = '사진을 보내주시면 여기에 넣어드릴게요';
 
-function isSkeleton7File(content: string): boolean {
+export function isSkeleton7File(content: string): boolean {
   if (content.includes('data-slot="hero"')) {
     return true;
   }

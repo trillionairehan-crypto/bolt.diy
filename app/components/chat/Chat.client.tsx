@@ -15,6 +15,7 @@ import {
   DEFAULT_MODEL,
   DEFAULT_PROVIDER,
   EXAMPLE_PROMPT_FILL_KEY,
+  ONBOARDING_ADDITIONS_MARKER,
   PROMPT_COOKIE_KEY,
   PROVIDER_LIST,
   SHOW_DEV_TOOLS,
@@ -44,6 +45,8 @@ import { createGenerationChargeGate } from '~/lib/generationChargeGate';
 import { authUserStore } from '~/lib/stores/auth';
 import { buildFixPrompt } from '~/utils/buildFixPrompt';
 import { reviewGeneratedApp } from '~/utils/reviewGeneratedApp';
+import { applySkeleton7Images, rememberSkeleton7Context, startSkeleton7ImageJob } from '~/lib/media/skeleton7Images';
+import { getActivePalette } from '~/lib/palettes';
 import { setSidebarOpen } from '~/lib/stores/sidebar';
 import type { ProgressAnnotation } from '~/types/context';
 
@@ -1057,6 +1060,29 @@ export const ChatImpl = memo(
       }
 
       generateNewApp(finalPrompt, designSchemeOverride);
+
+      /*
+       * 골격 7 이미지 세트 — 골격 7이 기본값이면 생성과 동시에 시작(LLM 생성 안에 끝난다), 아니면
+       * 재료만 기억해 생성물이 골격 7로 나올 때 시작한다. 주입은 자동 검토 뒤(applySkeleton7Images).
+       */
+      const mediaChatId = chatId.get();
+
+      if (mediaChatId && directives.industry) {
+        const palette = getActivePalette();
+        const jobInput = {
+          chatId: mediaChatId,
+          industry: directives.industry,
+          prompt: finalPrompt.split(ONBOARDING_ADDITIONS_MARKER)[0].trim(),
+          accentHex: palette.accent,
+          darkPalette: palette.dark,
+        };
+
+        if (directives.skeleton === 7) {
+          startSkeleton7ImageJob(jobInput);
+        } else {
+          rememberSkeleton7Context(jobInput);
+        }
+      }
     };
 
     /**
@@ -1310,6 +1336,16 @@ export const ChatImpl = memo(
               filesWritten: result.filesWritten,
               screenshotCaptured: result.screenshotCaptured,
             });
+          }
+
+          // 자동 검토가 data-slot 이름을 바로잡은 뒤에 주입해야 4개 슬롯을 전부 찾는다.
+          const media = await applySkeleton7Images().catch((error) => {
+            logger.error('skeleton 7 images: failed', error);
+            return null;
+          });
+
+          if (media) {
+            logger.info('skeleton 7 images: applied', media);
           }
         } finally {
           setAutoReviewing(false);

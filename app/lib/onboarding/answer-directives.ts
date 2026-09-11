@@ -28,6 +28,12 @@ export interface GenerationDirectives {
    * hueToRepresentativeHex/Chat.client.tsx's designSchemeOverride wiring.
    */
   hue?: number;
+
+  /** Q3에서 정해진 골격 기본값 — 골격 7이면 이미지 세트 생성을 미리 시작하는 데 쓴다. */
+  skeleton?: SkeletonId | null;
+
+  /** 업종 라벨(격자 항목 이름) 또는 직접 입력 원문 — 이미지 프롬프트 재료. */
+  industry?: string;
 }
 
 const EMPTY: Partial<GenerationDirectives> = {};
@@ -115,6 +121,14 @@ export function mergeDirectives(parts: Array<Partial<GenerationDirectives>>): Ge
 
     if (part.hue !== undefined) {
       result.hue = part.hue;
+    }
+
+    if (part.skeleton !== undefined) {
+      result.skeleton = part.skeleton;
+    }
+
+    if (part.industry !== undefined) {
+      result.industry = part.industry;
     }
   }
 

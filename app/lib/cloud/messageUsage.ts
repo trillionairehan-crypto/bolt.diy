@@ -14,6 +14,10 @@ export interface MessageUsageEntry {
   cacheWriteTokens: number;
   model: string;
   isAutoFix: boolean;
+
+  /** 이미지·영상 생성 원가(USD). 텍스트 메시지 행은 생략한다. */
+  imageCost?: number;
+  videoCost?: number;
 }
 
 /*
@@ -46,6 +50,8 @@ export async function recordMessageUsage(
       cache_write_tokens: entry.cacheWriteTokens,
       model: entry.model,
       is_auto_fix: entry.isAutoFix,
+      ...(entry.imageCost !== undefined ? { image_cost: entry.imageCost } : {}),
+      ...(entry.videoCost !== undefined ? { video_cost: entry.videoCost } : {}),
     });
 
     if (error) {

@@ -221,6 +221,9 @@ importers:
       ai:
         specifier: 7.0.70
         version: 7.0.70(zod@3.25.76)
+      aws4fetch:
+        specifier: 1.0.20
+        version: 1.0.20
       chalk:
         specifier: ^5.4.1
         version: 5.4.1
