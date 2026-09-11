@@ -42,7 +42,15 @@ export function useReducedMotion(): boolean {
  * Lenis 스무스 스크롤 + GSAP ScrollTrigger 동기화. 페이지 루트에서 한 번만 부른다.
  * reduced-motion이면 네이티브 스크롤 그대로.
  */
-export function useSmoothScroll(enabled = true): void {
+export interface SmoothScrollOptions {
+  enabled?: boolean;
+  /** true면 스크롤이 멈출 때 가장 가까운 장면([data-ck]) 상단에 붙는다 — wearebrand.io 식 한 화면 한 장면. */
+  snap?: boolean;
+}
+
+export function useSmoothScroll(options: SmoothScrollOptions | boolean = true): void {
+  const { enabled = true, snap = false } = typeof options === 'boolean' ? { enabled: options } : options;
+
   useEffect(() => {
     if (!enabled || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return;
@@ -57,12 +65,31 @@ export function useSmoothScroll(enabled = true): void {
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
+    let snapTrigger: ScrollTrigger | undefined;
+
+    if (snap) {
+      const scenes = Array.from(document.querySelectorAll<HTMLElement>('[data-ck="hero"], [data-ck="scene"], [data-ck="chapter"], [data-ck="contact"]'));
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+
+      if (scenes.length > 1 && max > 0) {
+        snapTrigger = ScrollTrigger.create({
+          snap: {
+            snapTo: scenes.map((el) => Math.min(1, el.offsetTop / max)),
+            duration: { min: 0.25, max: 0.7 },
+            delay: 0.05,
+            ease: 'power2.out',
+          },
+        });
+      }
+    }
+
     return () => {
+      snapTrigger?.kill();
       gsap.ticker.remove(tick);
       lenis.destroy();
       document.documentElement.classList.remove('ck-lenis');
     };
-  }, [enabled]);
+  }, [enabled, snap]);
 }
 
 /** 요소가 뷰포트에 들어올 때 한 번 위로 떠오르며 나타난다. 자식은 stagger. */

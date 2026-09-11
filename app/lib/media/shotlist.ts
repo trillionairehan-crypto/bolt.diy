@@ -2,6 +2,9 @@
  * 업종별 샷리스트 — 이미지 4장(히어로·챕터 3)의 피사체와 히어로 영상의 움직임 지시. 서버(이미지 세트 프롬프트)와
  * 클라이언트(영상 프롬프트) 둘 다 쓰므로 .server 밖에 둔다. 업종 문자열은 온보딩 격자 라벨 또는 직접 입력 원문이라
  * 키워드 매칭으로 고른다. 없으면 generic.
+ *
+ * 사용자 판정(2026-09-11): 생성형 인물은 어색하다 — 모든 샷은 사물·제품·공간만. 사람·손 없음. 히어로는
+ * wearebrand.io 식 "제품이 공중에 떠 있는 초현실 오브젝트 샷"과 "공간 와이드 샷" 두 결 중 업종에 맞는 쪽.
  */
 
 export interface ShotList {
@@ -16,67 +19,66 @@ export interface ShotList {
 
 const SHOTLISTS: Record<string, ShotList> = {
   food: {
-    hero: 'Wide shot of the counter or open kitchen at golden hour, fresh products in the foreground, warm light from a window.',
-    ch1: 'Close-up of hands at work on the signature item — dough, coffee pour, plating — shallow depth of field.',
-    ch2: 'The seating area with two or three tables, one cup or plate in the foreground, soft daylight.',
-    ch3: 'The entrance or storefront seen from slightly outside, door half open, warm light spilling out.',
-    motion:
-      'Steam rising slowly from the food or cup, light flickering softly through the window, a hand moving gently in the background.',
+    hero: 'Signature product as a hero object: a few pieces arranged on a rustic wooden board, suspended in soft warm light against a clean plaster wall, crumbs and steam, nothing else in frame.',
+    ch1: 'Extreme close-up of the signature item — crust texture, butter layers, crumb — on a textured surface, shallow depth of field.',
+    ch2: 'Empty seating area with two or three tables, one cup and plate in the foreground, soft daylight through a window.',
+    ch3: 'Entrance or storefront seen from slightly outside, door half open, warm light spilling out, no people.',
+    motion: 'Steam rising slowly from the product, light flickering softly through a window, crumbs perfectly still.',
   },
   beauty: {
-    hero: 'Wide shot of a bright salon interior, mirror and styling chair in the foreground, soft daylight.',
-    ch1: 'Close-up of hands styling hair or doing nails, tools in focus, shallow depth of field.',
-    ch2: 'Product shelf or treatment room, neat arrangement, one accent object in the foreground.',
-    ch3: 'Reception desk or entrance with fresh flowers, welcoming and calm.',
-    motion: 'Fabric or hair moving slightly, light shifting softly across the mirror, a hand adjusting a tool.',
+    hero: 'Styling tools and a product bottle arranged as a still life on a stone surface, soft studio light, one accent flower.',
+    ch1: 'Close-up of product texture — cream, oil, or a brush tip — on a neutral surface, shallow depth of field.',
+    ch2: 'Empty salon interior: mirror, chair, and shelf in soft daylight, tidy.',
+    ch3: 'Reception desk or entrance with fresh flowers, welcoming and calm, no people.',
+    motion: 'Light shifting softly across the mirror, a flower petal trembling, a fabric edge moving slightly.',
   },
   education: {
-    hero: 'Wide shot of a bright classroom or study space, desks and a window, morning light.',
-    ch1: 'Close-up of hands writing or a tablet with notes, pencil and paper texture.',
-    ch2: 'A small group at a table mid-discussion, seen from behind, faces not visible.',
-    ch3: 'Bookshelf or entrance hallway with warm lighting, tidy and inviting.',
-    motion: 'A page turning slowly, sunlight moving across the desk, dust in the light beam.',
+    hero: 'Open notebook, pen, and a stack of books on a wooden desk by a window, morning light, nothing else.',
+    ch1: 'Close-up of pencil marks on paper or a tablet with notes, paper texture visible.',
+    ch2: 'Empty classroom or study room with desks and a window, tidy and calm.',
+    ch3: 'Bookshelf or entrance hallway with warm lighting, inviting, no people.',
+    motion: 'A page lifting slowly in a breeze, sunlight moving across the desk, dust in the light beam.',
   },
   fitness: {
-    hero: 'Wide shot of a gym or studio floor with equipment, dramatic side light, empty and ready.',
-    ch1: 'Close-up of hands gripping a bar or a foot on a mat, chalk or texture visible.',
-    ch2: 'Studio space with mats or racks in rows, one person mid-movement in the distance, back to camera.',
-    ch3: 'Reception or locker area with towels and water, clean and welcoming.',
-    motion: 'Slow breathing movement of a person in the background, light rays shifting, a towel swaying slightly.',
+    hero: 'Kettlebell, rolled mat, and towel arranged on a studio floor, dramatic side light, empty and ready.',
+    ch1: 'Close-up of equipment texture — knurled bar, chalk, mat surface — shallow depth of field.',
+    ch2: 'Empty studio space with mats or racks in rows, light rays through windows.',
+    ch3: 'Reception or locker area with towels and water bottles, clean and welcoming, no people.',
+    motion: 'Light rays shifting slowly, chalk dust drifting, a towel edge swaying.',
   },
   clinic: {
-    hero: 'Wide shot of a calm clinic reception, soft neutral tones, plants and daylight.',
+    hero: 'Calm clinic reception still life: plant, neutral ceramics, soft daylight on a clean counter.',
     ch1: 'Close-up of clean instruments or a consultation desk, orderly and precise.',
-    ch2: 'A treatment room with a bed and window, calm and spotless.',
-    ch3: 'Waiting area with comfortable chairs and a plant, warm afternoon light.',
+    ch2: 'Empty treatment room with a bed and window, calm and spotless.',
+    ch3: 'Waiting area with comfortable chairs and a plant, warm afternoon light, no people.',
     motion: 'Curtains moving gently, light shifting on the floor, a plant leaf swaying.',
   },
   retail: {
-    hero: 'Wide shot of the shop interior with products displayed on shelves and tables, warm spot lighting.',
-    ch1: 'Close-up of the signature product on a textured surface, shallow depth of field.',
-    ch2: 'A display table or rack seen at an angle, a few products arranged with space between them.',
+    hero: 'Signature product floating as a hero object against a soft gradient backdrop, dramatic studio light, subtle shadow below.',
+    ch1: 'Close-up of the product material — fabric weave, leather grain, glass — shallow depth of field.',
+    ch2: 'Shop interior: products on shelves and a display table, warm spot lighting, no people.',
     ch3: 'Storefront window from outside at dusk, interior lights glowing.',
-    motion: 'Light glinting slowly across the products, a price tag or fabric moving slightly, ambient glow.',
+    motion: 'Light glinting slowly across the product, a gentle drift as if floating, ambient glow.',
   },
   space: {
-    hero: 'Wide architectural shot of the space — living room, studio, or office — with large windows and daylight.',
+    hero: 'Wide architectural shot of the space — living room, studio, or office — large windows and daylight, empty.',
     ch1: 'Close-up of a material detail: wood grain, stone, fabric, or a door handle.',
     ch2: 'Another room seen through a doorway, layered depth, soft light.',
     ch3: 'The building entrance or facade in late afternoon light.',
-    motion: 'Sunlight sliding slowly across the floor, curtain moving in a breeze, tree shadows shifting outside.',
+    motion: 'Sunlight sliding slowly across the floor, a curtain moving in a breeze, tree shadows shifting outside.',
   },
   freelance: {
-    hero: 'Wide shot of a creative workspace — desk, monitor or tools, window light, tidy and personal.',
-    ch1: 'Close-up of hands at work on the craft: sketching, editing, camera, or keyboard.',
-    ch2: 'Finished work displayed on the wall or a table, viewed at an angle.',
-    ch3: 'A meeting corner with two chairs and a notebook, calm and welcoming.',
-    motion: 'Cursor blinking or pen moving slightly, light changing softly on the desk, a plant leaf swaying.',
+    hero: 'Tools of the craft arranged as a still life — camera, sketchbook, keyboard, or brushes — on a desk by a window.',
+    ch1: 'Close-up of the craft in progress: a sketch, a screen with work, a lens — no hands.',
+    ch2: 'Finished work displayed on a wall or table, viewed at an angle, soft light.',
+    ch3: 'A meeting corner with two chairs and a notebook, calm and welcoming, empty.',
+    motion: 'Light changing softly on the desk, a page corner lifting, a plant leaf swaying.',
   },
   generic: {
-    hero: 'Wide establishing shot that shows the place or the craft at its best moment, daylight.',
-    ch1: 'Close-up detail of the signature product, service, or craft — hands at work or the product itself.',
-    ch2: 'The space or atmosphere customers experience — interior, seating, tools, or workspace, mid-distance.',
-    ch3: 'A welcoming closing image — entrance, storefront, table setting, or a finished result ready for a customer.',
+    hero: 'The signature product or object as a still life in soft directional light, clean backdrop, nothing else.',
+    ch1: 'Extreme close-up detail of the product or material, shallow depth of field.',
+    ch2: 'The space customers experience — interior, seating, tools, or workspace, mid-distance, empty.',
+    ch3: 'A welcoming closing image — entrance, storefront, table setting, or a finished result, no people.',
     motion: 'Subtle ambient motion only: gentle light shift, soft steam or dust, slight fabric or leaf movement.',
   },
 };
@@ -102,9 +104,9 @@ export function pickShotList(industry: string): ShotList {
   return SHOTLISTS.generic;
 }
 
-/** 히어로 영상 프롬프트 — 루프 이음새를 위해 시작·끝 상태가 같도록, 카메라 고정. */
+/** 히어로 영상 프롬프트 — 루프 이음새를 위해 시작·끝 상태가 같도록, 카메라 고정, 사람 없음. */
 export function buildLoopMotionPrompt(industry: string): string {
   const { motion } = pickShotList(industry);
 
-  return `${motion} Camera completely locked, no zoom, no pan, no cuts. The last frame returns to the exact starting state so the clip loops seamlessly. Silent, no text, no people looking at the camera, photorealistic.`;
+  return `${motion} Camera completely locked, no zoom, no pan, no cuts. The last frame returns to the exact starting state so the clip loops seamlessly. Silent, no people, no text, photorealistic.`;
 }

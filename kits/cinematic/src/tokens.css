@@ -29,6 +29,17 @@ html.ck-lenis body {
   height: auto;
 }
 
+/* 굵은 산세리프 디스플레이 변형(wearebrand.io 결) — 세리프 대신 Black 웨이트, 자간 더 촘촘. */
+.ck-page--bold {
+  --ck-font-display: 'Noto Sans KR', 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+}
+
+.ck-page--bold .ck-display {
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 1.0;
+}
+
 .ck-page {
   background: var(--ck-bg);
   color: var(--ck-text);

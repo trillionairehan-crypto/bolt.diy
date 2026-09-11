@@ -56,7 +56,9 @@ const STYLE_LOCK = (accentHex: string, dark: boolean) =>
     `Lighting: soft natural window light, ${dark ? 'moody low-key' : 'bright airy'}, gentle shadows, no harsh flash.`,
     'Texture: subtle film grain, matte surfaces, shallow depth of field on the subject only.',
     'Composition: full frame, nothing blurred or blocking the foreground edges, no walls or pillars cutting the frame.',
-    'No text, no letters, no signs, no logos, no watermarks, no people looking at the camera.',
+
+    // 사용자 판정(2026-09-11): 생성 인물은 어색하다 — 사람·얼굴·손 전부 금지, 사물·공간·제품만.
+    'No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks.',
   ].join(' ');
 
 function buildHeroPrompt(input: Skeleton7ImageSetInput): string {
