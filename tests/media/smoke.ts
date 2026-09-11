@@ -95,7 +95,8 @@ async function main() {
       elapsedMs: Date.now() - started,
     });
 
-    const url = await putR2Object(r2, `media/smoke/${started}-hero.png`, image.bytes, image.mimeType);
+    const ext = image.mimeType === 'image/jpeg' ? 'jpg' : 'png';
+    const url = await putR2Object(r2, `media/smoke/${started}-hero.${ext}`, image.bytes, image.mimeType);
     console.log('r2 ok', url);
   }
 
