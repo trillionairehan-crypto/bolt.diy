@@ -22,7 +22,8 @@ async function main() {
   mkdirSync(OUT_DIR, { recursive: true });
 
   const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  const desktop = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  const mobile = await browser.newPage({ viewport: { width: 400, height: 780 }, deviceScaleFactor: 2, isMobile: true });
 
   for (const file of readdirSync(FIXTURES_DIR).filter((f) => f.endsWith('.json'))) {
     const name = basename(file, '.json');
@@ -31,23 +32,29 @@ async function main() {
     const server = await buildAndServeFixture(name, { ...raw, ...updatedFiles });
 
     try {
-      await page.goto(server.url, { waitUntil: 'networkidle' });
-      await page.waitForTimeout(800);
+      for (const [page, suffix, viewportHeight] of [
+        [desktop, '', 800],
+        [mobile, '-m400', 780],
+      ] as const) {
+        await page.goto(server.url, { waitUntil: 'networkidle' });
+        await page.waitForTimeout(800);
 
-      const height = await page.evaluate(() => document.documentElement.scrollHeight);
-      const stops: Array<[string, number]> = [
-        ['top', 0],
-        ['mid', Math.max(0, Math.round(height / 2 - 400))],
-        ['bottom', Math.max(0, height - 800)],
-      ];
+        const height = await page.evaluate(() => document.documentElement.scrollHeight);
+        const overflowX = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+        const stops: Array<[string, number]> = [
+          ['top', 0],
+          ['mid', Math.max(0, Math.round(height / 2 - viewportHeight / 2))],
+          ['bottom', Math.max(0, height - viewportHeight)],
+        ];
 
-      for (const [label, y] of stops) {
-        await page.evaluate((top) => window.scrollTo(0, top), y);
-        await page.waitForTimeout(900);
-        await page.screenshot({ path: join(OUT_DIR, `${name}-${label}.png`) });
+        for (const [label, y] of stops) {
+          await page.evaluate((top) => window.scrollTo(0, top), y);
+          await page.waitForTimeout(900);
+          await page.screenshot({ path: join(OUT_DIR, `${name}-${label}${suffix}.png`) });
+        }
+
+        console.log(`${name}${suffix}: height ${height}px, overflowX ${overflowX}, 3 shots`);
       }
-
-      console.log(`${name}: height ${height}px, 3 shots`);
     } finally {
       await server.close();
     }
