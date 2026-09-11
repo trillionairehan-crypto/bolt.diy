@@ -15,7 +15,12 @@ import {
  * 원가: usage.completion_tokens × 모델 단가(USD/M tokens). 토큰 = W×H×fps×초/1024.
  */
 
-export const SEEDANCE_DEFAULT_MODEL = 'seedance-1-0-pro-250528';
+/*
+ * 실측(2026-09-11): 이 계정엔 1.0이 없고(단종) 콘솔에 활성화된 id는 dreamina-seedance-2-5-260628,
+ * dreamina-seedance-2-0-260128, dreamina-seedance-2-0-fast-260128, dreamina-seedance-2-0-mini-260615.
+ * 평문 id(seedance-2-0 등)는 InvalidEndpointOrModel.NotFound.
+ */
+export const SEEDANCE_DEFAULT_MODEL = 'dreamina-seedance-2-0-fast-260128';
 
 const DEFAULT_BASE_URL = 'https://ark.ap-southeast.bytepluses.com/api/v3';
 
@@ -24,7 +29,12 @@ const USD_PER_M_TOKENS: Record<string, number> = {
   'seedance-1-0-pro-250528': 2.5,
   'seedance-1-0-pro-fast-251015': 2.5,
   'seedance-1-0-lite-i2v-250428': 1.8,
-  'seedance-2-5': 10.7,
+
+  // 2.5는 공개 단가($10.7/M, 480p $0.10/s·720p $0.23/s). 2.0 계열은 공개 단가를 못 찾아 2.5 값으로 상한 추정 — 콘솔 청구서로 보정할 것.
+  'dreamina-seedance-2-5-260628': 10.7,
+  'dreamina-seedance-2-0-260128': 10.7,
+  'dreamina-seedance-2-0-fast-260128': 10.7,
+  'dreamina-seedance-2-0-mini-260615': 10.7,
 };
 
 export interface SeedanceConfig {
@@ -58,7 +68,8 @@ export function createSeedanceProvider(config: SeedanceConfig): VideoProvider {
     model,
 
     async createTask(input: VideoTaskInput) {
-      const text = `${input.prompt || DEFAULT_LOOP_PROMPT} --duration ${input.durationSec} --ratio adaptive --resolution ${resolution} --camerafixed true --watermark false`;
+      // 실측: 2.5는 i2v에서 --camerafixed를 거부한다("camera_fixed … must be empty") — 카메라 고정은 프롬프트 문장으로만.
+      const text = `${input.prompt || DEFAULT_LOOP_PROMPT} --duration ${input.durationSec} --ratio adaptive --resolution ${resolution} --watermark false`;
       const body = {
         model: input.model || model,
         content: [
