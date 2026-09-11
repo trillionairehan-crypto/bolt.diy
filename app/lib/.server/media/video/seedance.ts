@@ -30,11 +30,13 @@ const USD_PER_M_TOKENS: Record<string, number> = {
   'seedance-1-0-pro-fast-251015': 2.5,
   'seedance-1-0-lite-i2v-250428': 1.8,
 
-  // 2.5는 공개 단가($10.7/M, 480p $0.10/s·720p $0.23/s). 2.0 계열은 공개 단가를 못 찾아 2.5 값으로 상한 추정 — 콘솔 청구서로 보정할 것.
+  // 2.5는 공개 단가($10.7/M, 480p $0.10/s·720p $0.23/s).
   'dreamina-seedance-2-5-260628': 10.7,
-  'dreamina-seedance-2-0-260128': 10.7,
-  'dreamina-seedance-2-0-fast-260128': 10.7,
-  'dreamina-seedance-2-0-mini-260615': 10.7,
+
+  // 2.0 fast: 콘솔 청구 실측(2026-09-11) 108.9K 토큰 ≈ $0.15 → $1.38/M. 2.0·mini는 미확정(fast 값으로 추정).
+  'dreamina-seedance-2-0-fast-260128': 1.38,
+  'dreamina-seedance-2-0-260128': 1.38,
+  'dreamina-seedance-2-0-mini-260615': 1.38,
 };
 
 export interface SeedanceConfig {
