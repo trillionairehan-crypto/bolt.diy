@@ -262,21 +262,38 @@ export interface ApplyResult {
 }
 
 /*
- * LLM이 URL을 직접 썼는데 파일(이미지·영상)이 미리보기보다 늦게 올라온 경우, src가 바뀌지 않으면 브라우저가
- * 다시 요청하지 않는다. URL 뒤에 ?v=를 붙여 파일을 한 번 다시 써서 HMR로 다시 그리게 한다. 이미 ?v=가
- * 붙은 URL은 건너뛴다(멱등).
+ * 실측(2026-09-11, 5회차): LLM은 URL을 통째로 쓰지 않고 `const MEDIA_BASE = '…/media/<jobId>'` + 템플릿
+ * 리터럴로 조립한다. 그래서 "이미 썼는지"는 잡 경로(media/<jobId>)로 판정하고, 캐시버스터도 URL 전체가 아니라
+ * 마지막 파일명(hero.jpg, hero-kling.mp4)에 붙인다.
  */
-async function bustUrls(urls: string[]): Promise<string[]> {
+function usesJobMedia(content: string, jobId: string): boolean {
+  return content.includes(`media/${jobId}`);
+}
+
+function fileNameOf(url: string): string {
+  return url.slice(url.lastIndexOf('/') + 1);
+}
+
+/*
+ * 파일(이미지·영상)이 미리보기보다 늦게 올라온 경우, src가 바뀌지 않으면 브라우저가 다시 요청하지 않는다.
+ * 파일명 뒤에 ?v=를 붙여 한 번 다시 써서 HMR로 다시 그리게 한다. 이미 ?v=가 붙은 곳은 건너뛴다(멱등).
+ */
+async function bustUrls(jobId: string, urls: string[]): Promise<string[]> {
   const stamp = Date.now();
   const filesWritten: string[] = [];
 
   for (const [filePath, file] of selectReviewableEntries(workbenchStore.files.get())) {
+    if (!usesJobMedia(file.content, jobId)) {
+      continue;
+    }
+
     let next = file.content;
 
-    for (const url of urls) {
-      if (next.includes(url) && !next.includes(`${url}?v=`)) {
-        next = next.split(url).join(`${url}?v=${stamp}`);
-      }
+    for (const name of urls.map(fileNameOf)) {
+      next = next.replace(
+        new RegExp(`${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?!\\?v=)`, 'g'),
+        `${name}?v=${stamp}`,
+      );
     }
 
     if (next !== file.content) {
@@ -295,8 +312,8 @@ async function bustUrls(urls: string[]): Promise<string[]> {
 export async function applySkeleton7Images(): Promise<ApplyResult | null> {
   const files = workbenchStore.files.get();
   const reviewable = selectReviewableEntries(files);
-  const heroUrl = pending?.urls.hero;
-  const alreadyPrompted = heroUrl ? reviewable.some(([, file]) => file.content.includes(heroUrl)) : false;
+  const jobId = pending?.jobId;
+  const alreadyPrompted = jobId ? reviewable.some(([, file]) => usesJobMedia(file.content, jobId)) : false;
   const skeleton7Entries = reviewable.filter(([, file]) => isSkeleton7File(file.content));
 
   if (!alreadyPrompted && skeleton7Entries.length === 0) {
@@ -336,7 +353,12 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
   const filesWritten: string[] = [];
 
   if (alreadyPrompted) {
-    filesWritten.push(...(await bustUrls(Object.values(urls).filter((url): url is string => Boolean(url)))));
+    filesWritten.push(
+      ...(await bustUrls(
+        job.jobId,
+        Object.values(urls).filter((url): url is string => Boolean(url)),
+      )),
+    );
 
     // 영상은 이미지보다 1~5분 늦다 — 기다리지 않고, 준비되면 그 URL만 한 번 더 다시 그린다.
     if (job.videoPromise && job.video) {
@@ -344,7 +366,7 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
 
       void job.videoPromise.then(async (ready) => {
         if (ready) {
-          const written = await bustUrls([videoUrl]);
+          const written = await bustUrls(job.jobId, [videoUrl]);
           logger.info('video applied', { filesWritten: written });
         }
       });
