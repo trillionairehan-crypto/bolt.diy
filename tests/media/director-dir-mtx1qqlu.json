@@ -1,0 +1,583 @@
+{
+  "job": "dir-mtx1qqlu",
+  "world": "photo-editorial",
+  "brand": "밀도 — 연남동 소금빵집. 매일 새벽 네 시에 굽고 하루 세 번, 다 팔리면 문을 닫는다. 국산 밀·발효 버터·굵은 소금.",
+  "threshold": 8.5,
+  "refUrls": [],
+  "shots": [
+    {
+      "round": 1,
+      "index": 0,
+      "brief": {
+        "title": "First Bake, Before Opening",
+        "prompt": "At 07:00, place one cooled salt roll from the four-o’clock bake on pale oak, lower-right. Show its split seam, darkened tip and irregular coarse salt. A torn heel exposes the fermented-butter crumb; frayed linen enters cropped at the bottom. Keep the upper-left bare. Final capture uses the locked 80mm at f/4; the quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No additional rolls, plates, bowls, knives, ingredient piles or packaging. No more than three objects: roll, torn heel, linen. No steam from cooled bread. No uniform salt distribution, polished crust, orange cast, floating crumbs, centred arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-0.jpg",
+      "costUsd": 0.086539,
+      "gen": "gemini-3.1-flash-image",
+      "claude": {
+        "index": 0,
+        "score": 7,
+        "tells": [
+          "torn face is smooth slab, not crumb",
+          "near-shadowless soft top light",
+          "bread floats; no contact shadow anchor"
+        ],
+        "fix": "Add a low single window key from left to cast a real contact shadow."
+      },
+      "astra": {
+        "index": 0,
+        "score": 7.1,
+        "tells": [
+          "Generic bread-and-linen stock composition",
+          "Exposed crumb merges unnaturally into an otherwise intact loaf"
+        ],
+        "fix": "Tear off the heel and leave its matching fragment beside the loaf."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 1,
+      "brief": {
+        "title": "First Bake, Before Opening",
+        "prompt": "At 07:00, place one cooled salt roll from the four-o’clock bake on pale oak, lower-right. Show its split seam, darkened tip and irregular coarse salt. A torn heel exposes the fermented-butter crumb; frayed linen enters cropped at the bottom. Keep the upper-left bare. Final capture uses the locked 80mm at f/4; the quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No additional rolls, plates, bowls, knives, ingredient piles or packaging. No more than three objects: roll, torn heel, linen. No steam from cooled bread. No uniform salt distribution, polished crust, orange cast, floating crumbs, centred arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-1.jpg",
+      "costUsd": 0.088334,
+      "gen": "gemini-3.1-flash-image",
+      "claude": {
+        "index": 1,
+        "score": 7,
+        "tells": [
+          "torn face looks like uncooked dough",
+          "flat overhead light, faint anchor shadow",
+          "salt reads as pretzel sugar"
+        ],
+        "fix": "Lower key to 20° side light and tear the roll for real open crumb."
+      },
+      "astra": {
+        "index": 1,
+        "score": 8,
+        "tells": [
+          "Generic rustic tabletop styling lacks a specific bakery identity"
+        ],
+        "fix": "Replace the decorative linen with a visibly used bakery proofing cloth, retaining the soft left key."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 2,
+      "brief": {
+        "title": "First Bake, Before Opening",
+        "prompt": "At 07:00, place one cooled salt roll from the four-o’clock bake on pale oak, lower-right. Show its split seam, darkened tip and irregular coarse salt. A torn heel exposes the fermented-butter crumb; frayed linen enters cropped at the bottom. Keep the upper-left bare. Final capture uses the locked 80mm at f/4; the quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No additional rolls, plates, bowls, knives, ingredient piles or packaging. No more than three objects: roll, torn heel, linen. No steam from cooled bread. No uniform salt distribution, polished crust, orange cast, floating crumbs, centred arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-2.jpg",
+      "costUsd": 0.090487,
+      "gen": "gemini-3.1-flash-image",
+      "claude": {
+        "index": 2,
+        "score": 6.5,
+        "tells": [
+          "burnt ridge is a melted fin shape",
+          "oversized salt crystals like rock sugar",
+          "flat, sourceless lighting despite window",
+          "crumb face plasticky"
+        ],
+        "fix": "Use one directional window key raking across crust, reduce salt scale."
+      },
+      "astra": {
+        "index": 2,
+        "score": 7.2,
+        "tells": [
+          "Exposed front crumb lacks a convincing torn crust boundary",
+          "Generic bread-and-linen stock composition"
+        ],
+        "fix": "Photograph a genuinely torn heel at this low camera height, preserving the rightward contact shadow."
+      },
+      "score": 6.5
+    },
+    {
+      "round": 1,
+      "index": 3,
+      "brief": {
+        "title": "First Bake, Before Opening",
+        "prompt": "At 07:00, place one cooled salt roll from the four-o’clock bake on pale oak, lower-right. Show its split seam, darkened tip and irregular coarse salt. A torn heel exposes the fermented-butter crumb; frayed linen enters cropped at the bottom. Keep the upper-left bare. Final capture uses the locked 80mm at f/4; the quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No additional rolls, plates, bowls, knives, ingredient piles or packaging. No more than three objects: roll, torn heel, linen. No steam from cooled bread. No uniform salt distribution, polished crust, orange cast, floating crumbs, centred arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-3.jpg",
+      "costUsd": 0.163701,
+      "gen": "gemini-3-pro-image",
+      "claude": {
+        "index": 3,
+        "score": 7,
+        "tells": [
+          "torn face is smooth like raw dough",
+          "soft grey light, weak shadow anchor",
+          "bread ends abruptly at cloth edge"
+        ],
+        "fix": "Harden the key and tear to expose honeycomb crumb."
+      },
+      "astra": {
+        "index": 3,
+        "score": 7.2,
+        "tells": [
+          "Front crust transitions too smoothly into exposed crumb",
+          "Generic rustic product arrangement"
+        ],
+        "fix": "Break the front crust irregularly and retain the fallen fragments exactly where they land."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 4,
+      "brief": {
+        "title": "First Bake, Before Opening",
+        "prompt": "At 07:00, place one cooled salt roll from the four-o’clock bake on pale oak, lower-right. Show its split seam, darkened tip and irregular coarse salt. A torn heel exposes the fermented-butter crumb; frayed linen enters cropped at the bottom. Keep the upper-left bare. Final capture uses the locked 80mm at f/4; the quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No additional rolls, plates, bowls, knives, ingredient piles or packaging. No more than three objects: roll, torn heel, linen. No steam from cooled bread. No uniform salt distribution, polished crust, orange cast, floating crumbs, centred arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-4.jpg",
+      "costUsd": 0.15736,
+      "gen": "gemini-3-pro-image",
+      "claude": {
+        "index": 4,
+        "score": 7.5,
+        "tells": [
+          "torn face smooth, no crumb structure",
+          "crust half-baked colour transition"
+        ],
+        "fix": "Keep this key; swap for a properly torn roll with real crumb."
+      },
+      "astra": {
+        "index": 4,
+        "score": 7,
+        "tells": [
+          "Exposed crumb resembles a molded recess rather than tearing",
+          "Generic rustic product arrangement"
+        ],
+        "fix": "Replace the recessed bread face with a fresh hand-torn opening and its matching heel."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 5,
+      "brief": {
+        "title": "First Bake, Before Opening",
+        "prompt": "At 07:00, place one cooled salt roll from the four-o’clock bake on pale oak, lower-right. Show its split seam, darkened tip and irregular coarse salt. A torn heel exposes the fermented-butter crumb; frayed linen enters cropped at the bottom. Keep the upper-left bare. Final capture uses the locked 80mm at f/4; the quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No additional rolls, plates, bowls, knives, ingredient piles or packaging. No more than three objects: roll, torn heel, linen. No steam from cooled bread. No uniform salt distribution, polished crust, orange cast, floating crumbs, centred arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-5.jpg",
+      "costUsd": 0.168247,
+      "gen": "gemini-3-pro-image",
+      "claude": {
+        "index": 5,
+        "score": 8,
+        "tells": [
+          "burnt ear reads as artificial fin",
+          "salt density heavy, slightly render-like"
+        ],
+        "fix": "Reduce salt to a few flakes and keep the hard left key."
+      },
+      "astra": {
+        "index": 5,
+        "score": 7.6,
+        "tells": [
+          "Generic catalog composition despite convincing directional sunlight",
+          "Salt coverage looks excessively art-directed"
+        ],
+        "fix": "Shoot an untouched roll straight from the first tray without rearranging its salt or crumbs."
+      },
+      "score": 7.6
+    },
+    {
+      "round": 1,
+      "index": 6,
+      "brief": {
+        "title": "First Bake, Before Opening",
+        "prompt": "At 07:00, place one cooled salt roll from the four-o’clock bake on pale oak, lower-right. Show its split seam, darkened tip and irregular coarse salt. A torn heel exposes the fermented-butter crumb; frayed linen enters cropped at the bottom. Keep the upper-left bare. Final capture uses the locked 80mm at f/4; the quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No additional rolls, plates, bowls, knives, ingredient piles or packaging. No more than three objects: roll, torn heel, linen. No steam from cooled bread. No uniform salt distribution, polished crust, orange cast, floating crumbs, centred arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-6.jpg",
+      "costUsd": 0.1,
+      "gen": "gpt-image-2.5-flare",
+      "claude": {
+        "index": 6,
+        "score": 6.5,
+        "tells": [
+          "glossy render-look crust",
+          "soft sourceless light, weak anchor shadow",
+          "crumbs look scattered by algorithm"
+        ],
+        "fix": "Kill the fill, matte the crust, add one hard side key."
+      },
+      "astra": {
+        "index": 6,
+        "score": 7.3,
+        "tells": [
+          "Crust highlights look slightly lacquered",
+          "Generic bread, scattered crumbs, and linen styling"
+        ],
+        "fix": "Use a larger diffused left window key to soften the lacquer-like highlights while retaining shadow separation."
+      },
+      "score": 6.5
+    },
+    {
+      "round": 1,
+      "index": 7,
+      "brief": {
+        "title": "First Bake, Before Opening",
+        "prompt": "At 07:00, place one cooled salt roll from the four-o’clock bake on pale oak, lower-right. Show its split seam, darkened tip and irregular coarse salt. A torn heel exposes the fermented-butter crumb; frayed linen enters cropped at the bottom. Keep the upper-left bare. Final capture uses the locked 80mm at f/4; the quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No additional rolls, plates, bowls, knives, ingredient piles or packaging. No more than three objects: roll, torn heel, linen. No steam from cooled bread. No uniform salt distribution, polished crust, orange cast, floating crumbs, centred arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-7.jpg",
+      "costUsd": 0.1,
+      "gen": "gpt-image-2.5-flare",
+      "claude": {
+        "index": 7,
+        "score": 7,
+        "tells": [
+          "wet over-glossy laminated crust",
+          "burnt nipple tip looks impossible",
+          "hybrid croissant/roll form"
+        ],
+        "fix": "Shoot a matte crusty roll, same low sun key."
+      },
+      "astra": {
+        "index": 7,
+        "score": 6.9,
+        "tells": [
+          "Over-glossy crust highlights",
+          "Orange saturation overwhelms subtle baked color variation",
+          "Generic rustic tabletop composition"
+        ],
+        "fix": "Shoot an unglazed roll under neutral daylight with a gray-card white balance."
+      },
+      "score": 6.9
+    },
+    {
+      "round": 1,
+      "index": 8,
+      "brief": {
+        "title": "First Bake, Before Opening",
+        "prompt": "At 07:00, place one cooled salt roll from the four-o’clock bake on pale oak, lower-right. Show its split seam, darkened tip and irregular coarse salt. A torn heel exposes the fermented-butter crumb; frayed linen enters cropped at the bottom. Keep the upper-left bare. Final capture uses the locked 80mm at f/4; the quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No additional rolls, plates, bowls, knives, ingredient piles or packaging. No more than three objects: roll, torn heel, linen. No steam from cooled bread. No uniform salt distribution, polished crust, orange cast, floating crumbs, centred arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-8.jpg",
+      "costUsd": 0.1,
+      "gen": "gpt-image-2.5-flare",
+      "claude": {
+        "index": 8,
+        "score": 7,
+        "tells": [
+          "main body is croissant, piece is bread",
+          "torn piece geometry unconvincing",
+          "over-glossy highlights"
+        ],
+        "fix": "Use one consistent bread type and a matching torn fragment."
+      },
+      "astra": {
+        "index": 8,
+        "score": 8,
+        "tells": [
+          "Generic pastry-and-linen stock styling"
+        ],
+        "fix": "Replace the linen with the edge of a battered cooling tray, keeping the low oblique view and left key."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 9,
+      "brief": {
+        "title": "The Quiet Between Bakes",
+        "prompt": "At noon, work across matte limestone, leaving its upper-left expanse empty. Set one domestic-wheat salt roll near the right edge, its flattened shoulder and uneven salt facing camera. Place its ragged torn heel alongside. Crop a scratched butter knife through the lower-left foreground. Back-left window shadows anchor everything. Final capture uses the locked 80mm at f/4; quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No cloth, plate, butter dish, loose butter block, salt bowl or additional bread. No more than three objects: roll, torn heel, knife. No stamped lettering on the knife. No steam, mirror-bright metal, varnished crust, evenly spaced salt, floating food, symmetrical arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-9.jpg",
+      "costUsd": 0.084025,
+      "gen": "gemini-3.1-flash-image",
+      "claude": {
+        "index": 9,
+        "score": 8,
+        "tells": [
+          "window grid shadow soft while bread shadow crisp",
+          "torn face slightly smooth"
+        ],
+        "fix": "Match shadow edge hardness between window pattern and bread."
+      },
+      "astra": {
+        "index": 9,
+        "score": 7.7,
+        "tells": [
+          "Upright bread fragment feels conspicuously staged",
+          "Generic diagonal foreground cutlery composition"
+        ],
+        "fix": "Let the detached bread piece rest naturally on its cut face rather than balancing upright."
+      },
+      "score": 7.7
+    },
+    {
+      "round": 1,
+      "index": 10,
+      "brief": {
+        "title": "The Quiet Between Bakes",
+        "prompt": "At noon, work across matte limestone, leaving its upper-left expanse empty. Set one domestic-wheat salt roll near the right edge, its flattened shoulder and uneven salt facing camera. Place its ragged torn heel alongside. Crop a scratched butter knife through the lower-left foreground. Back-left window shadows anchor everything. Final capture uses the locked 80mm at f/4; quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No cloth, plate, butter dish, loose butter block, salt bowl or additional bread. No more than three objects: roll, torn heel, knife. No stamped lettering on the knife. No steam, mirror-bright metal, varnished crust, evenly spaced salt, floating food, symmetrical arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-10.jpg",
+      "costUsd": 0.089888,
+      "gen": "gemini-3.1-flash-image",
+      "claude": {
+        "index": 10,
+        "score": 7.5,
+        "tells": [
+          "torn face is smooth dough slab",
+          "crust plasticky smooth",
+          "torn piece looks like a separate bun"
+        ],
+        "fix": "Tear the actual roll so crumb matches the fragment."
+      },
+      "astra": {
+        "index": 10,
+        "score": 8,
+        "tells": [
+          "Generic bread-and-diagonal-knife stock composition"
+        ],
+        "fix": "Reframe with a 50mm lens slightly farther back to include the actual working counter edge."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 1,
+      "index": 11,
+      "brief": {
+        "title": "The Quiet Between Bakes",
+        "prompt": "At noon, work across matte limestone, leaving its upper-left expanse empty. Set one domestic-wheat salt roll near the right edge, its flattened shoulder and uneven salt facing camera. Place its ragged torn heel alongside. Crop a scratched butter knife through the lower-left foreground. Back-left window shadows anchor everything. Final capture uses the locked 80mm at f/4; quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No cloth, plate, butter dish, loose butter block, salt bowl or additional bread. No more than three objects: roll, torn heel, knife. No stamped lettering on the knife. No steam, mirror-bright metal, varnished crust, evenly spaced salt, floating food, symmetrical arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-11.jpg",
+      "costUsd": 0.08917,
+      "gen": "gemini-3.1-flash-image",
+      "claude": {
+        "index": 11,
+        "score": 7.5,
+        "tells": [
+          "glossy plastic crust",
+          "torn face smooth, no crumb",
+          "light on bread stronger than table suggests"
+        ],
+        "fix": "Matte the crust and expose real crumb in the tear."
+      },
+      "astra": {
+        "index": 11,
+        "score": 8.1,
+        "tells": [
+          "Generic foreground knife placement"
+        ],
+        "fix": "Move the knife beside the torn bread rather than using it as a diagonal foreground border."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 1,
+      "index": 12,
+      "brief": {
+        "title": "The Quiet Between Bakes",
+        "prompt": "At noon, work across matte limestone, leaving its upper-left expanse empty. Set one domestic-wheat salt roll near the right edge, its flattened shoulder and uneven salt facing camera. Place its ragged torn heel alongside. Crop a scratched butter knife through the lower-left foreground. Back-left window shadows anchor everything. Final capture uses the locked 80mm at f/4; quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No cloth, plate, butter dish, loose butter block, salt bowl or additional bread. No more than three objects: roll, torn heel, knife. No stamped lettering on the knife. No steam, mirror-bright metal, varnished crust, evenly spaced salt, floating food, symmetrical arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-12.jpg",
+      "costUsd": 0.159507,
+      "gen": "gemini-3-pro-image",
+      "claude": {
+        "index": 12,
+        "score": 8,
+        "tells": [
+          "torn face smooth, lacks crumb",
+          "salt reads as coarse sugar"
+        ],
+        "fix": "Real tear with visible crumb; otherwise keep this lighting."
+      },
+      "astra": {
+        "index": 12,
+        "score": 6.7,
+        "tells": [
+          "Detached wedge has no matching opening in the roll",
+          "Roll silhouette looks unnaturally regular",
+          "Generic diagonal knife styling"
+        ],
+        "fix": "Remove a real wedge from the roll and turn the matching opening toward the camera."
+      },
+      "score": 6.7
+    },
+    {
+      "round": 1,
+      "index": 13,
+      "brief": {
+        "title": "The Quiet Between Bakes",
+        "prompt": "At noon, work across matte limestone, leaving its upper-left expanse empty. Set one domestic-wheat salt roll near the right edge, its flattened shoulder and uneven salt facing camera. Place its ragged torn heel alongside. Crop a scratched butter knife through the lower-left foreground. Back-left window shadows anchor everything. Final capture uses the locked 80mm at f/4; quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No cloth, plate, butter dish, loose butter block, salt bowl or additional bread. No more than three objects: roll, torn heel, knife. No stamped lettering on the knife. No steam, mirror-bright metal, varnished crust, evenly spaced salt, floating food, symmetrical arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-13.jpg",
+      "costUsd": 0.157114,
+      "gen": "gemini-3-pro-image",
+      "claude": {
+        "index": 13,
+        "score": 7,
+        "tells": [
+          "fragment awkwardly cropped at frame edge",
+          "zero crumbs on a torn roll",
+          "flat, generic crust"
+        ],
+        "fix": "Pull fragment into frame and add scattered crumbs."
+      },
+      "astra": {
+        "index": 13,
+        "score": 6.6,
+        "tells": [
+          "Detached bread piece lacks a matching missing section",
+          "Overly regular roll resembles a molded product",
+          "Bread fragment is awkwardly clipped by the right edge"
+        ],
+        "fix": "Pull back and show both the complete detached piece and its matching tear in the roll."
+      },
+      "score": 6.6
+    },
+    {
+      "round": 1,
+      "index": 14,
+      "brief": {
+        "title": "The Quiet Between Bakes",
+        "prompt": "At noon, work across matte limestone, leaving its upper-left expanse empty. Set one domestic-wheat salt roll near the right edge, its flattened shoulder and uneven salt facing camera. Place its ragged torn heel alongside. Crop a scratched butter knife through the lower-left foreground. Back-left window shadows anchor everything. Final capture uses the locked 80mm at f/4; quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No cloth, plate, butter dish, loose butter block, salt bowl or additional bread. No more than three objects: roll, torn heel, knife. No stamped lettering on the knife. No steam, mirror-bright metal, varnished crust, evenly spaced salt, floating food, symmetrical arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-14.jpg",
+      "costUsd": 0.166805,
+      "gen": "gemini-3-pro-image",
+      "claude": {
+        "index": 14,
+        "score": 8,
+        "tells": [
+          "salt clusters only on one lobe",
+          "window shadows and bread shadow directions slightly conflict"
+        ],
+        "fix": "Align window key so all shadows fall the same way."
+      },
+      "astra": {
+        "index": 14,
+        "score": 7.3,
+        "tells": [
+          "Exposed side crumb blends ambiguously into intact crust",
+          "Oversized foreground knife competes with the bread",
+          "Generic rustic still-life arrangement"
+        ],
+        "fix": "Place the knife behind the roll and rotate a clearly broken crust edge toward the lens."
+      },
+      "score": 7.3
+    },
+    {
+      "round": 1,
+      "index": 15,
+      "brief": {
+        "title": "The Quiet Between Bakes",
+        "prompt": "At noon, work across matte limestone, leaving its upper-left expanse empty. Set one domestic-wheat salt roll near the right edge, its flattened shoulder and uneven salt facing camera. Place its ragged torn heel alongside. Crop a scratched butter knife through the lower-left foreground. Back-left window shadows anchor everything. Final capture uses the locked 80mm at f/4; quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No cloth, plate, butter dish, loose butter block, salt bowl or additional bread. No more than three objects: roll, torn heel, knife. No stamped lettering on the knife. No steam, mirror-bright metal, varnished crust, evenly spaced salt, floating food, symmetrical arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-15.jpg",
+      "costUsd": 0.1,
+      "gen": "gpt-image-2.5-flare",
+      "claude": {
+        "index": 15,
+        "score": 7.5,
+        "tells": [
+          "oversaturated golden glow, render-like",
+          "torn interior slightly melted",
+          "bread crowding right edge"
+        ],
+        "fix": "Cool the grade 300K and pull bread inside frame."
+      },
+      "astra": {
+        "index": 15,
+        "score": 7.2,
+        "tells": [
+          "Hero loaf is awkwardly clipped by the right edge",
+          "Knife scratches look exaggerated and decoratively distributed",
+          "Crust highlights verge on lacquered"
+        ],
+        "fix": "Widen the framing by fifteen percent while preserving the left-side headline space and window key."
+      },
+      "score": 7.2
+    },
+    {
+      "round": 1,
+      "index": 16,
+      "brief": {
+        "title": "The Quiet Between Bakes",
+        "prompt": "At noon, work across matte limestone, leaving its upper-left expanse empty. Set one domestic-wheat salt roll near the right edge, its flattened shoulder and uneven salt facing camera. Place its ragged torn heel alongside. Crop a scratched butter knife through the lower-left foreground. Back-left window shadows anchor everything. Final capture uses the locked 80mm at f/4; quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No cloth, plate, butter dish, loose butter block, salt bowl or additional bread. No more than three objects: roll, torn heel, knife. No stamped lettering on the knife. No steam, mirror-bright metal, varnished crust, evenly spaced salt, floating food, symmetrical arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-16.jpg",
+      "costUsd": 0.1,
+      "gen": "gpt-image-2.5-flare",
+      "claude": {
+        "index": 16,
+        "score": 7.5,
+        "tells": [
+          "bread cropped hard at right edge",
+          "warm CG-like glow on crust",
+          "crumbs oddly uniform"
+        ],
+        "fix": "Recompose with bread fully in frame, reduce warmth."
+      },
+      "astra": {
+        "index": 16,
+        "score": 7,
+        "tells": [
+          "Hero loaf is excessively cropped on the right",
+          "Knife scratches look unnaturally dense",
+          "Glossy crust pushes toward commercial render aesthetics"
+        ],
+        "fix": "Pull back until the entire loaf clears the right edge, using the same low camera angle."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 17,
+      "brief": {
+        "title": "The Quiet Between Bakes",
+        "prompt": "At noon, work across matte limestone, leaving its upper-left expanse empty. Set one domestic-wheat salt roll near the right edge, its flattened shoulder and uneven salt facing camera. Place its ragged torn heel alongside. Crop a scratched butter knife through the lower-left foreground. Back-left window shadows anchor everything. Final capture uses the locked 80mm at f/4; quoted focal lengths are reference only.\n“Camera: 90mm macro at f/4 for a single hero item or 50mm at f/5.6 for a table; camera at 30–45° above the table (never 90° top-down unless the world is brutal), tripod.”\n“Light: Backlight-key: a soft window or 1×1 m diffusion behind and 45° to one side of the food so steam, crumbs and glaze rim-light; white fill card from the front at 2:1 to open the shadows. Small black flag to keep the front from going flat. Steam only if the food is actually hot in the story.”\nEditorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No cloth, plate, butter dish, loose butter block, salt bowl or additional bread. No more than three objects: roll, torn heel, knife. No stamped lettering on the knife. No steam, mirror-bright metal, varnished crust, evenly spaced salt, floating food, symmetrical arrangement or overhead view. No visible lighting equipment, people, body parts, text, logos, watermarks or borders."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qqlu/r1-17.jpg",
+      "costUsd": 0.1,
+      "gen": "gpt-image-2.5-flare",
+      "claude": {
+        "index": 17,
+        "score": 8.5,
+        "tells": [
+          "slight warm oversaturation",
+          "bread clipped at right edge"
+        ],
+        "fix": "Ease back 10% saturation and give the roll edge room."
+      },
+      "astra": {
+        "index": 17,
+        "score": 7.8,
+        "tells": [
+          "Right-edge crop unnecessarily crowds the loaf",
+          "Knife scratches look excessively emphasized"
+        ],
+        "fix": "Shift the bread group left enough to leave a narrow right margin without sacrificing headline space."
+      },
+      "score": 7.8
+    }
+  ],
+  "costUsd": 2.1011770000000003
+}

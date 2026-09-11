@@ -1,0 +1,408 @@
+{
+  "job": "dir-mtx1qork",
+  "world": "neoclassical-painting",
+  "brand": "밀도 — 연남동 소금빵집. 매일 새벽 네 시에 굽고 하루 세 번, 다 팔리면 문을 닫는다. 국산 밀·발효 버터·굵은 소금.",
+  "threshold": 9,
+  "refUrls": [],
+  "shots": [
+    {
+      "round": 1,
+      "index": 0,
+      "brief": {
+        "title": "Four O’Clock — The First Bake",
+        "prompt": "04:00: torchlit salt-roll at right golden-section; split seam, scorched tip. Chipped gilded earthenware plate cropped foreground; ultramarine linen folds complete triangle. Contact shadow anchors plate. \"Camera: Painter's viewpoint: eye level, slightly below the figures, 50mm-equivalent normal perspective, no wide distortion, the picture plane parallel to the main wall.\" \"Light: Single motivated source from the upper left (a window or a torch out of frame), key:fill 6:1, shadows warm umber not black, a reflected bounce from the floor lifting the shadow side by one stop. Figures and objects modelled with a clear terminator line; highlights small and matte (glazed oil, never plastic).\" Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or visible hands. No additional rolls, utensils, butter dishes, scattered decorative props, or visible torch. Maximum three objects: roll, plate, linen. No modern packaging, plastic, electric lighting, photographic elements, glossy highlights, digital sharpness, black crushed shadows, secondary light source, centered symmetry, floating objects, or detail filling the headline space. No text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qork/r1-0.jpg",
+      "costUsd": 0.1,
+      "gen": "gpt-image-2.5-flare",
+      "claude": {
+        "index": 0,
+        "score": 5.5,
+        "tells": [
+          "photoreal bread and cloth clash with painted figures",
+          "cluttered composition, subjects mid-scale and unfocused",
+          "man's face backlit while woman is front-lit",
+          "bread implausibly small beside figure"
+        ],
+        "fix": "Drop the potted tree and second figure; keep one loaf on the parapet, single low sun from left, sky left clear for headline."
+      },
+      "astra": {
+        "index": 0,
+        "score": 6.8,
+        "tells": [
+          "Photographic bread and velvet clash with painted figures",
+          "Bread competes with an unrelated tree-tending tableau",
+          "Oversaturated cobalt dominates the palette"
+        ],
+        "fix": "Replace the tree-tending action with one baker placing the loaf, using consistent painted edges throughout."
+      },
+      "score": 5.5
+    },
+    {
+      "round": 1,
+      "index": 1,
+      "brief": {
+        "title": "Four O’Clock — The First Bake",
+        "prompt": "04:00: torchlit salt-roll at right golden-section; split seam, scorched tip. Chipped gilded earthenware plate cropped foreground; ultramarine linen folds complete triangle. Contact shadow anchors plate. \"Camera: Painter's viewpoint: eye level, slightly below the figures, 50mm-equivalent normal perspective, no wide distortion, the picture plane parallel to the main wall.\" \"Light: Single motivated source from the upper left (a window or a torch out of frame), key:fill 6:1, shadows warm umber not black, a reflected bounce from the floor lifting the shadow side by one stop. Figures and objects modelled with a clear terminator line; highlights small and matte (glazed oil, never plastic).\" Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or visible hands. No additional rolls, utensils, butter dishes, scattered decorative props, or visible torch. Maximum three objects: roll, plate, linen. No modern packaging, plastic, electric lighting, photographic elements, glossy highlights, digital sharpness, black crushed shadows, secondary light source, centered symmetry, floating objects, or detail filling the headline space. No text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qork/r1-1.jpg",
+      "costUsd": 0.1,
+      "gen": "gpt-image-2.5-flare",
+      "claude": {
+        "index": 1,
+        "score": 6,
+        "tells": [
+          "photoreal glossy bread pasted into painterly scene",
+          "peeling gold bowl looks like texture artifact",
+          "woman's resting hand melted at wrist"
+        ],
+        "fix": "Repaint the bread with brushwork matching the figure and unify a single warm side key from the left."
+      },
+      "astra": {
+        "index": 1,
+        "score": 7.4,
+        "tells": [
+          "Photographic bread texture breaks the painted world",
+          "Oversized foreground platter competes with the portrait",
+          "Generic classical muse overlooking an idealized coastline"
+        ],
+        "fix": "Paint the foreground loaf and platter with the same restrained detail and edge softness as the figure."
+      },
+      "score": 6
+    },
+    {
+      "round": 1,
+      "index": 2,
+      "brief": {
+        "title": "Four O’Clock — The First Bake",
+        "prompt": "04:00: torchlit salt-roll at right golden-section; split seam, scorched tip. Chipped gilded earthenware plate cropped foreground; ultramarine linen folds complete triangle. Contact shadow anchors plate. \"Camera: Painter's viewpoint: eye level, slightly below the figures, 50mm-equivalent normal perspective, no wide distortion, the picture plane parallel to the main wall.\" \"Light: Single motivated source from the upper left (a window or a torch out of frame), key:fill 6:1, shadows warm umber not black, a reflected bounce from the floor lifting the shadow side by one stop. Figures and objects modelled with a clear terminator line; highlights small and matte (glazed oil, never plastic).\" Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or visible hands. No additional rolls, utensils, butter dishes, scattered decorative props, or visible torch. Maximum three objects: roll, plate, linen. No modern packaging, plastic, electric lighting, photographic elements, glossy highlights, digital sharpness, black crushed shadows, secondary light source, centered symmetry, floating objects, or detail filling the headline space. No text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qork/r1-2.jpg",
+      "costUsd": 0.1,
+      "gen": "gpt-image-2.5-flare",
+      "claude": {
+        "index": 2,
+        "score": 5.5,
+        "tells": [
+          "bread and bowl photoreal, figures painterly",
+          "man's arm too long, hand fused to parapet",
+          "bowl clipped awkwardly bottom right",
+          "laurel sprig held by melted hand"
+        ],
+        "fix": "Pull camera back, keep both figures whole, remove foreground bowl, place one painterly loaf on the ledge."
+      },
+      "astra": {
+        "index": 2,
+        "score": 7.1,
+        "tells": [
+          "Photographic foreground clashes with painterly background",
+          "Foreground platter is disproportionately large",
+          "Posed figures have no meaningful relationship to baking"
+        ],
+        "fix": "Stage the figures passing the loaf across the parapet instead of posing behind a separate still life."
+      },
+      "score": 5.5
+    },
+    {
+      "round": 1,
+      "index": 3,
+      "brief": {
+        "title": "Four O’Clock — The First Bake",
+        "prompt": "04:00: torchlit salt-roll at right golden-section; split seam, scorched tip. Chipped gilded earthenware plate cropped foreground; ultramarine linen folds complete triangle. Contact shadow anchors plate. \"Camera: Painter's viewpoint: eye level, slightly below the figures, 50mm-equivalent normal perspective, no wide distortion, the picture plane parallel to the main wall.\" \"Light: Single motivated source from the upper left (a window or a torch out of frame), key:fill 6:1, shadows warm umber not black, a reflected bounce from the floor lifting the shadow side by one stop. Figures and objects modelled with a clear terminator line; highlights small and matte (glazed oil, never plastic).\" Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or visible hands. No additional rolls, utensils, butter dishes, scattered decorative props, or visible torch. Maximum three objects: roll, plate, linen. No modern packaging, plastic, electric lighting, photographic elements, glossy highlights, digital sharpness, black crushed shadows, secondary light source, centered symmetry, floating objects, or detail filling the headline space. No text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qork/r1-3.jpg",
+      "costUsd": 0.089509,
+      "gen": "gemini-3.1-flash-image",
+      "claude": {
+        "index": 3,
+        "score": 6,
+        "tells": [
+          "disembodied cropped arm bottom left",
+          "plate cracked with random white chip artifacts",
+          "bread crack looks like melted paint"
+        ],
+        "fix": "Remove the arm entirely; keep bread, cloth, plate with one raking window key from upper left."
+      },
+      "astra": {
+        "index": 3,
+        "score": 7.6,
+        "tells": [
+          "Severed foreground arm makes the crop feel accidental",
+          "Smooth blue cloth has molded, plastic-looking folds",
+          "Loaf's inflated silhouette feels sculpted rather than baked"
+        ],
+        "fix": "Reframe at tabletop height to exclude the cropped arm and platter while retaining the loaf's rightward contact shadow."
+      },
+      "score": 6
+    },
+    {
+      "round": 1,
+      "index": 4,
+      "brief": {
+        "title": "Four O’Clock — The First Bake",
+        "prompt": "04:00: torchlit salt-roll at right golden-section; split seam, scorched tip. Chipped gilded earthenware plate cropped foreground; ultramarine linen folds complete triangle. Contact shadow anchors plate. \"Camera: Painter's viewpoint: eye level, slightly below the figures, 50mm-equivalent normal perspective, no wide distortion, the picture plane parallel to the main wall.\" \"Light: Single motivated source from the upper left (a window or a torch out of frame), key:fill 6:1, shadows warm umber not black, a reflected bounce from the floor lifting the shadow side by one stop. Figures and objects modelled with a clear terminator line; highlights small and matte (glazed oil, never plastic).\" Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or visible hands. No additional rolls, utensils, butter dishes, scattered decorative props, or visible torch. Maximum three objects: roll, plate, linen. No modern packaging, plastic, electric lighting, photographic elements, glossy highlights, digital sharpness, black crushed shadows, secondary light source, centered symmetry, floating objects, or detail filling the headline space. No text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qork/r1-4.jpg",
+      "costUsd": 0.087416,
+      "gen": "gemini-3.1-flash-image",
+      "claude": {
+        "index": 4,
+        "score": 7.5,
+        "tells": [
+          "random white chips on plate read as artifacts",
+          "overly glossy bread crust"
+        ],
+        "fix": "Clean the plate surface and add a faint scorch mark so the 'first bake' story lands."
+      },
+      "astra": {
+        "index": 4,
+        "score": 8,
+        "tells": [
+          "Empty platter dominates the actual bread subject",
+          "Generic still-life arrangement weakens the neoclassical identity"
+        ],
+        "fix": "Remove the empty platter and position the loaf on the right third, preserving the upper-left key and dark contact shadow."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 1,
+      "index": 5,
+      "brief": {
+        "title": "Four O’Clock — The First Bake",
+        "prompt": "04:00: torchlit salt-roll at right golden-section; split seam, scorched tip. Chipped gilded earthenware plate cropped foreground; ultramarine linen folds complete triangle. Contact shadow anchors plate. \"Camera: Painter's viewpoint: eye level, slightly below the figures, 50mm-equivalent normal perspective, no wide distortion, the picture plane parallel to the main wall.\" \"Light: Single motivated source from the upper left (a window or a torch out of frame), key:fill 6:1, shadows warm umber not black, a reflected bounce from the floor lifting the shadow side by one stop. Figures and objects modelled with a clear terminator line; highlights small and matte (glazed oil, never plastic).\" Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or visible hands. No additional rolls, utensils, butter dishes, scattered decorative props, or visible torch. Maximum three objects: roll, plate, linen. No modern packaging, plastic, electric lighting, photographic elements, glossy highlights, digital sharpness, black crushed shadows, secondary light source, centered symmetry, floating objects, or detail filling the headline space. No text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qork/r1-5.jpg",
+      "costUsd": 0.085262,
+      "gen": "gemini-3.1-flash-image",
+      "claude": {
+        "index": 5,
+        "score": 5,
+        "tells": [
+          "heads cropped off at top edge",
+          "blank white void reads unfinished, not sky",
+          "torch does not light the figures' faces",
+          "plate cracked with artifacts"
+        ],
+        "fix": "Lower the camera and reframe to include full heads, or remove figures and let torchlight motivate the whole still life."
+      },
+      "astra": {
+        "index": 5,
+        "score": 5.7,
+        "tells": [
+          "Principal figure's head is accidentally cropped away",
+          "Bright wall and broad illumination overpower the tiny torch",
+          "Bread has an implausibly smooth circular end",
+          "Glossy blue drapery looks molded"
+        ],
+        "fix": "Pull back to an eye-level tableau with the torchbearer's entire head and flame inside the frame."
+      },
+      "score": 5
+    },
+    {
+      "round": 1,
+      "index": 6,
+      "brief": {
+        "title": "Wheat Before Sunrise",
+        "prompt": "04:00: torchlit salt-roll at lower-left golden-section; torn seam, uneven salt. Chipped gilded plinth clips foreground; bent wheat stalk completes triangle. Bread’s contact shadow grounds its weight. \"Camera: Painter's viewpoint: eye level, slightly below the figures, 50mm-equivalent normal perspective, no wide distortion, the picture plane parallel to the main wall.\" \"Light: Single motivated source from the upper left (a window or a torch out of frame), key:fill 6:1, shadows warm umber not black, a reflected bounce from the floor lifting the shadow side by one stop. Figures and objects modelled with a clear terminator line; highlights small and matte (glazed oil, never plastic).\" Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or visible hands. No wheat sheaves, repeated stalks, additional bread, plates, cloth, utensils, or visible torch. Maximum three objects: roll, plinth, single wheat stalk. No modern objects, packaging, photographic inserts, rendered surfaces, plastic shine, digital sharpness, competing light sources, unanchored shadows, centered symmetry, or headline-space clutter. No text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qork/r1-6.jpg",
+      "costUsd": 0.1,
+      "gen": "gpt-image-2.5-flare",
+      "claude": {
+        "index": 6,
+        "score": 7,
+        "tells": [
+          "bread more photoreal than surrounding paint",
+          "wheat pinched between fingers looks unnatural",
+          "lamp flame does not affect nearby light"
+        ],
+        "fix": "Make the oil lamp the only key at pre-dawn, dim the sky and let its glow rim the bread and hand."
+      },
+      "astra": {
+        "index": 6,
+        "score": 8.2,
+        "tells": [
+          "Photographic crust detail exceeds the surrounding painted treatment",
+          "Bright daylight undermines the before-sunrise lamp staging"
+        ],
+        "fix": "Relight the tableau with a low left-hand dawn key, keeping the lamp subordinate and the loaf's contact shadow intact."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 7,
+      "brief": {
+        "title": "Wheat Before Sunrise",
+        "prompt": "04:00: torchlit salt-roll at lower-left golden-section; torn seam, uneven salt. Chipped gilded plinth clips foreground; bent wheat stalk completes triangle. Bread’s contact shadow grounds its weight. \"Camera: Painter's viewpoint: eye level, slightly below the figures, 50mm-equivalent normal perspective, no wide distortion, the picture plane parallel to the main wall.\" \"Light: Single motivated source from the upper left (a window or a torch out of frame), key:fill 6:1, shadows warm umber not black, a reflected bounce from the floor lifting the shadow side by one stop. Figures and objects modelled with a clear terminator line; highlights small and matte (glazed oil, never plastic).\" Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or visible hands. No wheat sheaves, repeated stalks, additional bread, plates, cloth, utensils, or visible torch. Maximum three objects: roll, plinth, single wheat stalk. No modern objects, packaging, photographic inserts, rendered surfaces, plastic shine, digital sharpness, competing light sources, unanchored shadows, centered symmetry, or headline-space clutter. No text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qork/r1-7.jpg",
+      "costUsd": 0.1,
+      "gen": "gpt-image-2.5-flare",
+      "claude": {
+        "index": 7,
+        "score": 7,
+        "tells": [
+          "loaves and olives render-real versus painted jug",
+          "too many props for a hero",
+          "wheat stalk floats oddly across ledge"
+        ],
+        "fix": "Reduce to one loaf, one bowl, one wheat stalk; keep the left dawn key and the marble pilaster."
+      },
+      "astra": {
+        "index": 7,
+        "score": 7.5,
+        "tells": [
+          "Stacked loaves repeat near-identical round forms and crust treatment",
+          "Bread textures drift toward photography",
+          "Decorative abundance feels like a generic luxury food advertisement"
+        ],
+        "fix": "Replace the stacked loaves with one asymmetrical, hand-painted loaf beside the wheat."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 8,
+      "brief": {
+        "title": "Wheat Before Sunrise",
+        "prompt": "04:00: torchlit salt-roll at lower-left golden-section; torn seam, uneven salt. Chipped gilded plinth clips foreground; bent wheat stalk completes triangle. Bread’s contact shadow grounds its weight. \"Camera: Painter's viewpoint: eye level, slightly below the figures, 50mm-equivalent normal perspective, no wide distortion, the picture plane parallel to the main wall.\" \"Light: Single motivated source from the upper left (a window or a torch out of frame), key:fill 6:1, shadows warm umber not black, a reflected bounce from the floor lifting the shadow side by one stop. Figures and objects modelled with a clear terminator line; highlights small and matte (glazed oil, never plastic).\" Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or visible hands. No wheat sheaves, repeated stalks, additional bread, plates, cloth, utensils, or visible torch. Maximum three objects: roll, plinth, single wheat stalk. No modern objects, packaging, photographic inserts, rendered surfaces, plastic shine, digital sharpness, competing light sources, unanchored shadows, centered symmetry, or headline-space clutter. No text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qork/r1-8.jpg",
+      "costUsd": 0.1,
+      "gen": "gpt-image-2.5-flare",
+      "claude": {
+        "index": 8,
+        "score": 6.5,
+        "tells": [
+          "photoreal bread against painterly figure",
+          "duplicated wheat stalks with impossible stems",
+          "gold pedestal detail inconsistent with pillar"
+        ],
+        "fix": "One wheat stalk only, painted consistently; let the lamp flame be the sole pre-dawn key."
+      },
+      "astra": {
+        "index": 8,
+        "score": 8.1,
+        "tells": [
+          "Photographic bread contrasts with idealized painted skin",
+          "Lamp reads as decoration under the daylight-strength key",
+          "Oversized gilded chair competes with the food"
+        ],
+        "fix": "Replace the gilded foreground chair arm with plain shadowed stone to keep attention on the hand, wheat, and loaf."
+      },
+      "score": 6.5
+    },
+    {
+      "round": 1,
+      "index": 9,
+      "brief": {
+        "title": "Wheat Before Sunrise",
+        "prompt": "04:00: torchlit salt-roll at lower-left golden-section; torn seam, uneven salt. Chipped gilded plinth clips foreground; bent wheat stalk completes triangle. Bread’s contact shadow grounds its weight. \"Camera: Painter's viewpoint: eye level, slightly below the figures, 50mm-equivalent normal perspective, no wide distortion, the picture plane parallel to the main wall.\" \"Light: Single motivated source from the upper left (a window or a torch out of frame), key:fill 6:1, shadows warm umber not black, a reflected bounce from the floor lifting the shadow side by one stop. Figures and objects modelled with a clear terminator line; highlights small and matte (glazed oil, never plastic).\" Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or visible hands. No wheat sheaves, repeated stalks, additional bread, plates, cloth, utensils, or visible torch. Maximum three objects: roll, plinth, single wheat stalk. No modern objects, packaging, photographic inserts, rendered surfaces, plastic shine, digital sharpness, competing light sources, unanchored shadows, centered symmetry, or headline-space clutter. No text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qork/r1-9.jpg",
+      "costUsd": 0.088854,
+      "gen": "gemini-3.1-flash-image",
+      "claude": {
+        "index": 9,
+        "score": 5.5,
+        "tells": [
+          "four crowded stiff figures with identical faces",
+          "glossy over-rendered bread and salt pile",
+          "gold box looks like a broken 3D asset",
+          "no clear headline space"
+        ],
+        "fix": "Cut to one figure in profile behind a single loaf, window key from left, wall clear for text."
+      },
+      "astra": {
+        "index": 9,
+        "score": 5.8,
+        "tells": [
+          "Bread's leftward shadow contradicts the visible left window",
+          "Faces and skin have waxy, excessively smooth finishes",
+          "Unexplained gilded block dominates the food staging",
+          "Crowded figures leave little clean headline space"
+        ],
+        "fix": "Use the visible left window as the sole key and repaint every cast shadow consistently toward the right."
+      },
+      "score": 5.5
+    },
+    {
+      "round": 1,
+      "index": 10,
+      "brief": {
+        "title": "Wheat Before Sunrise",
+        "prompt": "04:00: torchlit salt-roll at lower-left golden-section; torn seam, uneven salt. Chipped gilded plinth clips foreground; bent wheat stalk completes triangle. Bread’s contact shadow grounds its weight. \"Camera: Painter's viewpoint: eye level, slightly below the figures, 50mm-equivalent normal perspective, no wide distortion, the picture plane parallel to the main wall.\" \"Light: Single motivated source from the upper left (a window or a torch out of frame), key:fill 6:1, shadows warm umber not black, a reflected bounce from the floor lifting the shadow side by one stop. Figures and objects modelled with a clear terminator line; highlights small and matte (glazed oil, never plastic).\" Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or visible hands. No wheat sheaves, repeated stalks, additional bread, plates, cloth, utensils, or visible torch. Maximum three objects: roll, plinth, single wheat stalk. No modern objects, packaging, photographic inserts, rendered surfaces, plastic shine, digital sharpness, competing light sources, unanchored shadows, centered symmetry, or headline-space clutter. No text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qork/r1-10.jpg",
+      "costUsd": 0.0934,
+      "gen": "gemini-3.1-flash-image",
+      "claude": {
+        "index": 10,
+        "score": 7.5,
+        "tells": [
+          "ghost figure lit from opposite side to bread",
+          "wheat stalk broken with duplicated leaves"
+        ],
+        "fix": "Move the figure to the light side or remove it; light bread and wheat from a single low pre-dawn window."
+      },
+      "astra": {
+        "index": 10,
+        "score": 7.5,
+        "tells": [
+          "Background figure's curled hand has unclear finger anatomy",
+          "Repeated pale bread toppings resemble applied decorative pellets",
+          "Heavy tenebrism drifts toward Baroque rather than neoclassical painting"
+        ],
+        "fix": "Paint the doorway figure from a posed reference with a clearly readable, relaxed five-finger hand."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 1,
+      "index": 11,
+      "brief": {
+        "title": "Wheat Before Sunrise",
+        "prompt": "04:00: torchlit salt-roll at lower-left golden-section; torn seam, uneven salt. Chipped gilded plinth clips foreground; bent wheat stalk completes triangle. Bread’s contact shadow grounds its weight. \"Camera: Painter's viewpoint: eye level, slightly below the figures, 50mm-equivalent normal perspective, no wide distortion, the picture plane parallel to the main wall.\" \"Light: Single motivated source from the upper left (a window or a torch out of frame), key:fill 6:1, shadows warm umber not black, a reflected bounce from the floor lifting the shadow side by one stop. Figures and objects modelled with a clear terminator line; highlights small and matte (glazed oil, never plastic).\" Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people or visible hands. No wheat sheaves, repeated stalks, additional bread, plates, cloth, utensils, or visible torch. Maximum three objects: roll, plinth, single wheat stalk. No modern objects, packaging, photographic inserts, rendered surfaces, plastic shine, digital sharpness, competing light sources, unanchored shadows, centered symmetry, or headline-space clutter. No text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx1qork/r1-11.jpg",
+      "costUsd": 0.090768,
+      "gen": "gemini-3.1-flash-image",
+      "claude": {
+        "index": 11,
+        "score": 8,
+        "tells": [
+          "gilded frame edge mysteriously sitting on the table",
+          "wheat stem arcs unnaturally like wire"
+        ],
+        "fix": "Remove the gold frame strip; let the torch remain the single key and keep the upper wall clear for headline."
+      },
+      "astra": {
+        "index": 11,
+        "score": 6.4,
+        "tells": [
+          "Wheat appears suspended without convincing support",
+          "Bread's circular exposed end looks mechanically hollowed",
+          "Foreground gilded molding feels arbitrarily inserted",
+          "Torchlight lacks convincing falloff across the tabletop"
+        ],
+        "fix": "Lay the wheat directly on the tabletop with a continuous stem and a visible contact shadow."
+      },
+      "score": 6.4
+    }
+  ],
+  "costUsd": 1.135209
+}

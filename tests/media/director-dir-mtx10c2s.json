@@ -1,0 +1,532 @@
+{
+  "job": "dir-mtx10c2s",
+  "world": "neoclassical-painting",
+  "brand": "밀도 — 연남동 소금빵집. 매일 새벽 네 시에 굽고 하루 세 번, 다 팔리면 문을 닫는다. 국산 밀·발효 버터·굵은 소금.",
+  "threshold": 9,
+  "refUrls": [],
+  "shots": [
+    {
+      "round": 1,
+      "index": 0,
+      "brief": {
+        "title": "Four O’Clock, First Bake",
+        "prompt": "Stage the first bake at 4:05 a.m.; use an 80mm medium-format perspective, looking slightly down. Keep three objects: one Korean-wheat salt roll, a chipped ivory plate with rubbed gilding, and an ochre linen fold cropped by the bottom edge. Place the plate on the lower-right third. The roll has an uneven seam, one overbrowned tip, and coarse salt caught in its matte crust; cultured butter darkens its base. One upper-left bakery lamp anchors the plate’s shadow down-right. A high opening reveals ultramarine predawn sky; keep the headline area quiet. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "Photographic rendering, people, hands, extra pastries, extra tableware, utensils, packaging, wheat stalks, butter blocks, scattered decorative ingredients, lettering, signage, logos, watermarks, borders, centered symmetry, glossy CGI crust, uniform salt spacing, multiple light sources, filled upper-left headline area."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r1-0.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 0,
+        "score": 7,
+        "tells": [
+          "brass electric desk lamp is a 20th-c. anachronism in a neoclassical world (style drift)",
+          "over-glossy syrupy croissant highlights read as CG render",
+          "near-centred subject on centred plate",
+          "syrup pool under pastry looks like a melted blob",
+          "woman's torso/shoulder anatomy soft and slumped"
+        ],
+        "fix": "Swap the desk lamp for an oil lamp or candle, dry the glaze, and push the plate off-centre to the lower-right so the sky reads as a headline field."
+      },
+      "astra": {
+        "index": 0,
+        "score": 6.8,
+        "tells": [
+          "plastic/over-glossy highlights",
+          "style drift from the requested world"
+        ],
+        "fix": "Paint the roll with restrained, broken oil-paint highlights and the same edge softness as the background figure, rather than photographic food-ad detail."
+      },
+      "score": 6.8
+    },
+    {
+      "round": 1,
+      "index": 1,
+      "brief": {
+        "title": "Four O’Clock, First Bake",
+        "prompt": "Stage the first bake at 4:05 a.m.; use an 80mm medium-format perspective, looking slightly down. Keep three objects: one Korean-wheat salt roll, a chipped ivory plate with rubbed gilding, and an ochre linen fold cropped by the bottom edge. Place the plate on the lower-right third. The roll has an uneven seam, one overbrowned tip, and coarse salt caught in its matte crust; cultured butter darkens its base. One upper-left bakery lamp anchors the plate’s shadow down-right. A high opening reveals ultramarine predawn sky; keep the headline area quiet. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "Photographic rendering, people, hands, extra pastries, extra tableware, utensils, packaging, wheat stalks, butter blocks, scattered decorative ingredients, lettering, signage, logos, watermarks, borders, centered symmetry, glossy CGI crust, uniform salt spacing, multiple light sources, filled upper-left headline area."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r1-1.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 1,
+        "score": 7,
+        "tells": [
+          "anachronistic brass desk lamp (style drift)",
+          "plate dead-centre in frame",
+          "plastic wet glaze and molten butter puddle",
+          "burnt patch on croissant looks like a painted smudge rather than a bake mark",
+          "flat uniform wall lighting, weak shadow anchor under plate"
+        ],
+        "fix": "Kill the desk lamp, light from the window at dusk, move the plate to the right third and let the blank wall carry the headline."
+      },
+      "astra": {
+        "index": 1,
+        "score": 7.4,
+        "tells": [
+          "style drift from the requested world"
+        ],
+        "fix": "Unify the bread, lamp and architecture with consistent neoclassical painted modeling instead of placing a sharply photographic product against a painted backdrop."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 2,
+      "brief": {
+        "title": "Four O’Clock, First Bake",
+        "prompt": "Stage the first bake at 4:05 a.m.; use an 80mm medium-format perspective, looking slightly down. Keep three objects: one Korean-wheat salt roll, a chipped ivory plate with rubbed gilding, and an ochre linen fold cropped by the bottom edge. Place the plate on the lower-right third. The roll has an uneven seam, one overbrowned tip, and coarse salt caught in its matte crust; cultured butter darkens its base. One upper-left bakery lamp anchors the plate’s shadow down-right. A high opening reveals ultramarine predawn sky; keep the headline area quiet. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "Photographic rendering, people, hands, extra pastries, extra tableware, utensils, packaging, wheat stalks, butter blocks, scattered decorative ingredients, lettering, signage, logos, watermarks, borders, centered symmetry, glossy CGI crust, uniform salt spacing, multiple light sources, filled upper-left headline area."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r1-2.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 2,
+        "score": 7.5,
+        "tells": [
+          "woman's forearm dissolves into the balustrade (impossible detail)",
+          "glossy render-look glaze on the pastry",
+          "statue behind the figure is a melted second figure",
+          "salt crystals scattered like duplicated sprinkles"
+        ],
+        "fix": "Remove the ghost statue, resolve the woman's hand on the ledge, and matte down the glaze so it reads as painted crust not lacquer."
+      },
+      "astra": {
+        "index": 2,
+        "score": 7.7,
+        "tells": [
+          "style drift from the requested world"
+        ],
+        "fix": "Render the bread and salt with the same controlled brushwork as the draped figure while preserving the generous upper-left headline space."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 1,
+      "index": 3,
+      "brief": {
+        "title": "Four O’Clock, First Bake",
+        "prompt": "Stage the first bake at 4:05 a.m.; use an 80mm medium-format perspective, looking slightly down. Keep three objects: one Korean-wheat salt roll, a chipped ivory plate with rubbed gilding, and an ochre linen fold cropped by the bottom edge. Place the plate on the lower-right third. The roll has an uneven seam, one overbrowned tip, and coarse salt caught in its matte crust; cultured butter darkens its base. One upper-left bakery lamp anchors the plate’s shadow down-right. A high opening reveals ultramarine predawn sky; keep the headline area quiet. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "Photographic rendering, people, hands, extra pastries, extra tableware, utensils, packaging, wheat stalks, butter blocks, scattered decorative ingredients, lettering, signage, logos, watermarks, borders, centered symmetry, glossy CGI crust, uniform salt spacing, multiple light sources, filled upper-left headline area."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r1-3.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 3,
+        "score": 7,
+        "tells": [
+          "brass gooseneck desk lamp is flagrantly anachronistic (style drift)",
+          "figure cropped awkwardly at right edge with head clipped into frame",
+          "over-glossy pastry with syrup pool",
+          "plate slightly too large and centred in lower half"
+        ],
+        "fix": "Replace the lamp with candlelight, either commit the figure fully into frame or drop her, and let the empty sky-left hold the title."
+      },
+      "astra": {
+        "index": 3,
+        "score": 6.5,
+        "tells": [
+          "plastic/over-glossy highlights",
+          "style drift from the requested world"
+        ],
+        "fix": "Replace the lacquer-like crust sheen with small, irregular painted highlights that follow the upper-right lamp."
+      },
+      "score": 6.5
+    },
+    {
+      "round": 1,
+      "index": 4,
+      "brief": {
+        "title": "The Last Roll",
+        "prompt": "Build a closing-time still life at 4:30 p.m., with a 65mm lens perspective at counter height. Only two objects: a flour-scuffed wooden baker’s peel and one Korean-wheat salt roll, torn open but still joined. Set the bread at the far-right third; crop the peel’s handle through the lower-left foreground. Show ragged crumb, an irregular cultured-butter cavity, and sparse coarse salt. Upper-left window sunlight casts one firm shadow beneath the peel. Beyond, leave an uncluttered ultramarine sky opening; a worn architectural gilt edge catches light. Reserve the burnt-ochre accent for the peel’s handle. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "Photorealism, people, visible hands, separate bread halves, additional rolls, bread rows, plates, cloth, knives, ingredient bowls, printed packaging, shop signs, lettering, logos, watermarks, picture frames, borders, floating bread, symmetrical placement, lacquered wood, plastic butter sheen, theatrical steam, secondary lighting, clutter behind the headline."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r1-4.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 4,
+        "score": 7,
+        "tells": [
+          "woman's face is a featureless smear and hand on ledge is unresolved",
+          "butter filling looks like plastic putty",
+          "flour on peel and marble is uniform noise texture",
+          "gilded pillar oversaturated versus the muted painting palette",
+          "bread crumb too perfect and symmetrically torn"
+        ],
+        "fix": "Turn the figure fully away or push her into deep shadow, roughen the tear, and cool the gilding to match the toned-down oil palette."
+      },
+      "astra": {
+        "index": 4,
+        "score": 6,
+        "tells": [
+          "plastic/over-glossy highlights",
+          "oversaturation",
+          "style drift from the requested world"
+        ],
+        "fix": "Repaint the entire scene in a restrained earth-and-ultramarine palette, treating the bread as an oil-painted still life rather than a glossy product cutout."
+      },
+      "score": 6
+    },
+    {
+      "round": 1,
+      "index": 5,
+      "brief": {
+        "title": "The Last Roll",
+        "prompt": "Build a closing-time still life at 4:30 p.m., with a 65mm lens perspective at counter height. Only two objects: a flour-scuffed wooden baker’s peel and one Korean-wheat salt roll, torn open but still joined. Set the bread at the far-right third; crop the peel’s handle through the lower-left foreground. Show ragged crumb, an irregular cultured-butter cavity, and sparse coarse salt. Upper-left window sunlight casts one firm shadow beneath the peel. Beyond, leave an uncluttered ultramarine sky opening; a worn architectural gilt edge catches light. Reserve the burnt-ochre accent for the peel’s handle. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "Photorealism, people, visible hands, separate bread halves, additional rolls, bread rows, plates, cloth, knives, ingredient bowls, printed packaging, shop signs, lettering, logos, watermarks, picture frames, borders, floating bread, symmetrical placement, lacquered wood, plastic butter sheen, theatrical steam, secondary lighting, clutter behind the headline."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r1-5.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 5,
+        "score": 7.5,
+        "tells": [
+          "red drapery at right belongs to a figure that is missing (impossible detail)",
+          "butter block reads as glossy plastic",
+          "bread surface too flawless and lacquered",
+          "peel end has a suspicious black hole/tangent at frame edge"
+        ],
+        "fix": "Either show the draped figure or remove the orphan cloth, and give the crust a real matte-to-gloss transition with visible brush texture."
+      },
+      "astra": {
+        "index": 5,
+        "score": 6.8,
+        "tells": [
+          "oversaturation",
+          "style drift from the requested world"
+        ],
+        "fix": "Use a muted, atmospheric blue sky and carry its painterly handling through the bread and butter instead of retaining macro-photographic foreground detail."
+      },
+      "score": 6.8
+    },
+    {
+      "round": 1,
+      "index": 6,
+      "brief": {
+        "title": "The Last Roll",
+        "prompt": "Build a closing-time still life at 4:30 p.m., with a 65mm lens perspective at counter height. Only two objects: a flour-scuffed wooden baker’s peel and one Korean-wheat salt roll, torn open but still joined. Set the bread at the far-right third; crop the peel’s handle through the lower-left foreground. Show ragged crumb, an irregular cultured-butter cavity, and sparse coarse salt. Upper-left window sunlight casts one firm shadow beneath the peel. Beyond, leave an uncluttered ultramarine sky opening; a worn architectural gilt edge catches light. Reserve the burnt-ochre accent for the peel’s handle. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "Photorealism, people, visible hands, separate bread halves, additional rolls, bread rows, plates, cloth, knives, ingredient bowls, printed packaging, shop signs, lettering, logos, watermarks, picture frames, borders, floating bread, symmetrical placement, lacquered wood, plastic butter sheen, theatrical steam, secondary lighting, clutter behind the headline."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r1-6.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 6,
+        "score": 7.5,
+        "tells": [
+          "woman's hands are tiny indistinct blobs",
+          "butter core is a smooth CG highlight",
+          "bread and pillar in tangent, pastry pushed too far right",
+          "flour dusting is uniform texture noise"
+        ],
+        "fix": "Pull the bread left so it clears the pillar, resolve or hide the hands behind the drapery, and add a real cast shadow of the bread on the peel."
+      },
+      "astra": {
+        "index": 6,
+        "score": 6.2,
+        "tells": [
+          "plastic/over-glossy highlights",
+          "oversaturation",
+          "style drift from the requested world"
+        ],
+        "fix": "Repaint the bread and butter with subdued highlights and simplified tonal planes that match the classical figure."
+      },
+      "score": 6.2
+    },
+    {
+      "round": 1,
+      "index": 7,
+      "brief": {
+        "title": "The Last Roll",
+        "prompt": "Build a closing-time still life at 4:30 p.m., with a 65mm lens perspective at counter height. Only two objects: a flour-scuffed wooden baker’s peel and one Korean-wheat salt roll, torn open but still joined. Set the bread at the far-right third; crop the peel’s handle through the lower-left foreground. Show ragged crumb, an irregular cultured-butter cavity, and sparse coarse salt. Upper-left window sunlight casts one firm shadow beneath the peel. Beyond, leave an uncluttered ultramarine sky opening; a worn architectural gilt edge catches light. Reserve the burnt-ochre accent for the peel’s handle. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "Photorealism, people, visible hands, separate bread halves, additional rolls, bread rows, plates, cloth, knives, ingredient bowls, printed packaging, shop signs, lettering, logos, watermarks, picture frames, borders, floating bread, symmetrical placement, lacquered wood, plastic butter sheen, theatrical steam, secondary lighting, clutter behind the headline."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r1-7.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 7,
+        "score": 7,
+        "tells": [
+          "bread visually merges with the woman's lap (bad tangent, reads as impossible overlap)",
+          "stringy melted butter looks like glue/plastic",
+          "bread surface over-glossed",
+          "bread slightly too large relative to figure, crowding the right third"
+        ],
+        "fix": "Slide the bread left so it separates from the figure with sky between them, and tone the butter to a matte pale yellow smear."
+      },
+      "astra": {
+        "index": 7,
+        "score": 7.3,
+        "tells": [
+          "style drift from the requested world"
+        ],
+        "fix": "Match the foreground bread's texture and edge hierarchy to the painted figure and coastal architecture, eliminating the food-photography-against-mural effect."
+      },
+      "score": 7
+    },
+    {
+      "round": 2,
+      "index": 0,
+      "brief": {
+        "title": "Four O’Clock, First Bake",
+        "prompt": "At 4:05 a.m., take an 80mm f/2.8 medium-format viewpoint, slightly above the counter. Keep only one Korean-wheat salt roll, a chipped ivory plate with rubbed gilding, and an ochre linen fold cut by the bottom edge. Set the plate low on the right third. Preserve the uneven seam and overbrowned tip; paint crust matte, with three unequal salt fragments embedded rather than scattered. Cultured butter leaves a dull stain underneath. One unseen upper-left bakery lamp casts a grounded shadow down-right; the distant ultramarine opening contributes no fill. Omit all figures and statuary. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people, forearms, hands, statues, balustrades, extra bread, utensils, or packaging. No lacquered pastry, plastic highlights, floating plate, repeated salt sprinkles, scattered crystal field, secondary light source, or photographic rendering. No centred arrangement, busy headline area, text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r2-0.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 0,
+        "score": 7.5,
+        "tells": [
+          "melted/ambiguous bread form (croissant-loaf hybrid)",
+          "salt flakes rendered as pasted white blobs",
+          "butter pool on plate reads as unmotivated glaze spill",
+          "column base perspective doesn't sit on the sill",
+          "generic still-life-on-ledge composition"
+        ],
+        "fix": "Commit to one bread type (a round brioche roll) with three irregular coarse salt crystals, and drop the butter puddle; let the plate cast a single hard shadow from the upper-left window light."
+      },
+      "astra": {
+        "index": 0,
+        "score": 7.5,
+        "tells": [
+          "style drift from the requested world: photographic bread and stone textures dominate; the dark still-life treatment reads more Dutch Old Master than neoclassical painting",
+          "generic stock composition: plated product with decorative corner cloth and an architectural backdrop"
+        ],
+        "fix": "Repaint the entire scene with restrained neoclassical modeling and unified brushwork rather than photographic food textures against an aged backdrop."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 2,
+      "index": 1,
+      "brief": {
+        "title": "Four O’Clock, First Bake",
+        "prompt": "At 4:05 a.m., take an 80mm f/2.8 medium-format viewpoint, slightly above the counter. Keep only one Korean-wheat salt roll, a chipped ivory plate with rubbed gilding, and an ochre linen fold cut by the bottom edge. Set the plate low on the right third. Preserve the uneven seam and overbrowned tip; paint crust matte, with three unequal salt fragments embedded rather than scattered. Cultured butter leaves a dull stain underneath. One unseen upper-left bakery lamp casts a grounded shadow down-right; the distant ultramarine opening contributes no fill. Omit all figures and statuary. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people, forearms, hands, statues, balustrades, extra bread, utensils, or packaging. No lacquered pastry, plastic highlights, floating plate, repeated salt sprinkles, scattered crystal field, secondary light source, or photographic rendering. No centred arrangement, busy headline area, text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r2-1.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 1,
+        "score": 7,
+        "tells": [
+          "salt flakes as identical cross/flower shapes (duplicated details)",
+          "column pedestal floats on the sill with no structural logic",
+          "butter pool with hard-edged blob outline",
+          "bread form lumpy/undefined between roll and loaf",
+          "window opening cuts wall with no reveal depth"
+        ],
+        "fix": "Replace the star-shaped salt with a light irregular flour dusting, remove the column block from the window, and give the wall opening a visible reveal thickness so the architecture reads as built."
+      },
+      "astra": {
+        "index": 1,
+        "score": 7.1,
+        "tells": [
+          "generic stock composition: an isolated roll staged on a presentation plate with predictable luxury props",
+          "style drift from the requested world: the sharply photographic crust feels separate from the softly painted architecture"
+        ],
+        "fix": "Render the roll with the same simplified tonal planes and painted edge treatment as the column."
+      },
+      "score": 7
+    },
+    {
+      "round": 2,
+      "index": 2,
+      "brief": {
+        "title": "Four O’Clock, First Bake",
+        "prompt": "At 4:05 a.m., take an 80mm f/2.8 medium-format viewpoint, slightly above the counter. Keep only one Korean-wheat salt roll, a chipped ivory plate with rubbed gilding, and an ochre linen fold cut by the bottom edge. Set the plate low on the right third. Preserve the uneven seam and overbrowned tip; paint crust matte, with three unequal salt fragments embedded rather than scattered. Cultured butter leaves a dull stain underneath. One unseen upper-left bakery lamp casts a grounded shadow down-right; the distant ultramarine opening contributes no fill. Omit all figures and statuary. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people, forearms, hands, statues, balustrades, extra bread, utensils, or packaging. No lacquered pastry, plastic highlights, floating plate, repeated salt sprinkles, scattered crystal field, secondary light source, or photographic rendering. No centred arrangement, busy headline area, text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r2-2.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 2,
+        "score": 7.5,
+        "tells": [
+          "salt flakes as repeated flower shapes",
+          "column standing on an unsupported block at window edge",
+          "bread seam runs unnaturally straight like a cut",
+          "slightly over-uniform wall glow with weak cast shadow from bread"
+        ],
+        "fix": "Anchor the roll with a hard cast shadow toward lower-right, replace the flower-shaped salt with irregular grains, and move the column base fully behind the window jamb."
+      },
+      "astra": {
+        "index": 2,
+        "score": 7.6,
+        "tells": [
+          "generic stock composition: conventional three-quarter food presentation dressed with antique props",
+          "style drift from the requested world: food-advertising microtexture overwhelms the neoclassical illustration treatment"
+        ],
+        "fix": "Replace the crust's photographic microdetail with deliberate painted highlights and sculptural light-to-shadow transitions."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 2,
+      "index": 3,
+      "brief": {
+        "title": "Four O’Clock, First Bake",
+        "prompt": "At 4:05 a.m., take an 80mm f/2.8 medium-format viewpoint, slightly above the counter. Keep only one Korean-wheat salt roll, a chipped ivory plate with rubbed gilding, and an ochre linen fold cut by the bottom edge. Set the plate low on the right third. Preserve the uneven seam and overbrowned tip; paint crust matte, with three unequal salt fragments embedded rather than scattered. Cultured butter leaves a dull stain underneath. One unseen upper-left bakery lamp casts a grounded shadow down-right; the distant ultramarine opening contributes no fill. Omit all figures and statuary. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No people, forearms, hands, statues, balustrades, extra bread, utensils, or packaging. No lacquered pastry, plastic highlights, floating plate, repeated salt sprinkles, scattered crystal field, secondary light source, or photographic rendering. No centred arrangement, busy headline area, text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r2-3.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 3,
+        "score": 8,
+        "tells": [
+          "far-right column cut off at an awkward stub",
+          "butter smear on plate reads as glaze spill",
+          "salt crystals slightly too glassy/large"
+        ],
+        "fix": "Crop the right edge to remove the stub column and reduce the salt crystals to two small matte grains so nothing distracts from the loaf."
+      },
+      "astra": {
+        "index": 3,
+        "score": 8,
+        "tells": [
+          "style drift from the requested world: the convincing painted setting still contains a noticeably photographic bread-and-plate foreground"
+        ],
+        "fix": "Unify the bread, plate, and architecture under one neoclassical oil-painting edge hierarchy while preserving the diagonal table and empty left field."
+      },
+      "score": 8
+    },
+    {
+      "round": 2,
+      "index": 4,
+      "brief": {
+        "title": "The Last Roll Before Closing",
+        "prompt": "At 4:30 p.m., use a 65mm f/4 lens perspective at counter height. Retain only a flour-scuffed wooden peel and one palm-sized Korean-wheat salt roll, torn but joined. Move the bread inward to the right-third line, leaving clear counter around its silhouette; crop the peel handle through the lower-left foreground. Show ragged crumb and a matte pale-yellow cultured-butter smear, never strands. Keep salt sparse and irregular. Upper-left sunlight anchors one firm shadow beneath the peel. Retain the worn architectural gilt edge; restrict burnt ochre to the handle. Remove every figure. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No figures, laps, hands, statues, extra rolls, plates, cloth, utensils, or packaging. No oversized bread, silhouette tangencies, detached bread halves, stringy butter, dripping butter, translucent glue-like crumb, glossy crust, duplicated salt, floating peel, or photographic rendering. No additional lighting, crowded upper-left third, text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r2-4.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 4,
+        "score": 6.5,
+        "tells": [
+          "render/photo-look bread pasted onto painted background (style drift)",
+          "butter inside the tear looks like a cutout",
+          "peel handle perspective doesn't align with the board",
+          "gilded ledge and marble planes stack without spatial logic",
+          "subject competes with busy background city and urn"
+        ],
+        "fix": "Repaint the roll in the same brushy neoclassical handling as the landscape (matte crust, no photographic micro-texture) and simplify the background to sea and one column."
+      },
+      "astra": {
+        "index": 4,
+        "score": 7.4,
+        "tells": [
+          "style drift from the requested world: the roll and flour-covered board resemble a food photograph composited into an idealized classical landscape",
+          "generic stock composition: the split roll and prominently displayed butter use a familiar bakery-advertising arrangement"
+        ],
+        "fix": "Paint the torn crumb and board with the same controlled level of detail as the distant temple instead of foreground photographic sharpness."
+      },
+      "score": 6.5
+    },
+    {
+      "round": 2,
+      "index": 5,
+      "brief": {
+        "title": "The Last Roll Before Closing",
+        "prompt": "At 4:30 p.m., use a 65mm f/4 lens perspective at counter height. Retain only a flour-scuffed wooden peel and one palm-sized Korean-wheat salt roll, torn but joined. Move the bread inward to the right-third line, leaving clear counter around its silhouette; crop the peel handle through the lower-left foreground. Show ragged crumb and a matte pale-yellow cultured-butter smear, never strands. Keep salt sparse and irregular. Upper-left sunlight anchors one firm shadow beneath the peel. Retain the worn architectural gilt edge; restrict burnt ochre to the handle. Remove every figure. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No figures, laps, hands, statues, extra rolls, plates, cloth, utensils, or packaging. No oversized bread, silhouette tangencies, detached bread halves, stringy butter, dripping butter, translucent glue-like crumb, glossy crust, duplicated salt, floating peel, or photographic rendering. No additional lighting, crowded upper-left third, text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r2-5.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 5,
+        "score": 6.5,
+        "tells": [
+          "photoreal glossy bread vs painted world (style drift)",
+          "peel appears to hover on marble with no contact shadow",
+          "statue and column base mismatched scale",
+          "overly saturated ultramarine sky",
+          "generic hero-object-on-board composition"
+        ],
+        "fix": "Ground the peel with a contact shadow, desaturate the sky toward a Claude-like haze, and paint the bread with visible brushwork matching the statue."
+      },
+      "astra": {
+        "index": 5,
+        "score": 6.8,
+        "tells": [
+          "plastic/over-glossy highlights: the broad shine on the left crust gives it a lacquered shell appearance",
+          "generic stock composition: a neatly opened, butter-filled roll supplies a predictable product beauty shot",
+          "style drift from the requested world: photographic food styling sits against a visibly painted classical fantasy"
+        ],
+        "fix": "Repaint the roll in matte, broken ochre brushstrokes that match the surrounding classical scene."
+      },
+      "score": 6.5
+    },
+    {
+      "round": 2,
+      "index": 6,
+      "brief": {
+        "title": "The Last Roll Before Closing",
+        "prompt": "At 4:30 p.m., use a 65mm f/4 lens perspective at counter height. Retain only a flour-scuffed wooden peel and one palm-sized Korean-wheat salt roll, torn but joined. Move the bread inward to the right-third line, leaving clear counter around its silhouette; crop the peel handle through the lower-left foreground. Show ragged crumb and a matte pale-yellow cultured-butter smear, never strands. Keep salt sparse and irregular. Upper-left sunlight anchors one firm shadow beneath the peel. Retain the worn architectural gilt edge; restrict burnt ochre to the handle. Remove every figure. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No figures, laps, hands, statues, extra rolls, plates, cloth, utensils, or packaging. No oversized bread, silhouette tangencies, detached bread halves, stringy butter, dripping butter, translucent glue-like crumb, glossy crust, duplicated salt, floating peel, or photographic rendering. No additional lighting, crowded upper-left third, text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r2-6.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 6,
+        "score": 6.5,
+        "tells": [
+          "plastic/over-glossy highlights on crust",
+          "photo-render bread against painted backdrop",
+          "peel projects off ledge at an impossible angle",
+          "statue is stiffly centred behind bread",
+          "gilded frame-like ledge confuses whether we see a painting or a table"
+        ],
+        "fix": "Kill the specular glaze on the crust, lay the peel flat on the marble with its handle inside frame, and shift the statue further right out of the bread's silhouette."
+      },
+      "astra": {
+        "index": 6,
+        "score": 6.7,
+        "tells": [
+          "plastic/over-glossy highlights: the crust and exposed butter have conspicuously slick, polished highlights",
+          "generic stock composition: the front-facing split and showcased filling feel mechanically arranged for advertising",
+          "style drift from the requested world: the foreground reads as commercial food photography rather than part of the neoclassical painting"
+        ],
+        "fix": "Show an unevenly torn roll in three-quarter view, using restrained painted highlights rather than a glossy frontal filling reveal."
+      },
+      "score": 6.5
+    },
+    {
+      "round": 2,
+      "index": 7,
+      "brief": {
+        "title": "The Last Roll Before Closing",
+        "prompt": "At 4:30 p.m., use a 65mm f/4 lens perspective at counter height. Retain only a flour-scuffed wooden peel and one palm-sized Korean-wheat salt roll, torn but joined. Move the bread inward to the right-third line, leaving clear counter around its silhouette; crop the peel handle through the lower-left foreground. Show ragged crumb and a matte pale-yellow cultured-butter smear, never strands. Keep salt sparse and irregular. Upper-left sunlight anchors one firm shadow beneath the peel. Retain the worn architectural gilt edge; restrict burnt ochre to the handle. Remove every figure. Neoclassical oil painting in the manner of Jacques-Louis David and Ingres: smooth glazed brushwork, warm ochre and umber flesh tones, deep ultramarine sky, gilded details, dramatic chiaroscuro from the upper left, faint canvas texture and craquelure. One accent pigment close to #b45309 used sparingly on drapery or a single object. Figures, if any, are painted, never photographic; shown at medium distance with faces turned three-quarter or away and hands simplified. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "No figures, laps, hands, statues, extra rolls, plates, cloth, utensils, or packaging. No oversized bread, silhouette tangencies, detached bread halves, stringy butter, dripping butter, translucent glue-like crumb, glossy crust, duplicated salt, floating peel, or photographic rendering. No additional lighting, crowded upper-left third, text, letters, signs, logos, watermarks, frame, or border."
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx10c2s/r2-7.jpg",
+      "costUsd": 0.1,
+      "claude": {
+        "index": 7,
+        "score": 6.5,
+        "tells": [
+          "red drape attaches to the column impossibly (melted detail)",
+          "bread is photoreal while everything else is painted",
+          "peel floats without contact shadow",
+          "oversaturated sky",
+          "statue placed just above bread creating awkward stacking"
+        ],
+        "fix": "Remove the floating red drape, paint the roll in matte oil-paint handling with a single warm cast shadow on the peel, and drop the statue lower behind the balustrade."
+      },
+      "astra": {
+        "index": 7,
+        "score": 6.6,
+        "tells": [
+          "plastic/over-glossy highlights: the roll's bright, continuous sheen looks varnished",
+          "generic stock composition: the carefully opened roll, scattered flour, and diagonal board form a familiar bakery-stock setup",
+          "style drift from the requested world: photographic bread contrasts with theatrical painted drapery and architecture",
+          "oversaturation: the strong orange-red drapery, blue sky, and bright gold ornament compete with the bread"
+        ],
+        "fix": "Repaint the scene in a restrained earth-pigment palette with matte bread highlights and substantially quieter red drapery."
+      },
+      "score": 6.5
+    }
+  ],
+  "costUsd": 1.6000000000000003
+}

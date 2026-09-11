@@ -1,0 +1,496 @@
+{
+  "job": "dir-mtx0w8wc",
+  "world": "photo-editorial",
+  "brand": "밀도 — 연남동 소금빵집. 매일 새벽 네 시에 굽고 하루 세 번, 다 팔리면 문을 닫는다. 국산 밀·발효 버터·굵은 소금.",
+  "threshold": 8.5,
+  "refUrls": [],
+  "shots": [
+    {
+      "round": 1,
+      "index": 0,
+      "brief": {
+        "title": "First Batch, Torn Open",
+        "prompt": "Seven in the morning, the first tray just pulled and cooling beside the shop's east-facing window. A single salt roll sits low in the bottom-right third on a blackened, well-seasoned steel sheet pan, torn in half by hand so the honeycomb crumb faces the lens; the pool of cultured butter that leaked during the bake has caramelised into a lacy brown ring on the pan around it, and that ring carries the only warm accent in the frame. Coarse grey salt crystals, a few knocked loose onto the steel. One end of the crust is a shade too dark from sitting near the oven door — leave it. The pan's near edge is cut hard by the bottom of the frame, a soft crumpled square of unbleached linen half in shot at right. Camera at counter height, slight downward tilt, focus on the torn crumb only, pan edge and linen falling away. Upper-left stays empty, pale plaster wall softly lit. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands, fingers or body parts; no text, letters, logos, printed packaging or price tags; no rows or multiples of identical rolls; no perfectly uniform or symmetrical bread; no glossy plastic highlights or wet-looking glaze; no centred floating hero; no clean brand-new baking tray; no artificial studio softbox look or flash; no neon or oversaturated orange; no 3D render or CGI smoothness; no border, frame or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-0.jpg",
+      "costUsd": 0.094687,
+      "claude": {
+        "index": 0,
+        "score": 7,
+        "tells": [
+          "plastic/over-glossy highlights on crumb (looks wet/cheesy, not bread)",
+          "melted/impossible details: crust cap sits on the crumb like a detached lid",
+          "salt grains rendered as uniform grey gravel",
+          "busy plaster wall eats the only headline area"
+        ],
+        "fix": "Shoot the crumb dry and matte, tear the crust so it remains continuous with the interior, and clear the left third of wall texture for copy."
+      },
+      "astra": {
+        "index": 0,
+        "score": 8,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Replace the decorative linen with the freshly removed torn piece, leaving an unstyled crumb trail across the tray."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 1,
+      "brief": {
+        "title": "First Batch, Torn Open",
+        "prompt": "Seven in the morning, the first tray just pulled and cooling beside the shop's east-facing window. A single salt roll sits low in the bottom-right third on a blackened, well-seasoned steel sheet pan, torn in half by hand so the honeycomb crumb faces the lens; the pool of cultured butter that leaked during the bake has caramelised into a lacy brown ring on the pan around it, and that ring carries the only warm accent in the frame. Coarse grey salt crystals, a few knocked loose onto the steel. One end of the crust is a shade too dark from sitting near the oven door — leave it. The pan's near edge is cut hard by the bottom of the frame, a soft crumpled square of unbleached linen half in shot at right. Camera at counter height, slight downward tilt, focus on the torn crumb only, pan edge and linen falling away. Upper-left stays empty, pale plaster wall softly lit. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands, fingers or body parts; no text, letters, logos, printed packaging or price tags; no rows or multiples of identical rolls; no perfectly uniform or symmetrical bread; no glossy plastic highlights or wet-looking glaze; no centred floating hero; no clean brand-new baking tray; no artificial studio softbox look or flash; no neon or oversaturated orange; no 3D render or CGI smoothness; no border, frame or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-1.jpg",
+      "costUsd": 0.088824,
+      "claude": {
+        "index": 1,
+        "score": 8,
+        "tells": [
+          "salt topping is a single flat grey clump, too uniform",
+          "crust too smooth/flawless on the un-torn side",
+          "cheese lace has an even doily-like edge"
+        ],
+        "fix": "Break the salt into scattered, translucent flakes and rough the lace edge so it looks like real overflow rather than a placed disc."
+      },
+      "astra": {
+        "index": 1,
+        "score": 7,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Tear the roll into two visibly ragged pieces rather than presenting a rounded bun with a neat section missing."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 2,
+      "brief": {
+        "title": "First Batch, Torn Open",
+        "prompt": "Seven in the morning, the first tray just pulled and cooling beside the shop's east-facing window. A single salt roll sits low in the bottom-right third on a blackened, well-seasoned steel sheet pan, torn in half by hand so the honeycomb crumb faces the lens; the pool of cultured butter that leaked during the bake has caramelised into a lacy brown ring on the pan around it, and that ring carries the only warm accent in the frame. Coarse grey salt crystals, a few knocked loose onto the steel. One end of the crust is a shade too dark from sitting near the oven door — leave it. The pan's near edge is cut hard by the bottom of the frame, a soft crumpled square of unbleached linen half in shot at right. Camera at counter height, slight downward tilt, focus on the torn crumb only, pan edge and linen falling away. Upper-left stays empty, pale plaster wall softly lit. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands, fingers or body parts; no text, letters, logos, printed packaging or price tags; no rows or multiples of identical rolls; no perfectly uniform or symmetrical bread; no glossy plastic highlights or wet-looking glaze; no centred floating hero; no clean brand-new baking tray; no artificial studio softbox look or flash; no neon or oversaturated orange; no 3D render or CGI smoothness; no border, frame or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-2.jpg",
+      "costUsd": 0.090978,
+      "claude": {
+        "index": 2,
+        "score": 7.5,
+        "tells": [
+          "cheese lace is a perfectly regular honeycomb disc (render-look)",
+          "two halves show inconsistent crumb: open airy vs dense white",
+          "crust glossiness reads as varnish"
+        ],
+        "fix": "Use one loaf torn once so both faces match, and let the melted cheese spill irregularly toward the tray edge."
+      },
+      "astra": {
+        "index": 2,
+        "score": 6.3,
+        "tells": [
+          "generic stock composition",
+          "melted/duplicated/impossible details"
+        ],
+        "fix": "Photograph two halves from the same actual tear so their exposed faces have corresponding cavities and consistent crumb density."
+      },
+      "score": 6.3
+    },
+    {
+      "round": 1,
+      "index": 3,
+      "brief": {
+        "title": "First Batch, Torn Open",
+        "prompt": "Seven in the morning, the first tray just pulled and cooling beside the shop's east-facing window. A single salt roll sits low in the bottom-right third on a blackened, well-seasoned steel sheet pan, torn in half by hand so the honeycomb crumb faces the lens; the pool of cultured butter that leaked during the bake has caramelised into a lacy brown ring on the pan around it, and that ring carries the only warm accent in the frame. Coarse grey salt crystals, a few knocked loose onto the steel. One end of the crust is a shade too dark from sitting near the oven door — leave it. The pan's near edge is cut hard by the bottom of the frame, a soft crumpled square of unbleached linen half in shot at right. Camera at counter height, slight downward tilt, focus on the torn crumb only, pan edge and linen falling away. Upper-left stays empty, pale plaster wall softly lit. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands, fingers or body parts; no text, letters, logos, printed packaging or price tags; no rows or multiples of identical rolls; no perfectly uniform or symmetrical bread; no glossy plastic highlights or wet-looking glaze; no centred floating hero; no clean brand-new baking tray; no artificial studio softbox look or flash; no neon or oversaturated orange; no 3D render or CGI smoothness; no border, frame or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-3.jpg",
+      "costUsd": 0.089363,
+      "claude": {
+        "index": 3,
+        "score": 7,
+        "tells": [
+          "crumb reads as cotton/marshmallow rather than baked bread",
+          "lace disc is an almost perfect circle centred under the loaf",
+          "over-glossy crust highlight",
+          "generic stock composition"
+        ],
+        "fix": "Tear the roll so strands and holes are visible, and shift the cheese spill off-centre with a ragged edge."
+      },
+      "astra": {
+        "index": 3,
+        "score": 8,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Include the discarded torn end beside the roll to make this read as a first-batch tasting rather than a styled product display."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 4,
+      "brief": {
+        "title": "First Batch, Torn Open",
+        "prompt": "Seven in the morning, the first tray just pulled and cooling beside the shop's east-facing window. A single salt roll sits low in the bottom-right third on a blackened, well-seasoned steel sheet pan, torn in half by hand so the honeycomb crumb faces the lens; the pool of cultured butter that leaked during the bake has caramelised into a lacy brown ring on the pan around it, and that ring carries the only warm accent in the frame. Coarse grey salt crystals, a few knocked loose onto the steel. One end of the crust is a shade too dark from sitting near the oven door — leave it. The pan's near edge is cut hard by the bottom of the frame, a soft crumpled square of unbleached linen half in shot at right. Camera at counter height, slight downward tilt, focus on the torn crumb only, pan edge and linen falling away. Upper-left stays empty, pale plaster wall softly lit. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands, fingers or body parts; no text, letters, logos, printed packaging or price tags; no rows or multiples of identical rolls; no perfectly uniform or symmetrical bread; no glossy plastic highlights or wet-looking glaze; no centred floating hero; no clean brand-new baking tray; no artificial studio softbox look or flash; no neon or oversaturated orange; no 3D render or CGI smoothness; no border, frame or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-4.jpg",
+      "costUsd": 0.088107,
+      "claude": {
+        "index": 4,
+        "score": 7.5,
+        "tells": [
+          "lace has repeating identical honeycomb cells (render-look)",
+          "burnt crust patch is an abrupt painted-on black without gradient",
+          "salt grains uniformly sized"
+        ],
+        "fix": "Make the scorch gradate naturally into the crust and break up the lace's repetitive cell pattern."
+      },
+      "astra": {
+        "index": 4,
+        "score": 7.3,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Replace the conspicuously arranged lace ring with an irregular, partially broken baked skirt still attached to the roll."
+      },
+      "score": 7.3
+    },
+    {
+      "round": 1,
+      "index": 5,
+      "brief": {
+        "title": "First Batch, Torn Open",
+        "prompt": "Seven in the morning, the first tray just pulled and cooling beside the shop's east-facing window. A single salt roll sits low in the bottom-right third on a blackened, well-seasoned steel sheet pan, torn in half by hand so the honeycomb crumb faces the lens; the pool of cultured butter that leaked during the bake has caramelised into a lacy brown ring on the pan around it, and that ring carries the only warm accent in the frame. Coarse grey salt crystals, a few knocked loose onto the steel. One end of the crust is a shade too dark from sitting near the oven door — leave it. The pan's near edge is cut hard by the bottom of the frame, a soft crumpled square of unbleached linen half in shot at right. Camera at counter height, slight downward tilt, focus on the torn crumb only, pan edge and linen falling away. Upper-left stays empty, pale plaster wall softly lit. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands, fingers or body parts; no text, letters, logos, printed packaging or price tags; no rows or multiples of identical rolls; no perfectly uniform or symmetrical bread; no glossy plastic highlights or wet-looking glaze; no centred floating hero; no clean brand-new baking tray; no artificial studio softbox look or flash; no neon or oversaturated orange; no 3D render or CGI smoothness; no border, frame or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-5.jpg",
+      "costUsd": 0.090499,
+      "claude": {
+        "index": 5,
+        "score": 8,
+        "tells": [
+          "cheese lace ring too even and geometric",
+          "napkin dominates the right third with little purpose",
+          "soft focus on lace edge suggests depth fallback rather than lens"
+        ],
+        "fix": "Pull the linen back to a small corner and let the lace break into fragments on one side."
+      },
+      "astra": {
+        "index": 5,
+        "score": 6.5,
+        "tells": [
+          "generic stock composition",
+          "melted/duplicated/impossible details"
+        ],
+        "fix": "Use a genuinely hand-torn roll with irregular crumb strands instead of the conspicuously nested, web-like pore pattern."
+      },
+      "score": 6.5
+    },
+    {
+      "round": 1,
+      "index": 6,
+      "brief": {
+        "title": "First Batch, Torn Open",
+        "prompt": "Seven in the morning, the first tray just pulled and cooling beside the shop's east-facing window. A single salt roll sits low in the bottom-right third on a blackened, well-seasoned steel sheet pan, torn in half by hand so the honeycomb crumb faces the lens; the pool of cultured butter that leaked during the bake has caramelised into a lacy brown ring on the pan around it, and that ring carries the only warm accent in the frame. Coarse grey salt crystals, a few knocked loose onto the steel. One end of the crust is a shade too dark from sitting near the oven door — leave it. The pan's near edge is cut hard by the bottom of the frame, a soft crumpled square of unbleached linen half in shot at right. Camera at counter height, slight downward tilt, focus on the torn crumb only, pan edge and linen falling away. Upper-left stays empty, pale plaster wall softly lit. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands, fingers or body parts; no text, letters, logos, printed packaging or price tags; no rows or multiples of identical rolls; no perfectly uniform or symmetrical bread; no glossy plastic highlights or wet-looking glaze; no centred floating hero; no clean brand-new baking tray; no artificial studio softbox look or flash; no neon or oversaturated orange; no 3D render or CGI smoothness; no border, frame or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-6.jpg",
+      "costUsd": 0.090978,
+      "claude": {
+        "index": 6,
+        "score": 7,
+        "tells": [
+          "two halves have mismatched crumb structure (impossible for one loaf)",
+          "lace disc regular and centred",
+          "crust on right half flawless and glossy",
+          "subject slightly small for hero"
+        ],
+        "fix": "Photograph a single torn loaf with matching interior on both faces and move in a step closer."
+      },
+      "astra": {
+        "index": 6,
+        "score": 5.8,
+        "tells": [
+          "generic stock composition",
+          "melted/duplicated/impossible details"
+        ],
+        "fix": "Capture matching torn faces from one roll; eliminate the abrupt change from concentric honeycomb on the left to nearly solid crumb on the right."
+      },
+      "score": 5.8
+    },
+    {
+      "round": 1,
+      "index": 7,
+      "brief": {
+        "title": "First Batch, Torn Open",
+        "prompt": "Seven in the morning, the first tray just pulled and cooling beside the shop's east-facing window. A single salt roll sits low in the bottom-right third on a blackened, well-seasoned steel sheet pan, torn in half by hand so the honeycomb crumb faces the lens; the pool of cultured butter that leaked during the bake has caramelised into a lacy brown ring on the pan around it, and that ring carries the only warm accent in the frame. Coarse grey salt crystals, a few knocked loose onto the steel. One end of the crust is a shade too dark from sitting near the oven door — leave it. The pan's near edge is cut hard by the bottom of the frame, a soft crumpled square of unbleached linen half in shot at right. Camera at counter height, slight downward tilt, focus on the torn crumb only, pan edge and linen falling away. Upper-left stays empty, pale plaster wall softly lit. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands, fingers or body parts; no text, letters, logos, printed packaging or price tags; no rows or multiples of identical rolls; no perfectly uniform or symmetrical bread; no glossy plastic highlights or wet-looking glaze; no centred floating hero; no clean brand-new baking tray; no artificial studio softbox look or flash; no neon or oversaturated orange; no 3D render or CGI smoothness; no border, frame or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-7.jpg",
+      "costUsd": 0.095704,
+      "claude": {
+        "index": 7,
+        "score": 8,
+        "tells": [
+          "crumb mismatch between halves",
+          "top-right salt cluster uniform",
+          "cheese spill slightly too glossy"
+        ],
+        "fix": "Match the two interiors and dry down the cheese spill so it reads as baked, not wet."
+      },
+      "astra": {
+        "index": 7,
+        "score": 6.4,
+        "tells": [
+          "generic stock composition",
+          "melted/duplicated/impossible details"
+        ],
+        "fix": "Turn both halves toward the camera under the same exposure so the tear structure remains visibly consistent across them."
+      },
+      "score": 6.4
+    },
+    {
+      "round": 1,
+      "index": 8,
+      "brief": {
+        "title": "What Goes In",
+        "prompt": "Overhead, camera straight down onto the worn maple prep counter, knife scars and a faint flour haze across the grain. Three things only, clustered in the lower-right two-thirds: a block of cultured butter on its torn wax-paper wrapper with the corner shaved off in a long curl by a knife that has already left — one pale scrape mark on the paper; a small chipped white enamel dish, rim showing dark iron where the enamel flaked, holding a rough heap of coarse Korean sea salt, one pinch spilled onto the wood; and a scoop of stone-milled domestic wheat flour dumped straight onto the counter in a soft mound with a thumb-sized divot in it, no bowl. The butter block's edge is nearest the window and throws a long soft shadow to the right. Focus on the salt and the cut edge of the butter, flour mound slightly soft. Entire upper-left third is bare counter, lightest part of the wood. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands or body parts; no text, letters, logos or printed labels on the butter wrapper or anywhere; no knife or extra tools in frame; no more than three props; no bowls or measuring cups; no bread in this frame; no glossy melted or sweating butter; no perfectly cubed factory butter; no pristine unmarked counter; no symmetrical or centred arrangement; no hard flash shadows or multiple light sources; no neon or saturated colour; no CGI or render finish; no frame, border or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-8.jpg",
+      "costUsd": 0.090917,
+      "claude": {
+        "index": 8,
+        "score": 7.5,
+        "tells": [
+          "butter curl has impossible ridged texture and cut face melts into paper",
+          "dark shadowed window edge intrudes top-left",
+          "no clean headline area—elements spread across frame"
+        ],
+        "fix": "Cut the butter with a real knife stroke and cluster the objects to the right leaving the left half clear."
+      },
+      "astra": {
+        "index": 8,
+        "score": 8.2,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Replace the decorative butter curls with one rough knife cut and leave the used knife on the wrapper."
+      },
+      "score": 7.5
+    },
+    {
+      "round": 1,
+      "index": 9,
+      "brief": {
+        "title": "What Goes In",
+        "prompt": "Overhead, camera straight down onto the worn maple prep counter, knife scars and a faint flour haze across the grain. Three things only, clustered in the lower-right two-thirds: a block of cultured butter on its torn wax-paper wrapper with the corner shaved off in a long curl by a knife that has already left — one pale scrape mark on the paper; a small chipped white enamel dish, rim showing dark iron where the enamel flaked, holding a rough heap of coarse Korean sea salt, one pinch spilled onto the wood; and a scoop of stone-milled domestic wheat flour dumped straight onto the counter in a soft mound with a thumb-sized divot in it, no bowl. The butter block's edge is nearest the window and throws a long soft shadow to the right. Focus on the salt and the cut edge of the butter, flour mound slightly soft. Entire upper-left third is bare counter, lightest part of the wood. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands or body parts; no text, letters, logos or printed labels on the butter wrapper or anywhere; no knife or extra tools in frame; no more than three props; no bowls or measuring cups; no bread in this frame; no glossy melted or sweating butter; no perfectly cubed factory butter; no pristine unmarked counter; no symmetrical or centred arrangement; no hard flash shadows or multiple light sources; no neon or saturated colour; no CGI or render finish; no frame, border or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-9.jpg",
+      "costUsd": 0.091515,
+      "claude": {
+        "index": 9,
+        "score": 7,
+        "tells": [
+          "butter block is a broken irregular blob with melted top edge (impossible details)",
+          "separate butter smear reads as a paint stroke",
+          "paper folds too geometric"
+        ],
+        "fix": "Use a clean rectangular block with one knife slice and a curl that visibly originates from that cut."
+      },
+      "astra": {
+        "index": 9,
+        "score": 7.3,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Shoot the ingredients immediately after measuring, retaining uneven spills instead of styling three isolated ingredient stations."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 10,
+      "brief": {
+        "title": "What Goes In",
+        "prompt": "Overhead, camera straight down onto the worn maple prep counter, knife scars and a faint flour haze across the grain. Three things only, clustered in the lower-right two-thirds: a block of cultured butter on its torn wax-paper wrapper with the corner shaved off in a long curl by a knife that has already left — one pale scrape mark on the paper; a small chipped white enamel dish, rim showing dark iron where the enamel flaked, holding a rough heap of coarse Korean sea salt, one pinch spilled onto the wood; and a scoop of stone-milled domestic wheat flour dumped straight onto the counter in a soft mound with a thumb-sized divot in it, no bowl. The butter block's edge is nearest the window and throws a long soft shadow to the right. Focus on the salt and the cut edge of the butter, flour mound slightly soft. Entire upper-left third is bare counter, lightest part of the wood. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands or body parts; no text, letters, logos or printed labels on the butter wrapper or anywhere; no knife or extra tools in frame; no more than three props; no bowls or measuring cups; no bread in this frame; no glossy melted or sweating butter; no perfectly cubed factory butter; no pristine unmarked counter; no symmetrical or centred arrangement; no hard flash shadows or multiple light sources; no neon or saturated colour; no CGI or render finish; no frame, border or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-10.jpg",
+      "costUsd": 0.091276,
+      "claude": {
+        "index": 10,
+        "score": 8,
+        "tells": [
+          "butter curl ridges too regular",
+          "flour mound edge over-crisp",
+          "salt spill duplicated grain shapes"
+        ],
+        "fix": "Soften the flour pile edge with a dusting and vary salt grain sizes."
+      },
+      "astra": {
+        "index": 10,
+        "score": 7.1,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Move the butter and salt closer to the flour on the right, preserving a continuous quiet left third for the headline."
+      },
+      "score": 7.1
+    },
+    {
+      "round": 1,
+      "index": 11,
+      "brief": {
+        "title": "What Goes In",
+        "prompt": "Overhead, camera straight down onto the worn maple prep counter, knife scars and a faint flour haze across the grain. Three things only, clustered in the lower-right two-thirds: a block of cultured butter on its torn wax-paper wrapper with the corner shaved off in a long curl by a knife that has already left — one pale scrape mark on the paper; a small chipped white enamel dish, rim showing dark iron where the enamel flaked, holding a rough heap of coarse Korean sea salt, one pinch spilled onto the wood; and a scoop of stone-milled domestic wheat flour dumped straight onto the counter in a soft mound with a thumb-sized divot in it, no bowl. The butter block's edge is nearest the window and throws a long soft shadow to the right. Focus on the salt and the cut edge of the butter, flour mound slightly soft. Entire upper-left third is bare counter, lightest part of the wood. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands or body parts; no text, letters, logos or printed labels on the butter wrapper or anywhere; no knife or extra tools in frame; no more than three props; no bowls or measuring cups; no bread in this frame; no glossy melted or sweating butter; no perfectly cubed factory butter; no pristine unmarked counter; no symmetrical or centred arrangement; no hard flash shadows or multiple light sources; no neon or saturated colour; no CGI or render finish; no frame, border or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-11.jpg",
+      "costUsd": 0.093131,
+      "claude": {
+        "index": 11,
+        "score": 7.5,
+        "tells": [
+          "butter smear disconnected from block (impossible detail)",
+          "curl floating on paper without origin",
+          "wood grain slightly too uniform/flat"
+        ],
+        "fix": "Make the curl and smear physically continuous with a knife cut on the block."
+      },
+      "astra": {
+        "index": 11,
+        "score": 7.4,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Replace the sculpted butter ribbons with a partially used block bearing irregular scrape marks."
+      },
+      "score": 7.4
+    },
+    {
+      "round": 1,
+      "index": 12,
+      "brief": {
+        "title": "What Goes In",
+        "prompt": "Overhead, camera straight down onto the worn maple prep counter, knife scars and a faint flour haze across the grain. Three things only, clustered in the lower-right two-thirds: a block of cultured butter on its torn wax-paper wrapper with the corner shaved off in a long curl by a knife that has already left — one pale scrape mark on the paper; a small chipped white enamel dish, rim showing dark iron where the enamel flaked, holding a rough heap of coarse Korean sea salt, one pinch spilled onto the wood; and a scoop of stone-milled domestic wheat flour dumped straight onto the counter in a soft mound with a thumb-sized divot in it, no bowl. The butter block's edge is nearest the window and throws a long soft shadow to the right. Focus on the salt and the cut edge of the butter, flour mound slightly soft. Entire upper-left third is bare counter, lightest part of the wood. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands or body parts; no text, letters, logos or printed labels on the butter wrapper or anywhere; no knife or extra tools in frame; no more than three props; no bowls or measuring cups; no bread in this frame; no glossy melted or sweating butter; no perfectly cubed factory butter; no pristine unmarked counter; no symmetrical or centred arrangement; no hard flash shadows or multiple light sources; no neon or saturated colour; no CGI or render finish; no frame, border or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-12.jpg",
+      "costUsd": 0.088644,
+      "claude": {
+        "index": 12,
+        "score": 8,
+        "tells": [
+          "butter block flawless, edges too perfect",
+          "paper cutout looks stamped",
+          "flour mound perfectly conical"
+        ],
+        "fix": "Add fingerprints or a knife nick to the butter and let some flour drift toward the empty left."
+      },
+      "astra": {
+        "index": 12,
+        "score": 7.8,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Introduce a used measuring scoop partly buried in the flour to establish a specific preparation moment."
+      },
+      "score": 7.8
+    },
+    {
+      "round": 1,
+      "index": 13,
+      "brief": {
+        "title": "What Goes In",
+        "prompt": "Overhead, camera straight down onto the worn maple prep counter, knife scars and a faint flour haze across the grain. Three things only, clustered in the lower-right two-thirds: a block of cultured butter on its torn wax-paper wrapper with the corner shaved off in a long curl by a knife that has already left — one pale scrape mark on the paper; a small chipped white enamel dish, rim showing dark iron where the enamel flaked, holding a rough heap of coarse Korean sea salt, one pinch spilled onto the wood; and a scoop of stone-milled domestic wheat flour dumped straight onto the counter in a soft mound with a thumb-sized divot in it, no bowl. The butter block's edge is nearest the window and throws a long soft shadow to the right. Focus on the salt and the cut edge of the butter, flour mound slightly soft. Entire upper-left third is bare counter, lightest part of the wood. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands or body parts; no text, letters, logos or printed labels on the butter wrapper or anywhere; no knife or extra tools in frame; no more than three props; no bowls or measuring cups; no bread in this frame; no glossy melted or sweating butter; no perfectly cubed factory butter; no pristine unmarked counter; no symmetrical or centred arrangement; no hard flash shadows or multiple light sources; no neon or saturated colour; no CGI or render finish; no frame, border or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-13.jpg",
+      "costUsd": 0.096062,
+      "claude": {
+        "index": 13,
+        "score": 8,
+        "tells": [
+          "butter cut face has a strange rolled 'smear tongue' (melted detail)",
+          "wood a touch oversaturated"
+        ],
+        "fix": "Re-cut the butter so the shaved piece sits as a clear curl, and cool the wood by a half stop."
+      },
+      "astra": {
+        "index": 13,
+        "score": 8.5,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Replace the deliberately cratered flour mound with a freshly tipped scoopful, retaining the strong directional light and open left side."
+      },
+      "score": 8
+    },
+    {
+      "round": 1,
+      "index": 14,
+      "brief": {
+        "title": "What Goes In",
+        "prompt": "Overhead, camera straight down onto the worn maple prep counter, knife scars and a faint flour haze across the grain. Three things only, clustered in the lower-right two-thirds: a block of cultured butter on its torn wax-paper wrapper with the corner shaved off in a long curl by a knife that has already left — one pale scrape mark on the paper; a small chipped white enamel dish, rim showing dark iron where the enamel flaked, holding a rough heap of coarse Korean sea salt, one pinch spilled onto the wood; and a scoop of stone-milled domestic wheat flour dumped straight onto the counter in a soft mound with a thumb-sized divot in it, no bowl. The butter block's edge is nearest the window and throws a long soft shadow to the right. Focus on the salt and the cut edge of the butter, flour mound slightly soft. Entire upper-left third is bare counter, lightest part of the wood. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands or body parts; no text, letters, logos or printed labels on the butter wrapper or anywhere; no knife or extra tools in frame; no more than three props; no bowls or measuring cups; no bread in this frame; no glossy melted or sweating butter; no perfectly cubed factory butter; no pristine unmarked counter; no symmetrical or centred arrangement; no hard flash shadows or multiple light sources; no neon or saturated colour; no CGI or render finish; no frame, border or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-14.jpg",
+      "costUsd": 0.091994,
+      "claude": {
+        "index": 14,
+        "score": 7,
+        "tells": [
+          "paper covered in scattered butter smears that don't correspond to any action",
+          "harder lighting gives a render-look on wood",
+          "salt grains uniform"
+        ],
+        "fix": "Wipe the paper to one honest smear and soften the key light."
+      },
+      "astra": {
+        "index": 14,
+        "score": 7,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Remove the ornamental butter loop and photograph a single rough shaving resting naturally against the cut edge."
+      },
+      "score": 7
+    },
+    {
+      "round": 1,
+      "index": 15,
+      "brief": {
+        "title": "What Goes In",
+        "prompt": "Overhead, camera straight down onto the worn maple prep counter, knife scars and a faint flour haze across the grain. Three things only, clustered in the lower-right two-thirds: a block of cultured butter on its torn wax-paper wrapper with the corner shaved off in a long curl by a knife that has already left — one pale scrape mark on the paper; a small chipped white enamel dish, rim showing dark iron where the enamel flaked, holding a rough heap of coarse Korean sea salt, one pinch spilled onto the wood; and a scoop of stone-milled domestic wheat flour dumped straight onto the counter in a soft mound with a thumb-sized divot in it, no bowl. The butter block's edge is nearest the window and throws a long soft shadow to the right. Focus on the salt and the cut edge of the butter, flour mound slightly soft. Entire upper-left third is bare counter, lightest part of the wood. Editorial still-life photography, one cohesive series, shot on medium format with a 80mm lens. Color grading: warm neutral base, a single accent hue close to #b45309, low saturation, no neon. Lighting: soft directional window light from the left, bright and airy, gentle long shadows, no flash. Texture: fine film grain, matte surfaces, shallow depth of field on the subject only. No people, no faces, no hands, no body parts anywhere in the frame. No text, no letters, no signs, no logos, no watermarks, no frame or border. Composition leaves clean negative space in the upper-left third for a headline.",
+        "negative": "no people, hands or body parts; no text, letters, logos or printed labels on the butter wrapper or anywhere; no knife or extra tools in frame; no more than three props; no bowls or measuring cups; no bread in this frame; no glossy melted or sweating butter; no perfectly cubed factory butter; no pristine unmarked counter; no symmetrical or centred arrangement; no hard flash shadows or multiple light sources; no neon or saturated colour; no CGI or render finish; no frame, border or watermark"
+      },
+      "url": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/director/dir-mtx0w8wc/r1-15.jpg",
+      "costUsd": 0.09002,
+      "claude": {
+        "index": 15,
+        "score": 7,
+        "tells": [
+          "isolated butter stroke on paper with no origin (impossible detail)",
+          "butter block flawless and too pale/plastic",
+          "hard shadows give render-look"
+        ],
+        "fix": "Remove the stray smear, cut a visible slice from the block, and diffuse the light."
+      },
+      "astra": {
+        "index": 15,
+        "score": 7.1,
+        "tells": [
+          "generic stock composition"
+        ],
+        "fix": "Photograph the butter immediately after an ordinary knife scrape rather than shaping its end into an upright ribbon."
+      },
+      "score": 7
+    }
+  ],
+  "costUsd": 1.462699
+}

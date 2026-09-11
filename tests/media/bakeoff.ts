@@ -173,6 +173,68 @@ async function openaiImage(
   return { ...(await fetchBytes(d.url!)), usage: body.usage };
 }
 
+/** ByteDance Seedream (BytePlus ModelArk images API) — ARK_API_KEY. 모델 활성화가 안 돼 있으면 InvalidEndpointOrModel.NotFound */
+async function seedreamImage(
+  env: Record<string, string>,
+  model: string,
+  prompt: string,
+): Promise<{ bytes: Uint8Array; mimeType: string }> {
+  const res = await fetch('https://ark.ap-southeast.bytepluses.com/api/v3/images/generations', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${env.ARK_API_KEY}` },
+    body: JSON.stringify({ model, prompt, size: '2K', response_format: 'url', watermark: false }),
+  });
+  const body = (await res.json()) as {
+    data?: Array<{ url?: string; b64_json?: string }>;
+    error?: { message?: string };
+  };
+
+  if (!res.ok || !body.data?.[0]) {
+    throw new Error(`${model}: ${res.status} ${body.error?.message || JSON.stringify(body).slice(0, 160)}`);
+  }
+
+  if (body.data[0].b64_json) {
+    return { bytes: new Uint8Array(Buffer.from(body.data[0].b64_json, 'base64')), mimeType: 'image/jpeg' };
+  }
+
+  return fetchBytes(body.data[0].url!);
+}
+
+/** Black Forest Labs FLUX.2 Pro — BFL_API_KEY. 비동기(polling_url) */
+async function fluxImage(
+  env: Record<string, string>,
+  model: string,
+  prompt: string,
+): Promise<{ bytes: Uint8Array; mimeType: string }> {
+  const create = await fetch(`https://api.bfl.ai/v1/${model}`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-key': env.BFL_API_KEY },
+    body: JSON.stringify({ prompt, width: 1536, height: 864, output_format: 'jpeg' }),
+  });
+  const task = (await create.json()) as { id?: string; polling_url?: string; error?: string; detail?: unknown };
+
+  if (!create.ok || !task.polling_url) {
+    throw new Error(`${model}: ${create.status} ${task.error || JSON.stringify(task.detail || task).slice(0, 160)}`);
+  }
+
+  for (let i = 0; i < 60; i++) {
+    await new Promise((r) => setTimeout(r, 2000));
+
+    const poll = await fetch(task.polling_url, { headers: { 'x-key': env.BFL_API_KEY } });
+    const state = (await poll.json()) as { status?: string; result?: { sample?: string } };
+
+    if (state.status === 'Ready' && state.result?.sample) {
+      return fetchBytes(state.result.sample);
+    }
+
+    if (state.status && /fail|error|moderat/i.test(state.status)) {
+      throw new Error(`${model}: ${state.status}`);
+    }
+  }
+
+  throw new Error(`${model}: timeout`);
+}
+
 async function main() {
   const env = loadEnv();
   const r2 = readR2Config(env as never);
@@ -183,7 +245,7 @@ async function main() {
     'gemini-3.1-flash-image,gemini-3-pro-image,gpt-image-2.5-sunburst,gpt-image-2.5-flare,gpt-image-2'
   ).split(',');
 
-  if (!from || !r2 || !env.GOOGLE_GENERATIVE_AI_API_KEY || !env.OPENAI_API_KEY || !env.ANTHROPIC_API_KEY) {
+  if (!from || !r2 || !env.GOOGLE_GENERATIVE_AI_API_KEY || !env.OPENAI_API_KEY) {
     throw new Error('--from + GOOGLE/OPENAI/ANTHROPIC/R2 env required');
   }
 
@@ -223,7 +285,11 @@ async function main() {
               aspectRatio: '16:9',
               model,
             })
-          : await openaiImage(env, model, brief.prompt);
+          : model.startsWith('seedream')
+            ? await seedreamImage(env, model, brief.prompt)
+            : model.startsWith('flux')
+              ? await fluxImage(env, model, brief.prompt)
+              : await openaiImage(env, model, brief.prompt);
         const url = await putR2Object(r2, `media/bakeoff/${ts}/${bi}-${model}.jpg`, img.bytes, img.mimeType);
         urls.push({ model, url });
         results.push({ model, brief: brief.title, url, ms: Date.now() - t0 });
