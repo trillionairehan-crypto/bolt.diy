@@ -1,0 +1,1123 @@
+{
+ "score": {
+  "n": 73,
+  "mean": 8.62,
+  "min": 8.07,
+  "max": 9.67,
+  "ui": 8.19,
+  "ux": 8.16,
+  "innovation": 8.19
+ },
+ "judges": {
+  "Mattia Rinaudo": {
+   "n": 44,
+   "avg": 8.23,
+   "ui": 8.23,
+   "ux": 8.23,
+   "inn": 8.23,
+   "sd": 0.24
+  },
+  "Amin Salehi": {
+   "n": 39,
+   "avg": 7.95,
+   "ui": 7.95,
+   "ux": 7.92,
+   "inn": 7.97,
+   "sd": 0.14
+  },
+  "Sergey Dubovenko": {
+   "n": 27,
+   "avg": 8.28,
+   "ui": 8.29,
+   "ux": 8.25,
+   "inn": 8.29,
+   "sd": 0.42
+  },
+  "Federica Gandolfo": {
+   "n": 22,
+   "avg": 8.0,
+   "ui": 8.01,
+   "ux": 7.95,
+   "inn": 8.06,
+   "sd": 0.25
+  },
+  "Radislav Eliseev": {
+   "n": 21,
+   "avg": 8.03,
+   "ui": 8.05,
+   "ux": 8.03,
+   "inn": 8.0,
+   "sd": 0.11
+  },
+  "Salva Carlino": {
+   "n": 20,
+   "avg": 8.02,
+   "ui": 7.93,
+   "ux": 7.99,
+   "inn": 8.14,
+   "sd": 0.29
+  },
+  "Timofey Beloglazov": {
+   "n": 17,
+   "avg": 8.19,
+   "ui": 8.18,
+   "ux": 8.19,
+   "inn": 8.19,
+   "sd": 0.36
+  },
+  "ZHOU Wen": {
+   "n": 17,
+   "avg": 8.16,
+   "ui": 8.03,
+   "ux": 8.37,
+   "inn": 8.09,
+   "sd": 0.25
+  },
+  "Francesco Carli": {
+   "n": 15,
+   "avg": 8.11,
+   "ui": 8.14,
+   "ux": 8.01,
+   "inn": 8.18,
+   "sd": 0.19
+  },
+  "Joe Ben": {
+   "n": 13,
+   "avg": 8.29,
+   "ui": 8.38,
+   "ux": 8.73,
+   "inn": 7.74,
+   "sd": 0.65
+  },
+  "Mayra Metaxa": {
+   "n": 11,
+   "avg": 8.0,
+   "ui": 8.0,
+   "ux": 7.94,
+   "inn": 8.05,
+   "sd": 0.25
+  },
+  "Kristijan Binski": {
+   "n": 10,
+   "avg": 8.41,
+   "ui": 8.44,
+   "ux": 8.24,
+   "inn": 8.54,
+   "sd": 0.23
+  },
+  "Elena Levkovich": {
+   "n": 9,
+   "avg": 8.08,
+   "ui": 8.17,
+   "ux": 8.06,
+   "inn": 8.02,
+   "sd": 0.16
+  },
+  "Giampiero Cruceli": {
+   "n": 9,
+   "avg": 8.16,
+   "ui": 8.16,
+   "ux": 8.18,
+   "inn": 8.13,
+   "sd": 0.23
+  },
+  "Roberto Gonzalez": {
+   "n": 8,
+   "avg": 8.19,
+   "ui": 8.14,
+   "ux": 8.29,
+   "inn": 8.14,
+   "sd": 0.33
+  },
+  "Labib Jaffar": {
+   "n": 7,
+   "avg": 8.26,
+   "ui": 8.21,
+   "ux": 8.21,
+   "inn": 8.34,
+   "sd": 0.28
+  },
+  "Martin Breton": {
+   "n": 7,
+   "avg": 8.35,
+   "ui": 8.33,
+   "ux": 8.37,
+   "inn": 8.34,
+   "sd": 0.26
+  },
+  "Hanson He": {
+   "n": 6,
+   "avg": 8.44,
+   "ui": 8.57,
+   "ux": 8.43,
+   "inn": 8.32,
+   "sd": 0.27
+  },
+  "Aleksandr Kirshin": {
+   "n": 6,
+   "avg": 8.34,
+   "ui": 8.35,
+   "ux": 8.37,
+   "inn": 8.3,
+   "sd": 0.16
+  },
+  "Alessandro Giammaria": {
+   "n": 4,
+   "avg": 7.85,
+   "ui": 7.85,
+   "ux": 7.8,
+   "inn": 7.9,
+   "sd": 0.25
+  },
+  "Viran Dayaratne": {
+   "n": 3,
+   "avg": 7.92,
+   "ui": 7.97,
+   "ux": 7.97,
+   "inn": 7.83,
+   "sd": 0.14
+  },
+  "Maria Nora": {
+   "n": 3,
+   "avg": 8.74,
+   "ui": 9.0,
+   "ux": 8.57,
+   "inn": 8.67,
+   "sd": 0.55
+  },
+  "Hely Lopes": {
+   "n": 3,
+   "avg": 8,
+   "ui": 8,
+   "ux": 8,
+   "inn": 8,
+   "sd": 0.0
+  },
+  "Grigoris Tsakiris": {
+   "n": 3,
+   "avg": 8,
+   "ui": 8,
+   "ux": 8,
+   "inn": 8,
+   "sd": 0.0
+  },
+  "Ana Abreu": {
+   "n": 2,
+   "avg": 8.1,
+   "ui": 8.4,
+   "ux": 7.5,
+   "inn": 8.4,
+   "sd": 0.57
+  },
+  "Matteo Banchelli": {
+   "n": 2,
+   "avg": 8.5,
+   "ui": 8.38,
+   "ux": 8.5,
+   "inn": 8.62,
+   "sd": 0.17
+  },
+  "Samet Cubuk": {
+   "n": 2,
+   "avg": 8.28,
+   "ui": 8.55,
+   "ux": 8.15,
+   "inn": 8.15,
+   "sd": 0.15
+  },
+  "Margherita Silvestri": {
+   "n": 2,
+   "avg": 7.92,
+   "ui": 7.75,
+   "ux": 7.75,
+   "inn": 8.25,
+   "sd": 0.08
+  },
+  "Zack Bujazia": {
+   "n": 1,
+   "avg": 8.62,
+   "ui": 8.63,
+   "ux": 8.63,
+   "inn": 8.6,
+   "sd": 0
+  },
+  "Areg Safaryan": {
+   "n": 1,
+   "avg": 8.8,
+   "ui": 8.9,
+   "ux": 8.7,
+   "inn": 8.8,
+   "sd": 0
+  },
+  "Stella Guan": {
+   "n": 1,
+   "avg": 8,
+   "ui": 8,
+   "ux": 8,
+   "inn": 8,
+   "sd": 0
+  },
+  "Sophia Sobol": {
+   "n": 1,
+   "avg": 8.1,
+   "ui": 8,
+   "ux": 8.3,
+   "inn": 8,
+   "sd": 0
+  },
+  "Prokuda Group": {
+   "n": 1,
+   "avg": 9,
+   "ui": 9,
+   "ux": 9,
+   "inn": 9,
+   "sd": 0
+  },
+  "Andrew Gargay": {
+   "n": 1,
+   "avg": 8.17,
+   "ui": 8.5,
+   "ux": 8,
+   "inn": 8,
+   "sd": 0
+  },
+  "Clement Merouani": {
+   "n": 1,
+   "avg": 8.6,
+   "ui": 8.6,
+   "ux": 8.6,
+   "inn": 8.6,
+   "sd": 0
+  },
+  "Jacquemin Creative": {
+   "n": 1,
+   "avg": 8.83,
+   "ui": 9,
+   "ux": 8.5,
+   "inn": 9,
+   "sd": 0
+  },
+  "Sergei Bortcov": {
+   "n": 1,
+   "avg": 8.83,
+   "ui": 9,
+   "ux": 8.5,
+   "inn": 9,
+   "sd": 0
+  }
+ },
+ "tags": [
+  [
+   "animated",
+   61
+  ],
+  [
+   "webgl",
+   47
+  ],
+  [
+   "scroll",
+   33
+  ],
+  [
+   "typographic",
+   17
+  ],
+  [
+   "minimal",
+   14
+  ],
+  [
+   "video/sound",
+   12
+  ],
+  [
+   "grid",
+   11
+  ],
+  [
+   "photographic",
+   11
+  ],
+  [
+   "one page",
+   10
+  ],
+  [
+   "responsive",
+   10
+  ],
+  [
+   "fullscreen",
+   8
+  ],
+  [
+   "parallax",
+   8
+  ],
+  [
+   "ecommerce",
+   7
+  ],
+  [
+   "illustrated",
+   5
+  ],
+  [
+   "colorful",
+   5
+  ],
+  [
+   "material design",
+   2
+  ],
+  [
+   "svg",
+   2
+  ],
+  [
+   "liquid",
+   1
+  ],
+  [
+   "flat design",
+   1
+  ]
+ ],
+ "categories": [
+  [
+   "agency",
+   20
+  ],
+  [
+   "web design/dev",
+   12
+  ],
+  [
+   "products",
+   11
+  ],
+  [
+   "services",
+   9
+  ],
+  [
+   "real estate",
+   6
+  ],
+  [
+   "photography",
+   4
+  ],
+  [
+   "other",
+   4
+  ],
+  [
+   "entertainment",
+   4
+  ],
+  [
+   "art",
+   3
+  ],
+  [
+   "wellbeing",
+   2
+  ],
+  [
+   "app",
+   2
+  ],
+  [
+   "food/drink",
+   2
+  ],
+  [
+   "sport",
+   2
+  ],
+  [
+   "blog",
+   2
+  ],
+  [
+   "education",
+   2
+  ]
+ ],
+ "countries": [
+  [
+   "USA",
+   11
+  ],
+  [
+   "ITALY",
+   7
+  ],
+  [
+   "FRANCE",
+   7
+  ],
+  [
+   "?",
+   5
+  ],
+  [
+   "UKRAINE",
+   5
+  ],
+  [
+   "GERMANY",
+   4
+  ],
+  [
+   "JAPAN",
+   4
+  ],
+  [
+   "POLAND",
+   3
+  ],
+  [
+   "NETHERLANDS",
+   3
+  ],
+  [
+   "AUSTRALIA",
+   3
+  ],
+  [
+   "UAE",
+   3
+  ],
+  [
+   "VIET NAM",
+   2
+  ],
+  [
+   "RUSSIA",
+   2
+  ],
+  [
+   "INDIA",
+   2
+  ],
+  [
+   "CANADA",
+   2
+  ]
+ ],
+ "tech": [
+  [
+   "gsap",
+   30,
+   "36%"
+  ],
+  [
+   "jquery",
+   29,
+   "35%"
+  ],
+  [
+   "lenis",
+   23,
+   "28%"
+  ],
+  [
+   "splitting",
+   22,
+   "27%"
+  ],
+  [
+   "webflow",
+   21,
+   "25%"
+  ],
+  [
+   "video-lib",
+   19,
+   "23%"
+  ],
+  [
+   "next",
+   16,
+   "19%"
+  ],
+  [
+   "nuxt",
+   12,
+   "14%"
+  ],
+  [
+   "swiper",
+   9,
+   "11%"
+  ],
+  [
+   "barba",
+   9,
+   "11%"
+  ],
+  [
+   "three",
+   7,
+   "8%"
+  ],
+  [
+   "wordpress",
+   7,
+   "8%"
+  ],
+  [
+   "lottie",
+   6,
+   "7%"
+  ],
+  [
+   "tailwind",
+   5,
+   "6%"
+  ],
+  [
+   "rive",
+   3,
+   "4%"
+  ],
+  [
+   "framer-motion",
+   3,
+   "4%"
+  ],
+  [
+   "webgl-other",
+   3,
+   "4%"
+  ],
+  [
+   "shopify",
+   2,
+   "2%"
+  ],
+  [
+   "matter",
+   2,
+   "2%"
+  ],
+  [
+   "unity",
+   2,
+   "2%"
+  ],
+  [
+   "astro",
+   2,
+   "2%"
+  ],
+  [
+   "svelte",
+   1,
+   "1%"
+  ],
+  [
+   "spline",
+   1,
+   "1%"
+  ],
+  [
+   "locomotive",
+   1,
+   "1%"
+  ]
+ ],
+ "tech_vs_score": {
+  "gsap": [
+   27,
+   8.58,
+   41,
+   8.64
+  ],
+  "jquery": [
+   24,
+   8.51,
+   44,
+   8.67
+  ],
+  "lenis": [
+   21,
+   8.52,
+   47,
+   8.66
+  ],
+  "splitting": [
+   21,
+   8.56,
+   47,
+   8.64
+  ],
+  "webflow": [
+   17,
+   8.53,
+   51,
+   8.65
+  ],
+  "video-lib": [
+   16,
+   8.51,
+   52,
+   8.65
+  ],
+  "next": [
+   14,
+   8.59,
+   54,
+   8.63
+  ],
+  "nuxt": [
+   6,
+   8.51,
+   62,
+   8.63
+  ],
+  "swiper": [
+   7,
+   8.5,
+   61,
+   8.63
+  ],
+  "barba": [
+   7,
+   8.48,
+   61,
+   8.63
+  ],
+  "three": [
+   7,
+   8.43,
+   61,
+   8.64
+  ],
+  "wordpress": [
+   6,
+   8.52,
+   62,
+   8.63
+  ]
+ },
+ "structure": {
+  "webglCanvas(실측)": "59%",
+  "canvas": "71%",
+  "video": "57%",
+  "cursorEl": "46%",
+  "preloaderEl": "48%",
+  "scrollSnap": "0%",
+  "marquee": "22%",
+  "mixBlend": "54%",
+  "viewportsTall_median": 10,
+  "sections_median": 4,
+  "jsKB_median": 177,
+  "imgKB_median": 2442,
+  "requests_median": 76,
+  "loadMs_median": 12119
+ },
+ "visual": {
+  "darkBg": "20%",
+  "lightBg": "76%",
+  "headingPx_median": 90,
+  "headingPx_p75": 146,
+  "headingPx_max": 606.832,
+  "headingWeights": [
+   [
+    "400",
+    39
+   ],
+   [
+    "500",
+    14
+   ],
+   [
+    "700",
+    10
+   ],
+   [
+    "600",
+    5
+   ],
+   [
+    "300",
+    2
+   ],
+   [
+    "900",
+    2
+   ]
+  ],
+  "headingTransform": [
+   [
+    "none",
+    45
+   ],
+   [
+    "uppercase",
+    30
+   ]
+  ],
+  "headingFamilies": [
+   [
+    "Times New Roman",
+    2
+   ],
+   [
+    "Neue Montreal",
+    2
+   ],
+   [
+    "switzer",
+    1
+   ],
+   [
+    "BT Glyphius Regular",
+    1
+   ],
+   [
+    "Figtree",
+    1
+   ],
+   [
+    "Koulen",
+    1
+   ],
+   [
+    "Moderat-Regular",
+    1
+   ],
+   [
+    "feat",
+    1
+   ],
+   [
+    "Flecha M",
+    1
+   ],
+   [
+    "kun90",
+    1
+   ],
+   [
+    "sans",
+    1
+   ],
+   [
+    "monumentHeading",
+    1
+   ]
+  ],
+  "bodyFonts": [
+   [
+    "Times New Roman",
+    9
+   ],
+   [
+    "sans-serif",
+    4
+   ],
+   [
+    "Arial",
+    4
+   ],
+   [
+    "ui-sans-serif",
+    4
+   ],
+   [
+    "PP Neue Montreal",
+    2
+   ],
+   [
+    "Inter",
+    2
+   ],
+   [
+    "Neue Montreal",
+    2
+   ],
+   [
+    "switzer",
+    1
+   ],
+   [
+    "Koulen",
+    1
+   ],
+   [
+    "Moderat-Regular",
+    1
+   ],
+   [
+    "synt",
+    1
+   ],
+   [
+    "Neue Haas Grotesk",
+    1
+   ]
+  ],
+  "uppercaseEls_median": 43
+ },
+ "top10": [
+  [
+   9.67,
+   "100 Lost Species",
+   "https://www.100lostspecies.com/",
+   []
+  ],
+  [
+   9.5,
+   "Not Supported",
+   "https://santionispirits.com/",
+   []
+  ],
+  [
+   9.33,
+   "Spectral Field · Rob FWA",
+   "https://www.robfwa.com/",
+   []
+  ],
+  [
+   9.33,
+   "Icare — A WorldLabs Showcase",
+   "https://www.icare-game.world/",
+   []
+  ],
+  [
+   9.3,
+   "Dolce&Gabbana® Beauty Tools",
+   "https://beautytools.dolcegabbana.com/gift-finder",
+   [
+    "gsap"
+   ]
+  ],
+  [
+   9.23,
+   "Wembi • Instant Digital Twin of Everything",
+   "https://www.wembi.ai/",
+   [
+    "nuxt"
+   ]
+  ],
+  [
+   9.17,
+   "Huy Phan - Award-winning designer",
+   "https://huyml.co/",
+   [
+    "rive",
+    "framer-motion"
+   ]
+  ],
+  [
+   9.17,
+   "Cipher Digital: Built for Hyperscale",
+   "https://cipherdigital.com/",
+   [
+    "gsap",
+    "lenis",
+    "locomotive",
+    "wordpress",
+    "splitting"
+   ]
+  ],
+  [
+   8.93,
+   "FS 60P - The timeless automatic watch by 60fps",
+   "https://thewatch.60fps.fr/",
+   []
+  ],
+  [
+   8.9,
+   "artem shcherbakov",
+   "https://artemartemartem.com/",
+   [
+    "next",
+    "video-lib"
+   ]
+  ]
+ ],
+ "bottom10": [
+  [
+   8.07,
+   "Numa — Smart Insulin Pump for Diabetes Care",
+   "https://numa.uprock.pro/",
+   [
+    "lenis",
+    "swiper",
+    "lottie",
+    "jquery"
+   ]
+  ],
+  [
+   8.1,
+   "Cobloc | Cabinet d'architecture",
+   "https://www.cobloc.archi/",
+   [
+    "wordpress"
+   ]
+  ],
+  [
+   8.13,
+   "MilleDollars",
+   "https://milledollars.fr/",
+   [
+    "nuxt",
+    "tailwind",
+    "video-lib"
+   ]
+  ],
+  [
+   8.13,
+   "Obys® Experiment Space — Unpublished Works & Experiments",
+   "https://experiment.obys.agency/",
+   [
+    "three",
+    "gsap",
+    "webflow",
+    "jquery",
+    "splitting"
+   ]
+  ],
+  [
+   8.17,
+   "LAYR Media | Creative Photography & Videography Studio",
+   "https://layrmedia.com/",
+   [
+    "next",
+    "video-lib"
+   ]
+  ],
+  [
+   8.17,
+   "Become A Yogi — Jonah Kest Yoga Teacher Training & Retreats",
+   "https://www.become-a-yogi.com/",
+   [
+    "gsap",
+    "lenis",
+    "barba",
+    "splitting",
+    "video-lib"
+   ]
+  ],
+  [
+   8.17,
+   "Noomo Showcase — Immersive 3D & WebGL Work",
+   "https://showcase.noomoagency.com/",
+   [
+    "nuxt"
+   ]
+  ],
+  [
+   8.17,
+   "KEI inc. - Design studio",
+   "https://kei-inc.jp/",
+   [
+    "wordpress"
+   ]
+  ],
+  [
+   8.2,
+   "Maison AUGE",
+   "https://www.maisonauge.com/",
+   [
+    "next",
+    "video-lib"
+   ]
+  ],
+  [
+   8.2,
+   "Eleos | Affordable Housing Development in Los Angeles",
+   "http://eleos.la/",
+   [
+    "gsap",
+    "lenis",
+    "webflow",
+    "jquery",
+    "splitting"
+   ]
+  ]
+ ],
+ "motion": {
+  "n": 87,
+  "idleMotion>0.02 (앰비언트 모션)": "57%",
+  "hoverDiff>0.01 (호버 반응)": "47%",
+  "inertia>0.02 (스무스/관성 스크롤)": "78%",
+  "parallax>=2 (패럴랙스 요소)": "20%",
+  "pinned>=1 (핀/스티키 장면)": "49%",
+  "scrollHijack/snap": "44%",
+  "lenis": "56%",
+  "gsap": "33%",
+  "scrollTriggers_median": 23,
+  "journeyChange_median": 0.367,
+  "idleMotion_median": 0.034
+ },
+ "motion_vs_score": {
+  "idleMotion>0.02": [
+   42,
+   8.57,
+   31,
+   8.69
+  ],
+  "inertia>0.02": [
+   57,
+   8.57,
+   16,
+   8.8
+  ],
+  "hoverDiff>0.01": [
+   35,
+   8.6,
+   38,
+   8.65
+  ],
+  "journeyChange>0.15": [
+   47,
+   8.58,
+   26,
+   8.71
+  ]
+ },
+ "failed": [
+  [
+   "The State of the Gallery",
+   "https://mesh3d.gallery/the-state-of-the-gallery",
+   "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\u001b[2m  - fonts loaded\u001b[22m\n"
+  ],
+  [
+   "BUNQ",
+   "https://www.bunqlabs.com/",
+   "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n"
+  ],
+  [
+   "NOTA | Smart Writing System",
+   "https://nota.uprock.pro/",
+   "page.goto: net::ERR_NAME_NOT_RESOLVED at https://nota.uprock.pro/\nCall log:\n\u001b[2m  - navigating to \"https://nota.uprock.pro/\", waiting until \"domcontentloaded\"\u001b[22m\n"
+  ],
+  [
+   "",
+   "https://haoqi.design/",
+   "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n\u001b[2m  - waiting for fonts to load...\u001b[22m\n\u001b[2m  - fonts loaded\u001b[22m\n"
+  ],
+  [
+   "Icare — A WorldLabs Showcase",
+   "https://www.icare-game.world/",
+   "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n"
+  ],
+  [
+   "F40 Competizione — AC Motorsport",
+   "https://acmotorsport.eu/",
+   "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n"
+  ],
+  [
+   "Hubtown Unseen Studio® UK",
+   "https://hubtown.co.in/",
+   "page.screenshot: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - taking page screenshot\u001b[22m\n"
+  ]
+ ]
+}

@@ -1,0 +1,1138 @@
+[
+  {
+    "id": "50090",
+    "url": "https://drone.riotters.com/",
+    "ok": true,
+    "tech": [
+      "rive",
+      "next"
+    ],
+    "scripts": 15,
+    "requests": 34,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "50016",
+    "url": "https://mesh3d.gallery/the-state-of-the-gallery",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 34,
+    "requests": 44,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "50068",
+    "url": "https://huyml.co/",
+    "ok": true,
+    "tech": [
+      "rive",
+      "framer-motion"
+    ],
+    "scripts": 12,
+    "requests": 76,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "50049",
+    "url": "https://coloniazacamil.com/",
+    "ok": true,
+    "tech": [
+      "nuxt"
+    ],
+    "scripts": 14,
+    "requests": 76,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "50017",
+    "url": "https://numa.uprock.pro/",
+    "ok": true,
+    "tech": [
+      "lenis",
+      "swiper",
+      "lottie",
+      "jquery"
+    ],
+    "scripts": 42,
+    "requests": 148,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "50021",
+    "url": "https://www.bunqlabs.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "astro"
+    ],
+    "scripts": 21,
+    "requests": 43,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "50006",
+    "url": "https://www.mariavasilyeva.com/",
+    "ok": true,
+    "tech": [],
+    "scripts": 1,
+    "requests": 62,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49962",
+    "url": "https://layrmedia.com/",
+    "ok": true,
+    "tech": [
+      "next",
+      "video-lib"
+    ],
+    "scripts": 27,
+    "requests": 116,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49975",
+    "url": "https://mecha-xyz.webflow.io/",
+    "ok": true,
+    "tech": [
+      "three",
+      "gsap",
+      "lenis",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 14,
+    "requests": 39,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49960",
+    "url": "https://www.quintinlodge.com/",
+    "ok": true,
+    "tech": [
+      "video-lib"
+    ],
+    "scripts": 2,
+    "requests": 108,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49963",
+    "url": "https://heirest.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "swiper",
+      "shopify",
+      "jquery",
+      "tailwind",
+      "matter"
+    ],
+    "scripts": 198,
+    "requests": 374,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49956",
+    "url": "https://www.maisonauge.com/",
+    "ok": true,
+    "tech": [
+      "next",
+      "video-lib"
+    ],
+    "scripts": 13,
+    "requests": 33,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49966",
+    "url": "https://jesperlandberg.com/",
+    "ok": true,
+    "tech": [
+      "nuxt",
+      "tailwind"
+    ],
+    "scripts": 13,
+    "requests": 79,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "50008",
+    "url": "https://santionispirits.com/",
+    "ok": true,
+    "tech": [],
+    "scripts": 9,
+    "requests": 17,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49998",
+    "url": "https://office.graffico.it/",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 18,
+    "requests": 43,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49958",
+    "url": "https://illoca.unseen.co/",
+    "ok": true,
+    "tech": [
+      "nuxt"
+    ],
+    "scripts": 12,
+    "requests": 94,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49936",
+    "url": "https://www.runrobrun.com/",
+    "ok": true,
+    "tech": [
+      "three",
+      "lottie",
+      "next"
+    ],
+    "scripts": 41,
+    "requests": 59,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49895",
+    "url": "https://hackfirst.io/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "splitting"
+    ],
+    "scripts": 3,
+    "requests": 19,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49917",
+    "url": "https://www.ceragres.ca/",
+    "ok": true,
+    "tech": [
+      "swiper",
+      "nuxt",
+      "shopify",
+      "tailwind",
+      "video-lib"
+    ],
+    "scripts": 89,
+    "requests": 154,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49899",
+    "url": "https://www.aspensearch.com/",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 38,
+    "requests": 46,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49863",
+    "url": "https://www.become-a-yogi.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "barba",
+      "splitting",
+      "video-lib"
+    ],
+    "scripts": 22,
+    "requests": 135,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49883",
+    "url": "https://nota.uprock.pro/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "swiper",
+      "lottie",
+      "jquery"
+    ],
+    "scripts": 42,
+    "requests": 124,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49911",
+    "url": "https://revelatio.studio/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "swiper",
+      "webflow",
+      "jquery",
+      "splitting",
+      "video-lib"
+    ],
+    "scripts": 44,
+    "requests": 153,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49885",
+    "url": "https://www.charlesalexandertv.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "swiper",
+      "webflow",
+      "jquery",
+      "splitting",
+      "video-lib"
+    ],
+    "scripts": 25,
+    "requests": 67,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49867",
+    "url": "https://www.schemeengine.com/",
+    "ok": true,
+    "tech": [
+      "webflow",
+      "jquery",
+      "video-lib"
+    ],
+    "scripts": 4,
+    "requests": 40,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49870",
+    "url": "https://www.melius.com/",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 69,
+    "requests": 128,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49845",
+    "url": "https://db-union-awards.webflow.io/",
+    "ok": true,
+    "tech": [
+      "webflow",
+      "jquery"
+    ],
+    "scripts": 22,
+    "requests": 77,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49823",
+    "url": "https://houseofyellow.nl/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "wordpress",
+      "jquery",
+      "splitting",
+      "video-lib"
+    ],
+    "scripts": 35,
+    "requests": 81,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49832",
+    "url": "https://www.daoism.systems/",
+    "ok": false,
+    "tech": [
+      "svelte"
+    ],
+    "scripts": 35,
+    "requests": 74,
+    "error": "page.evaluate: InvalidStateError: Failed to execute 'getContext' on 'HTMLCanvasElement': Cannot get context from a canva"
+  },
+  {
+    "id": "49794",
+    "url": "https://why.zero.university/",
+    "ok": true,
+    "tech": [],
+    "scripts": 2,
+    "requests": 41,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49865",
+    "url": "https://unitedcarriers.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "barba",
+      "webflow",
+      "jquery",
+      "unity"
+    ],
+    "scripts": 47,
+    "requests": 146,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49819",
+    "url": "https://haoqi.design/",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 13,
+    "requests": 67,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49814",
+    "url": "https://orgnzm.studio/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 23,
+    "requests": 51,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49748",
+    "url": "https://razed-mods.webflow.io/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 11,
+    "requests": 60,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49807",
+    "url": "http://www.parinazkassemi.com/",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 33,
+    "requests": 138,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49788",
+    "url": "https://sondaven.com/en",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "barba",
+      "swiper",
+      "webflow",
+      "jquery",
+      "splitting",
+      "video-lib"
+    ],
+    "scripts": 27,
+    "requests": 262,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49776",
+    "url": "https://milledollars.fr/",
+    "ok": true,
+    "tech": [
+      "nuxt",
+      "tailwind",
+      "video-lib"
+    ],
+    "scripts": 46,
+    "requests": 87,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49739",
+    "url": "https://www.thetriadicballetai.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 10,
+    "requests": 34,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49749",
+    "url": "https://zorge9.estate/",
+    "ok": true,
+    "tech": [
+      "jquery"
+    ],
+    "scripts": 3,
+    "requests": 81,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49730",
+    "url": "https://www.robfwa.com/",
+    "ok": true,
+    "tech": [],
+    "scripts": 0,
+    "requests": 2,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49762",
+    "url": "https://noho.ink/",
+    "ok": true,
+    "tech": [
+      "webgl-other",
+      "gsap",
+      "lenis",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 14,
+    "requests": 66,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49745",
+    "url": "https://www.aardvarkbookclub.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "barba",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 15,
+    "requests": 92,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49764",
+    "url": "https://weekend-mm-2026-pasticcino-bag-master.monogrid.io/en/",
+    "ok": true,
+    "tech": [
+      "jquery"
+    ],
+    "scripts": 39,
+    "requests": 81,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49744",
+    "url": "https://homunculus.jp/",
+    "ok": true,
+    "tech": [],
+    "scripts": 2,
+    "requests": 27,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49729",
+    "url": "https://www.cula.tech/",
+    "ok": true,
+    "tech": [
+      "framer-motion"
+    ],
+    "scripts": 32,
+    "requests": 465,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49758",
+    "url": "https://www.motiondeep.com/",
+    "ok": true,
+    "tech": [
+      "three",
+      "gsap",
+      "lottie"
+    ],
+    "scripts": 21,
+    "requests": 46,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49728",
+    "url": "https://www.russellnumo.nl/",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 27,
+    "requests": 32,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49725",
+    "url": "https://otsuka-air.jp/",
+    "ok": true,
+    "tech": [
+      "astro"
+    ],
+    "scripts": 59,
+    "requests": 272,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49631",
+    "url": "https://showcase.noomoagency.com/",
+    "ok": true,
+    "tech": [
+      "nuxt"
+    ],
+    "scripts": 9,
+    "requests": 27,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49710",
+    "url": "https://duyucare.dops.agency/",
+    "ok": true,
+    "tech": [
+      "next",
+      "unity"
+    ],
+    "scripts": 48,
+    "requests": 1119,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49695",
+    "url": "https://jeskojets.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "barba",
+      "lottie",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 12,
+    "requests": 47,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49697",
+    "url": "https://grigoriak.doctor/",
+    "ok": true,
+    "tech": [
+      "jquery",
+      "video-lib"
+    ],
+    "scripts": 7,
+    "requests": 82,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49685",
+    "url": "https://cipher.tv/",
+    "ok": true,
+    "tech": [
+      "nuxt",
+      "video-lib"
+    ],
+    "scripts": 15,
+    "requests": 41,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49669",
+    "url": "https://fitosauna.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "swiper",
+      "wordpress",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 47,
+    "requests": 407,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49592",
+    "url": "https://www.nudot.com.tw/",
+    "ok": true,
+    "tech": [
+      "three",
+      "webgl-other",
+      "gsap",
+      "lenis",
+      "video-lib"
+    ],
+    "scripts": 9,
+    "requests": 79,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49620",
+    "url": "https://flowty.co/",
+    "ok": true,
+    "tech": [
+      "nuxt",
+      "tailwind"
+    ],
+    "scripts": 39,
+    "requests": 62,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49680",
+    "url": "https://thewatch.60fps.fr/",
+    "ok": true,
+    "tech": [],
+    "scripts": 6,
+    "requests": 54,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49616",
+    "url": "https://www.glukhovsky.com/",
+    "ok": true,
+    "tech": [
+      "lenis",
+      "lottie",
+      "webflow",
+      "jquery"
+    ],
+    "scripts": 7,
+    "requests": 39,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49611",
+    "url": "https://www.verostudio.com/",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 46,
+    "requests": 69,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49651",
+    "url": "https://lemansclassic.richardmille.com/",
+    "ok": true,
+    "tech": [
+      "nuxt"
+    ],
+    "scripts": 12,
+    "requests": 60,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49617",
+    "url": "https://www.getblue.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "swiper",
+      "lottie",
+      "spline",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 103,
+    "requests": 163,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49596",
+    "url": "https://benjamincreative.me/",
+    "ok": true,
+    "tech": [
+      "framer-motion"
+    ],
+    "scripts": 20,
+    "requests": 30,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49591",
+    "url": "https://www.risk.film/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "webflow",
+      "jquery"
+    ],
+    "scripts": 5,
+    "requests": 23,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49601",
+    "url": "https://sstr.tech/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "barba",
+      "astro",
+      "splitting"
+    ],
+    "scripts": 10,
+    "requests": 28,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49632",
+    "url": "https://www.cobloc.archi/",
+    "ok": true,
+    "tech": [
+      "wordpress"
+    ],
+    "scripts": 11,
+    "requests": 43,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49604",
+    "url": "https://www.k95.it/",
+    "ok": true,
+    "tech": [
+      "nuxt"
+    ],
+    "scripts": 15,
+    "requests": 59,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49386",
+    "url": "https://www.100lostspecies.com/",
+    "ok": true,
+    "tech": [],
+    "scripts": 9,
+    "requests": 44,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49581",
+    "url": "https://www.curiotech.co.jp/recruit/",
+    "ok": true,
+    "tech": [
+      "wordpress"
+    ],
+    "scripts": 8,
+    "requests": 57,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49579",
+    "url": "https://www.icare-game.world/",
+    "ok": true,
+    "tech": [],
+    "scripts": 11,
+    "requests": 31,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49560",
+    "url": "https://rideradian.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "barba",
+      "swiper",
+      "webflow",
+      "jquery",
+      "splitting",
+      "video-lib"
+    ],
+    "scripts": 30,
+    "requests": 147,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49511",
+    "url": "https://wrapped-party.activetheory.dev/en",
+    "ok": true,
+    "tech": [],
+    "scripts": 92,
+    "requests": 110,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49576",
+    "url": "https://beautytools.dolcegabbana.com/gift-finder",
+    "ok": true,
+    "tech": [
+      "gsap"
+    ],
+    "scripts": 50,
+    "requests": 113,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49572",
+    "url": "https://kei-inc.jp/",
+    "ok": true,
+    "tech": [
+      "wordpress"
+    ],
+    "scripts": 4,
+    "requests": 49,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49564",
+    "url": "https://experiment.obys.agency/",
+    "ok": true,
+    "tech": [
+      "three",
+      "gsap",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 5,
+    "requests": 77,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49557",
+    "url": "http://eleos.la/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 10,
+    "requests": 27,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49543",
+    "url": "https://www.codebyjesse.com/",
+    "ok": true,
+    "tech": [
+      "webgl-other",
+      "gsap",
+      "lenis",
+      "barba",
+      "webflow",
+      "jquery",
+      "splitting",
+      "matter",
+      "video-lib"
+    ],
+    "scripts": 23,
+    "requests": 73,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49548",
+    "url": "https://trionn.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "next"
+    ],
+    "scripts": 36,
+    "requests": 83,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49539",
+    "url": "https://cipherdigital.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "locomotive",
+      "wordpress",
+      "splitting"
+    ],
+    "scripts": 24,
+    "requests": 51,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49549",
+    "url": "https://aikawakenichi.com/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "nuxt"
+    ],
+    "scripts": 8,
+    "requests": 29,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49476",
+    "url": "https://aircenter.space/",
+    "ok": true,
+    "tech": [
+      "jquery",
+      "video-lib"
+    ],
+    "scripts": 14,
+    "requests": 94,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49484",
+    "url": "https://dobre.agency/",
+    "ok": true,
+    "tech": [
+      "next",
+      "wordpress"
+    ],
+    "scripts": 40,
+    "requests": 57,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49500",
+    "url": "https://www.houseofhoney.com/",
+    "ok": true,
+    "tech": [
+      "rive",
+      "next"
+    ],
+    "scripts": 36,
+    "requests": 61,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49457",
+    "url": "https://www.ilcapoproduction.com/",
+    "ok": true,
+    "tech": [
+      "next",
+      "video-lib"
+    ],
+    "scripts": 14,
+    "requests": 86,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49486",
+    "url": "https://bymonolog.com/",
+    "ok": true,
+    "tech": [
+      "three",
+      "gsap",
+      "lenis",
+      "barba",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 11,
+    "requests": 45,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49464",
+    "url": "https://voltlites.com/",
+    "ok": true,
+    "tech": [],
+    "scripts": 0,
+    "requests": 1,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49458",
+    "url": "https://www.wembi.ai/",
+    "ok": true,
+    "tech": [
+      "nuxt"
+    ],
+    "scripts": 8,
+    "requests": 45,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "49461",
+    "url": "https://rdapkuns.github.io/around-digiphy/",
+    "ok": true,
+    "tech": [],
+    "scripts": 2,
+    "requests": 81,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49465",
+    "url": "https://artemartemartem.com/",
+    "ok": true,
+    "tech": [
+      "next",
+      "video-lib"
+    ],
+    "scripts": 23,
+    "requests": 75,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49453",
+    "url": "https://acmotorsport.eu/",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "barba",
+      "wordpress"
+    ],
+    "scripts": 19,
+    "requests": 46,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "49408",
+    "url": "https://hubtown.co.in/",
+    "ok": true,
+    "tech": [
+      "nuxt"
+    ],
+    "scripts": 32,
+    "requests": 102,
+    "hasWebGLCanvas": true
+  }
+]

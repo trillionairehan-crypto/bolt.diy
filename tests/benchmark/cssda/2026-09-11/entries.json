@@ -1,0 +1,6305 @@
+[
+  {
+    "id": "50090",
+    "slug": "lidar-drone-scanning",
+    "detail": "/sites/lidar-drone-scanning/50090/",
+    "title": "Lidar Drone Scanning",
+    "award": "WEBSITE OF THE DAY 2026 SEP 11",
+    "listScore": 8.5,
+    "page": 1,
+    "url": "https://drone.riotters.com/",
+    "agency": "Riotters",
+    "country": "POLAND",
+    "about": "A Riotters R&D experiment turning raw drone LIDAR scans into a real-time 3D point cloud, rendered live in the browser with WebGL.",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "products",
+    "publicAvg": 8.5,
+    "finalScore": 8.87,
+    "ui": 8.59,
+    "ux": 8.34,
+    "innovation": 8.57,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.87 Areg Safaryan Managing CD & Founder",
+        "ui": 8.9,
+        "ux": 8.9,
+        "inn": 8.8,
+        "avg": 8.87
+      },
+      {
+        "name": "Zack Bujazia Chief Creative",
+        "role": "Officer",
+        "ui": 8.63,
+        "ux": 8.63,
+        "inn": 8.6,
+        "avg": 8.62
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 9,
+        "ux": 7.5,
+        "inn": 9,
+        "avg": 8.5
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "50068",
+    "slug": "huy-phan-vol-2",
+    "detail": "/sites/huy-phan-vol-2/50068/",
+    "title": "Huy Phan Vol.2",
+    "award": "WEBSITE OF THE DAY 2026 SEP 10",
+    "listScore": 8.33,
+    "page": 1,
+    "url": "https://huyml.co/",
+    "agency": "Huy Phan",
+    "country": "VIET NAM",
+    "about": "Huy Phan is an independent digital designer based in Vietnam. Passionate about creating memorable digital experiences. COLLABORATORS",
+    "tags": [
+      "scroll",
+      "typographic",
+      "webgl"
+    ],
+    "category": "web design/dev",
+    "publicAvg": 8.33,
+    "finalScore": 9.17,
+    "ui": 8.4,
+    "ux": 8.23,
+    "innovation": 8.36,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9.17 Daria Prokuda Group Design Manager",
+        "ui": 9.5,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9.17
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 9,
+        "ux": 8.5,
+        "inn": 9,
+        "avg": 8.83
+      },
+      {
+        "name": "Areg Safaryan Managing CD",
+        "role": "& Founder",
+        "ui": 8.9,
+        "ux": 8.7,
+        "inn": 8.8,
+        "avg": 8.8
+      },
+      {
+        "name": "Ana Abreu Founder",
+        "role": "and Creative Head",
+        "ui": 9,
+        "ux": 8,
+        "inn": 9,
+        "avg": 8.67
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8.4,
+        "ux": 8.4,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8.2,
+        "ux": 8.2,
+        "inn": 8.5,
+        "avg": 8.3
+      }
+    ]
+  },
+  {
+    "id": "50016",
+    "slug": "the-state-of-the-gallery",
+    "detail": "/sites/the-state-of-the-gallery/50016/",
+    "title": "The State of the Gallery",
+    "award": "WEBSITE OF THE DAY 2026 SEP 9",
+    "listScore": 8.45,
+    "page": 1,
+    "url": "https://mesh3d.gallery/the-state-of-the-gallery",
+    "agency": "Majo Puterka",
+    "country": "SLOVAKIA",
+    "about": "mesh3d - 'The state of the gallery' is an overview of the gallery in numbers and picks.",
+    "tags": [
+      "one page",
+      "scroll",
+      "webgl"
+    ],
+    "category": "web design/dev",
+    "publicAvg": 8.45,
+    "finalScore": null,
+    "ui": 8.28,
+    "ux": 8.42,
+    "innovation": 8.65,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Sergey Dubovenko CEO",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Hanson He Senior UX",
+        "role": "Engineer",
+        "ui": 8.5,
+        "ux": 9,
+        "inn": 9,
+        "avg": 8.83
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8.5,
+        "ux": 9,
+        "inn": 8.7,
+        "avg": 8.73
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8.2,
+        "ux": 8,
+        "inn": 8.2,
+        "avg": 8.13
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.5,
+        "ux": 7.5,
+        "inn": 9,
+        "avg": 8
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "50049",
+    "slug": "colonia-zacamil",
+    "detail": "/sites/colonia-zacamil/50049/",
+    "title": "Colonia Zacamil",
+    "award": "WEBSITE OF THE DAY 2026 SEP 8",
+    "listScore": 8.31,
+    "page": 1,
+    "url": "https://coloniazacamil.com/",
+    "agency": "Adoratorio® Studio",
+    "country": "ITALY",
+    "about": "Colonia Zacamil is a place where public art, community co-design and sustainable development converge. COLLABORATORS",
+    "tags": [
+      "illustrated",
+      "webgl"
+    ],
+    "category": "art",
+    "publicAvg": 8.31,
+    "finalScore": null,
+    "ui": 8.3,
+    "ux": 8.35,
+    "innovation": 8.27,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Sergey Dubovenko CEO",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 8.8,
+        "ux": 8.8,
+        "inn": 9,
+        "avg": 8.87
+      },
+      {
+        "name": "Zack Bujazia Chief Creative",
+        "role": "Officer",
+        "ui": 8.2,
+        "ux": 8.2,
+        "inn": 8.1,
+        "avg": 8.17
+      },
+      {
+        "name": "Mattia Rinaudo Design Manager",
+        "role": "UI 8 UX 8 INN 8 8 Amin Salehi Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 7.8,
+        "ux": 8.1,
+        "inn": 7.5,
+        "avg": 7.8
+      }
+    ]
+  },
+  {
+    "id": "50021",
+    "slug": "bunq-labs",
+    "detail": "/sites/bunq-labs/50021/",
+    "title": "BUNQ",
+    "award": "WEBSITE OF THE DAY 2026 SEP 7",
+    "listScore": 8.29,
+    "page": 1,
+    "url": "https://www.bunqlabs.com/",
+    "agency": "BUNQ LABS",
+    "country": "LABS BUNQ LABS INDIA",
+    "about": "BUNQ LABS is a design and engineering studio where the same small room draws the work and builds it.",
+    "tags": [
+      "animated",
+      "video/sound",
+      "webgl"
+    ],
+    "category": "agency",
+    "publicAvg": 8.29,
+    "finalScore": 8.63,
+    "ui": 8.25,
+    "ux": 8.18,
+    "innovation": 8.43,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.63 Alexander Kolomeets Senior Digital Designer",
+        "ui": 8.6,
+        "ux": 8.5,
+        "inn": 8.8,
+        "avg": 8.63
+      },
+      {
+        "name": "Kristijan Binski Co-Founder",
+        "role": "& Creative Director",
+        "ui": 8.6,
+        "ux": 8.3,
+        "inn": 9,
+        "avg": 8.63
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.8,
+        "avg": 8.47
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Elena Levkovich Senior Digital",
+        "role": "Designer & Webflow Developer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "50017",
+    "slug": "numa",
+    "detail": "/sites/numa/50017/",
+    "title": "Numa",
+    "award": "WEBSITE OF THE DAY 2026 SEP 6",
+    "listScore": 8.01,
+    "page": 1,
+    "url": "https://numa.uprock.pro/",
+    "agency": "Uprock",
+    "country": "RUSSIA",
+    "about": "A smart insulin pump that helps people with diabetes control glucose more easily in their daily lives.",
+    "tags": [
+      "animated",
+      "one page",
+      "scroll"
+    ],
+    "category": "wellbeing",
+    "publicAvg": 8.01,
+    "finalScore": 8.07,
+    "ui": 8,
+    "ux": 8,
+    "innovation": 8.03,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.07 Salva Carlino Senior UI-UX & Product Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.2,
+        "avg": 8.07
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8 UX 8 INN 8 8 Ana Abreu Founder and Creative Head",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Kristijan Binski Co-Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Elena Levkovich Senior Digital",
+        "role": "Designer & Webflow Developer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49962",
+    "slug": "layr-media",
+    "detail": "/sites/layr-media/49962/",
+    "title": "LAYR Media",
+    "award": "WEBSITE OF THE DAY 2026 SEP 5",
+    "listScore": 8.01,
+    "page": 1,
+    "url": "https://layrmedia.com/",
+    "agency": "Lumina",
+    "country": "INDIA",
+    "about": "Toronto-based creative studio crafting films, photography and digital content that bring brands and stories to life.",
+    "tags": [
+      "animated",
+      "colorful",
+      "fullscreen"
+    ],
+    "category": "photography",
+    "publicAvg": 8.01,
+    "finalScore": 8.17,
+    "ui": 7.98,
+    "ux": 7.97,
+    "innovation": 8.07,
+    "judges": [
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.5,
+        "avg": 8.17
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8.1,
+        "ux": 8,
+        "inn": 8.1,
+        "avg": 8.07
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative Director",
+        "role": "UI 8 UX 8 INN 8 7.8 Mattia Rinaudo Design Manager",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 7.8,
+        "avg": 7.8
+      }
+    ]
+  },
+  {
+    "id": "49963",
+    "slug": "heirest",
+    "detail": "/sites/heirest/49963/",
+    "title": "Heirest",
+    "award": "WEBSITE OF THE DAY 2026 SEP 4",
+    "listScore": 8.05,
+    "page": 1,
+    "url": "https://heirest.com/",
+    "agency": "Studio Almond",
+    "country": "NEW ZEALAND",
+    "about": "Heirest removes the barrier between browsing, trying and buying jewellery online. 100k configurations, 3D models, all interactive.",
+    "tags": [
+      "ecommerce",
+      "scroll",
+      "webgl"
+    ],
+    "category": "products",
+    "publicAvg": 8.05,
+    "finalScore": 8.43,
+    "ui": 8.07,
+    "ux": 8.15,
+    "innovation": 7.93,
+    "judges": [
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 8.5,
+        "ux": 9,
+        "inn": 7.8,
+        "avg": 8.43
+      },
+      {
+        "name": "Viran Dayaratne Head",
+        "role": "of UX & Researcher",
+        "ui": 8.2,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8.07
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 7.9,
+        "ux": 8.1,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 7.8,
+        "avg": 7.8
+      }
+    ]
+  },
+  {
+    "id": "50006",
+    "slug": "maria-vasilyeva-portfolio",
+    "detail": "/sites/maria-vasilyeva-portfolio/50006/",
+    "title": "Maria Vasilyeva — Portfolio",
+    "award": "WEBSITE OF THE DAY 2026 SEP 3",
+    "listScore": 8.16,
+    "page": 1,
+    "url": "https://www.mariavasilyeva.com/",
+    "agency": "Maria Vasilyeva",
+    "country": "SPAIN",
+    "about": "Portfolio website of an interactive designer, inspired by music and sound, with an experience shaped by rhythm, typography and layout. COLLABORATORS",
+    "tags": [
+      "animated",
+      "typographic",
+      "webgl"
+    ],
+    "category": "web design/dev",
+    "publicAvg": 8.16,
+    "finalScore": 8.67,
+    "ui": 8.28,
+    "ux": 7.83,
+    "innovation": 8.37,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.67 Sergey Dubovenko CEO",
+        "ui": 9,
+        "ux": 8,
+        "inn": 9,
+        "avg": 8.67
+      },
+      {
+        "name": "Labib Jaffar Senior Visual",
+        "role": "Designer",
+        "ui": 8.4,
+        "ux": 8.5,
+        "inn": 8.7,
+        "avg": 8.53
+      },
+      {
+        "name": "Maria Nora Arnone Multidisciplinary",
+        "role": "Designer",
+        "ui": 9,
+        "ux": 8,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.5,
+        "ux": 7.5,
+        "inn": 8.2,
+        "avg": 7.73
+      },
+      {
+        "name": "Ana Abreu Founder",
+        "role": "and Creative Head",
+        "ui": 7.8,
+        "ux": 7,
+        "inn": 7.8,
+        "avg": 7.53
+      }
+    ]
+  },
+  {
+    "id": "49975",
+    "slug": "mecha",
+    "detail": "/sites/mecha/49975/",
+    "title": "MECHA",
+    "award": "WEBSITE OF THE DAY 2026 SEP 2",
+    "listScore": 8.05,
+    "page": 1,
+    "url": "https://mecha-xyz.webflow.io/",
+    "agency": "Widelab",
+    "country": "POLAND",
+    "about": "Robotics-driven venture capital and industrial buyouts. The Non-Fiction Revolution.",
+    "tags": [
+      "grid",
+      "minimal",
+      "one page"
+    ],
+    "category": "other",
+    "publicAvg": 8.05,
+    "finalScore": 8.5,
+    "ui": 8.13,
+    "ux": 8.25,
+    "innovation": 7.75,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.5 Sergey Dubovenko CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Maria Nora Arnone Multidisciplinary",
+        "role": "Designer",
+        "ui": 8.5,
+        "ux": 8.2,
+        "inn": 8,
+        "avg": 8.23
+      },
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 8,
+        "avg": 7.87
+      },
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 8,
+        "ux": 9,
+        "inn": 6,
+        "avg": 7.67
+      }
+    ]
+  },
+  {
+    "id": "49960",
+    "slug": "quintin-lodge",
+    "detail": "/sites/quintin-lodge/49960/",
+    "title": "Quintin Lodge",
+    "award": "WEBSITE OF THE DAY 2026 SEP 1",
+    "listScore": 8.1,
+    "page": 1,
+    "url": "https://www.quintinlodge.com/",
+    "agency": "Quintin Lodge",
+    "country": "USA",
+    "about": "Creative Director, Designer and the founder of Non-Linear Studio. Passionate about the outdoors and environmental stewardship. COLLABORATORS",
+    "tags": [
+      "animated",
+      "typographic",
+      "webgl"
+    ],
+    "category": "web design/dev",
+    "publicAvg": 8.1,
+    "finalScore": 8.7,
+    "ui": 8.1,
+    "ux": 8.02,
+    "innovation": 8.17,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.7 Salva Carlino Senior UI-UX & Product Designer",
+        "ui": 8.8,
+        "ux": 8.3,
+        "inn": 9,
+        "avg": 8.7
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 8,
+        "avg": 7.87
+      }
+    ]
+  },
+  {
+    "id": "49966",
+    "slug": "jesper-landberg",
+    "detail": "/sites/jesper-landberg/49966/",
+    "title": "Jesper Landberg",
+    "award": "WEBSITE OF THE DAY 2026 AUG 31",
+    "listScore": 8.2,
+    "page": 1,
+    "url": "https://jesperlandberg.com/",
+    "agency": "Jesper Landberg",
+    "country": "SWEDEN",
+    "about": "Swedish design engineer building visually rich, motion-driven websites.",
+    "tags": [
+      "animated",
+      "webgl"
+    ],
+    "category": "web design/dev",
+    "publicAvg": 8.2,
+    "finalScore": null,
+    "ui": 8.08,
+    "ux": 8.2,
+    "innovation": 8.32,
+    "judges": [
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 8.5,
+        "ux": 9,
+        "inn": 9.5,
+        "avg": 9
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8.2,
+        "inn": 8.4,
+        "avg": 8.2
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49956",
+    "slug": "maison-auge",
+    "detail": "/sites/maison-auge/49956/",
+    "title": "Maison AUGE",
+    "award": "WEBSITE OF THE DAY 2026 AUG 30",
+    "listScore": 8,
+    "page": 1,
+    "url": "https://www.maisonauge.com/",
+    "agency": "AUGE Experience",
+    "country": "ITALY",
+    "about": "Maison AUGE is a creative studio for beauty and luxury, crafting brand identity, packaging, spatial experiences and digital design.",
+    "tags": [
+      "parallax",
+      "photographic",
+      "scroll"
+    ],
+    "category": "agency",
+    "publicAvg": 8,
+    "finalScore": 8.2,
+    "ui": 8,
+    "ux": 8,
+    "innovation": 8,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.2 Mattia Rinaudo Design Manager",
+        "ui": 8.2,
+        "ux": 8.2,
+        "inn": 8.2,
+        "avg": 8.2
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 7.8,
+        "avg": 7.93
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 8,
+        "avg": 7.87
+      }
+    ]
+  },
+  {
+    "id": "49936",
+    "slug": "run-rob-run",
+    "detail": "/sites/run-rob-run/49936/",
+    "title": "Run Rob Run",
+    "award": "WEBSITE OF THE DAY 2026 AUG 29",
+    "listScore": 8.01,
+    "page": 1,
+    "url": "https://www.runrobrun.com/",
+    "agency": "Robert Aperios",
+    "country": "DENMARK",
+    "about": "A one pager developed by Robert Aperios, in React, Next.js, Lottie, GSAP and WebGPU.",
+    "tags": [
+      "material design",
+      "video/sound",
+      "webgl"
+    ],
+    "category": "web design/dev",
+    "publicAvg": 8.01,
+    "finalScore": 8.23,
+    "ui": 7.97,
+    "ux": 7.97,
+    "innovation": 8.08,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.23 Salva Carlino Senior UI-UX & Product Designer",
+        "ui": 8.1,
+        "ux": 8,
+        "inn": 8.6,
+        "avg": 8.23
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8 UX 8 INN 8 8 Mattia Rinaudo Design Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 7.93
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 7.9,
+        "ux": 7.8,
+        "inn": 7.9,
+        "avg": 7.87
+      }
+    ]
+  },
+  {
+    "id": "49998",
+    "slug": "graffico-office",
+    "detail": "/sites/graffico-office/49998/",
+    "title": "Graffico Office",
+    "award": "WEBSITE OF THE DAY 2026 AUG 28",
+    "listScore": 8.3,
+    "page": 1,
+    "url": "https://office.graffico.it/",
+    "agency": "Graffico",
+    "country": "ITALY",
+    "about": "Graffico Office is a 3D studio you can enter, explore and code in. Come inside and don't unplug anything!",
+    "tags": [
+      "animated",
+      "video/sound",
+      "webgl"
+    ],
+    "category": "agency",
+    "publicAvg": 8.3,
+    "finalScore": null,
+    "ui": 8.12,
+    "ux": 8.1,
+    "innovation": 8.68,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Sergey Dubovenko CEO",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 8.6,
+        "ux": 8.6,
+        "inn": 8.6,
+        "avg": 8.6
+      },
+      {
+        "name": "Maria Nora Arnone Multidisciplinary",
+        "role": "Designer",
+        "ui": 8,
+        "ux": 8.5,
+        "inn": 9,
+        "avg": 8.5
+      },
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 8,
+        "ux": 7,
+        "inn": 9,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 8,
+        "avg": 7.87
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.3,
+        "ux": 7.7,
+        "inn": 8.5,
+        "avg": 7.83
+      }
+    ]
+  },
+  {
+    "id": "49958",
+    "slug": "illoca",
+    "detail": "/sites/illoca/49958/",
+    "title": "illoca Unseen Studio® UK",
+    "award": "WEBSITE OF THE DAY 2026 AUG 27",
+    "listScore": 8.12,
+    "page": 1,
+    "url": "https://illoca.unseen.co/",
+    "agency": "Unseen Studio®",
+    "country": null,
+    "about": "illoca is an AI-native design engine built for professional architects. Explore, refine, and move from first ideas to editable 2D",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "app",
+    "publicAvg": 8.12,
+    "finalScore": 8.3,
+    "ui": 8.12,
+    "ux": 8.1,
+    "innovation": 8.15,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.3 Mattia Rinaudo Design Manager",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 8.4,
+        "ux": 8.3,
+        "inn": 8.2,
+        "avg": 8.3
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.2,
+        "avg": 8.07
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.2,
+        "avg": 8.07
+      },
+      {
+        "name": "Timofey Beloglazov Marketing Strategist",
+        "role": "UI 8 UX 8 INN 8 8 Amin Salehi Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "50008",
+    "slug": "santioni-spirits",
+    "detail": "/sites/santioni-spirits/50008/",
+    "title": "/ WOTM AUG Santioni Spirits",
+    "award": "WEBSITE OF THE DAY 2026 AUG 26",
+    "listScore": 9.24,
+    "page": 1,
+    "url": "https://santionispirits.com/",
+    "agency": "Active Theory",
+    "country": "USA",
+    "about": "'The Notturno Experience' invites visitors into the immersive, comic book-inspired universe of Santioni Spirits. COLLABORATORS",
+    "tags": [
+      "illustrated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "food/drink",
+    "publicAvg": 9.24,
+    "finalScore": 9.5,
+    "ui": 9.26,
+    "ux": 9.11,
+    "innovation": 9.36,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9.5 Salva Carlino Senior UI-UX & Product Designer",
+        "ui": 9.5,
+        "ux": 9.5,
+        "inn": 9.5,
+        "avg": 9.5
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 9.5,
+        "ux": 9.5,
+        "inn": 9.5,
+        "avg": 9.5
+      },
+      {
+        "name": "Maria Nora Arnone Multidisciplinary",
+        "role": "Designer",
+        "ui": 9.5,
+        "ux": 9.5,
+        "inn": 9.5,
+        "avg": 9.5
+      },
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 9.5,
+        "ux": 9,
+        "inn": 1,
+        "avg": 6.5
+      },
+      {
+        "name": "Timofey Beloglazov Marketing Strategist",
+        "role": "UI 9 UX 9 INN 9 9 Amin Salehi Creative Director",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      }
+    ]
+  },
+  {
+    "id": "49917",
+    "slug": "ceragres",
+    "detail": "/sites/ceragres/49917/",
+    "title": "Ceragres",
+    "award": "WEBSITE OF THE DAY 2026 AUG 25",
+    "listScore": 8.09,
+    "page": 1,
+    "url": "https://www.ceragres.ca/",
+    "agency": "REF Digital",
+    "country": "CANADA",
+    "about": "A high-end website where design, precision, and seamless navigation turn inspiration into real-world projects.",
+    "tags": [
+      "ecommerce",
+      "photographic",
+      "responsive"
+    ],
+    "category": "products",
+    "publicAvg": 8.09,
+    "finalScore": null,
+    "ui": 8.17,
+    "ux": 8.08,
+    "innovation": 8.02,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Marie-Bénédict Jacquemin Creative Director",
+        "ui": 9.2,
+        "ux": 9,
+        "inn": 8.8,
+        "avg": 9
+      },
+      {
+        "name": "Martin Breton Founder",
+        "role": "& Development Director",
+        "ui": 8.4,
+        "ux": 8.2,
+        "inn": 8.2,
+        "avg": 8.27
+      },
+      {
+        "name": "Mayra Metaxa Founder",
+        "role": "and Web Developer",
+        "ui": 8.2,
+        "ux": 8,
+        "inn": 7.9,
+        "avg": 8.03
+      },
+      {
+        "name": "Mattia Rinaudo Design Manager",
+        "role": "UI 8 UX 8 INN 8 7.73 Amin Salehi Creative Director",
+        "ui": 7.7,
+        "ux": 7.8,
+        "inn": 7.7,
+        "avg": 7.73
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 7.5,
+        "ux": 7.5,
+        "inn": 7.5,
+        "avg": 7.5
+      }
+    ]
+  },
+  {
+    "id": "49895",
+    "slug": "hackfirst",
+    "detail": "/sites/hackfirst/49895/",
+    "title": "HACKFIRST™",
+    "award": "WEBSITE OF THE DAY 2026 AUG 24",
+    "listScore": 8.11,
+    "page": 2,
+    "url": "https://hackfirst.io/",
+    "agency": "Cassy",
+    "country": "GERMANY",
+    "about": "A dark, high-tension site for HackFirst — a cybersecurity team running real-world attack simulations",
+    "tags": [
+      "animated",
+      "fullscreen",
+      "typographic"
+    ],
+    "category": "agency",
+    "publicAvg": 8.11,
+    "finalScore": 8.7,
+    "ui": 8.13,
+    "ux": 8.11,
+    "innovation": 8.1,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.7 Labib Jaffar Senior Visual Designer",
+        "ui": 8.8,
+        "ux": 8.4,
+        "inn": 8.9,
+        "avg": 8.7
+      },
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 8.5,
+        "ux": 8.8,
+        "inn": 8.5,
+        "avg": 8.6
+      },
+      {
+        "name": "Roberto Gonzalez CTO UI",
+        "role": "8 UX 9 INN 8 8.1 Mattia Rinaudo Design Manager",
+        "ui": 8.1,
+        "ux": 8.1,
+        "inn": 8.1,
+        "avg": 8.1
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Elena Levkovich Senior Digital",
+        "role": "Designer & Webflow Developer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49863",
+    "slug": "become-a-yogi",
+    "detail": "/sites/become-a-yogi/49863/",
+    "title": "Become A Yogi",
+    "award": "WEBSITE OF THE DAY 2026 AUG 23",
+    "listScore": 8.01,
+    "page": 2,
+    "url": "https://www.become-a-yogi.com/",
+    "agency": "Johannes Buehler",
+    "country": "SWITZERLAND",
+    "about": "Editorial Webflow platform for Jonah Kest's lineage-based yoga teacher trainings. Cinematic photography and refined motion.",
+    "tags": [
+      "animated",
+      "photographic",
+      "typographic"
+    ],
+    "category": "sport",
+    "publicAvg": 8.01,
+    "finalScore": 8.17,
+    "ui": 7.98,
+    "ux": 8.07,
+    "innovation": 7.97,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.17 Sergey Dubovenko CEO",
+        "ui": 8,
+        "ux": 8.5,
+        "inn": 8,
+        "avg": 8.17
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.1,
+        "ux": 8.1,
+        "inn": 8.1,
+        "avg": 8.1
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8.2,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8.07
+      },
+      {
+        "name": "Timofey Beloglazov Marketing Strategist",
+        "role": "UI 8 UX 8 INN 8 7.9 Amin Salehi Creative Director",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 7.9,
+        "avg": 7.9
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 7.8,
+        "avg": 7.8
+      }
+    ]
+  },
+  {
+    "id": "49883",
+    "slug": "nota-smart-writing-system",
+    "detail": "/sites/nota-smart-writing-system/49883/",
+    "title": "NOTA | Smart Writing System",
+    "award": "WEBSITE OF THE DAY 2026 AUG 22",
+    "listScore": 8.05,
+    "page": 2,
+    "url": "https://nota.uprock.pro/",
+    "agency": "UPROCK",
+    "country": "UPROCK RUSSIA",
+    "about": "Smart writing system combining a precision pen, intelligent paper, and real-time digital sync for modern thinking.",
+    "tags": [
+      "animated",
+      "minimal",
+      "responsive"
+    ],
+    "category": "products",
+    "publicAvg": 8.05,
+    "finalScore": 8.67,
+    "ui": 8.04,
+    "ux": 8.04,
+    "innovation": 8.07,
+    "judges": [
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 8,
+        "ux": 9,
+        "inn": 9,
+        "avg": 8.67
+      },
+      {
+        "name": "Mattia Rinaudo Design Manager",
+        "role": "UI 8.3 UX 8.3 INN 8.3 8 Roberto Gonzalez CTO",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 7.7,
+        "inn": 7.7,
+        "avg": 7.8
+      }
+    ]
+  },
+  {
+    "id": "49911",
+    "slug": "revelatio-studio",
+    "detail": "/sites/revelatio-studio/49911/",
+    "title": "Revelatio Studio",
+    "award": "WEBSITE OF THE DAY 2026 AUG 21",
+    "listScore": 8.32,
+    "page": 2,
+    "url": "https://revelatio.studio/",
+    "agency": "Revelatio Studio",
+    "country": "BRAZIL",
+    "about": "Revelatio Studio is a Branding, Product & Code consultancy. Three disciplines, one team, one process. Recife-based, shipping every",
+    "tags": [
+      "animated",
+      "photographic",
+      "webgl"
+    ],
+    "category": "agency",
+    "publicAvg": 8.32,
+    "finalScore": 8.87,
+    "ui": 8.37,
+    "ux": 8.28,
+    "innovation": 8.32,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.87 Marie-Bénédict Jacquemin Creative Director",
+        "ui": 8.8,
+        "ux": 8.8,
+        "inn": 9,
+        "avg": 8.87
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "9 UX 8.5 INN 8.5 8.4 Mattia Rinaudo Design Manager",
+        "ui": 8.4,
+        "ux": 8.4,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "Martin Breton Founder",
+        "role": "& Development Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Elena Levkovich Senior Digital",
+        "role": "Designer & Webflow Developer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49899",
+    "slug": "aspen-search",
+    "detail": "/sites/aspen-search/49899/",
+    "title": "Aspen Search",
+    "award": "WEBSITE OF THE DAY 2026 AUG 20",
+    "listScore": 8.2,
+    "page": 2,
+    "url": "https://www.aspensearch.com/",
+    "agency": "Edoardo Lunardi",
+    "country": "AUSTRIA",
+    "about": "Boutique executive search firm placing engineering and research talent with quantitative trading firms and tech startups. COLLABORATORS",
+    "tags": [
+      "grid",
+      "minimal",
+      "typographic"
+    ],
+    "category": "services",
+    "publicAvg": 8.2,
+    "finalScore": 8.83,
+    "ui": 8.25,
+    "ux": 8.19,
+    "innovation": 8.18,
+    "judges": [
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 9,
+        "ux": 9,
+        "inn": 8.5,
+        "avg": 8.83
+      },
+      {
+        "name": "Kristijan Binski Co-Founder",
+        "role": "& Creative Director",
+        "ui": 8.8,
+        "ux": 8.3,
+        "inn": 9,
+        "avg": 8.7
+      },
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Elena Levkovich Senior Digital",
+        "role": "Designer & Webflow Developer",
+        "ui": 8.5,
+        "ux": 8,
+        "inn": 8.2,
+        "avg": 8.23
+      },
+      {
+        "name": "Mattia Rinaudo Design Manager",
+        "role": "UI 8.2 UX 8.2 INN 8.2 8 Roberto Gonzalez CTO",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49885",
+    "slug": "ca-film-creatives",
+    "detail": "/sites/ca-film-creatives/49885/",
+    "title": "CA Film Creatives The Moss",
+    "award": "WEBSITE OF THE DAY 2026 AUG 19",
+    "listScore": 8.13,
+    "page": 2,
+    "url": "https://www.charlesalexandertv.com/",
+    "agency": "The Moss WDS",
+    "country": "WDS CANADA",
+    "about": "From 3D architectural visualization to cinematic commercials — films that market luxury real estate before it's built. COLLABORATORS",
+    "tags": [
+      "animated",
+      "scroll",
+      "video/sound"
+    ],
+    "category": "real estate",
+    "publicAvg": 8.13,
+    "finalScore": 8.67,
+    "ui": 8.08,
+    "ux": 8.19,
+    "innovation": 8.14,
+    "judges": [
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 9,
+        "ux": 9,
+        "inn": 8,
+        "avg": 8.67
+      },
+      {
+        "name": "Matteo Banchelli Experience Design",
+        "role": "Director",
+        "ui": 7.75,
+        "ux": 8.5,
+        "inn": 8.75,
+        "avg": 8.33
+      },
+      {
+        "name": "Mattia Rinaudo Design Manager",
+        "role": "UI 8.2 UX 8.2 INN 8.2 8 Roberto Gonzalez CTO",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 8,
+        "avg": 7.87
+      }
+    ]
+  },
+  {
+    "id": "49867",
+    "slug": "scheme-engine",
+    "detail": "/sites/scheme-engine/49867/",
+    "title": "Scheme Engine The Blackpepper Studio UK",
+    "award": "WEBSITE OF THE DAY 2026 AUG 18",
+    "listScore": 8.39,
+    "page": 2,
+    "url": "https://www.schemeengine.com/",
+    "agency": "The Blackpepper Studio",
+    "country": null,
+    "about": "Scheme Engine is a BIPOC-owned production company and TV/Film studio founded to provoke and reimagine the status quo.",
+    "tags": [
+      "fullscreen",
+      "scroll",
+      "webgl"
+    ],
+    "category": "agency",
+    "publicAvg": 8.39,
+    "finalScore": null,
+    "ui": 8.26,
+    "ux": 8.34,
+    "innovation": 8.56,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Sergey Dubovenko CEO",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8.5,
+        "ux": 8.6,
+        "inn": 8.5,
+        "avg": 8.53
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 8.7,
+        "avg": 8.1
+      },
+      {
+        "name": "Matteo Banchelli Experience Design",
+        "role": "Director",
+        "ui": 7.5,
+        "ux": 8,
+        "inn": 8.75,
+        "avg": 8.08
+      }
+    ]
+  },
+  {
+    "id": "49870",
+    "slug": "melius",
+    "detail": "/sites/melius/49870/",
+    "title": "Melius",
+    "award": "WEBSITE OF THE DAY 2026 AUG 17",
+    "listScore": 8.13,
+    "page": 2,
+    "url": "https://www.melius.com/",
+    "agency": "View Source",
+    "country": "USA",
+    "about": "View Source transformed Melius, an AI platform for creative teams, into a cinematic, interactive world.",
+    "tags": [
+      "animated",
+      "responsive",
+      "scroll"
+    ],
+    "category": "other",
+    "publicAvg": 8.13,
+    "finalScore": 8.5,
+    "ui": 8.12,
+    "ux": 8.05,
+    "innovation": 8.22,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.5 Matteo Banchelli Experience Design Director",
+        "ui": 8.5,
+        "ux": 8,
+        "inn": 9,
+        "avg": 8.5
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.2,
+        "ux": 8.2,
+        "inn": 8.2,
+        "avg": 8.2
+      },
+      {
+        "name": "Mayra Metaxa Founder",
+        "role": "and Web Developer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.1,
+        "avg": 8.03
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8.1,
+        "inn": 8,
+        "avg": 8.03
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49823",
+    "slug": "house-of-yellow",
+    "detail": "/sites/house-of-yellow/49823/",
+    "title": "House Of Yellow",
+    "award": "WEBSITE OF THE DAY 2026 AUG 16",
+    "listScore": 8.06,
+    "page": 2,
+    "url": "https://houseofyellow.nl/",
+    "agency": "Mees Verberne",
+    "country": "NETHERLANDS",
+    "about": "HOY is a creative content agency that moves at the speed of your ambition. Build with firepower. COLLABORATORS",
+    "tags": [
+      "colorful",
+      "svg",
+      "video/sound"
+    ],
+    "category": "agency",
+    "publicAvg": 8.06,
+    "finalScore": 8.53,
+    "ui": 8.05,
+    "ux": 8,
+    "innovation": 8.14,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.53 Labib Jaffar Senior Visual Designer",
+        "ui": 8.4,
+        "ux": 8.5,
+        "inn": 8.7,
+        "avg": 8.53
+      },
+      {
+        "name": "Martin Breton Founder",
+        "role": "& Development Director",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 8.2,
+        "avg": 7.93
+      }
+    ]
+  },
+  {
+    "id": "49845",
+    "slug": "union",
+    "detail": "/sites/union/49845/",
+    "title": "Union",
+    "award": "WEBSITE OF THE DAY 2026 AUG 15",
+    "listScore": 8.07,
+    "page": 2,
+    "url": "https://db-union-awards.webflow.io/",
+    "agency": "Digital Butlers",
+    "country": "CYPRUS",
+    "about": "Landing page for the documentary film UNION about the Amazon Labor Union's struggle to form a union.",
+    "tags": [
+      "animated",
+      "fullscreen",
+      "grid"
+    ],
+    "category": "other",
+    "publicAvg": 8.07,
+    "finalScore": 8.63,
+    "ui": 8.05,
+    "ux": 8.03,
+    "innovation": 8.12,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.63 Labib Jaffar Senior Visual Designer",
+        "ui": 8.6,
+        "ux": 8.5,
+        "inn": 8.8,
+        "avg": 8.63
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.4,
+        "ux": 8.4,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "Martin Breton Founder",
+        "role": "& Development Director",
+        "ui": 8.4,
+        "ux": 8.4,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8 UX 8 INN 8 7.67 Amin Salehi Creative Director",
+        "ui": 7.6,
+        "ux": 7.6,
+        "inn": 7.8,
+        "avg": 7.67
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.3,
+        "ux": 7.3,
+        "inn": 7.3,
+        "avg": 7.3
+      }
+    ]
+  },
+  {
+    "id": "49865",
+    "slug": "united-carriers",
+    "detail": "/sites/united-carriers/49865/",
+    "title": "United Carriers",
+    "award": "WEBSITE OF THE DAY 2026 AUG 14",
+    "listScore": 8.39,
+    "page": 2,
+    "url": "https://unitedcarriers.com/",
+    "agency": "Bearplus",
+    "country": "AUSTRALIA",
+    "about": "Trusted by global brands, United Carriers works alongside clients to create clarity, control, and scalable supply chain solution.",
+    "tags": [
+      "responsive",
+      "scroll",
+      "webgl"
+    ],
+    "category": "services",
+    "publicAvg": 8.39,
+    "finalScore": null,
+    "ui": 8.31,
+    "ux": 8.3,
+    "innovation": 8.55,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Timofey Beloglazov Marketing Strategist",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 9,
+        "avg": 8.67
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8.8,
+        "ux": 8,
+        "inn": 9,
+        "avg": 8.6
+      },
+      {
+        "name": "Matteo Banchelli Experience Design",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 9,
+        "avg": 8.33
+      },
+      {
+        "name": "Mattia Rinaudo Design Manager",
+        "role": "UI 8.2 UX 8.2 INN 8.2 8.17 Sergey Dubovenko CEO",
+        "ui": 8,
+        "ux": 8.5,
+        "inn": 8,
+        "avg": 8.17
+      }
+    ]
+  },
+  {
+    "id": "49832",
+    "slug": "daoism-systems",
+    "detail": "/sites/daoism-systems/49832/",
+    "title": "Daoism Systems",
+    "award": "WEBSITE OF THE DAY 2026 AUG 13",
+    "listScore": 8.12,
+    "page": 2,
+    "url": "https://www.daoism.systems/",
+    "agency": "Lynksen",
+    "country": "PORTUGAL",
+    "about": "Daoism Systems, a web3 venture studio, builds decentralized infrastructure and blockchain tools.",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "services",
+    "publicAvg": 8.12,
+    "finalScore": 8.53,
+    "ui": 8.17,
+    "ux": 8.01,
+    "innovation": 8.19,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.53 Labib Jaffar Senior Visual Designer",
+        "ui": 8.8,
+        "ux": 8.4,
+        "inn": 8.4,
+        "avg": 8.53
+      },
+      {
+        "name": "Hanson He Senior UX",
+        "role": "Engineer",
+        "ui": 8.5,
+        "ux": 8.2,
+        "inn": 8.2,
+        "avg": 8.3
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.6,
+        "avg": 8.2
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.1,
+        "ux": 8.1,
+        "inn": 8.1,
+        "avg": 8.1
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 7.8,
+        "ux": 7.9,
+        "inn": 8,
+        "avg": 7.9
+      }
+    ]
+  },
+  {
+    "id": "49819",
+    "slug": "haoqi-design",
+    "detail": "/sites/haoqi-design/49819/",
+    "title": "",
+    "award": "WEBSITE OF THE DAY 2026 AUG 12",
+    "listScore": 8.28,
+    "page": 2,
+    "url": "https://haoqi.design/",
+    "agency": "HAOQI.DESIGN",
+    "country": "HAOQI.DESIGN CHINA",
+    "about": "Haoqi Wen is a product designer and design engineer at TikTok, specializing in design systems and AI.",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "blog",
+    "publicAvg": 8.28,
+    "finalScore": null,
+    "ui": 8.23,
+    "ux": 8.2,
+    "innovation": 8.4,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Sergey Dubovenko CEO",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8.4,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.47
+      },
+      {
+        "name": "Labib Jaffar Senior Visual",
+        "role": "Designer",
+        "ui": 8.2,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.4
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.1,
+        "ux": 8.1,
+        "inn": 8.1,
+        "avg": 8.1
+      },
+      {
+        "name": "Kristijan Binski Co-Founder",
+        "role": "& Creative Director",
+        "ui": 7.8,
+        "ux": 7.4,
+        "inn": 8.9,
+        "avg": 8.03
+      },
+      {
+        "name": "Alessandro Giammaria",
+        "role": "UI/UX Designer",
+        "ui": 8.1,
+        "ux": 8.1,
+        "inn": 7.8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49794",
+    "slug": "why-zero",
+    "detail": "/sites/why-zero/49794/",
+    "title": "Why Zero",
+    "award": "WEBSITE OF THE DAY 2026 AUG 11",
+    "listScore": 8.9,
+    "page": 2,
+    "url": "https://why.zero.university/",
+    "agency": "Zero University",
+    "country": "USA",
+    "about": "Why Zero is an immersive site on how Zero University replaces the broken degree system with AI-native learning and real jobs. COLLABORATORS",
+    "tags": [
+      "animated",
+      "one page",
+      "webgl"
+    ],
+    "category": "education",
+    "publicAvg": 8.9,
+    "finalScore": null,
+    "ui": 8.87,
+    "ux": 8.9,
+    "innovation": 8.93,
+    "judges": [
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 9,
+        "ux": 9.2,
+        "inn": 9,
+        "avg": 9.07
+      },
+      {
+        "name": "Alessandro Giammaria",
+        "role": "UI/UX Designer",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Elena Levkovich Senior Digital",
+        "role": "Designer & Webflow Developer",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8.8,
+        "ux": 8.8,
+        "inn": 9.2,
+        "avg": 8.93
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      }
+    ]
+  },
+  {
+    "id": "49814",
+    "slug": "orgnzm-studio",
+    "detail": "/sites/orgnzm-studio/49814/",
+    "title": "Orgnzm Studio",
+    "award": "WEBSITE OF THE DAY 2026 AUG 10",
+    "listScore": 8.3,
+    "page": 2,
+    "url": "https://orgnzm.studio/",
+    "agency": "Orgnzm Studio",
+    "country": "UKRAINE",
+    "about": "Building digital ecosystems that grow and deliver results.",
+    "tags": [
+      "animated",
+      "fullscreen",
+      "one page"
+    ],
+    "category": "agency",
+    "publicAvg": 8.3,
+    "finalScore": 8.67,
+    "ui": 8.36,
+    "ux": 8.34,
+    "innovation": 8.2,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.67 Labib Jaffar Senior Visual Designer",
+        "ui": 8.4,
+        "ux": 8.8,
+        "inn": 8.8,
+        "avg": 8.67
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Kristijan Binski Co-Founder",
+        "role": "& Creative Director",
+        "ui": 8.8,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.47
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49807",
+    "slug": "parinazs-desktop-portfolio",
+    "detail": "/sites/parinazs-desktop-portfolio/49807/",
+    "title": "Parinaz's Desktop Portfolio",
+    "award": "WEBSITE OF THE DAY 2026 AUG 9",
+    "listScore": 8.04,
+    "page": 2,
+    "url": "http://www.parinazkassemi.com/",
+    "agency": "Parinaz Kassemi",
+    "country": "USA",
+    "about": "An interactive desktop portfolio where product design, systems thinking, and AI case studies unfold",
+    "tags": [
+      "animated",
+      "one page",
+      "responsive"
+    ],
+    "category": "web design/dev",
+    "publicAvg": 8.04,
+    "finalScore": 8.5,
+    "ui": 8.02,
+    "ux": 7.9,
+    "innovation": 8.22,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.5 Timofey Beloglazov Marketing Strategist",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "Kristijan Binski Co-Founder",
+        "role": "& Creative Director",
+        "ui": 7.9,
+        "ux": 7.4,
+        "inn": 8.8,
+        "avg": 8.03
+      },
+      {
+        "name": "Labib Jaffar Senior Visual",
+        "role": "Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 7.7,
+        "ux": 7.7,
+        "inn": 8,
+        "avg": 7.8
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 7.7,
+        "ux": 7.5,
+        "inn": 7.7,
+        "avg": 7.63
+      }
+    ]
+  },
+  {
+    "id": "49776",
+    "slug": "milledollars",
+    "detail": "/sites/milledollars/49776/",
+    "title": "MilleDollars",
+    "award": "WEBSITE OF THE DAY 2026 AUG 8",
+    "listScore": 8.03,
+    "page": 2,
+    "url": "https://milledollars.fr/",
+    "agency": "Magnetism",
+    "country": "FRANCE",
+    "about": "Milledollars is a creative bureau focused on high-end video production. COLLABORATORS",
+    "tags": [
+      "animated",
+      "illustrated"
+    ],
+    "category": "agency",
+    "publicAvg": 8.03,
+    "finalScore": 8.13,
+    "ui": 8.05,
+    "ux": 8.02,
+    "innovation": 8.02,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.13 Ana Abreu Founder and Creative Head",
+        "ui": 8.4,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8.13
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.1,
+        "ux": 8.1,
+        "inn": 8.1,
+        "avg": 8.1
+      },
+      {
+        "name": "Alessandro Giammaria",
+        "role": "UI/UX Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.2,
+        "avg": 8.07
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Roberto Gonzalez CTO UI",
+        "role": "8 UX 8 INN 8 7.87 Amin Salehi Creative Director",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 7.8,
+        "avg": 7.87
+      }
+    ]
+  },
+  {
+    "id": "49788",
+    "slug": "son-daven",
+    "detail": "/sites/son-daven/49788/",
+    "title": "Son Daven",
+    "award": "WEBSITE OF THE DAY 2026 AUG 7",
+    "listScore": 8.5,
+    "page": 2,
+    "url": "https://sondaven.com/en",
+    "agency": "The First The Last",
+    "country": "USA",
+    "about": "Son Daven is a new place of power in the Carpathians, where Hutsul culture meets contemporary architecture, art and modern comfort.",
+    "tags": [
+      "parallax",
+      "scroll",
+      "webgl"
+    ],
+    "category": "travel",
+    "publicAvg": 8.5,
+    "finalScore": null,
+    "ui": 8.46,
+    "ux": 8.51,
+    "innovation": 8.53,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Salva Carlino Senior UI-UX & Product Designer",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Giampiero Cruceli Digital Art",
+        "role": "Director / Designer",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Elena Levkovich Senior Digital",
+        "role": "Designer & Webflow Developer",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Martin Breton Founder",
+        "role": "& Development Director",
+        "ui": 8.3,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.43
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8.5 UX 8.5 INN 8 8.3 Mattia Rinaudo Design Manager",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      }
+    ]
+  },
+  {
+    "id": "49748",
+    "slug": "razed-mods",
+    "detail": "/sites/razed-mods/49748/",
+    "title": "Razed Mods",
+    "award": "WEBSITE OF THE DAY 2026 AUG 6",
+    "listScore": 8.11,
+    "page": 3,
+    "url": "https://razed-mods.webflow.io/",
+    "agency": "Arian Atmar",
+    "country": "GERMANY",
+    "about": "Razed Mods crafts visual mods for the most iconic game titles, blurring the line between virtual and reality.",
+    "tags": [
+      "animated",
+      "scroll",
+      "typographic"
+    ],
+    "category": "entertainment",
+    "publicAvg": 8.11,
+    "finalScore": 8.5,
+    "ui": 8.22,
+    "ux": 8.12,
+    "innovation": 8,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.5 Sergey Dubovenko CEO",
+        "ui": 9,
+        "ux": 8.5,
+        "inn": 8,
+        "avg": 8.5
+      },
+      {
+        "name": "Hanson He Senior UX",
+        "role": "Engineer",
+        "ui": 8.3,
+        "ux": 8.2,
+        "inn": 8,
+        "avg": 8.17
+      },
+      {
+        "name": "Mayra Metaxa Founder",
+        "role": "and Web Developer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Hely Lopes",
+        "role": "UI/UX Lead",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Mattia Rinaudo Design Manager",
+        "role": "UI 8 UX 8 INN 8 8 Amin Salehi Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49749",
+    "slug": "zorge-9",
+    "detail": "/sites/zorge-9/49749/",
+    "title": "Zorge 9",
+    "award": "WEBSITE OF THE DAY 2026 AUG 5",
+    "listScore": 8.5,
+    "page": 3,
+    "url": "https://zorge9.estate/",
+    "agency": "Vide Infra",
+    "country": "UAE",
+    "about": "Luxury website for a premium real estate project",
+    "tags": [
+      "animated",
+      "minimal",
+      "parallax"
+    ],
+    "category": "real estate",
+    "publicAvg": 8.5,
+    "finalScore": null,
+    "ui": 8.67,
+    "ux": 8.47,
+    "innovation": 8.36,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Mattia Rinaudo Design Manager",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Timofey Beloglazov Marketing Strategist",
+        "role": "UI 9 UX 9 INN 9 8.67 Hely Lopes UI/UX Lead",
+        "ui": 9,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.67
+      },
+      {
+        "name": "Hanson He Senior UX",
+        "role": "Engineer",
+        "ui": 9,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.67
+      },
+      {
+        "name": "Samet Cubuk Founder",
+        "role": "& Creative Director",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.5,
+        "avg": 8.37
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8.4,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8.13
+      }
+    ]
+  },
+  {
+    "id": "49739",
+    "slug": "the-triadic-ballet-ai",
+    "detail": "/sites/the-triadic-ballet-ai/49739/",
+    "title": "The Triadic Ballet AI Isabelle Cuisset UK",
+    "award": "WEBSITE OF THE DAY 2026 AUG 4",
+    "listScore": 8.11,
+    "page": 3,
+    "url": "https://www.thetriadicballetai.com/",
+    "agency": "Isabelle Cuisset",
+    "country": null,
+    "about": "A digital reinterpretation of Oskar Schlemmer's Triadic Ballet, blending AI imagery, motion and experimental web design.",
+    "tags": [
+      "animated",
+      "minimal",
+      "photographic"
+    ],
+    "category": "art",
+    "publicAvg": 8.11,
+    "finalScore": 8.67,
+    "ui": 8.34,
+    "ux": 8.14,
+    "innovation": 7.86,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.67 Sergey Dubovenko CEO",
+        "ui": 9,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.67
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Hanson He Senior UX",
+        "role": "Engineer",
+        "ui": 8.6,
+        "ux": 8.5,
+        "inn": 8.3,
+        "avg": 8.47
+      },
+      {
+        "name": "Samet Cubuk Founder",
+        "role": "& Creative Director",
+        "ui": 8.8,
+        "ux": 8.5,
+        "inn": 8,
+        "avg": 8.43
+      },
+      {
+        "name": "Alessandro Giammaria",
+        "role": "UI/UX Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.2,
+        "avg": 8.07
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 7.9,
+        "ux": 8.1,
+        "inn": 7.4,
+        "avg": 7.8
+      }
+    ]
+  },
+  {
+    "id": "49745",
+    "slug": "aardvark-book-club",
+    "detail": "/sites/aardvark-book-club/49745/",
+    "title": "Aardvark Book Club",
+    "award": "WEBSITE OF THE DAY 2026 AUG 3",
+    "listScore": 8.04,
+    "page": 3,
+    "url": "https://www.aardvarkbookclub.com/",
+    "agency": "FUTURE THREE®",
+    "country": "GERMANY",
+    "about": "Where BookTok meets the bookshelf. A digital rebuild for Aardvark Book Club — editorial curation meets custom 3D craft. COLLABORATORS",
+    "tags": [
+      "animated",
+      "colorful",
+      "ecommerce"
+    ],
+    "category": "community",
+    "publicAvg": 8.04,
+    "finalScore": 8.5,
+    "ui": 8.03,
+    "ux": 8.03,
+    "innovation": 8.05,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.5 Timofey Beloglazov Marketing Strategist",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Mayra Metaxa Founder",
+        "role": "and Web Developer",
+        "ui": 8.4,
+        "ux": 8.4,
+        "inn": 8.5,
+        "avg": 8.43
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Hely Lopes",
+        "role": "UI/UX Lead",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Mattia Rinaudo Design Manager",
+        "role": "UI 7.8 UX 7.8 INN 7.8 7.5 Sergey Dubovenko CEO",
+        "ui": 7.5,
+        "ux": 7.5,
+        "inn": 7.5,
+        "avg": 7.5
+      }
+    ]
+  },
+  {
+    "id": "49730",
+    "slug": "spectral-field",
+    "detail": "/sites/spectral-field/49730/",
+    "title": "Spectral Field Rob",
+    "award": "WEBSITE OF THE DAY 2026 AUG 2",
+    "listScore": 8.17,
+    "page": 3,
+    "url": "https://www.robfwa.com/",
+    "agency": "Rob FWA",
+    "country": "FWA UK",
+    "about": "Turn any track into a unique artwork that draws itself in sync with the music — entirely in your browser.",
+    "tags": [
+      "animated",
+      "video/sound",
+      "webgl"
+    ],
+    "category": "art",
+    "publicAvg": 8.17,
+    "finalScore": 9.33,
+    "ui": 8.06,
+    "ux": 8.19,
+    "innovation": 8.27,
+    "judges": [
+      {
+        "name": "Roberto Gonzalez CTO UI",
+        "role": "9 UX 10 INN 9 9 Mattia Rinaudo Design Manager",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8.5,
+        "ux": 9.2,
+        "inn": 9,
+        "avg": 8.9
+      },
+      {
+        "name": "Timofey Beloglazov Marketing Strategist",
+        "role": "UI 8.5 UX 8.5 INN 8.5 8 Sergey Dubovenko CEO",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 7.7,
+        "ux": 7.2,
+        "inn": 7.7,
+        "avg": 7.53
+      }
+    ]
+  },
+  {
+    "id": "49764",
+    "slug": "the-tuscan-journey-begins",
+    "detail": "/sites/the-tuscan-journey-begins/49764/",
+    "title": "The Tuscan Journey Begins",
+    "award": "WEBSITE OF THE DAY 2026 AUG 1",
+    "listScore": 8.07,
+    "page": 3,
+    "url": "https://weekend-mm-2026-pasticcino-bag-master.monogrid.io/en/",
+    "agency": "MONOGRID SRL",
+    "country": "MONOGRID SRL ITALY",
+    "about": "MONOGRID created an interactive journey through Italian craftsmanship for Weekend Max Mara's Pasticcino Bag.",
+    "tags": [
+      "animated",
+      "illustrated",
+      "video/sound"
+    ],
+    "category": "fashion",
+    "publicAvg": 8.07,
+    "finalScore": 8.6,
+    "ui": 8.08,
+    "ux": 8.08,
+    "innovation": 8.05,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.6 Mattia Rinaudo Design Manager",
+        "ui": 8.6,
+        "ux": 8.6,
+        "inn": 8.6,
+        "avg": 8.6
+      },
+      {
+        "name": "Aleksandr Kirshin Creative Director",
+        "role": "& Founder",
+        "ui": 8.4,
+        "ux": 8.5,
+        "inn": 8.2,
+        "avg": 8.37
+      },
+      {
+        "name": "Roberto Gonzalez",
+        "role": "CTO",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Alessandro Giammaria",
+        "role": "UI/UX Designer",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 7.8,
+        "avg": 7.8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 7.7,
+        "ux": 7.6,
+        "inn": 7.7,
+        "avg": 7.67
+      }
+    ]
+  },
+  {
+    "id": "49762",
+    "slug": "noho",
+    "detail": "/sites/noho/49762/",
+    "title": "Noho",
+    "award": "WEBSITE OF THE DAY 2026 JUL 31",
+    "listScore": 8.22,
+    "page": 3,
+    "url": "https://noho.ink/",
+    "agency": "Eugene Morev",
+    "country": "SERBIA",
+    "about": "Non-commercial redesign concept for Noho. A modern, sustainable, ergonomic, and aesthetically pleasing furniture website. COLLABORATORS",
+    "tags": [
+      "minimal",
+      "one page",
+      "webgl"
+    ],
+    "category": "products",
+    "publicAvg": 8.22,
+    "finalScore": 8.83,
+    "ui": 8.3,
+    "ux": 8.1,
+    "innovation": 8.27,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.83 Matteo Banchelli Experience Design Director",
+        "ui": 9,
+        "ux": 8.5,
+        "inn": 9,
+        "avg": 8.83
+      },
+      {
+        "name": "Martin Breton Founder",
+        "role": "& Development Director",
+        "ui": 8.7,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.57
+      },
+      {
+        "name": "Mattia Rinaudo Design Manager",
+        "role": "UI 8.1 UX 8.1 INN 8.1 8 Sergey Dubovenko CEO",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Margherita Silvestri Brand Director",
+        "role": "and Co-Founder",
+        "ui": 8,
+        "ux": 7.5,
+        "inn": 8,
+        "avg": 7.83
+      }
+    ]
+  },
+  {
+    "id": "49744",
+    "slug": "homunculus-inc-2026",
+    "detail": "/sites/homunculus-inc-2026/49744/",
+    "title": "homunculus Inc. 2026",
+    "award": "WEBSITE OF THE DAY 2026 JUL 30",
+    "listScore": 8.14,
+    "page": 3,
+    "url": "https://homunculus.jp/",
+    "agency": "homunculus Inc.",
+    "country": "JAPAN",
+    "about": "homunculus Inc. is a creative digital production in Japan. This is our new corporate site.",
+    "tags": [
+      "one page",
+      "video/sound",
+      "webgl"
+    ],
+    "category": "web design/dev",
+    "publicAvg": 8.14,
+    "finalScore": 8.5,
+    "ui": 8.1,
+    "ux": 8.02,
+    "innovation": 8.3,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.5 Mattia Rinaudo Design Manager",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 9,
+        "avg": 8.33
+      },
+      {
+        "name": "Samet Cubuk Founder",
+        "role": "& Creative Director",
+        "ui": 8.3,
+        "ux": 7.8,
+        "inn": 8.3,
+        "avg": 8.13
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8 UX 8 INN 8 8 Amin Salehi Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Mayra Metaxa Founder",
+        "role": "and Web Developer",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 8,
+        "avg": 7.87
+      }
+    ]
+  },
+  {
+    "id": "49758",
+    "slug": "motiondeep",
+    "detail": "/sites/motiondeep/49758/",
+    "title": "Motiondeep Motiondeep UK",
+    "award": "WEBSITE OF THE DAY 2026 JUL 29",
+    "listScore": 8.25,
+    "page": 3,
+    "url": "https://www.motiondeep.com/",
+    "agency": "Motiondeep",
+    "country": null,
+    "about": "Our minimalistic immersive teaser microsite is here. Step inside our play area, explore the experience.",
+    "tags": [
+      "animated",
+      "minimal",
+      "webgl"
+    ],
+    "category": "agency",
+    "publicAvg": 8.25,
+    "finalScore": 8.67,
+    "ui": 8.15,
+    "ux": 8.12,
+    "innovation": 8.47,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.67 Sergey Dubovenko CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 9,
+        "avg": 8.67
+      },
+      {
+        "name": "Labib Jaffar Senior Visual",
+        "role": "Designer",
+        "ui": 8.4,
+        "ux": 8.5,
+        "inn": 8.8,
+        "avg": 8.57
+      },
+      {
+        "name": "Roberto Gonzalez CTO UI",
+        "role": "8 UX 8 INN 9 8.2 Mattia Rinaudo Design Manager",
+        "ui": 8.2,
+        "ux": 8.2,
+        "inn": 8.2,
+        "avg": 8.2
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 7.7,
+        "inn": 8,
+        "avg": 7.9
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 7.8,
+        "avg": 7.8
+      }
+    ]
+  },
+  {
+    "id": "49729",
+    "slug": "cula-technologies",
+    "detail": "/sites/cula-technologies/49729/",
+    "title": "Cula Technologies",
+    "award": "WEBSITE OF THE DAY 2026 JUL 28",
+    "listScore": 8.15,
+    "page": 3,
+    "url": "https://www.cula.tech/",
+    "agency": "Cula Technologies",
+    "country": "GERMANY",
+    "about": "A 3D world on how Cula captures real-time operational data, automating MRV operations in carbon removal. Scroll to begin. COLLABORATORS",
+    "tags": [
+      "grid",
+      "scroll",
+      "video/sound"
+    ],
+    "category": "services",
+    "publicAvg": 8.15,
+    "finalScore": 8.8,
+    "ui": 8.01,
+    "ux": 8.26,
+    "innovation": 8.19,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.8 Timofey Beloglazov Marketing Strategist",
+        "ui": 8.8,
+        "ux": 8.8,
+        "inn": 8.8,
+        "avg": 8.8
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8.2,
+        "ux": 8.8,
+        "inn": 8.3,
+        "avg": 8.43
+      },
+      {
+        "name": "Roberto Gonzalez",
+        "role": "CTO",
+        "ui": 8,
+        "ux": 9,
+        "inn": 8,
+        "avg": 8.33
+      },
+      {
+        "name": "Margherita Silvestri Brand Director",
+        "role": "and Co-Founder",
+        "ui": 7.5,
+        "ux": 8,
+        "inn": 8.5,
+        "avg": 8
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49725",
+    "slug": "zeroz-brand-site",
+    "detail": "/sites/zeroz-brand-site/49725/",
+    "title": "/zeroz Brand Site",
+    "award": "WEBSITE OF THE DAY 2026 JUL 27",
+    "listScore": 8.09,
+    "page": 3,
+    "url": "https://otsuka-air.jp/",
+    "agency": "SHIFTBRAIN Inc.",
+    "country": "JAPAN",
+    "about": "Brand site for /zeroz, a self-conditioning food born from Otsuka Pharmaceutical Co., Ltd.'s 'Active Inner Resource' concept. COLLABORATORS",
+    "tags": [
+      "ecommerce",
+      "typographic",
+      "webgl"
+    ],
+    "category": "food/drink",
+    "publicAvg": 8.09,
+    "finalScore": 8.67,
+    "ui": 8.01,
+    "ux": 8.08,
+    "innovation": 8.17,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.67 Sergey Dubovenko CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 9,
+        "avg": 8.67
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8.2,
+        "inn": 8,
+        "avg": 8.07
+      },
+      {
+        "name": "Mayra Metaxa Founder",
+        "role": "and Web Developer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Roberto Gonzalez CTO UI",
+        "role": "8 UX 8 INN 8 8 Mattia Rinaudo Design Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49728",
+    "slug": "russell-numo",
+    "detail": "/sites/russell-numo/49728/",
+    "title": "Russell Numo — Portfolio",
+    "award": "WEBSITE OF THE DAY 2026 JUL 26",
+    "listScore": 8,
+    "page": 3,
+    "url": "https://www.russellnumo.nl/",
+    "agency": "Russell Numo",
+    "country": "NETHERLANDS",
+    "about": "Personal portfolio of Russell Numo, a creative developer based in Amsterdam.",
+    "tags": [
+      "animated",
+      "typographic",
+      "webgl"
+    ],
+    "category": "web design/dev",
+    "publicAvg": 8,
+    "finalScore": 8.67,
+    "ui": 8.05,
+    "ux": 8.1,
+    "innovation": 7.83,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.67 Roberto Gonzalez CTO",
+        "ui": 9,
+        "ux": 9,
+        "inn": 8,
+        "avg": 8.67
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.4,
+        "ux": 8.4,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8.2,
+        "ux": 8.5,
+        "inn": 8,
+        "avg": 8.23
+      },
+      {
+        "name": "Amin Salehi Creative Director",
+        "role": "UI 7.6 UX 7.8 INN 7.7 7.5 Sergey Dubovenko CEO",
+        "ui": 7.5,
+        "ux": 7.5,
+        "inn": 7.5,
+        "avg": 7.5
+      },
+      {
+        "name": "Alessandro Giammaria",
+        "role": "UI/UX Designer",
+        "ui": 7.6,
+        "ux": 7.4,
+        "inn": 7.4,
+        "avg": 7.47
+      }
+    ]
+  },
+  {
+    "id": "49631",
+    "slug": "noomo-showcase",
+    "detail": "/sites/noomo-showcase/49631/",
+    "title": "Noomo Showcase",
+    "award": "WEBSITE OF THE DAY 2026 JUL 25",
+    "listScore": 8.03,
+    "page": 3,
+    "url": "https://showcase.noomoagency.com/",
+    "agency": "Noomo Agency",
+    "country": "USA",
+    "about": "Instead of a standard showreel, we built an immersive showcase of our latest work for brands like Salesforce, AMD, and Coinbase.",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "agency",
+    "publicAvg": 8.03,
+    "finalScore": 8.17,
+    "ui": 7.92,
+    "ux": 7.92,
+    "innovation": 8.27,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.17 Sergey Dubovenko CEO",
+        "ui": 8.5,
+        "ux": 7.5,
+        "inn": 8.5,
+        "avg": 8.17
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8.1,
+        "ux": 8.1,
+        "inn": 8.1,
+        "avg": 8.1
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 7,
+        "ux": 8,
+        "inn": 9,
+        "avg": 8
+      },
+      {
+        "name": "Mayra Metaxa Founder",
+        "role": "and Web Developer",
+        "ui": 7.9,
+        "ux": 7.9,
+        "inn": 8,
+        "avg": 7.93
+      }
+    ]
+  },
+  {
+    "id": "49710",
+    "slug": "duyu-care",
+    "detail": "/sites/duyu-care/49710/",
+    "title": "Duyu Care",
+    "award": "WEBSITE OF THE DAY 2026 JUL 24",
+    "listScore": 8.14,
+    "page": 3,
+    "url": "https://duyucare.dops.agency/",
+    "agency": "Dops Agency",
+    "country": "UKRAINE",
+    "about": "We combined realistic 3D graphics with sophisticated photo shoots and conceptual images to make a strong impression on visitors.",
+    "tags": [
+      "animated",
+      "minimal",
+      "photographic"
+    ],
+    "category": "products",
+    "publicAvg": 8.14,
+    "finalScore": 8.63,
+    "ui": 8.13,
+    "ux": 8.13,
+    "innovation": 8.17,
+    "judges": [
+      {
+        "name": "Kristijan Binski Co-Founder",
+        "role": "& Creative Director",
+        "ui": 8.8,
+        "ux": 8.3,
+        "inn": 8.8,
+        "avg": 8.63
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.4,
+        "ux": 8.4,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 7.8,
+        "ux": 8.2,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Roberto Gonzalez",
+        "role": "CTO",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Stella Guan Senior Visual",
+        "role": "Design Lead",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49685",
+    "slug": "cipher",
+    "detail": "/sites/cipher/49685/",
+    "title": "Cipher",
+    "award": "WEBSITE OF THE DAY 2026 JUL 23",
+    "listScore": 8.15,
+    "page": 3,
+    "url": "https://cipher.tv/",
+    "agency": "Magnetism",
+    "country": "FRANCE",
+    "about": "Cipher is a creative production company exploring the space between precision and possibility. COLLABORATORS",
+    "tags": [
+      "animated",
+      "material design",
+      "webgl"
+    ],
+    "category": "agency",
+    "publicAvg": 8.15,
+    "finalScore": 8.4,
+    "ui": 8.02,
+    "ux": 8.18,
+    "innovation": 8.23,
+    "judges": [
+      {
+        "name": "Kristijan Binski Co-Founder",
+        "role": "& Creative Director",
+        "ui": 8.3,
+        "ux": 8.5,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8.6,
+        "inn": 8.2,
+        "avg": 8.27
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Viran Dayaratne Head",
+        "role": "of UX & Researcher",
+        "ui": 8,
+        "ux": 7.9,
+        "inn": 8,
+        "avg": 7.97
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.5,
+        "ux": 7.8,
+        "inn": 8.5,
+        "avg": 7.93
+      }
+    ]
+  },
+  {
+    "id": "49695",
+    "slug": "jesko-jets",
+    "detail": "/sites/jesko-jets/49695/",
+    "title": "Jesko Jets",
+    "award": "WEBSITE OF THE DAY 2026 JUL 22",
+    "listScore": 8.16,
+    "page": 3,
+    "url": "https://jeskojets.com/",
+    "agency": "The First The Last",
+    "country": "USA",
+    "about": "Jesko Jets provides global private jet charters, offering tailored, secure and seamless VIP air travel.",
+    "tags": [
+      "one page",
+      "parallax",
+      "webgl"
+    ],
+    "category": "travel",
+    "publicAvg": 8.16,
+    "finalScore": 8.37,
+    "ui": 8.07,
+    "ux": 8.22,
+    "innovation": 8.18,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.37 ZHOU Wen Jun Founder & Creative Director",
+        "ui": 8.2,
+        "ux": 8.6,
+        "inn": 8.3,
+        "avg": 8.37
+      },
+      {
+        "name": "Kristijan Binski Co-Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8.3,
+        "inn": 8.4,
+        "avg": 8.23
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8.2,
+        "ux": 8.2,
+        "inn": 8.2,
+        "avg": 8.2
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.2,
+        "ux": 8.2,
+        "inn": 8.2,
+        "avg": 8.2
+      },
+      {
+        "name": "Labib Jaffar Senior Visual",
+        "role": "Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 7.93
+      }
+    ]
+  },
+  {
+    "id": "49697",
+    "slug": "dr-grigoriak",
+    "detail": "/sites/dr-grigoriak/49697/",
+    "title": "Dr Grigoriak",
+    "award": "WEBSITE OF THE DAY 2026 JUL 21",
+    "listScore": 8.15,
+    "page": 3,
+    "url": "https://grigoriak.doctor/",
+    "agency": "Vide Infra",
+    "country": "UAE",
+    "about": "Your beauty — refined to perfection. A mesmerizing website for a top-grade plastic surgeon.",
+    "tags": [
+      "animated",
+      "minimal",
+      "parallax"
+    ],
+    "category": "services",
+    "publicAvg": 8.15,
+    "finalScore": 8.47,
+    "ui": 8.15,
+    "ux": 8.2,
+    "innovation": 8.08,
+    "judges": [
+      {
+        "name": "Kristijan Binski Co-Founder",
+        "role": "& Creative Director",
+        "ui": 8.7,
+        "ux": 8.5,
+        "inn": 8.2,
+        "avg": 8.47
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8.3,
+        "ux": 8.5,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.1,
+        "ux": 8.1,
+        "inn": 8.1,
+        "avg": 8.1
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8.2,
+        "inn": 8,
+        "avg": 8.07
+      },
+      {
+        "name": "Labib Jaffar Senior Visual",
+        "role": "Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 7.8,
+        "ux": 7.9,
+        "inn": 7.8,
+        "avg": 7.83
+      }
+    ]
+  },
+  {
+    "id": "49669",
+    "slug": "fitosauna",
+    "detail": "/sites/fitosauna/49669/",
+    "title": "Fitosauna",
+    "award": "WEBSITE OF THE DAY 2026 JUL 20",
+    "listScore": 8.11,
+    "page": 3,
+    "url": "https://fitosauna.com/",
+    "agency": "Qream",
+    "country": "UKRAINE",
+    "about": "We built a layered 3D-like hero using video elements. Background and product move independently, creating depth and interactivity.",
+    "tags": [
+      "animated",
+      "ecommerce",
+      "photographic"
+    ],
+    "category": "wellbeing",
+    "publicAvg": 8.11,
+    "finalScore": 8.43,
+    "ui": 8.07,
+    "ux": 8.11,
+    "innovation": 8.14,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.43 Labib Jaffar Senior Visual Designer",
+        "ui": 8.4,
+        "ux": 8.5,
+        "inn": 8.4,
+        "avg": 8.43
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.4,
+        "ux": 8.4,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 7.9,
+        "ux": 8.1,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Timofey Beloglazov Marketing Strategist",
+        "role": "UI 8 UX 8 INN 8 8 Amin Salehi Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49592",
+    "slug": "nudot-studio",
+    "detail": "/sites/nudot-studio/49592/",
+    "title": "Nudot Studio",
+    "award": "WEBSITE OF THE DAY 2026 JUL 19",
+    "listScore": 8.04,
+    "page": 4,
+    "url": "https://www.nudot.com.tw/",
+    "agency": "Nudot Studio",
+    "country": "TAIWAN",
+    "about": "Nudot Studio is a digital studio specializing in premium web design and AI-driven visuals.",
+    "tags": [
+      "animated",
+      "parallax",
+      "webgl"
+    ],
+    "category": "web design/dev",
+    "publicAvg": 8.04,
+    "finalScore": 8.3,
+    "ui": 8.01,
+    "ux": 8.07,
+    "innovation": 8.03,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.3 Salva Carlino Senior UI-UX & Product Designer",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "Mayra Metaxa Founder",
+        "role": "and Web Developer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.2,
+        "avg": 8.07
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Mattia Rinaudo Design Manager",
+        "role": "UI 8 UX 8 INN 8 8 Amin Salehi Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 7.8,
+        "ux": 8.2,
+        "inn": 7.9,
+        "avg": 7.97
+      }
+    ]
+  },
+  {
+    "id": "49620",
+    "slug": "flowty",
+    "detail": "/sites/flowty/49620/",
+    "title": "Flowty",
+    "award": "WEBSITE OF THE DAY 2026 JUL 18",
+    "listScore": 8.08,
+    "page": 4,
+    "url": "https://flowty.co/",
+    "agency": "Moyra",
+    "country": "POLAND",
+    "about": "Work moves better when focus and recovery take turns. Block noisy apps and find your daily rhythm with Flowty app.",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "app",
+    "publicAvg": 8.08,
+    "finalScore": null,
+    "ui": 8.08,
+    "ux": 8.12,
+    "innovation": 8.03,
+    "judges": [
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8.2,
+        "ux": 8.2,
+        "inn": 8.5,
+        "avg": 8.3
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8.5 UX 8 INN 8 8 Mattia Rinaudo Design Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 7.7,
+        "avg": 7.83
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 7,
+        "ux": 7.5,
+        "inn": 7,
+        "avg": 7.17
+      }
+    ]
+  },
+  {
+    "id": "49680",
+    "slug": "the-watch",
+    "detail": "/sites/the-watch/49680/",
+    "title": "The Watch",
+    "award": "WEBSITE OF THE DAY 2026 JUL 17",
+    "listScore": 8.34,
+    "page": 4,
+    "url": "https://thewatch.60fps.fr/",
+    "agency": "60FPS",
+    "country": "FRANCE",
+    "about": "The FS 60P is our take on showing a luxury watch at its best. A real-time WebGL piece that interacts with the content around it.",
+    "tags": [
+      "responsive",
+      "scroll",
+      "webgl"
+    ],
+    "category": "products",
+    "publicAvg": 8.34,
+    "finalScore": 8.93,
+    "ui": 8.27,
+    "ux": 8.34,
+    "innovation": 8.41,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.93 Salva Carlino Senior UI-UX & Product Designer",
+        "ui": 8.8,
+        "ux": 9,
+        "inn": 9,
+        "avg": 8.93
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8.3,
+        "ux": 8.6,
+        "inn": 8.5,
+        "avg": 8.47
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8.2,
+        "ux": 8,
+        "inn": 8.2,
+        "avg": 8.13
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.2,
+        "avg": 8.07
+      }
+    ]
+  },
+  {
+    "id": "49651",
+    "slug": "le-mans-classic",
+    "detail": "/sites/le-mans-classic/49651/",
+    "title": "Le Mans Classic",
+    "award": "WEBSITE OF THE DAY 2026 JUL 16",
+    "listScore": 8.28,
+    "page": 4,
+    "url": "https://lemansclassic.richardmille.com/",
+    "agency": "Magnetism",
+    "country": "FRANCE",
+    "about": "Born from a restriction, Classic Bootleg transforms exclusion into perspective. COLLABORATORS",
+    "tags": [
+      "animated",
+      "photographic",
+      "scroll"
+    ],
+    "category": "photography",
+    "publicAvg": 8.28,
+    "finalScore": null,
+    "ui": 8.31,
+    "ux": 8.2,
+    "innovation": 8.31,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Timofey Beloglazov Marketing Strategist",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Martin Breton Founder",
+        "role": "& Development Director",
+        "ui": 8.6,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.53
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8.4,
+        "ux": 8.4,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8.2,
+        "ux": 8,
+        "inn": 8.3,
+        "avg": 8.17
+      },
+      {
+        "name": "Mattia Rinaudo Design Manager",
+        "role": "UI 8 UX 8 INN 8 8 Amin Salehi Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49616",
+    "slug": "dmitry-glukhovsky",
+    "detail": "/sites/dmitry-glukhovsky/49616/",
+    "title": "Dmitry Glukhovsky — Portfolio",
+    "award": "WEBSITE OF THE DAY 2026 JUL 15",
+    "listScore": 8.16,
+    "page": 4,
+    "url": "https://www.glukhovsky.com/",
+    "agency": "Oleg Ladygin",
+    "country": "UKRAINE",
+    "about": "A chapter-based digital archive for Dmitry Glukhovsky, bringing together books, games, films, theatre, articles, and news. COLLABORATORS",
+    "tags": [
+      "animated",
+      "grid",
+      "typographic"
+    ],
+    "category": "blog",
+    "publicAvg": 8.16,
+    "finalScore": 8.3,
+    "ui": 8.03,
+    "ux": 8.25,
+    "innovation": 8.18,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.3 Mattia Rinaudo Design Manager",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8.1,
+        "ux": 8.5,
+        "inn": 8.2,
+        "avg": 8.27
+      },
+      {
+        "name": "Martin Breton Founder",
+        "role": "& Development Director",
+        "ui": 7.7,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.23
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8.1,
+        "ux": 8.2,
+        "inn": 8.1,
+        "avg": 8.13
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8 UX 8 INN 8 8 Amin Salehi Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49617",
+    "slug": "get-blue",
+    "detail": "/sites/get-blue/49617/",
+    "title": "Get Blue",
+    "award": "WEBSITE OF THE DAY 2026 JUL 14",
+    "listScore": 8.13,
+    "page": 4,
+    "url": "https://www.getblue.com/",
+    "agency": "BRIGHTSCOUT",
+    "country": "BRIGHTSCOUT USA",
+    "about": "Get Blue decodes your body's data into clear daily actions. We designed their brand, website, and product to match its ambition.",
+    "tags": [
+      "animated",
+      "illustrated",
+      "minimal"
+    ],
+    "category": "services",
+    "publicAvg": 8.13,
+    "finalScore": 8.5,
+    "ui": 8.07,
+    "ux": 8.28,
+    "innovation": 8.05,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.5 Sergey Dubovenko CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 8,
+        "ux": 9,
+        "inn": 8,
+        "avg": 8.33
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8.3,
+        "inn": 8,
+        "avg": 8.1
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.1,
+        "ux": 8.1,
+        "inn": 8.1,
+        "avg": 8.1
+      },
+      {
+        "name": "Martin Breton Founder",
+        "role": "& Development Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 7.7,
+        "avg": 7.77
+      }
+    ]
+  },
+  {
+    "id": "49611",
+    "slug": "vero-new-york",
+    "detail": "/sites/vero-new-york/49611/",
+    "title": "Vero New-York",
+    "award": "WEBSITE OF THE DAY 2026 JUL 13",
+    "listScore": 8.19,
+    "page": 4,
+    "url": "https://www.verostudio.com/",
+    "agency": "Rodéo Studio",
+    "country": "FRANCE",
+    "about": "Vero crafts luxury custom sculptures from wedding dresses, blending advanced tech and artistry to immortalize each gown. COLLABORATORS",
+    "tags": [
+      "animated",
+      "ecommerce",
+      "webgl"
+    ],
+    "category": "products",
+    "publicAvg": 8.19,
+    "finalScore": 8.6,
+    "ui": 8.12,
+    "ux": 8.25,
+    "innovation": 8.2,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.6 Mattia Rinaudo Design Manager",
+        "ui": 8.6,
+        "ux": 8.6,
+        "inn": 8.6,
+        "avg": 8.6
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8.4,
+        "inn": 8.1,
+        "avg": 8.17
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 7.93
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 7.93
+      }
+    ]
+  },
+  {
+    "id": "49632",
+    "slug": "cobloc",
+    "detail": "/sites/cobloc/49632/",
+    "title": "Cobloc",
+    "award": "WEBSITE OF THE DAY 2026 JUL 12",
+    "listScore": 8.03,
+    "page": 4,
+    "url": "https://www.cobloc.archi/",
+    "agency": "Adveris",
+    "country": "FRANCE",
+    "about": "Cobloc defends a rooted, contemporary architecture born from its context, its materials, its history.",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "real estate",
+    "publicAvg": 8.03,
+    "finalScore": 8.1,
+    "ui": 8.07,
+    "ux": 8.02,
+    "innovation": 8,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.1 Martin Breton Founder & Development Director",
+        "ui": 8.3,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8.1
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8.1,
+        "ux": 8.1,
+        "inn": 8,
+        "avg": 8.07
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8 UX 8 INN 8 8 Mattia Rinaudo Design Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Timofey Beloglazov Marketing Strategist",
+        "role": "UI 8 UX 8 INN 8 8 Amin Salehi Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49596",
+    "slug": "benjamin-hoang-portfolio",
+    "detail": "/sites/benjamin-hoang-portfolio/49596/",
+    "title": "Benjamin Hoang — Portfolio",
+    "award": "WEBSITE OF THE DAY 2026 JUL 11",
+    "listScore": 8.03,
+    "page": 4,
+    "url": "https://benjamincreative.me/",
+    "agency": "Benjamin Hoang",
+    "country": "VIET NAM",
+    "about": "Portfolio of Benjamin Hoang, a Digital Product Designer based in Vietnam.",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "web design/dev",
+    "publicAvg": 8.03,
+    "finalScore": 8.3,
+    "ui": 7.97,
+    "ux": 8.07,
+    "innovation": 8.05,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.3 Mattia Rinaudo Design Manager",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "Mayra Metaxa Founder",
+        "role": "and Web Developer",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 8.3,
+        "avg": 8.03
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 7.8,
+        "ux": 8.2,
+        "inn": 7.9,
+        "avg": 7.97
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.9,
+        "ux": 7.9,
+        "inn": 8,
+        "avg": 7.93
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 7.8,
+        "avg": 7.93
+      }
+    ]
+  },
+  {
+    "id": "49601",
+    "slug": "sstr-friction-reduction",
+    "detail": "/sites/sstr-friction-reduction/49601/",
+    "title": "SSTR Friction Reduction",
+    "award": "WEBSITE OF THE DAY 2026 JUL 10",
+    "listScore": 8.32,
+    "page": 4,
+    "url": "https://sstr.tech/",
+    "agency": "Dmitry Golub",
+    "country": "RUSSIA",
+    "about": "Brand, site and 3D for a friction-reduction company in oil drilling. Editorial minimalism that speaks the engineer's language.",
+    "tags": [
+      "animated",
+      "grid",
+      "minimal"
+    ],
+    "category": "services",
+    "publicAvg": 8.32,
+    "finalScore": 8.67,
+    "ui": 8.29,
+    "ux": 8.31,
+    "innovation": 8.36,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.67 ZHOU Wen Jun Founder & Creative Director",
+        "ui": 8.5,
+        "ux": 8.8,
+        "inn": 8.7,
+        "avg": 8.67
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8.8,
+        "ux": 8.5,
+        "inn": 8.7,
+        "avg": 8.67
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Mayra Metaxa Founder",
+        "role": "and Web Developer",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "Sophia Sobol",
+        "role": "CEO",
+        "ui": 8,
+        "ux": 8.3,
+        "inn": 8,
+        "avg": 8.1
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.9,
+        "ux": 7.8,
+        "inn": 8.3,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49591",
+    "slug": "risk",
+    "detail": "/sites/risk/49591/",
+    "title": "RISK",
+    "award": "WEBSITE OF THE DAY 2026 JUL 9",
+    "listScore": 8.13,
+    "page": 4,
+    "url": "https://www.risk.film/",
+    "agency": "FLOT NOIR",
+    "country": "FLOT NOIR FRANCE",
+    "about": "RISK is a post-production studio born in the South of France. COLLABORATORS",
+    "tags": [
+      "animated",
+      "fullscreen",
+      "webgl"
+    ],
+    "category": "agency",
+    "publicAvg": 8.13,
+    "finalScore": null,
+    "ui": 8.07,
+    "ux": 8.19,
+    "innovation": 8.14,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Sergey Dubovenko CEO",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.1,
+        "ux": 8.1,
+        "inn": 8.1,
+        "avg": 8.1
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8.3,
+        "inn": 7.9,
+        "avg": 8.07
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 7.93
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 7.93
+      }
+    ]
+  },
+  {
+    "id": "49604",
+    "slug": "studio-k95",
+    "detail": "/sites/studio-k95/49604/",
+    "title": "Studio K95",
+    "award": "WEBSITE OF THE DAY 2026 JUL 8",
+    "listScore": 8.77,
+    "page": 4,
+    "url": "https://www.k95.it/",
+    "agency": "Studio K95",
+    "country": "ITALY",
+    "about": "A bold and immersive portfolio website for Studio K95, blending graphic design, motion, interaction and a dark editorial aesthetic",
+    "tags": [
+      "animated",
+      "typographic",
+      "webgl"
+    ],
+    "category": "agency",
+    "publicAvg": 8.77,
+    "finalScore": null,
+    "ui": 8.73,
+    "ux": 8.75,
+    "innovation": 8.82,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Salva Carlino Senior UI-UX & Product Designer",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Maria Nora Arnone Multidisciplinary",
+        "role": "Designer",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8.9,
+        "ux": 9,
+        "inn": 8.9,
+        "avg": 8.93
+      },
+      {
+        "name": "Elena Levkovich Senior Digital",
+        "role": "Designer & Webflow Developer",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 9,
+        "avg": 8.67
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49386",
+    "slug": "100-lost-species",
+    "detail": "/sites/100-lost-species/49386/",
+    "title": "/ WOTM JUL 100 Lost Species",
+    "award": "WEBSITE OF THE DAY 2026 JUL 7",
+    "listScore": 8.71,
+    "page": 4,
+    "url": "https://www.100lostspecies.com/",
+    "agency": "Immersive Garden",
+    "country": "FRANCE",
+    "about": "A digital memorial that unfolds across time. In 100 seconds, 100 lost species are remembered, before the site itself disappears. COLLABORATORS",
+    "tags": [
+      "grid",
+      "responsive",
+      "scroll"
+    ],
+    "category": "education",
+    "publicAvg": 8.71,
+    "finalScore": 9.67,
+    "ui": 8.76,
+    "ux": 8.76,
+    "innovation": 8.61,
+    "judges": [
+      {
+        "name": "Prokuda Group Design Manager",
+        "role": "UI 10 UX 10 INN 9 9 Mattia Rinaudo Design Manager",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Kristijan Binski Co-Founder",
+        "role": "& Creative Director",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      }
+    ]
+  },
+  {
+    "id": "49576",
+    "slug": "dolce-gabbana-beauty-gift-finder",
+    "detail": "/sites/dolce-gabbana-beauty-gift-finder/49576/",
+    "title": "Dolce&Gabbana Beauty Gift Finder",
+    "award": "WEBSITE OF THE DAY 2026 JUL 6",
+    "listScore": 8.15,
+    "page": 4,
+    "url": "https://beautytools.dolcegabbana.com/gift-finder",
+    "agency": "MONOGRID SRL",
+    "country": "MONOGRID SRL ITALY",
+    "about": "AI-powered gifting journey for Dolce&Gabbana Beauty, produced by MONOGRID. Premium UX, product discovery and global scalability.",
+    "tags": [
+      "liquid",
+      "minimal",
+      "responsive"
+    ],
+    "category": "fashion",
+    "publicAvg": 8.15,
+    "finalScore": 9.3,
+    "ui": 8.28,
+    "ux": 8,
+    "innovation": 8.17,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9.3 Mattia Rinaudo Design Manager",
+        "ui": 9.3,
+        "ux": 9.3,
+        "inn": 9.3,
+        "avg": 9.3
+      },
+      {
+        "name": "Hanson He Senior UX",
+        "role": "Engineer",
+        "ui": 8.5,
+        "ux": 8.2,
+        "inn": 8,
+        "avg": 8.23
+      },
+      {
+        "name": "Aleksandr Kirshin Creative Director",
+        "role": "& Founder",
+        "ui": 8.3,
+        "ux": 7.8,
+        "inn": 8,
+        "avg": 8.03
+      },
+      {
+        "name": "Elena Levkovich Senior Digital",
+        "role": "Designer & Webflow Developer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8 UX 7 INN 8 7.67 Amin Salehi Creative Director",
+        "ui": 7.6,
+        "ux": 7.7,
+        "inn": 7.7,
+        "avg": 7.67
+      }
+    ]
+  },
+  {
+    "id": "49579",
+    "slug": "icare-a-worldlabs-showcase",
+    "detail": "/sites/icare-a-worldlabs-showcase/49579/",
+    "title": "Icare — A WorldLabs Showcase",
+    "award": "WEBSITE OF THE DAY 2026 JUL 5",
+    "listScore": 8.42,
+    "page": 4,
+    "url": "https://www.icare-game.world/",
+    "agency": "WithLore",
+    "country": "USA",
+    "about": "Icare is a story about history's greatest minds. This project was built as a showcase of World Lab's Marble and SparkJS 2.0. COLLABORATORS",
+    "tags": [
+      "animated",
+      "fullscreen",
+      "webgl"
+    ],
+    "category": "entertainment",
+    "publicAvg": 8.42,
+    "finalScore": 9.33,
+    "ui": 8.47,
+    "ux": 8.22,
+    "innovation": 8.58,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9.33 Sergey Dubovenko CEO",
+        "ui": 9,
+        "ux": 9,
+        "inn": 1,
+        "avg": 6.33
+      },
+      {
+        "name": "Hanson He Senior UX",
+        "role": "Engineer",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.8,
+        "ux": 8.8,
+        "inn": 8.8,
+        "avg": 8.8
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8.2,
+        "ux": 7.7,
+        "inn": 8.4,
+        "avg": 8.1
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 7.8,
+        "inn": 8,
+        "avg": 7.93
+      },
+      {
+        "name": "Mayra Metaxa Founder",
+        "role": "and Web Developer",
+        "ui": 7.8,
+        "ux": 7,
+        "inn": 7.3,
+        "avg": 7.37
+      }
+    ]
+  },
+  {
+    "id": "49581",
+    "slug": "curio-tech",
+    "detail": "/sites/curio-tech/49581/",
+    "title": "Curio Tech",
+    "award": "WEBSITE OF THE DAY 2026 JUL 4",
+    "listScore": 8.09,
+    "page": 4,
+    "url": "https://www.curiotech.co.jp/recruit/",
+    "agency": "ALLIN",
+    "country": "ALLIN JAPAN",
+    "about": "CurioTech's career site, through interviews, bold visuals — Are you Craving?, shows a people-first culture driving reuse forward.",
+    "tags": [
+      "photographic",
+      "responsive",
+      "video/sound"
+    ],
+    "category": "other",
+    "publicAvg": 8.09,
+    "finalScore": 8.7,
+    "ui": 8.13,
+    "ux": 8.18,
+    "innovation": 7.93,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.7 Mattia Rinaudo Design Manager",
+        "ui": 8.7,
+        "ux": 8.7,
+        "inn": 8.7,
+        "avg": 8.7
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "9 UX 9 INN 8 8.17 Hanson He Senior UX Engineer",
+        "ui": 8.2,
+        "ux": 8.3,
+        "inn": 8,
+        "avg": 8.17
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 7.8,
+        "avg": 7.87
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 7.6,
+        "ux": 7.6,
+        "inn": 7.6,
+        "avg": 7.6
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 7.5,
+        "ux": 7.5,
+        "inn": 7.5,
+        "avg": 7.5
+      }
+    ]
+  },
+  {
+    "id": "49511",
+    "slug": "spotify-wrapped-party",
+    "detail": "/sites/spotify-wrapped-party/49511/",
+    "title": "Spotify Wrapped Party",
+    "award": "WEBSITE OF THE DAY 2026 JUL 3",
+    "listScore": 8.34,
+    "page": 4,
+    "url": "https://wrapped-party.activetheory.dev/en",
+    "agency": "Active Theory",
+    "country": "USA",
+    "about": "Spotify's first multiplayer Wrapped experience, letting up to 10 friends compare 2025 listening in a real-time party.",
+    "tags": [
+      "animated",
+      "colorful",
+      "video/sound"
+    ],
+    "category": "entertainment",
+    "publicAvg": 8.34,
+    "finalScore": null,
+    "ui": 8.4,
+    "ux": 8.27,
+    "innovation": 8.34,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Mattia Rinaudo Design Manager",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Hanson He Senior UX",
+        "role": "Engineer",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 9,
+        "ux": 8,
+        "inn": 9,
+        "avg": 8.67
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 7.8,
+        "avg": 7.87
+      }
+    ]
+  },
+  {
+    "id": "49560",
+    "slug": "radian",
+    "detail": "/sites/radian/49560/",
+    "title": "Radian",
+    "award": "WEBSITE OF THE DAY 2026 JUL 2",
+    "listScore": 8.35,
+    "page": 4,
+    "url": "https://rideradian.com/",
+    "agency": "UNCOMMON",
+    "country": "UNCOMMON NETHERLANDS",
+    "about": "Radian is a launch experience for a new electric off-road motorbike!",
+    "tags": [
+      "animated",
+      "ecommerce",
+      "scroll"
+    ],
+    "category": "products",
+    "publicAvg": 8.35,
+    "finalScore": 8.5,
+    "ui": 8.37,
+    "ux": 8.3,
+    "innovation": 8.38,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.5 Sergey Dubovenko CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Aleksandr Kirshin Creative Director",
+        "role": "& Founder",
+        "ui": 8.4,
+        "ux": 8.2,
+        "inn": 8.5,
+        "avg": 8.37
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8.3,
+        "ux": 8.1,
+        "inn": 8.3,
+        "avg": 8.23
+      },
+      {
+        "name": "Grigoris Tsakiris Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49564",
+    "slug": "obys-experiment-space",
+    "detail": "/sites/obys-experiment-space/49564/",
+    "title": "Obys® Experiment Space",
+    "award": "WEBSITE OF THE DAY 2026 JUL 1",
+    "listScore": 8.03,
+    "page": 5,
+    "url": "https://experiment.obys.agency/",
+    "agency": "Obys",
+    "country": "UKRAINE",
+    "about": "Obys® Experiment Space is an interactive archive of unpublished works, concepts, experiments, and alternative directions.",
+    "tags": [
+      "animated",
+      "typographic",
+      "webgl"
+    ],
+    "category": "agency",
+    "publicAvg": 8.03,
+    "finalScore": 8.13,
+    "ui": 8.02,
+    "ux": 8,
+    "innovation": 8.07,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.13 Grigoris Tsakiris Founder & Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.4,
+        "avg": 8.13
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8.1,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8.03
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49572",
+    "slug": "kei-inc",
+    "detail": "/sites/kei-inc/49572/",
+    "title": "KEI inc.",
+    "award": "WEBSITE OF THE DAY 2026 JUN 30",
+    "listScore": 8.05,
+    "page": 5,
+    "url": "https://kei-inc.jp/",
+    "agency": "Katsuaki Utsunomiya",
+    "country": "JAPAN",
+    "about": "KEI is a design partner that translates a brand's essential identity and aesthetic aspirations into tangible experiences. COLLABORATORS",
+    "tags": [
+      "grid",
+      "minimal",
+      "typographic"
+    ],
+    "category": "agency",
+    "publicAvg": 8.05,
+    "finalScore": 8.17,
+    "ui": 8.1,
+    "ux": 8.02,
+    "innovation": 8.02,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.17 Sergey Dubovenko CEO",
+        "ui": 8.5,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8.17
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.1,
+        "ux": 8.1,
+        "inn": 8.1,
+        "avg": 8.1
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Grigoris Tsakiris Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Elena Levkovich Senior Digital",
+        "role": "Designer & Webflow Developer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49548",
+    "slug": "trionn",
+    "detail": "/sites/trionn/49548/",
+    "title": "",
+    "award": "WEBSITE OF THE DAY 2026 JUN 29",
+    "listScore": 8.22,
+    "page": 5,
+    "url": "https://trionn.com/",
+    "agency": "TRIONN",
+    "country": "TRIONN INDIA",
+    "about": "TRIONN is an AI-powered digital studio using Next.js, GSAP, Lenis, and Three.js to create immersive experiences.",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "agency",
+    "publicAvg": 8.22,
+    "finalScore": 8.5,
+    "ui": 8.17,
+    "ux": 8.13,
+    "innovation": 8.35,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.5 Mayra Metaxa Founder and Web Developer",
+        "ui": 8.4,
+        "ux": 8.5,
+        "inn": 8.6,
+        "avg": 8.5
+      },
+      {
+        "name": "Hanson He Senior UX",
+        "role": "Engineer",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.4,
+        "avg": 8.47
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 8.3,
+        "avg": 8.03
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8 UX 7.5 INN 8.5 8 Amin Salehi Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49543",
+    "slug": "code-by-jesse",
+    "detail": "/sites/code-by-jesse/49543/",
+    "title": "Code by Jesse",
+    "award": "WEBSITE OF THE DAY 2026 JUN 28",
+    "listScore": 8.01,
+    "page": 5,
+    "url": "https://www.codebyjesse.com/",
+    "agency": "Jesse van Heijningen",
+    "country": "NETHERLANDS",
+    "about": "Portfolio for Code by Jesse, a designer, developer & athlete crafting high-end digital experiences for brands",
+    "tags": [
+      "animated",
+      "responsive",
+      "scroll"
+    ],
+    "category": "web design/dev",
+    "publicAvg": 8.01,
+    "finalScore": 8.5,
+    "ui": 8.07,
+    "ux": 7.97,
+    "innovation": 8,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.5 Matteo Banchelli Experience Design Director",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.2,
+        "ux": 8.2,
+        "inn": 8.2,
+        "avg": 8.2
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 7.8,
+        "avg": 7.8
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 7.9,
+        "ux": 7.8,
+        "inn": 7.7,
+        "avg": 7.8
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 8,
+        "ux": 7.5,
+        "inn": 7.8,
+        "avg": 7.77
+      }
+    ]
+  },
+  {
+    "id": "49557",
+    "slug": "eleos",
+    "detail": "/sites/eleos/49557/",
+    "title": "Eleos",
+    "award": "WEBSITE OF THE DAY 2026 JUN 27",
+    "listScore": 8,
+    "page": 5,
+    "url": "http://eleos.la/",
+    "agency": "Studio Off The Wall",
+    "country": "INDIA",
+    "about": "Los Angeles-based real-estate developer, building affordable housing with speed, cost, and discipline.",
+    "tags": [
+      "grid",
+      "svg",
+      "typographic"
+    ],
+    "category": "real estate",
+    "publicAvg": 8,
+    "finalScore": 8.2,
+    "ui": 8.03,
+    "ux": 7.98,
+    "innovation": 7.98,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.2 Mattia Rinaudo Design Manager",
+        "ui": 8.2,
+        "ux": 8.2,
+        "inn": 8.2,
+        "avg": 8.2
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8 UX 8 INN 8 8 Hanson He Senior UX Engineer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Grigoris Tsakiris Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Mayra Metaxa Founder",
+        "role": "and Web Developer",
+        "ui": 8,
+        "ux": 7.9,
+        "inn": 7.9,
+        "avg": 7.93
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 7.8,
+        "inn": 7.8,
+        "avg": 7.87
+      }
+    ]
+  },
+  {
+    "id": "49539",
+    "slug": "cipher-digital",
+    "detail": "/sites/cipher-digital/49539/",
+    "title": "Cipher Digital",
+    "award": "WEBSITE OF THE DAY 2026 JUN 26",
+    "listScore": 8.24,
+    "page": 5,
+    "url": "https://cipherdigital.com/",
+    "agency": "ONBOX Agency",
+    "country": "CANADA",
+    "about": "Cipher Digital evolved from Bitcoin miner to global hyperscale infrastructure partner. COLLABORATORS",
+    "tags": [
+      "grid",
+      "minimal",
+      "parallax"
+    ],
+    "category": "services",
+    "publicAvg": 8.24,
+    "finalScore": 9.17,
+    "ui": 8.3,
+    "ux": 8.26,
+    "innovation": 8.17,
+    "judges": [
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 9,
+        "ux": 9.5,
+        "inn": 9,
+        "avg": 9.17
+      },
+      {
+        "name": "Matteo Banchelli Experience Design",
+        "role": "Director",
+        "ui": 9,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.67
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "ZHOU Wen Jun Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8.2,
+        "inn": 8,
+        "avg": 8.07
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.8,
+        "ux": 8,
+        "inn": 8.2,
+        "avg": 8
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 7.8,
+        "inn": 7.7,
+        "avg": 7.83
+      }
+    ]
+  },
+  {
+    "id": "49549",
+    "slug": "kenichi-aikawa",
+    "detail": "/sites/kenichi-aikawa/49549/",
+    "title": "Kenichi Aikawa",
+    "award": "WEBSITE OF THE DAY 2026 JUN 25",
+    "listScore": 8.5,
+    "page": 5,
+    "url": "https://aikawakenichi.com/",
+    "agency": "Garden Eight",
+    "country": "JAPAN",
+    "about": "Portfolio of Kenichi Aikawa, a Photographer based in Tokyo. Active in Fashion, Portrait, Life style, Food, Corporate Advertising.",
+    "tags": [
+      "photographic",
+      "scroll",
+      "webgl"
+    ],
+    "category": "photography",
+    "publicAvg": 8.5,
+    "finalScore": 8.83,
+    "ui": 8.5,
+    "ux": 8.32,
+    "innovation": 8.67,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.83 Mayra Metaxa Founder and Web Developer",
+        "ui": 8.5,
+        "ux": 8.8,
+        "inn": 9.2,
+        "avg": 8.83
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "9 UX 8 INN 9 8.57 Hanson He Senior UX Engineer",
+        "ui": 8.6,
+        "ux": 8.4,
+        "inn": 8.7,
+        "avg": 8.57
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.4,
+        "ux": 8.4,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "Aleksandr Kirshin Creative Director",
+        "role": "& Founder",
+        "ui": 8.5,
+        "ux": 8.3,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.3,
+        "avg": 8.1
+      }
+    ]
+  },
+  {
+    "id": "49484",
+    "slug": "dobre-agency",
+    "detail": "/sites/dobre-agency/49484/",
+    "title": "Dobre Agency",
+    "award": "WEBSITE OF THE DAY 2026 JUN 24",
+    "listScore": 8.18,
+    "page": 5,
+    "url": "https://dobre.agency/",
+    "agency": "Dobre Agency",
+    "country": "AUSTRALIA",
+    "about": "We start with brand, and craft digital solutions where design, technology and commercial thinking work as one.",
+    "tags": [
+      "animated",
+      "webgl"
+    ],
+    "category": "agency",
+    "publicAvg": 8.18,
+    "finalScore": null,
+    "ui": 8.25,
+    "ux": 7.94,
+    "innovation": 8.35,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9 Mattia Rinaudo Design Manager",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Clement Merouani Creative Director",
+        "role": "& Founder",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8.5,
+        "ux": 8,
+        "inn": 8.7,
+        "avg": 8.4
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8.2,
+        "ux": 8.4,
+        "inn": 8.4,
+        "avg": 8.33
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 7.8,
+        "ux": 7.6,
+        "inn": 7.7,
+        "avg": 7.7
+      }
+    ]
+  },
+  {
+    "id": "49476",
+    "slug": "air",
+    "detail": "/sites/air/49476/",
+    "title": "AIR",
+    "award": "WEBSITE OF THE DAY 2026 JUN 23",
+    "listScore": 8.26,
+    "page": 5,
+    "url": "https://aircenter.space/",
+    "agency": "Vide Infra",
+    "country": "UAE",
+    "about": "The striking Grade A business center website",
+    "tags": [
+      "animated",
+      "parallax",
+      "webgl"
+    ],
+    "category": "real estate",
+    "publicAvg": 8.26,
+    "finalScore": 8.8,
+    "ui": 8.39,
+    "ux": 8.27,
+    "innovation": 8.11,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.8 Salva Carlino Senior UI-UX & Product Designer",
+        "ui": 9,
+        "ux": 8.6,
+        "inn": 8.8,
+        "avg": 8.8
+      },
+      {
+        "name": "Aleksandr Kirshin Creative Director",
+        "role": "& Founder",
+        "ui": 8.5,
+        "ux": 8.8,
+        "inn": 8.4,
+        "avg": 8.57
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8.7,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8.23
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 7.6,
+        "avg": 7.87
+      }
+    ]
+  },
+  {
+    "id": "49457",
+    "slug": "il-capo-production",
+    "detail": "/sites/il-capo-production/49457/",
+    "title": "IL CAPO PRODUCTION",
+    "award": "WEBSITE OF THE DAY 2026 JUN 22",
+    "listScore": 8.17,
+    "page": 5,
+    "url": "https://www.ilcapoproduction.com/",
+    "agency": "AUGE Experience",
+    "country": "ITALY",
+    "about": "IL CAPO blends artistic vision and industrial cinema into bold, elegant video production inspired by the past and shaped for today",
+    "tags": [
+      "animated",
+      "photographic",
+      "video/sound"
+    ],
+    "category": "photography",
+    "publicAvg": 8.17,
+    "finalScore": 8.83,
+    "ui": 8.17,
+    "ux": 8.14,
+    "innovation": 8.2,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.83 Sergei Bortcov Co-Founder & Design Director",
+        "ui": 8.5,
+        "ux": 9,
+        "inn": 9,
+        "avg": 8.83
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Andrew Gargay Founder",
+        "role": "& Creative Director",
+        "ui": 8.5,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8.17
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.1,
+        "avg": 8.03
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  },
+  {
+    "id": "49500",
+    "slug": "house-of-honey",
+    "detail": "/sites/house-of-honey/49500/",
+    "title": "House of Honey",
+    "award": "WEBSITE OF THE DAY 2026 JUN 21",
+    "listScore": 8.08,
+    "page": 5,
+    "url": "https://www.houseofhoney.com/",
+    "agency": "Edoardo Lunardi",
+    "country": "AUSTRIA",
+    "about": "House of Honey designs spaces with story. We built an editorial, fluid digital presence to match. COLLABORATORS",
+    "tags": [
+      "animated",
+      "grid",
+      "typographic"
+    ],
+    "category": "agency",
+    "publicAvg": 8.08,
+    "finalScore": 8.77,
+    "ui": 8.09,
+    "ux": 8.21,
+    "innovation": 7.95,
+    "judges": [
+      {
+        "name": "Joe Ben Taylor Designer",
+        "role": "+ Developer + Storyteller",
+        "ui": 8,
+        "ux": 9.5,
+        "inn": 8.8,
+        "avg": 8.77
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.4,
+        "ux": 8.4,
+        "inn": 8.4,
+        "avg": 8.4
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8.5,
+        "ux": 8.2,
+        "inn": 8.2,
+        "avg": 8.3
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8.4,
+        "ux": 8.2,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 7.7,
+        "inn": 7.67,
+        "avg": 7.79
+      },
+      {
+        "name": "Viran Dayaratne Head",
+        "role": "of UX & Researcher",
+        "ui": 7.7,
+        "ux": 8,
+        "inn": 7.5,
+        "avg": 7.73
+      }
+    ]
+  },
+  {
+    "id": "49461",
+    "slug": "digiphy",
+    "detail": "/sites/digiphy/49461/",
+    "title": "DigiPHY",
+    "award": "WEBSITE OF THE DAY 2026 JUN 20",
+    "listScore": 8.14,
+    "page": 5,
+    "url": "https://rdapkuns.github.io/around-digiphy/",
+    "agency": "Toms Krastins-Rullis",
+    "country": "LATVIA",
+    "about": "An immersive product story that brings DigiPHY's digital-physical vision to life through motion and interaction. COLLABORATORS",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "products",
+    "publicAvg": 8.14,
+    "finalScore": 8.87,
+    "ui": 8.13,
+    "ux": 8.09,
+    "innovation": 8.19,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.87 Timofey Beloglazov Marketing Strategist",
+        "ui": 8.8,
+        "ux": 8.8,
+        "inn": 9,
+        "avg": 8.87
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8.5,
+        "avg": 8.17
+      },
+      {
+        "name": "Labib Jaffar Senior Visual",
+        "role": "Designer",
+        "ui": 8.2,
+        "ux": 8.1,
+        "inn": 7.9,
+        "avg": 8.07
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8 UX 8 INN 8 7.87 Amin Salehi Creative Director",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 8,
+        "avg": 7.87
+      }
+    ]
+  },
+  {
+    "id": "49486",
+    "slug": "monolog",
+    "detail": "/sites/monolog/49486/",
+    "title": "MONOLOG",
+    "award": "WEBSITE OF THE DAY 2026 JUN 19",
+    "listScore": 8.3,
+    "page": 5,
+    "url": "https://bymonolog.com/",
+    "agency": "Huy Nguyen",
+    "country": "AUSTRALIA",
+    "about": "Building change-making web and brand experiences for founder-led brands who refuse to be underestimated. COLLABORATORS",
+    "tags": [
+      "flat design",
+      "typographic"
+    ],
+    "category": "agency",
+    "publicAvg": 8.3,
+    "finalScore": 8.67,
+    "ui": 8.31,
+    "ux": 8.33,
+    "innovation": 8.26,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.67 Sergey Dubovenko CEO",
+        "ui": 9,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.67
+      },
+      {
+        "name": "Clement Merouani Creative Director",
+        "role": "& Founder",
+        "ui": 8.6,
+        "ux": 8.6,
+        "inn": 8.6,
+        "avg": 8.6
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.6,
+        "ux": 8.6,
+        "inn": 8.6,
+        "avg": 8.6
+      },
+      {
+        "name": "Aleksandr Kirshin Creative Director",
+        "role": "& Founder",
+        "ui": 8,
+        "ux": 8.6,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "Radislav Eliseev Founder",
+        "role": "& Creative Director",
+        "ui": 8.2,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.27
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8.2,
+        "ux": 8.2,
+        "inn": 8.2,
+        "avg": 8.2
+      }
+    ]
+  },
+  {
+    "id": "49464",
+    "slug": "volt",
+    "detail": "/sites/volt/49464/",
+    "title": "Volt",
+    "award": "WEBSITE OF THE DAY 2026 JUN 18",
+    "listScore": 8.26,
+    "page": 5,
+    "url": "https://voltlites.com/",
+    "agency": "Nika Digital Agency",
+    "country": "USA",
+    "about": "Volt is an alighting company that provides creative solutions and top-tier equipment for entertainment productions worldwide.",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "entertainment",
+    "publicAvg": 8.26,
+    "finalScore": 8.77,
+    "ui": 8.4,
+    "ux": 8.26,
+    "innovation": 8.13,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.77 Marie-Bénédict Jacquemin Creative Director",
+        "ui": 9,
+        "ux": 8.5,
+        "inn": 8.8,
+        "avg": 8.77
+      },
+      {
+        "name": "Martin Breton Founder",
+        "role": "& Development Director",
+        "ui": 9,
+        "ux": 8.7,
+        "inn": 8.5,
+        "avg": 8.73
+      },
+      {
+        "name": "Mattia Rinaudo Design",
+        "role": "Manager",
+        "ui": 8.6,
+        "ux": 8.6,
+        "inn": 8.6,
+        "avg": 8.6
+      },
+      {
+        "name": "Elena Levkovich Senior Digital",
+        "role": "Designer & Webflow Developer",
+        "ui": 9,
+        "ux": 8.5,
+        "inn": 8,
+        "avg": 8.5
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8.3,
+        "ux": 8.3,
+        "inn": 8.3,
+        "avg": 8.3
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8.7,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8.23
+      }
+    ]
+  },
+  {
+    "id": "49465",
+    "slug": "artem-shcherbakov",
+    "detail": "/sites/artem-shcherbakov/49465/",
+    "title": "Artem Shcherbakov — Portfolio",
+    "award": "WEBSITE OF THE DAY 2026 JUN 17",
+    "listScore": 8.5,
+    "page": 5,
+    "url": "https://artemartemartem.com/",
+    "agency": "SALT AND PEPPER",
+    "country": "SALT AND PEPPER GERMANY",
+    "about": "Interactive portfolio for CGI and VFX director Artem Shcherbakov, featuring custom WebGL effects and dynamic animated typography COLLABORATORS",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "services",
+    "publicAvg": 8.5,
+    "finalScore": 8.9,
+    "ui": 8.56,
+    "ux": 8.38,
+    "innovation": 8.55,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.9 Aleksandr Kirshin Creative Director & Founder",
+        "ui": 9,
+        "ux": 8.9,
+        "inn": 8.8,
+        "avg": 8.9
+      },
+      {
+        "name": "Jacquemin Creative",
+        "role": "Director",
+        "ui": 9,
+        "ux": 8.5,
+        "inn": 9,
+        "avg": 8.83
+      },
+      {
+        "name": "Sergei Bortcov Co-Founder",
+        "role": "& Design Director",
+        "ui": 9,
+        "ux": 8.5,
+        "inn": 9,
+        "avg": 8.83
+      },
+      {
+        "name": "Labib Jaffar Senior Visual",
+        "role": "Designer",
+        "ui": 8.5,
+        "ux": 8.4,
+        "inn": 9,
+        "avg": 8.63
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8.1,
+        "ux": 8.2,
+        "inn": 8.3,
+        "avg": 8.2
+      }
+    ]
+  },
+  {
+    "id": "49458",
+    "slug": "wembi",
+    "detail": "/sites/wembi/49458/",
+    "title": "Wembi",
+    "award": "WEBSITE OF THE DAY 2026 JUN 16",
+    "listScore": 8.72,
+    "page": 5,
+    "url": "https://www.wembi.ai/",
+    "agency": "ET Studio",
+    "country": "ITALY",
+    "about": "Wembi instantly improves the performance of any device, machine, or digital system by creating its virtual twin. COLLABORATORS",
+    "tags": [
+      "colorful",
+      "scroll",
+      "typographic"
+    ],
+    "category": "products",
+    "publicAvg": 8.72,
+    "finalScore": 9.23,
+    "ui": 8.77,
+    "ux": 8.67,
+    "innovation": 8.73,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "9.23 Francesco Carli Creative & Art Director",
+        "ui": 9.4,
+        "ux": 9,
+        "inn": 9.3,
+        "avg": 9.23
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "9 UX 9 INN 9 9 Mattia Rinaudo Design Manager",
+        "ui": 9,
+        "ux": 9,
+        "inn": 9,
+        "avg": 9
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 8.8,
+        "ux": 8.8,
+        "inn": 8.6,
+        "avg": 8.73
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8.5,
+        "ux": 8.2,
+        "inn": 8.5,
+        "avg": 8.4
+      }
+    ]
+  },
+  {
+    "id": "49453",
+    "slug": "f40-competizione-ac-motorsport",
+    "detail": "/sites/f40-competizione-ac-motorsport/49453/",
+    "title": "F40 Competizione — AC Motorsport",
+    "award": "WEBSITE OF THE DAY 2026 JUN 15",
+    "listScore": 8.18,
+    "page": 5,
+    "url": "https://acmotorsport.eu/",
+    "agency": "FPTP Studio",
+    "country": "ITALY",
+    "about": "The digital memory of Ferrari F40 Competizione's American race adventure — storytelling, heritage and passion in one scroll. COLLABORATORS",
+    "tags": [
+      "animated",
+      "fullscreen",
+      "one page"
+    ],
+    "category": "sport",
+    "publicAvg": 8.18,
+    "finalScore": 8.7,
+    "ui": 8.17,
+    "ux": 8.16,
+    "innovation": 8.21,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.7 Mattia Rinaudo Design Manager",
+        "ui": 8.7,
+        "ux": 8.7,
+        "inn": 8.7,
+        "avg": 8.7
+      },
+      {
+        "name": "Sergey Dubovenko",
+        "role": "CEO",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Timofey Beloglazov Marketing",
+        "role": "Strategist",
+        "ui": 8.5,
+        "ux": 8.5,
+        "inn": 8.5,
+        "avg": 8.5
+      },
+      {
+        "name": "Federica Gandolfo Digital Art",
+        "role": "Director and Graphic Designer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Francesco Carli Creative",
+        "role": "& Art Director",
+        "ui": 8,
+        "ux": 7.9,
+        "inn": 8,
+        "avg": 7.97
+      },
+      {
+        "name": "Salva Carlino Senior UI-UX",
+        "role": "& Product Designer",
+        "ui": 7.8,
+        "ux": 7.8,
+        "inn": 8,
+        "avg": 7.87
+      }
+    ]
+  },
+  {
+    "id": "49408",
+    "slug": "hubtown",
+    "detail": "/sites/hubtown/49408/",
+    "title": "Hubtown Unseen Studio® UK",
+    "award": "WEBSITE OF THE DAY 2026 JUN 14",
+    "listScore": 8,
+    "page": 5,
+    "url": "https://hubtown.co.in/",
+    "agency": "Unseen Studio®",
+    "country": null,
+    "about": "Hubtown is one of India's leading real estate developers. Shaping the city of Mumbai for over 40 years.",
+    "tags": [
+      "animated",
+      "scroll",
+      "webgl"
+    ],
+    "category": "real estate",
+    "publicAvg": 8,
+    "finalScore": 8.23,
+    "ui": 8,
+    "ux": 8.04,
+    "innovation": 7.97,
+    "judges": [
+      {
+        "name": "FINAL JUDGE'S SCORE",
+        "role": "8.23 ZHOU Wen Jun Founder & Creative Director",
+        "ui": 8.2,
+        "ux": 8.5,
+        "inn": 8,
+        "avg": 8.23
+      },
+      {
+        "name": "Hely Lopes",
+        "role": "UI/UX Lead",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Sergey Dubovenko CEO UI",
+        "role": "8 UX 8 INN 8 8 Mattia Rinaudo Design Manager",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Elena Levkovich Senior Digital",
+        "role": "Designer & Webflow Developer",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      },
+      {
+        "name": "Amin Salehi Creative",
+        "role": "Director",
+        "ui": 8,
+        "ux": 8,
+        "inn": 8,
+        "avg": 8
+      }
+    ]
+  }
+]
