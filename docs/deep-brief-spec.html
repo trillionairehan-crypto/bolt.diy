@@ -210,6 +210,13 @@ footer{margin-top:64px;padding-top:14px;border-top:1px solid var(--line);font-si
       </ul>
     </div>
     <div>
+      <h3>생성기·목표 점수(세계관별 고정, 2026-09-11 베이크오프)</h3>
+      <div class="tablewrap"><table>
+        <tr><th>세계관</th><th>생성기</th><th>샘플</th><th>목표</th><th>근거</th></tr>
+        <tr><td>실사 에디토리얼 · 제품 3D · 흑백 브루탈</td><td>gemini-3.1-flash-image</td><td>8→1</td><td>8.5</td><td>5모델 베이크오프 평균 최고·10초·$0.09. 8.5 위는 비효율 — 실사 9+는 사용자 실사진</td></tr>
+        <tr><td>신고전 회화 · 수채 · 잉크 노블</td><td>gpt-image-2.5-flare</td><td>4→1</td><td>9.0</td><td>인물·회화 +1점(7.5 vs 6.0), 22초. 생성기가 잘하는 영역이라 9+</td></tr>
+      </table></div>
+      <p class="small" style="margin-top:8px">심사 = Fable 5.1 + GPT-6 Astra vision 이중 심사 최소값. 캘리브레이션: 실제 수상작 사진(Noho) 9.0/9.1, Pear 프레임 8.0, 1차 쇼룸 스틸 5~6.5. AD = GPT-6 Astra(스위치 가능). AD 규칙: 오브젝트 ≤3, 글자·군집·손 금지, 재수정은 빼기/단순화만, 레퍼런스 앵커 동봉.</p>
       <h3>미디어·슬롯</h3>
       <ul class="small">
         <li><b>peoplePolicy:</b> styleLock ∈ {painting, illustration, graphic-novel} &amp; allowPaintedPeople → painted-only. 그 외 none. 사용자 사진 속 실사 인물은 항상 허용(user-photos-only).</li>

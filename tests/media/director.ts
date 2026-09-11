@@ -115,32 +115,42 @@ async function claude(
   content: Array<Record<string, unknown>>,
   maxTokens = 4000,
 ): Promise<string> {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify({
-      model: CLAUDE_MODEL,
-      max_tokens: maxTokens,
-      system,
-      thinking: { type: 'adaptive' },
-      output_config: { effort: 'high' },
-      messages: [{ role: 'user', content }],
-    }),
-  });
-  const body = (await res.json()) as { content?: Array<{ type: string; text?: string }>; error?: unknown };
+  // 529 overloaded / 5xx 는 5s·15s·40s 백오프로 3회 재시도
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: CLAUDE_MODEL,
+        max_tokens: maxTokens,
+        system,
+        thinking: { type: 'adaptive' },
+        output_config: { effort: 'high' },
+        messages: [{ role: 'user', content }],
+      }),
+    });
+    const body = (await res.json()) as { content?: Array<{ type: string; text?: string }>; error?: unknown };
 
-  if (!res.ok) {
+    if (res.ok) {
+      return (body.content || [])
+        .filter((c) => c.type === 'text')
+        .map((c) => c.text || '')
+        .join('');
+    }
+
+    if ((res.status === 529 || res.status >= 500 || res.status === 429) && attempt < 3) {
+      const wait = [5000, 15000, 40000][attempt];
+      console.log(`  claude ${res.status} — retry in ${wait / 1000}s`);
+      await new Promise((r) => setTimeout(r, wait));
+      continue;
+    }
+
     throw new Error(`claude ${res.status}: ${JSON.stringify(body).slice(0, 300)}`);
   }
-
-  return (body.content || [])
-    .filter((c) => c.type === 'text')
-    .map((c) => c.text || '')
-    .join('');
 }
 
 async function astra(env: Record<string, string>, system: string, text: string, images: string[]): Promise<string> {
