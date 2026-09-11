@@ -2,7 +2,7 @@
  * 결정 규칙 — Brief(사용자 답) → Decided(아트디렉션). LLM 없음, 순수 함수, 같은 입력 = 같은 출력.
  * 표는 docs/deep-brief-spec.html "결정 규칙" 절과 1:1. 규칙을 바꾸면 여기와 스펙 문서를 같이 바꾼다.
  */
-import { getWorld, buildWorldMotionPrompt, type World } from '~/lib/media/style-locks';
+import { getWorld, buildWorldMotionPrompt, type World, type WorldId } from '~/lib/media/style-locks';
 import { pickShotList } from '~/lib/media/shotlist';
 import {
   GOAL_CTA,
@@ -35,6 +35,144 @@ function isIndustry(brief: Brief, ...keys: string[]): boolean {
   };
 
   return keys.some((k) => map[k]?.test(text));
+}
+
+/** B1 카드 개인화에 필요한 답만 — B1 이전에 답한 A1~A4·B3(무드)로 계산한다. */
+export type WorldPickInput = Pick<Brief, 'industry' | 'industryFree' | 'idea' | 'goal' | 'mood'>;
+
+const WORLD_ORDER: WorldId[] = [
+  'photo-editorial',
+  'neoclassical-painting',
+  'watercolor-illustration',
+  'product-3d',
+  'mono-brutal',
+  'ink-graphic-novel',
+];
+
+/**
+ * 개인화 카드 규칙 — 6세계관에 점수를 매겨 상위 3개를 돌려준다(B1은 이 3장을 먼저, 나머지 3장을 "다른 세계관"으로 접어 보여준다).
+ * 근거: 장면 유형(A3)·업종(A1)·무드(B3 예/아니오)·목적(A4). 실사 에디토리얼은 사용자 실사진이 기본 경로라 항상 +2.
+ * 동점은 WORLD_ORDER 순. 순수 함수 — 같은 입력이면 같은 순서.
+ */
+export function pickTopWorlds(input: WorldPickInput, count = 3): WorldId[] {
+  const score: Record<WorldId, number> = {
+    'photo-editorial': 2,
+    'neoclassical-painting': 0,
+    'watercolor-illustration': 0,
+    'product-3d': 0,
+    'mono-brutal': 0,
+    'ink-graphic-novel': 0,
+  };
+  const add = (id: WorldId, n: number) => {
+    score[id] += n;
+  };
+  const brief = { ...input, media: { uploads: [] } } as unknown as Brief;
+  const yes = new Set(input.mood?.yes ?? []);
+  const no = new Set(input.mood?.no ?? []);
+
+  switch (input.idea?.sceneType) {
+    case 'object':
+      add('product-3d', 2);
+      add('photo-editorial', 1);
+      break;
+    case 'space':
+    case 'landscape':
+      add('photo-editorial', 2);
+      add('watercolor-illustration', 1);
+      break;
+    case 'hands':
+    case 'material':
+      add('photo-editorial', 1);
+      add('neoclassical-painting', 1);
+      break;
+    case 'abstract':
+      add('product-3d', 1);
+      add('ink-graphic-novel', 1);
+      add('mono-brutal', 1);
+      break;
+    default:
+      break;
+  }
+
+  if (isIndustry(brief, 'cafe')) {
+    add('photo-editorial', 1);
+    add('watercolor-illustration', 1);
+  }
+
+  if (isIndustry(brief, 'shopping')) {
+    add('product-3d', 2);
+  }
+
+  if (isIndustry(brief, 'beauty')) {
+    add('photo-editorial', 1);
+    add('product-3d', 1);
+  }
+
+  if (isIndustry(brief, 'freelance')) {
+    add('mono-brutal', 1);
+    add('ink-graphic-novel', 1);
+  }
+
+  if (isIndustry(brief, 'clinic')) {
+    add('photo-editorial', 1);
+    add('mono-brutal', 1);
+  }
+
+  if (isIndustry(brief, 'realestate')) {
+    add('photo-editorial', 2);
+  }
+
+  if (isIndustry(brief, 'fitness')) {
+    add('mono-brutal', 2);
+  }
+
+  if (input.goal === 'portfolio') {
+    add('mono-brutal', 1);
+    add('ink-graphic-novel', 1);
+  }
+
+  const moodTable: Array<[string[], WorldId, number]> = [
+    [['고전적', '풍성한', '깊은'], 'neoclassical-painting', 2],
+    [['부드러운', '가벼운', '유쾌한', '달콤한'], 'watercolor-illustration', 2],
+    [['따뜻한'], 'watercolor-illustration', 1],
+    [['대담한', '엄격한', '단단한', '거친', '차가운'], 'mono-brutal', 2],
+    [['대담한', '거친'], 'ink-graphic-novel', 1],
+    [['현대적', '매끈한', '정확한'], 'product-3d', 2],
+    [['어두운'], 'ink-graphic-novel', 1],
+    [['어두운'], 'photo-editorial', 1],
+    [['장인', '정직한'], 'photo-editorial', 1],
+    [['장인'], 'ink-graphic-novel', 1],
+  ];
+
+  // 칩 하나마다 더한다 — 맞는 단어가 많을수록 강하게(3단어 전부 '고전적' 계열이면 회화가 실사를 이긴다).
+  for (const [chips, id, n] of moodTable) {
+    for (const c of chips) {
+      if (yes.has(c)) {
+        add(id, n);
+      }
+    }
+  }
+
+  // "절대 아닌" 단어는 그 세계관을 강하게 밀어낸다.
+  const noTable: Array<[string[], WorldId, number]> = [
+    [['고전적', '풍성한'], 'neoclassical-painting', 3],
+    [['부드러운', '가벼운', '달콤한'], 'watercolor-illustration', 3],
+    [['거친', '엄격한', '대담한'], 'mono-brutal', 3],
+    [['거친', '어두운'], 'ink-graphic-novel', 2],
+    [['매끈한', '현대적'], 'product-3d', 3],
+  ];
+
+  for (const [chips, id, n] of noTable) {
+    for (const c of chips) {
+      if (no.has(c)) {
+        add(id, -n);
+      }
+    }
+  }
+
+  return [...WORLD_ORDER]
+    .sort((a, b) => score[b] - score[a] || WORLD_ORDER.indexOf(a) - WORLD_ORDER.indexOf(b))
+    .slice(0, count);
 }
 
 export function decideArchetype(brief: Brief): Archetype {

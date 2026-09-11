@@ -3,7 +3,7 @@
  * 세계관당 스틸 N장을 뽑아 R2 media/showroom/<world>/still-<i>.jpg 에 올리고, 사람이 고른 뒤 --video <world>=<url> 로
  * Seedance 루프를 만든다. 품질 기준 9.0: 결함 0, 세계관 문법 충실, 헤드라인 자리 확보.
  *
- *   node tests/skeleton7-dom/bundleAndRun.cjs tests/media/showroom.ts stills [--world <id>] [--n 3]
+ *   node tests/skeleton7-dom/bundleAndRun.cjs tests/media/showroom.ts stills [--world <id>] [--n 3] [--gen gemini|openai]
  *   node tests/skeleton7-dom/bundleAndRun.cjs tests/media/showroom.ts video --world <id> --image <url> [--no-loop]
  */
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -54,8 +54,10 @@ const SUBJECT: Record<WorldId, string> = {
   // 1차(price tag)는 글자 없는 주황 덩어리로 렌더돼 결함처럼 보였다 → 색 포인트를 "빵 하나의 크러스트"로 바꾼다.
   'mono-brutal':
     'A stack of salt-bread rolls shot top-down on a black steel tray, one roll broken open, coarse salt scattered; exactly one roll keeps its natural burnt-orange crust color while everything else is monochrome.',
+
+  // 잉크 그래픽 노블(Santioni Spirits 문법): 한 덩어리의 굵은 실루엣 + 종이 여백 + 스팟 컬러 하나.
   'ink-graphic-novel':
-    'A salt-bread roll suspended in a world made entirely of burnt-orange tones, floating geometric slabs and a soft glowing sphere behind it.',
+    'A baker seen from behind at medium distance, drawn in a few confident brush strokes, sliding a tray of salt-bread rolls into a towering brick oven; the oven mouth is the single spot-color glow; the rest is black ink on paper with cross-hatched shadow.',
 };
 
 const LOG = 'tests/media/showroom-2026-09-11.json';
@@ -64,12 +66,33 @@ function readLog(): Record<string, unknown> {
   return existsSync(LOG) ? JSON.parse(readFileSync(LOG, 'utf8')) : {};
 }
 
+/** gpt-image(회화·잉크 세계관의 고정 생성기) — bakeoff.ts와 같은 호출. 원가는 high 1536x1024 기준 $0.19/장(실측). */
+async function openaiImage(
+  env: Record<string, string>,
+  prompt: string,
+): Promise<{ bytes: Uint8Array; mimeType: string; costUsd: number }> {
+  const model = 'gpt-image-2.5-flare';
+  const res = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${env.OPENAI_API_KEY}` },
+    body: JSON.stringify({ model, prompt, n: 1, size: '1536x1024', quality: 'high', output_format: 'jpeg' }),
+  });
+  const body = (await res.json()) as { data?: Array<{ b64_json?: string }>; error?: { message?: string } };
+
+  if (!res.ok || !body.data?.[0]?.b64_json) {
+    throw new Error(`${model}: ${res.status} ${body.error?.message || ''}`);
+  }
+
+  return { bytes: new Uint8Array(Buffer.from(body.data[0].b64_json, 'base64')), mimeType: 'image/jpeg', costUsd: 0.19 };
+}
+
 async function stills(env: Record<string, string>) {
   const apiKey = env.GOOGLE_GENERATIVE_AI_API_KEY;
   const r2 = readR2Config(env as never);
+  const gen = argValue('--gen') || 'gemini';
 
-  if (!apiKey || !r2) {
-    throw new Error('GOOGLE_GENERATIVE_AI_API_KEY / R2 env missing');
+  if (!apiKey || !r2 || (gen === 'openai' && !env.OPENAI_API_KEY)) {
+    throw new Error('GOOGLE_GENERATIVE_AI_API_KEY / OPENAI_API_KEY / R2 env missing');
   }
 
   const only = argValue('--world') as WorldId | undefined;
@@ -82,11 +105,11 @@ async function stills(env: Record<string, string>) {
 
     for (let i = 0; i < n; i++) {
       const started = Date.now();
-      const image = await generateGeminiImage({
-        apiKey,
-        prompt: `${SUBJECT[world.id]} ${world.styleLock(ACCENT)}`,
-        aspectRatio: '16:9',
-      });
+      const prompt = `${SUBJECT[world.id]} ${world.styleLock(ACCENT)}`;
+      const image =
+        gen === 'openai'
+          ? await openaiImage(env, prompt)
+          : await generateGeminiImage({ apiKey, prompt, aspectRatio: '16:9' });
       const url = await putR2Object(
         r2,
         `media/showroom/${world.id}/still-${Date.now().toString(36)}-${i}.jpg`,

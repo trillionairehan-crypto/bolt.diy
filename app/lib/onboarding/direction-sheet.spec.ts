@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { Brief, Upload } from './brief-schema';
 import { validateBrief } from './brief-schema';
-import { buildDirectionSheet, decide, decideArchetype, planShots } from './direction-sheet';
+import { buildDirectionSheet, decide, decideArchetype, pickTopWorlds, planShots } from './direction-sheet';
 import { getWorld } from '~/lib/media/style-locks';
 
 function upload(id: string, grade: Upload['grade'], slot?: Upload['slot']): Upload {
@@ -162,5 +162,54 @@ describe('direction-sheet: 결정 규칙', () => {
       'palette.accent',
       'brand.nameKo',
     ]);
+  });
+});
+
+describe('direction-sheet: pickTopWorlds (개인화 카드 상위 3)', () => {
+  it('결정론 — 같은 입력이면 같은 순서, 항상 3개, 중복 없음', () => {
+    const a = pickTopWorlds(base);
+    expect(a).toEqual(pickTopWorlds(structuredClone(base)));
+    expect(a).toHaveLength(3);
+    expect(new Set(a).size).toBe(3);
+  });
+
+  it('빵집 + 오브젝트 + 따뜻한/정직한/장인 → 실사가 1등, 제품 3D·수채가 따라온다', () => {
+    const top = pickTopWorlds(base);
+    expect(top[0]).toBe('photo-editorial');
+    expect(top).toContain('product-3d');
+    expect(top).toContain('watercolor-illustration');
+  });
+
+  it('무드 "고전적·풍성한" → 신고전주의 회화가 상위 3에 든다', () => {
+    expect(pickTopWorlds({ ...base, mood: { yes: ['고전적', '풍성한', '깊은'], no: [] } })[0]).toBe(
+      'neoclassical-painting',
+    );
+  });
+
+  it('헬스장 + 대담한·단단한 → 흑백 브루탈 1등', () => {
+    const top = pickTopWorlds({
+      ...base,
+      industry: '헬스·운동',
+      idea: { ...base.idea, sceneType: 'space' },
+      mood: { yes: ['대담한', '단단한', '빠른'], no: [] },
+    });
+    expect(top[0]).toBe('mono-brutal');
+  });
+
+  it('"절대 아닌" 단어는 그 세계관을 밀어낸다 — 고전적 금지면 회화가 3위 밖', () => {
+    const top = pickTopWorlds({ ...base, mood: { yes: ['고전적'], no: ['고전적', '풍성한'] } });
+    expect(top).not.toContain('neoclassical-painting');
+  });
+
+  it('포트폴리오 목적 + 프리랜서 + 거친 → 잉크 그래픽 노블이 상위 3에 든다', () => {
+    const top = pickTopWorlds({
+      ...base,
+      industry: '프리랜서·서비스',
+      goal: 'portfolio',
+      idea: { ...base.idea, sceneType: 'abstract' },
+      mood: { yes: ['거친', '대담한', '어두운'], no: [] },
+    });
+    expect(top).toContain('ink-graphic-novel');
+    expect(top).toContain('mono-brutal');
   });
 });
