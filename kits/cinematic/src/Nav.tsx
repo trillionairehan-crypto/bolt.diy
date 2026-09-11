@@ -30,7 +30,8 @@ export function Nav({ brand, links = [], cta }: NavProps) {
         justifyContent: 'space-between',
         gap: '24px',
         padding: '18px var(--ck-gutter)',
-        color: 'var(--ck-text)',
+        // 히어로(항상 어두운 사진) 위에서는 흰색, 스크롤해 블러 배경이 깔리면 킷 글자색.
+        color: scrolled ? 'var(--ck-text)' : '#fff',
         background: scrolled ? 'color-mix(in srgb, var(--ck-bg) 72%, transparent)' : 'transparent',
         backdropFilter: scrolled ? 'blur(14px)' : 'none',
         transition: 'background 400ms, backdrop-filter 400ms',

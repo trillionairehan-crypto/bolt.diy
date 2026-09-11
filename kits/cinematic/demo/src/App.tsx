@@ -2,7 +2,8 @@ import { Contact, Cursor, HeroScene, Nav, Preloader, ScrollChapter, useSmoothScr
 
 // 2026-09-11 실생성(빵집)에서 나온 실제 R2 미디어 — 킷 데모는 "생성물 재료 그대로" 조립한다.
 const MEDIA = 'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/jmtwp1apg-09a82dc44b71';
-const SEEDANCE_VIDEO = 'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/cmpmtwplbxz/hero-seedance.mp4';
+// 같은 잡의 히어로에서 만든 루프(Kling). Seedance 루프(cmpmtwplbxz)는 다른 사진에서 나온 거라 이미지와 안 맞는다.
+const HERO_VIDEO = `${MEDIA}/hero-kling.mp4`;
 
 export default function App() {
   useSmoothScroll();
@@ -15,7 +16,7 @@ export default function App() {
 
       <HeroScene
         image={`${MEDIA}/hero.jpg`}
-        video={SEEDANCE_VIDEO}
+        video={HERO_VIDEO}
         eyebrow="연남동 · 소금빵 전문"
         title={
           <>

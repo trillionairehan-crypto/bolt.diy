@@ -32,12 +32,15 @@ export function Contact({ title, rows, cta, image, note }: ContactProps) {
         padding: 'clamp(64px, 12vh, 160px) var(--ck-gutter) clamp(40px, 8vh, 96px)',
         overflow: 'hidden',
         isolation: 'isolate',
+        // 배경 사진이 있으면 흰 글자 + 검은 그라데이션(팔레트 무관), 없으면 킷 배경 위 킷 글자색.
+        color: image ? '#fff' : 'var(--ck-text)',
+        background: image ? '#0f0e0d' : 'var(--ck-bg)',
       }}
     >
       {image ? (
         <>
-          <img src={image} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: -2, opacity: 0.45 }} />
-          <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(180deg, var(--ck-bg) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.85) 100%)' }} />
+          <img src={image} alt="" loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: -2, opacity: 0.55 }} />
+          <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.9) 100%)' }} />
         </>
       ) : null}
       <div style={{ display: 'grid', gap: '48px', maxWidth: '1200px' }}>

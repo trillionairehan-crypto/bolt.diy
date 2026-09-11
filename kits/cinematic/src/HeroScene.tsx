@@ -74,7 +74,8 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
         alignItems: 'flex-end',
         overflow: 'hidden',
         isolation: 'isolate',
-        color: 'var(--ck-text)',
+        // 사진 위 텍스트는 킷 팔레트와 무관하게 항상 흰색 — 코랄레드 라이트 팔레트를 상속하면 검정 세리프가 사진에 묻힌다(실측).
+        color: '#fff',
       }}
     >
       <img
@@ -106,7 +107,7 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
           position: 'absolute',
           inset: 0,
           zIndex: 2,
-          background: `linear-gradient(180deg, rgba(0,0,0,${overlay * 0.3}) 0%, rgba(0,0,0,${overlay * 0.2}) 45%, rgba(0,0,0,${overlay + 0.25}) 100%)`,
+          background: `linear-gradient(180deg, rgba(0,0,0,${overlay * 0.5}) 0%, rgba(0,0,0,${overlay * 0.35}) 40%, rgba(0,0,0,${Math.min(0.92, overlay + 0.4)}) 100%)`,
         }}
       />
       <div
