@@ -82,6 +82,8 @@ interface Shot {
   brief: Brief;
   url: string;
   costUsd: number;
+  gen?: string;
+  editedFrom?: number;
   claude?: Critique;
   astra?: Critique;
   score?: number;
@@ -99,6 +101,49 @@ async function fetchBytes(url: string): Promise<{ bytes: Uint8Array; mimeType: s
   }
 
   return { bytes: new Uint8Array(await res.arrayBuffer()), mimeType: res.headers.get('content-type') || 'image/jpeg' };
+}
+
+import { existsSync, readdirSync } from 'node:fs';
+
+/** 로컬 파일 또는 URL */
+async function loadImage(src: string): Promise<{ bytes: Uint8Array; mimeType: string }> {
+  if (/^https?:/.test(src)) {
+    return fetchBytes(src);
+  }
+
+  return { bytes: new Uint8Array(readFileSync(src)), mimeType: src.endsWith('.png') ? 'image/png' : 'image/jpeg' };
+}
+
+/** OpenAI 이미지 편집(레퍼런스 동봉 생성에도 씀) — image[] + prompt, 마스크 없음 */
+async function openaiEdit(
+  env: Record<string, string>,
+  model: string,
+  prompt: string,
+  images: Array<{ bytes: Uint8Array; mimeType: string }>,
+): Promise<{ bytes: Uint8Array; mimeType: string }> {
+  const form = new FormData();
+  form.append('model', model);
+  form.append('prompt', prompt);
+  form.append('size', '1536x1024');
+  form.append('quality', 'high');
+  form.append('output_format', 'jpeg');
+
+  for (const [i, img] of images.entries()) {
+    form.append('image[]', new Blob([img.bytes], { type: img.mimeType }), `ref-${i}.jpg`);
+  }
+
+  const res = await fetch('https://api.openai.com/v1/images/edits', {
+    method: 'POST',
+    headers: { authorization: `Bearer ${env.OPENAI_API_KEY}` },
+    body: form,
+  });
+  const body = (await res.json()) as { data?: Array<{ b64_json?: string }>; error?: { message?: string } };
+
+  if (!res.ok || !body.data?.[0]?.b64_json) {
+    throw new Error(`${model} edit: ${res.status} ${body.error?.message || ''}`);
+  }
+
+  return { bytes: new Uint8Array(Buffer.from(body.data[0].b64_json, 'base64')), mimeType: 'image/jpeg' };
 }
 
 function extractJson<T>(text: string): T {
@@ -226,7 +271,13 @@ async function writeBriefs(
   ]
     .filter(Boolean)
     .join('\n\n');
-  const out = await claude(env, AD_SYSTEM, [{ type: 'text', text }], 6000);
+
+  // 사용자 결정(2026-09-11): AD = GPT-6 Astra 고정, --ad claude 로 스위치 가능
+  const ad = argValue('--ad') || 'astra';
+  const out =
+    ad === 'astra' && env.OPENAI_API_KEY
+      ? await astra(env, AD_SYSTEM, text, [])
+      : await claude(env, AD_SYSTEM, [{ type: 'text', text }], 6000);
 
   return extractJson<Brief[]>(out).slice(0, n);
 }
@@ -282,7 +333,19 @@ async function main() {
   }
 
   const job = `dir-${Date.now().toString(36)}`;
-  const references = await Promise.all(refUrls.map(fetchBytes));
+
+  // 레퍼런스 앵커: --ref URL + tests/media/anchors/<world>/*.jpg (실제 수상작 사진 — 스타일 앵커, 내용 복제 아님)
+  const anchorDir = `tests/media/anchors/${world.id}`;
+  const anchorFiles = existsSync(anchorDir)
+    ? readdirSync(anchorDir)
+        .filter((f) => /\.(jpe?g|png)$/i.test(f))
+        .map((f) => `${anchorDir}/${f}`)
+    : [];
+  const references = await Promise.all([...refUrls, ...anchorFiles].map(loadImage));
+  const gens = (argValue('--gens') || world.generator).split(',');
+  const editTop = Number(argValue('--edit') || 0);
+  console.log(`anchors ${references.length} · generators ${gens.join(',')} · samples ${samples} · edit top ${editTop}`);
+
   const shots: Shot[] = [];
   let briefs = await writeBriefs(env, world, brand, n, accent);
   let cost = 0;
@@ -296,36 +359,68 @@ async function main() {
     // 세계관별 생성기 + 브리프당 samples 장(생성 편차를 선별로 이용)
     let idx = 0;
 
+    const generate = async (gen: string, prompt: string) => {
+      if (gen.startsWith('gpt-image')) {
+        const refPrompt = references.length
+          ? `Use the attached images only as a reference for lighting, colour grading, texture and composition style — do not copy their content. ${prompt}`
+          : prompt;
+        const img = references.length
+          ? await openaiEdit(env, gen, refPrompt, references)
+          : await openaiImage(env, gen, prompt);
+
+        return { ...img, costUsd: 0.1 };
+      }
+
+      return generateGeminiImage({
+        apiKey: env.GOOGLE_GENERATIVE_AI_API_KEY,
+        prompt: references.length
+          ? `The attached images are style references only (light, grading, texture, composition) — do not reproduce their subjects. ${prompt}`
+          : prompt,
+        aspectRatio: '16:9',
+        references,
+        model: gen,
+      });
+    };
+
     for (const brief of briefs) {
-      for (let k = 0; k < samples; k++) {
-        const image =
-          world.generator === 'gpt-image-2.5-flare' && env.OPENAI_API_KEY
-            ? { ...(await openaiImage(env, world.generator, brief.prompt)), costUsd: 0.1 }
-            : await generateGeminiImage({
-                apiKey: env.GOOGLE_GENERATIVE_AI_API_KEY,
-                prompt: brief.prompt,
-                aspectRatio: '16:9',
-                references,
-              });
-        const url = await putR2Object(r2, `media/director/${job}/r${round}-${idx}.jpg`, image.bytes, image.mimeType);
-        cost += image.costUsd;
-        roundShots.push({ round, index: idx, brief, url, costUsd: image.costUsd });
-        console.log(`  [${idx}] ${brief.title} #${k} → ${url}`);
-        idx++;
+      for (const gen of gens) {
+        for (let k = 0; k < samples; k++) {
+          let image;
+
+          try {
+            image = await generate(gen, brief.prompt);
+          } catch (error) {
+            console.log(`  [${idx}] ${gen} failed: ${String((error as Error).message).slice(0, 100)}`);
+            continue;
+          }
+
+          const url = await putR2Object(r2, `media/director/${job}/r${round}-${idx}.jpg`, image.bytes, image.mimeType);
+          cost += image.costUsd;
+          roundShots.push({ round, index: idx, brief, url, costUsd: image.costUsd, gen });
+          console.log(`  [${idx}] ${brief.title} · ${gen} #${k} → ${url}`);
+          idx++;
+        }
       }
     }
 
-    const c1 = await critique(env, world, roundShots, 'claude');
+    // Claude가 과부하(529)면 Astra 단독 심사로 진행 — 루프가 멈추는 것보다 낫다
+    let c1: Critique[] = [];
     let c2: Critique[] | undefined;
 
-    if (critic === 'both' && env.OPENAI_API_KEY) {
+    try {
+      c1 = await critique(env, world, roundShots, 'claude');
+    } catch (error) {
+      console.log(`  claude critic unavailable (${String((error as Error).message).slice(0, 60)}) — astra only`);
+    }
+
+    if ((critic === 'both' || c1.length === 0) && env.OPENAI_API_KEY) {
       c2 = await critique(env, world, roundShots, 'astra');
     }
 
-    for (const s of roundShots) {
-      s.claude = c1.find((c) => c.index === s.index);
-      s.astra = c2?.find((c) => c.index === s.index);
-      s.score = Math.min(s.claude?.score ?? 0, s.astra?.score ?? 10);
+    for (const [pos, s] of roundShots.entries()) {
+      s.claude = c1.find((c) => c.index === pos);
+      s.astra = c2?.find((c) => c.index === pos);
+      s.score = Math.min(s.claude?.score ?? 10, s.astra?.score ?? 10);
       console.log(
         `  [${s.index}] score ${s.score} (fable ${s.claude?.score}${s.astra ? ` / astra ${s.astra.score}` : ''}) tells: ${(s.claude?.tells || []).join('; ')}`,
       );
@@ -337,6 +432,76 @@ async function main() {
       JSON.stringify({ job, world: world.id, brand, threshold, refUrls, shots, costUsd: cost }, null, 2),
     );
 
+    // 결함 부분 수정 루프: 7.3 이상·임계 미만 상위 editTop 장에 심사의 fix를 편집 지시로 적용 → 재심사
+    if (editTop > 0) {
+      const candidates = roundShots
+        .filter((s) => (s.score ?? 0) >= 7.3 && (s.score ?? 0) < threshold)
+        .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
+        .slice(0, editTop);
+      const edited: Shot[] = [];
+
+      for (const s of candidates) {
+        const fix = (s.claude ?? s.astra)?.fix || '';
+        const tells = ((s.claude ?? s.astra)?.tells || []).join('; ');
+        const instruction = `Edit this exact image. Fix only these problems: ${tells}. Do this: ${fix}. Keep the composition, camera, lighting, colours and every other element identical. Photographic realism, no text, no new objects.`;
+        const src = await fetchBytes(s.url);
+
+        try {
+          const img = (s.gen || world.generator).startsWith('gpt-image')
+            ? { ...(await openaiEdit(env, s.gen || world.generator, instruction, [src])), costUsd: 0.1 }
+            : await generateGeminiImage({
+                apiKey: env.GOOGLE_GENERATIVE_AI_API_KEY,
+                prompt: instruction,
+                aspectRatio: '16:9',
+                reference: src,
+                model: s.gen && s.gen.startsWith('gemini') ? s.gen : undefined,
+              });
+          const url = await putR2Object(r2, `media/director/${job}/r${round}-${idx}-edit.jpg`, img.bytes, img.mimeType);
+          cost += img.costUsd;
+          edited.push({
+            round,
+            index: idx,
+            brief: s.brief,
+            url,
+            costUsd: img.costUsd,
+            gen: s.gen,
+            editedFrom: s.index,
+          });
+          console.log(`  [${idx}] edit of ${s.index} (${s.score}) → ${url}`);
+          idx++;
+        } catch (error) {
+          console.log(`  edit of ${s.index} failed: ${String((error as Error).message).slice(0, 100)}`);
+        }
+      }
+
+      if (edited.length) {
+        let e1: Critique[] = [];
+
+        try {
+          e1 = await critique(env, world, edited, 'claude');
+        } catch {
+          /* astra only */
+        }
+
+        const e2 = env.OPENAI_API_KEY ? await critique(env, world, edited, 'astra') : undefined;
+
+        edited.forEach((s, i) => {
+          s.claude = e1.find((c) => c.index === i);
+          s.astra = e2?.find((c) => c.index === i);
+          s.score = Math.min(s.claude?.score ?? 10, s.astra?.score ?? 10);
+          console.log(
+            `  [${s.index}] edited score ${s.score} (from ${s.editedFrom}) tells: ${((s.claude ?? s.astra)?.tells || []).join('; ')}`,
+          );
+        });
+        roundShots.push(...edited);
+        shots.push(...edited);
+        writeFileSync(
+          `tests/media/director-${job}.json`,
+          JSON.stringify({ job, world: world.id, brand, threshold, refUrls, shots, costUsd: cost }, null, 2),
+        );
+      }
+    }
+
     const keepers = roundShots.filter((s) => (s.score ?? 0) >= threshold);
 
     if (keepers.length >= 1 || round === rounds) {
@@ -347,7 +512,12 @@ async function main() {
     const perBrief = briefs.map((brief, bi) => {
       const best = roundShots.filter((s) => s.brief === brief).sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0];
 
-      return { index: bi, score: best?.score ?? 0, tells: best?.claude?.tells ?? [], fix: best?.claude?.fix ?? '' };
+      return {
+        index: bi,
+        score: best?.score ?? 0,
+        tells: (best?.claude ?? best?.astra)?.tells ?? [],
+        fix: (best?.claude ?? best?.astra)?.fix ?? '',
+      };
     });
     briefs = await writeBriefs(env, world, brand, n, accent, { briefs, critiques: perBrief });
   }
