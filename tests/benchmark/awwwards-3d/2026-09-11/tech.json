@@ -1,0 +1,223 @@
+[
+  {
+    "id": "brilean",
+    "url": "https://www.brilean.com",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "swiper",
+      "lottie",
+      "webflow",
+      "jquery",
+      "splitting"
+    ],
+    "scripts": 42,
+    "requests": 73,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "design-bomb-festival",
+    "url": "https://www.designbomb.it",
+    "ok": true,
+    "tech": [
+      "lottie",
+      "framer-motion"
+    ],
+    "scripts": 30,
+    "requests": 121,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "creche-the-tank",
+    "url": "https://www.crechetank.com",
+    "ok": true,
+    "tech": [],
+    "scripts": 2,
+    "requests": 29,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "cerebrium",
+    "url": "https://cerebrium.ai",
+    "ok": true,
+    "tech": [
+      "lottie",
+      "astro",
+      "tailwind"
+    ],
+    "scripts": 56,
+    "requests": 116,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "palmo",
+    "url": "https://www.palmo.co.in",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 30,
+    "requests": 59,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "altitude-101-1",
+    "url": "https://altitude101.com",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 41,
+    "requests": 65,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "bless-a-business-extraordinarily",
+    "url": "https://beblessed.io",
+    "ok": true,
+    "tech": [],
+    "scripts": 1,
+    "requests": 28,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "why-zero",
+    "url": "https://why.zero.university",
+    "ok": true,
+    "tech": [],
+    "scripts": 3,
+    "requests": 55,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "seasats",
+    "url": "https://www.seasats.com",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 31,
+    "requests": 578,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "persona-studio",
+    "url": "https://persona-studio.com",
+    "ok": true,
+    "tech": [],
+    "scripts": 9,
+    "requests": 16,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "overworld-audio",
+    "url": "https://overworldaudio.com",
+    "ok": true,
+    "tech": [
+      "nuxt"
+    ],
+    "scripts": 26,
+    "requests": 68,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "united-carriers",
+    "url": "https://unitedcarriers.com",
+    "ok": true,
+    "tech": [
+      "gsap",
+      "lenis",
+      "barba",
+      "webflow",
+      "jquery",
+      "unity"
+    ],
+    "scripts": 47,
+    "requests": 146,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "penguin-music",
+    "url": "https://penguin.music",
+    "ok": true,
+    "tech": [],
+    "scripts": 5,
+    "requests": 88,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "gionatan-nese-26",
+    "url": "https://www.gionatannese.com",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 20,
+    "requests": 75,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "three-js-game-gallery-dian-noy-you-ji-chang",
+    "url": "https://amix-design.com",
+    "ok": true,
+    "tech": [
+      "astro"
+    ],
+    "scripts": 4,
+    "requests": 67,
+    "hasWebGLCanvas": false
+  },
+  {
+    "id": "helmetverse",
+    "url": "https://helmetverse.ai",
+    "ok": true,
+    "tech": [
+      "next"
+    ],
+    "scripts": 22,
+    "requests": 423,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "illoca",
+    "url": "https://illoca.com",
+    "ok": true,
+    "tech": [
+      "nuxt"
+    ],
+    "scripts": 31,
+    "requests": 132,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "nick-ho",
+    "url": "https://nickho-motorsports.nl",
+    "ok": true,
+    "tech": [
+      "three",
+      "gsap",
+      "lenis",
+      "swiper",
+      "webflow",
+      "jquery",
+      "splitting",
+      "video-lib"
+    ],
+    "scripts": 50,
+    "requests": 114,
+    "hasWebGLCanvas": true
+  },
+  {
+    "id": "klausen",
+    "url": "https://klausen.com",
+    "ok": true,
+    "tech": [
+      "wordpress",
+      "jquery"
+    ],
+    "scripts": 16,
+    "requests": 106,
+    "hasWebGLCanvas": true
+  }
+]

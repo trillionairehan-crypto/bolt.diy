@@ -71,7 +71,8 @@ async function main() {
         const award = text.match(/(Site of the Day|Site of the Month|Site of the Year|Honorable Mention|Developer Award|Mobile Excellence|Nominee)/)?.[1];
         const scores = {};
 
-        for (const m of text.matchAll(/\b(Design|Usability|Creativity|Content|Developer|Mobile)\s+(\d{1,2}(?:\.\d{1,2})?)\b/g)) scores[m[1].toLowerCase()] = Number(m[2]);
+        // "Design 40 Usability 30 …" 는 가중치(%), 점수는 소수점 있는 값만 ("Design 8.32")
+        for (const m of text.matchAll(/\b(Design|Usability|Creativity|Content|Developer|Mobile)\s+(\d{1,2}\.\d{1,2})\b/g)) scores[m[1].toLowerCase()] = Number(m[2]);
 
         const overall = text.match(/\b(\d\.\d{1,2})\s*(?:\/\s*10)?\s*(?:Overall|Score)/i)?.[1] || text.match(/Overall\s*(\d\.\d{1,2})/i)?.[1];
         const tags = [...document.querySelectorAll('a[href*="/websites/"]')].map((a) => (a.textContent || '').trim().toLowerCase()).filter((t) => t && t.length < 24 && !/see all|more|websites/.test(t));

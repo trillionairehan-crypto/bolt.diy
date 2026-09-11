@@ -27,6 +27,23 @@ const H = 900;
 const GATE_RE = /^(enter|start|begin|play|explore|press any key|start now|enter with(out)? (audio|sound)|입장|시작)/i;
 
 async function pressGate(page) {
+  // 0) Playwright 로케이터로 실제 마우스 클릭(hover 상태·캔버스 위 버튼도 잡힘). el.click()은 pointer 이벤트로 게이트를 여는 사이트에서 안 먹었다(100 Lost Species).
+  for (const name of [/^enter$/i, /enter/i, /start/i, /begin/i, /explore/i, /play/i, /입장|시작/]) {
+    const loc = page.getByRole('button', { name }).or(page.getByRole('link', { name })).or(page.getByText(name, { exact: false })).first();
+
+    if (await loc.count().catch(() => 0)) {
+      try {
+        await loc.hover({ timeout: 3000 });
+        await page.waitForTimeout(400);
+        await loc.click({ timeout: 5000 });
+
+        return `locator:${String(name)}`;
+      } catch {
+        /* 다음 후보 */
+      }
+    }
+  }
+
   // 1) 텍스트가 게이트 문구인 버튼/링크 클릭
   const clicked = await page.evaluate((reSrc) => {
     const re = new RegExp(reSrc, 'i');
@@ -72,12 +89,30 @@ async function run(browser, entry) {
     const canvases = await page.evaluate(() => document.querySelectorAll('canvas').length);
     result.canvases = canvases;
 
+    // 안내 모달(CONTROLS 등)이 있으면 닫기
+    for (const name of [/close/i, /skip/i, /continue/i, /got it/i]) {
+      const loc = page.getByRole('button', { name }).first();
+
+      if (await loc.count().catch(() => 0)) {
+        await loc.click({ timeout: 3000 }).catch(() => {});
+      }
+    }
+
     for (let i = 0; i < shots; i++) {
-      // 진행: 휠 + 오른쪽 키 + 마우스 드리프트(경험형은 셋 중 하나에 반응)
+      // 진행: 휠 + 키 + 마우스 드리프트. WASD 월드(Icare)는 W를 누르고 있어야 움직인다.
       await page.mouse.move(W / 2 + Math.sin(i) * 300, H / 2 + Math.cos(i) * 150, { steps: 12 });
       await page.mouse.wheel(0, 700);
-      await page.keyboard.press(i % 3 === 0 ? 'ArrowRight' : i % 3 === 1 ? 'ArrowDown' : 'Space');
-      await page.waitForTimeout(4000);
+
+      if (canvases > 0 && i % 2 === 0) {
+        await page.keyboard.down('w');
+        await page.waitForTimeout(2500);
+        await page.keyboard.up('w');
+        await page.keyboard.press('e');
+      } else {
+        await page.keyboard.press(i % 3 === 0 ? 'ArrowRight' : i % 3 === 1 ? 'ArrowDown' : 'Space');
+      }
+
+      await page.waitForTimeout(canvases > 0 && i % 2 === 0 ? 1500 : 4000);
       const file = join(DIR, `${entry.id}-${i}.jpg`);
       await page.screenshot({ path: file, type: 'jpeg', quality: 55, timeout: 20000 }).catch(() => {});
       result.frames.push(file);

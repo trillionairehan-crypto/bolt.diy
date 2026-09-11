@@ -68,5 +68,6 @@ docs/instructions/Roadmap.md
 # 모델 벤치마크 결과표 — 실제 요청된 산출물, 재실행 없이 이력으로 남겨야 함
 !tests/benchmark/results/**/*.md
 !tests/benchmark/cinematic/*.md
+!tests/benchmark/cssda/*.md
 !tests/media/*.md
 .qodo
