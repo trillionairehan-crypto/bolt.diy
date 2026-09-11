@@ -24,8 +24,10 @@ const JWT_TTL_SEC = 1800;
 const USD_PER_5S: Record<'std' | 'pro', number> = { std: 0.42, pro: 0.56 };
 
 export interface KlingConfig {
-  accessKey: string;
-  secretKey: string;
+  /** 단일 API 키(새 플랫폼). 있으면 JWT 대신 이 값을 Bearer로 보낸다. */
+  apiKey?: string;
+  accessKey?: string;
+  secretKey?: string;
   model?: string;
   mode?: 'std' | 'pro';
   baseUrl?: string;
@@ -82,10 +84,11 @@ export function createKlingProvider(config: KlingConfig): VideoProvider {
   const baseUrl = (config.baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, '');
 
   async function authHeaders(): Promise<Record<string, string>> {
-    return {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${await signKlingJwt(config.accessKey, config.secretKey)}`,
-    };
+    const token = config.apiKey
+      ? config.apiKey
+      : await signKlingJwt(config.accessKey as string, config.secretKey as string);
+
+    return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
   }
 
   return {

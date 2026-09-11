@@ -35,6 +35,7 @@ interface Env {
   VIDEO_PROVIDER: string;
   ARK_API_KEY: string;
   SEEDANCE_MODEL: string;
+  KLING_API_KEY: string;
   KLING_ACCESS_KEY: string;
   KLING_SECRET_KEY: string;
   KLING_MODEL: string;

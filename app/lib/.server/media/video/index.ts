@@ -18,6 +18,9 @@ export interface VideoEnv {
   VIDEO_PROVIDER?: string;
   ARK_API_KEY?: string;
   SEEDANCE_MODEL?: string;
+
+  /** 새 개발자 플랫폼의 단일 API 키(`api-key-kling-…`) — 있으면 Bearer로 바로 쓴다. */
+  KLING_API_KEY?: string;
   KLING_ACCESS_KEY?: string;
   KLING_SECRET_KEY?: string;
   KLING_MODEL?: string;
@@ -35,13 +38,20 @@ export function getVideoProvider(name: VideoProviderName, env: VideoEnv | undefi
     return env?.ARK_API_KEY ? createSeedanceProvider({ apiKey: env.ARK_API_KEY, model: env.SEEDANCE_MODEL }) : null;
   }
 
-  if (!env?.KLING_ACCESS_KEY || !env?.KLING_SECRET_KEY) {
+  if (!env) {
+    return null;
+  }
+
+  const hasKeyPair = Boolean(env.KLING_ACCESS_KEY && env.KLING_SECRET_KEY);
+
+  if (!env.KLING_API_KEY && !hasKeyPair) {
     return null;
   }
 
   const mode = env.KLING_MODE === 'pro' ? 'pro' : 'std';
 
   return createKlingProvider({
+    apiKey: env.KLING_API_KEY,
     accessKey: env.KLING_ACCESS_KEY,
     secretKey: env.KLING_SECRET_KEY,
     model: env.KLING_MODEL,
