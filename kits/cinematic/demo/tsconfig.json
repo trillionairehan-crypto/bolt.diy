@@ -9,6 +9,7 @@
     "skipLibCheck": true,
     "types": ["vite/client"],
     "noEmit": true,
+    "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": { "@kit/*": ["../src/*"] }
   },

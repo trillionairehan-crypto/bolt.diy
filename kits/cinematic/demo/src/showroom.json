@@ -1,0 +1,68 @@
+[
+  {
+    "id": "photo-editorial",
+    "label": "실사 에디토리얼",
+    "reference": "Lidar 8.87 · Noho 8.83",
+    "theme": "light",
+    "typePreset": "grotesk",
+    "still": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/still-mtwykpyk-1.jpg",
+    "video": "",
+    "headline": "매일 새벽 네 시,\n그날 구운 만큼만",
+    "sub": "창가 자연광, 나무 도마, 김 한 줄기. 사진이 곧 증거인 세계."
+  },
+  {
+    "id": "neoclassical-painting",
+    "label": "신고전주의 회화",
+    "reference": "Pear · Awwwards HM, Design 9.3",
+    "theme": "light",
+    "typePreset": "serif",
+    "still": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/neoclassical-painting/still-mtwylnoa-1.jpg",
+    "video": "",
+    "headline": "빵은 매일\n다시 태어난다",
+    "sub": "회화 속 인물이 빵을 바친다. 스크롤이 그림을 움직이는 세계."
+  },
+  {
+    "id": "watercolor-illustration",
+    "label": "수채 일러스트",
+    "reference": "100 Lost Species 9.67",
+    "theme": "light",
+    "typePreset": "serif",
+    "still": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/watercolor-illustration/still-mtwymb3l-0.jpg",
+    "video": "",
+    "headline": "작은 가게,\n큰 빵 하나",
+    "sub": "종이 위에 번지는 수채. 가볍고 다정한 세계."
+  },
+  {
+    "id": "product-3d",
+    "label": "제품 오브젝트 3D",
+    "reference": "The Watch 8.93 · Wembi 9.23",
+    "theme": "light",
+    "typePreset": "grotesk",
+    "still": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/product-3d/still-mtwynawg-1.jpg",
+    "video": "",
+    "headline": "소금빵,\n그 자체",
+    "sub": "빵 하나가 스튜디오에 떠 있다. 제품이 주인공인 세계."
+  },
+  {
+    "id": "mono-brutal",
+    "label": "흑백 브루탈",
+    "reference": "Aspen 8.83 · HACKFIRST 8.7",
+    "theme": "light",
+    "typePreset": "compact",
+    "still": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-brutal/still-mtwyvoae-1.jpg",
+    "video": "",
+    "headline": "빵. 소금. 불.\n그게 전부",
+    "sub": "흑백 망점 위에 색 하나. 단호한 세계."
+  },
+  {
+    "id": "mono-color",
+    "label": "단색 컬러 월드",
+    "reference": "/zeroz 8.67 · Volt 8.77",
+    "theme": "dark",
+    "typePreset": "grotesk",
+    "still": "https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/mono-color/still-mtwyop4r-0.jpg",
+    "video": "",
+    "headline": "오븐 속\n한 가지 색",
+    "sub": "온 세상이 한 색. 빛과 오브젝트가 떠다니는 세계."
+  }
+]
