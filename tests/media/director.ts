@@ -206,7 +206,7 @@ async function astra(env: Record<string, string>, system: string, text: string, 
     body: JSON.stringify({
       model: ASTRA_MODEL,
       store: false,
-      max_output_tokens: 3000,
+      max_output_tokens: 8000,
       input: [
         { role: 'system', content: [{ type: 'input_text', text: system }] },
         {
@@ -253,7 +253,7 @@ Write in English. Return JSON only.`;
 const CRITIC_SYSTEM = `You are a jury member for a web design award, judging hero photography/illustration. Score each image 0-10 where 9+ means it would pass unnoticed as a commissioned editorial shot on a Site-of-the-Day winner, 8 = good but one visible tell, 7 = competent stock, ≤6 = obvious AI/generic.
 Also judge cinematography like a DP: is there ONE motivated key light with a believable ratio and a real contact/anchor shadow? Is the light quality (hard/soft) consistent with its source? Is the camera height and focal length deliberate? Flat, sourceless, multi-directional or 'everything evenly lit' lighting is a tell.
 Check these AI tells and list every one that applies: centred-symmetric subject; plastic/over-glossy highlights; flawless too-perfect surfaces; generic stock composition; uniform lighting with no shadow anchor; melted/duplicated/impossible details; wrong hands or text-like scribbles; oversaturation; render-look where a photo was intended; no room for a headline; subject too small or too large; style drift from the requested world.
-Be harsh. Return JSON only: [{"index":0,"score":7.5,"tells":["..."],"fix":"one concrete instruction for the next shot"}]`;
+Be harsh. Keep each tell under 12 words and at most 4 tells per image. Return JSON only: [{"index":0,"score":7.5,"tells":["..."],"fix":"one concrete instruction for the next shot"}]`;
 
 async function writeBriefs(
   env: Record<string, string>,
@@ -304,7 +304,7 @@ async function critique(
       content.push({ type: 'image', source: { type: 'base64', media_type: img.mimeType, data: toBase64(img.bytes) } });
     });
 
-    return extractJson<Critique[]>(await claude(env, CRITIC_SYSTEM, content, 3000));
+    return extractJson<Critique[]>(await claude(env, CRITIC_SYSTEM, content, 8000));
   }
 
   return extractJson<Critique[]>(
