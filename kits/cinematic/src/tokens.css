@@ -1,0 +1,112 @@
+/*
+ * 시네마틱 킷 토큰. 코랄레드 킷 변수(--accent, --bg, --text …)가 있으면 그걸 받고, 없으면 폴백.
+ * 레퍼런스(landonorris.com·lusion.co) 공통: 색 2~3개, 서체 2개, 거대 타이포 — 그 규칙을 값으로 고정한다.
+ */
+:root {
+  --ck-accent: var(--accent, #ff5330);
+  --ck-bg: var(--bg, #0f0e0d);
+  --ck-surface: var(--surface, #1a1816);
+  --ck-text: var(--text, #f5f1ea);
+  --ck-muted: var(--muted, #b8b0a4);
+  --ck-line: rgba(255, 255, 255, 0.12);
+
+  --ck-font-display: 'Noto Serif KR', 'Apple SD Gothic Neo', serif;
+  --ck-font-body: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  --ck-font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --ck-display-xl: clamp(48px, 8vw, 128px);
+  --ck-display-lg: clamp(36px, 5vw, 72px);
+  --ck-display-md: clamp(28px, 3.2vw, 44px);
+  --ck-body: clamp(16px, 1.15vw, 19px);
+  --ck-eyebrow: 12px;
+
+  --ck-gutter: clamp(20px, 5vw, 96px);
+  --ck-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html.ck-lenis,
+html.ck-lenis body {
+  height: auto;
+}
+
+.ck-page {
+  background: var(--ck-bg);
+  color: var(--ck-text);
+  font-family: var(--ck-font-body);
+  font-size: var(--ck-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+.ck-eyebrow {
+  font-family: var(--ck-font-mono);
+  font-size: var(--ck-eyebrow);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ck-accent);
+}
+
+.ck-display {
+  font-family: var(--ck-font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  text-wrap: balance;
+  margin: 0;
+}
+
+.ck-display--xl {
+  font-size: var(--ck-display-xl);
+}
+
+.ck-display--lg {
+  font-size: var(--ck-display-lg);
+}
+
+.ck-display--md {
+  font-size: var(--ck-display-md);
+}
+
+.ck-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 28px;
+  border-radius: 999px;
+  background: var(--ck-accent);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 400ms var(--ck-ease), background 300ms;
+}
+
+.ck-btn:hover {
+  transform: translateY(-2px);
+}
+
+.ck-btn--ghost {
+  background: transparent;
+  border: 1px solid var(--ck-line);
+  color: var(--ck-text);
+}
+
+/* 등장 애니메이션 기본 상태 — Preloader가 끝나고 html.ck-ready가 붙기 전까지 숨김 (reduced-motion이면 즉시 보임) */
+.ck-reveal {
+  opacity: 0;
+  transform: translateY(32px);
+}
+
+html.ck-ready .ck-reveal,
+html.ck-reduced .ck-reveal {
+  opacity: 1;
+  transform: none;
+  transition: opacity 900ms var(--ck-ease), transform 900ms var(--ck-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ck-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

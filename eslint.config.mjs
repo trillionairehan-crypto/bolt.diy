@@ -26,6 +26,8 @@ export default [
       'tests/skeleton7-dom/.bundled-*',
       'tests/benchmark/.dist/**',
       'tests/benchmark/results/**',
+      // kits/*: 생성물에 복사되는 독립 패키지 — 자체 tsconfig·deps(kits/cinematic/demo)로 검사한다.
+      'kits/**',
     ],
   },
   ...recommendedConfigs,
