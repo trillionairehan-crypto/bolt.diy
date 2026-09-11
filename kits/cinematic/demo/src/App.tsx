@@ -3,10 +3,10 @@ import { BigNumber, Contact, Cursor, HeroScene, Marquee, Nav, PinnedChapters, Pr
 /*
  * 데모 v0.2 = CSSDA 8.5~8.9 원형(제품 스토리 + 라이트 에디토리얼) 시퀀스:
  * 프리로더 → 히어로(영상 루프 + 한글 헤드라인 400) → 선언문(어절 스크럽 리빌) → 핀 챕터 ×3(ch1~ch3) → 큰 숫자 → 마퀴 → 연락처 + 풀블리드 워드마크.
- * 2026-09-11 실생성(빵집) R2 미디어 그대로. 사람 없음.
+ * 2026-09-11 밤 재생성(smoke-1789128016839, 인물 없는 샷리스트) R2 미디어 그대로. 히어로 영상은 같은 hero.jpg에서 만든 Seedance 2.0 fast 루프.
  */
-const MEDIA = 'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/jmtwp1apg-09a82dc44b71';
-const HERO_VIDEO = `${MEDIA}/hero-kling.mp4`;
+const MEDIA = 'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/smoke-1789128016839';
+const HERO_VIDEO = 'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/cmpmtwwnz17/hero-seedance.mp4';
 
 export default function App() {
   useSmoothScroll({ snap: true });
