@@ -196,8 +196,17 @@ export default function HeroCanvas({ src, video, strength = 1, onError }: HeroCa
     const loader = new THREE.TextureLoader();
     loader.setCrossOrigin('anonymous');
 
+    /*
+     * 같은 URL을 히어로가 이미 평범한 <img>로 받아둔 상태다(폴백용). 그 응답은 Origin 헤더 없이 받은
+     * 것이라, 뒤이어 crossOrigin='anonymous'로 같은 URL을 요청하면 브라우저가 그 캐시 항목을 재사용하고
+     * CORS 검사에서 떨어진다 — R2가 Vary: Origin과 ACAO를 제대로 보내는데도 실패한다
+     * (2026-09-12 WebContainer 프리뷰 실측: 서버는 ACAO를 주는데 new Image(crossOrigin)은 onerror).
+     * 쿼리를 하나 덧붙여 캐시 항목을 분리한다.
+     */
+    const separator = src.includes('?') ? '&' : '?';
+
     loader.load(
-      src,
+      `${src}${separator}ck=tex`,
       (loaded) => {
         if (dead) {
           loaded.dispose();

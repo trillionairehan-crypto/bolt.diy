@@ -1,13 +1,13 @@
 {
   "preloaderAtLoad": true,
-  "loadMs": 1043,
+  "loadMs": 3757,
   "paint": {
-    "fcpMs": 432,
-    "domMs": 1043
+    "fcpMs": 3156,
+    "domMs": 3757
   },
   "heroCanvas": true,
   "heroVideoFallback": false,
-  "heroMotion": 1.74,
+  "heroMotion": 1.7,
   "cursor": true,
   "chapterFound": true,
   "pinPosition": "sticky",
@@ -19,32 +19,32 @@
     },
     "samples": [
       {
-        "scrollY": 1826,
+        "scrollY": 1847,
         "top": 0,
         "position": "sticky",
         "active": 1,
         "inPinWindow": true
       },
       {
-        "scrollY": 997,
+        "scrollY": 1002,
         "top": 0,
         "position": "sticky",
         "active": 0,
         "inPinWindow": true
       },
       {
-        "scrollY": 2233,
+        "scrollY": 2864,
+        "top": -511,
+        "position": "sticky",
+        "active": 2,
+        "inPinWindow": false
+      },
+      {
+        "scrollY": 2308,
         "top": 0,
         "position": "sticky",
         "active": 2,
         "inPinWindow": true
-      },
-      {
-        "scrollY": 2833,
-        "top": -480,
-        "position": "sticky",
-        "active": 2,
-        "inPinWindow": false
       }
     ],
     "topsInPinWindow": [
@@ -64,20 +64,20 @@
   "canvasCount": 2,
   "showcaseClip": {
     "x": 672,
-    "y": 388.40625,
+    "y": 360.40625,
     "width": 544,
-    "height": 624
+    "height": 680
   },
-  "dragDelta": 27.35,
+  "dragDelta": 240.96,
   "mobile": {
     "scrollWidth": 400,
     "clientWidth": 400,
     "canvases": 0
   },
   "bundleKb": {
-    "HeroCanvas-BOlio2TY.js": 4,
+    "HeroCanvas-DGqzLr1r.js": 4,
+    "index-Bukw84e8.js": 293,
     "index-DpGTTM8U.css": 5,
-    "index-DtGrdeFj.js": 293,
     "Showcase3DScene-DgDc1k_X.js": 5,
     "three-kNIIe7K7.js": 808
   }

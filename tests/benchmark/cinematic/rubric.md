@@ -544,3 +544,25 @@ probe만 false로 떨어졌다. 생성 직후는 npm install·번들·이미지 
   hue가 아니라 배경·글자 밝기로 구별되므로 그 숫자에 아무것도 안 담겼다. 어두운 팔레트면 baseline
   index.html의 `<html>`에 `data-theme="dark"`를 붙인다 — 킷 토큰도 `var(--bg)`·`var(--text)`를 받으므로
   같이 어두워진다.
+
+### 가죽 공방 실생성 (2026-09-12 심야, 다크 팔레트 선택)
+
+| 확인 항목 | 결과 |
+|---|---|
+| 예약 사진 사용 | O — 외부 이미지 URL 0개, R2만. `<img>` 5장 전부 로드 |
+| 다크 팔레트 | O — `<html data-theme="dark">`, body 배경 `oklch(0.15 0.015 34)` |
+| 장면 구성 | preloader·cursor·nav·scene-nav·hero·chapter·scene·marquee·contact |
+| 히어로 WebGL | **X** — `<video>` 폴백. 원인 아래 |
+| Showcase3D | `data-ck-3d="still"` — 스크롤 전이라 정상(IntersectionObserver rootMargin 500px) |
+
+히어로 WebGL이 안 뜬 진짜 원인(이번에 특정했다): **CORS 캐시 충돌**이다.
+히어로는 같은 URL을 먼저 평범한 `<img>`로 받는다(폴백용). 그 응답은 Origin 헤더 없이 받은 것이라,
+뒤이어 `crossOrigin='anonymous'`로 같은 URL을 요청하면 브라우저가 그 캐시 항목을 재사용하고 CORS 검사에서
+떨어진다. 프리뷰에서 실측: 서버는 정확히 그 오리진으로 `Access-Control-Allow-Origin`과 `Vary: Origin`을
+돌려주는데(curl 확인) `new Image(crossOrigin='anonymous')`는 `onerror`였다. R2는 `Cache-Control:
+public, max-age=31536000, immutable`이라 재사용이 공격적이다.
+
+조치: `HeroCanvas`가 텍스처를 받을 때 쿼리(`?ck=tex`)를 붙여 캐시 항목을 분리한다. 로컬 렌더 하네스는
+수정 후에도 정상(히어로 캔버스 O, video 폴백 없음, 드래그 241.0).
+
+앞선 "probe가 false였다" 가설은 틀렸다 — `useWebGL` 재시도는 그대로 두되(무해한 보강), 실제 원인은 이쪽이다.
