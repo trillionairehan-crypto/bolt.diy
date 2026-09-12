@@ -63,8 +63,8 @@ export function Cursor() {
 
   return (
     <>
-      <div ref={dot} aria-hidden="true" style={{ ...base, width: 6, height: 6, background: 'var(--ck-accent)' }} />
-      <div ref={ring} aria-hidden="true" style={{ ...base, width: 36, height: 36, border: '1px solid var(--ck-accent)', transition: 'opacity 300ms' }} />
+      <div ref={dot} data-ck="cursor" aria-hidden="true" style={{ ...base, width: 6, height: 6, background: 'var(--ck-accent)' }} />
+      <div ref={ring} data-ck="cursor-ring" aria-hidden="true" style={{ ...base, width: 36, height: 36, border: '1px solid var(--ck-accent)', transition: 'opacity 300ms' }} />
     </>
   );
 }

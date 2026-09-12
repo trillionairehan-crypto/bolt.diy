@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useIsDesktop } from './hooks';
 
 export interface NavProps {
   brand: string;
@@ -9,6 +10,13 @@ export interface NavProps {
 /** 상단 고정 내비 — 처음엔 투명, 스크롤하면 블러 배경. 링크는 3개 이하로. */
 export function Nav({ brand, links = [], cta }: NavProps) {
   const [scrolled, setScrolled] = useState(false);
+
+  /*
+   * 400px에서는 브랜드·링크 3개·CTA가 한 줄에 다 안 들어가 링크가 글자 단위로 세로로 쪼개진다
+   * (2026-09-12 생성물 모바일 실측). 좁은 화면에서는 링크를 접고 브랜드와 CTA만 남긴다 — 섹션 이동은
+   * SceneNav가 맡는다.
+   */
+  const isDesktop = useIsDesktop();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -41,13 +49,20 @@ export function Nav({ brand, links = [], cta }: NavProps) {
         {brand}
       </a>
       <nav style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
-        {links.map((link) => (
-          <a key={link.href} href={link.href} data-cursor="hover" style={{ fontSize: '14px', textDecoration: 'none', color: 'inherit', opacity: 0.8 }}>
-            {link.label}
-          </a>
-        ))}
+        {isDesktop
+          ? links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                data-cursor="hover"
+                style={{ fontSize: '14px', textDecoration: 'none', color: 'inherit', opacity: 0.8, whiteSpace: 'nowrap' }}
+              >
+                {link.label}
+              </a>
+            ))
+          : null}
         {cta ? (
-          <a className="ck-btn" href={cta.href} data-cursor="hover" style={{ padding: '10px 18px', fontSize: '14px' }}>
+          <a className="ck-btn" href={cta.href} data-cursor="hover" style={{ padding: '10px 18px', fontSize: '14px', whiteSpace: 'nowrap' }}>
             {cta.label}
           </a>
         ) : null}

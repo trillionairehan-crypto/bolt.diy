@@ -71,3 +71,7 @@ docs/instructions/Roadmap.md
 !tests/benchmark/cssda/*.md
 !tests/media/*.md
 .qodo
+
+# 시네마틱 렌더 측정용 임시 프로젝트·내려받은 미디어
+kits/cinematic/.render-tmp/
+tests/benchmark/cinematic/.render-media/
