@@ -91,7 +91,10 @@ const KEYWORDS: Array<[RegExp, keyof typeof SHOTLISTS]> = [
   [/병원|의원|치과|한의원|클리닉|약국|clinic|dental|hospital/i, 'clinic'],
   [/쇼핑|판매|스토어|편집숍|잡화|소품|꽃집|플라워|shop|store|retail|flower/i, 'retail'],
   [/부동산|공간|스튜디오|공방|사무실|인테리어|숙소|펜션|estate|studio|space|interior/i, 'space'],
-  [/프리랜서|디자이너|사진|작가|영상|개발자|컨설|서비스|freelance|designer|photograph/i, 'freelance'],
+  [
+    /프리랜서|디자이너|사진|작가|영상|개발자|컨설|서비스|포트폴리오|freelance|designer|photograph|portfolio/i,
+    'freelance',
+  ],
 ];
 
 export function pickShotList(industry: string): ShotList {

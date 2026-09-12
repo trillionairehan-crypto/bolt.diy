@@ -95,6 +95,15 @@ export interface Q3GridItem {
  * 판단해 옮겼다 — 골격1의 실제 예시("카페 적립, 헬스장, 학원, 세차장")도 전부 "명단 + 횟수 차감/적립"
  * 구조라 동호회 회비·참석 관리와 구조적으로 더 가깝다. 이제 순위·티어형은 Q3 격자에 직접 매칭되는
  * 항목이 없다(직접 입력에서 Haiku가 골라줄 수는 있다) — 의도된 상태.
+ *
+ * 브랜드 소개·포트폴리오 → 소개·홍보형(2026-09-12 추가): 09-10에 카페를 골격1로 옮기면서 골격7이
+ * 격자에서 사라졌고, 그 뒤로는 요청 문장에 소개·홍보 명사가 있거나 직접 입력을 거쳐야만 골격7이 나왔다.
+ * 그 사이 골격7은 시네마틱 킷을 받았다 — 사진이 없으면 빈약하다는 09-10의 근거(타이포 폴백뿐)가 더는
+ * 맞지 않는다. 이제 골격7은 예약된 사진 4장 + 킷(히어로 WebGL·핀 챕터·3D)으로 렌더된다. 그래서 격자에
+ * 직접 고를 항목을 되돌려 놓되, 카페·음식점은 골격1 그대로 둔다(카페의 대표 수요는 여전히 적립·스탬프고,
+ * "카페 소개 페이지"처럼 소개 명사가 있으면 1단계 판정이 골격7로 보낸다).
+ * 팔레트 추천이 다크·미니멀인 이유: 시네마틱 킷은 전면 사진 위에 흰 타이포를 얹는 문법이라 유채 배경과
+ * 부딪힌다. palettes.ts의 dark 팔레트도 targets에 "포트폴리오"를 적어두고 있다.
  */
 export const Q3_GRID: Q3GridItem[] = [
   { id: 'cafe', label: '카페·음식점', skeleton: 1, recommendedPalettes: ['brown'] },
@@ -105,6 +114,7 @@ export const Q3_GRID: Q3GridItem[] = [
   { id: 'shopping', label: '쇼핑·판매', skeleton: 4, recommendedPalettes: ['red'] },
   { id: 'realestate', label: '공간·부동산', skeleton: 4, recommendedPalettes: ['blue'] },
   { id: 'freelance', label: '프리랜서·서비스', skeleton: 3, recommendedPalettes: ['indigo'] },
+  { id: 'showcase', label: '브랜드 소개·포트폴리오', skeleton: 7, recommendedPalettes: ['dark', 'minimal'] },
   { id: 'club', label: '모임·동호회', skeleton: 1, recommendedPalettes: ['purple'] },
   { id: 'personal', label: '개인 기록(가계부·습관)', skeleton: 5, recommendedPalettes: ['coral'] },
 ];
