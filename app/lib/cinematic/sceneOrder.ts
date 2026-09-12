@@ -106,6 +106,43 @@ function countObjectsInArrayAt(source: string, open: number): number {
   return count;
 }
 
+/*
+ * 예약된 사진(R2)을 안 쓰고 모델이 외부 스톡 사진을 지어낸 생성물을 잡는다.
+ *
+ * 2026-09-12 실측: 프롬프트에 예약 URL 4개를 줬는데도 생성물이 Unsplash 사진만 썼다. 킷 조립은
+ * 완벽했으므로 다른 검사는 전부 통과했고, 사진이 틀렸다는 걸 아무도 못 잡았다.
+ */
+const ALLOWED_IMAGE_HOST_REGEX = /\.r2\.dev$/;
+
+/*
+ * 이미지로 보이는 URL만 본다 — 확장자가 붙었거나 스톡 사진 호스트인 것. 지도 링크(map.kakao.com)처럼
+ * 사진이 아닌 외부 URL까지 잡으면 오탐이다(실측: bakery 생성물의 카카오맵 링크).
+ * injectCinematicImages.ts의 수집 규칙과 같은 모양을 유지한다.
+ */
+const IMAGE_URL_REGEX = /https?:\/\/[^"'`\s)]+?\.(?:jpe?g|png|webp|avif|gif)(?:\?[^"'`\s)]*)?/gi;
+const STOCK_IMAGE_URL_REGEX =
+  /https?:\/\/(?:images\.unsplash\.com|source\.unsplash\.com|images\.pexels\.com|picsum\.photos|placehold\.co|via\.placeholder\.com|loremflickr\.com)\/[^"'`\s)]*/gi;
+
+function externalImageHosts(source: string): string[] {
+  const hosts = new Set<string>();
+
+  for (const match of [...source.matchAll(IMAGE_URL_REGEX), ...source.matchAll(STOCK_IMAGE_URL_REGEX)]) {
+    const url = match[0];
+
+    try {
+      const { hostname } = new URL(url);
+
+      if (!ALLOWED_IMAGE_HOST_REGEX.test(hostname)) {
+        hosts.add(hostname);
+      }
+    } catch {
+      // URL로 못 읽으면 판정하지 않는다.
+    }
+  }
+
+  return [...hosts];
+}
+
 /**
  * @param source 생성물의 화면 소스 전체(킷 파일 `src/kit/**` 은 빼고 넘긴다 — 킷 내부는 이 규칙의 대상이 아니다).
  */
@@ -158,6 +195,12 @@ export function checkCinematicSceneOrder(source: string): SceneOrderResult {
 
   if (textReveal && !/\stext=/.test(textReveal[1] ?? '')) {
     problems.push('<TextReveal>에 text prop이 없다 — 문장을 children이 아니라 text로 넘긴다');
+  }
+
+  const foreignHosts = externalImageHosts(source);
+
+  if (foreignHosts.length > 0) {
+    problems.push(`예약된 사진 대신 외부 이미지를 썼다 — ${foreignHosts.join(', ')}`);
   }
 
   const chapterCount = countChapters(source);

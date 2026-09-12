@@ -18,6 +18,7 @@ const {
   runSkeleton7CaptionDedupeCheck,
   runSkeleton7CardGridHintCheck,
   isSkeleton7File,
+  isCinematicTrackFile,
   runSpacingGridCheck,
   run100vhToDvhCheck,
   runFontSizeMinimumCheck,
@@ -459,6 +460,35 @@ describe('isSkeleton7File', () => {
 
   it('does not flag a single incidental 100vh mention', () => {
     expect(isSkeleton7File('min-height: 100vh;')).toBe(false);
+  });
+
+  /*
+   * 2026-09-12 실측: 시네마틱 생성물에는 data-slot도 100vh 리터럴도 없어서 "골격7이 아님"으로 읽혔고,
+   * 미리 만들어 둔 이미지 세트가 통째로 버려졌다(원가는 이미 나간 뒤).
+   */
+  it('시네마틱 트랙(킷 import + HeroScene)도 골격7로 본다', () => {
+    const cinematic = `import { HeroScene } from './kit';\n<HeroScene image={HERO} />`;
+
+    expect(isCinematicTrackFile(cinematic)).toBe(true);
+    expect(isSkeleton7File(cinematic)).toBe(true);
+  });
+
+  it('킷 import만 있고 HeroScene이 없으면 시네마틱 트랙이 아니다', () => {
+    expect(isCinematicTrackFile("import { Nav } from './kit';")).toBe(false);
+  });
+});
+
+describe('runSkeleton7DataSlotCheck 시네마틱 예외', () => {
+  /*
+   * 시네마틱 트랙은 data-slot 컨테이너를 만들지 않는다. 이 검사가 거기에 "컨테이너가 4개가 아니다"를
+   * 남기면 자동 검토가 모델을 다시 data-slot 쪽으로 되돌린다 — 킷 장면 순서와 정면으로 부딪힌다.
+   */
+  it('시네마틱 생성물에는 data-slot 지적을 남기지 않는다', () => {
+    const cinematic = `import { HeroScene } from './kit';\n<HeroScene image={HERO} />\n<div style={{height:'100vh'}} />`;
+    const result = runSkeleton7DataSlotCheck('/home/project/src/App.tsx', cinematic);
+
+    expect(result.findings).toEqual([]);
+    expect(result.content).toBe(cinematic);
   });
 });
 

@@ -5,7 +5,8 @@ import { createScopedLogger } from '~/utils/logger';
 import { injectSkeleton7Images, type Skeleton7ImageUrls } from './injectSkeleton7Images';
 import { buildSkeleton7PromptLines } from './skeleton7PromptLines';
 import { buildLoopMotionPrompt } from './shotlist';
-import { isSkeleton7File } from '~/lib/review/mechanical-checks';
+import { isCinematicTrackFile, isSkeleton7File } from '~/lib/review/mechanical-checks';
+import { injectCinematicImages } from './injectCinematicImages';
 
 /**
  * 골격 7 이미지 세트 — 클라이언트 오케스트레이션.
@@ -382,6 +383,22 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
   const missing = new Set<string>();
 
   for (const [filePath, file] of skeleton7Entries) {
+    /*
+     * 시네마틱 트랙에는 data-slot 컨테이너도 직접 쓴 <img>도 없다 — 사진은 킷 컴포넌트의 prop으로만
+     * 들어간다. 그래서 마크업을 넣는 대신 모델이 지어낸 외부 이미지 URL을 예약 URL로 바꾼다.
+     */
+    if (isCinematicTrackFile(file.content)) {
+      const swapped = injectCinematicImages(file.content, urls);
+
+      if (swapped.replaced > 0) {
+        swapped.slots.forEach((slot) => injected.add(slot));
+        await workbenchStore.writeFileDirect(filePath, swapped.content);
+        filesWritten.push(filePath);
+      }
+
+      continue;
+    }
+
     const result = injectSkeleton7Images(file.content, urls);
 
     result.injected.forEach((slot) => injected.add(slot));

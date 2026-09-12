@@ -976,8 +976,22 @@ const CH7_VH_MARKER_REGEX = /100vh/gi;
 const CH7_DETECT_MIN_VH = 2;
 const CH7_HERO_CAPTION = '사진을 보내주시면 여기에 넣어드릴게요';
 
+/*
+ * 시네마틱 트랙(src/kit/ 시드됨)의 화면 파일. 킷을 import 하고 <HeroScene>을 쓰면 이 트랙이다.
+ *
+ * 이 트랙은 data-slot도 100vh 리터럴도 쓰지 않는다 — 둘 다 킷 컴포넌트 안에 있다. 그래서 골격7 판정이
+ * 그 두 신호만 보면 시네마틱 생성물을 "골격7이 아님"으로 읽고, 미리 만들어 둔 이미지 세트를 버린다
+ * (2026-09-12 실측: "generated app is not skeleton 7 — discarding pre-started image set" — 이미지 4장과
+ * 히어로 영상 원가는 이미 나간 뒤였고, 생성물은 모델이 지어낸 Unsplash 사진을 썼다).
+ */
+const CINEMATIC_KIT_IMPORT_REGEX = /from\s+['"](\.\/kit|\.\.\/kit|~\/kit)['"]/;
+
+export function isCinematicTrackFile(content: string): boolean {
+  return CINEMATIC_KIT_IMPORT_REGEX.test(content) && /<HeroScene(?![A-Za-z0-9_])/.test(content);
+}
+
 export function isSkeleton7File(content: string): boolean {
-  if (content.includes('data-slot="hero"')) {
+  if (content.includes('data-slot="hero"') || isCinematicTrackFile(content)) {
     return true;
   }
 
@@ -1073,7 +1087,15 @@ function runSkeleton7DataSlotCheck(
   filePath: string,
   content: string,
 ): { findings: MechanicalFinding[]; content: string } {
-  if (!hasExtension(filePath, ['.tsx', '.jsx', '.html']) || !isSkeleton7File(content)) {
+  /*
+   * 시네마틱 트랙은 data-slot 컨테이너를 만들지 않는다(킷 장면 순서가 그걸 대체한다). 이 검사가 그
+   * 생성물에 "컨테이너가 4개가 아니다"를 남기면 자동 검토가 모델을 다시 data-slot 쪽으로 되돌린다.
+   */
+  if (
+    !hasExtension(filePath, ['.tsx', '.jsx', '.html']) ||
+    isCinematicTrackFile(content) ||
+    !isSkeleton7File(content)
+  ) {
     return { findings: [], content };
   }
 
@@ -2411,6 +2433,7 @@ export const __internal = {
   runSkeleton7CardGridHintCheck,
   runSummaryCardMissingContextHintCheck,
   isSkeleton7File,
+  isCinematicTrackFile,
   findChapterSpan,
   findSkeleton7ChapterSpans,
   fixHeadlineTagFontSize,

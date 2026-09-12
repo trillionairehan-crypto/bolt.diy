@@ -489,3 +489,19 @@ Skeleton7Images  generated app is not skeleton 7 — discarding pre-started imag
 1. `isSkeleton7File`이 시네마틱 트랙도 골격7로 인정하게 한다(예: `from './kit'` + `<HeroScene`).
 2. 시네마틱 트랙용 주입 경로 — `data-slot` 대신 킷 props(`<HeroScene image=`, `chapters`의 `image:`)를 갈아끼운다.
 3. `checkCinematicSceneOrder`가 외부 이미지 호스트(unsplash 등)를 잡는다 — 예약 URL을 안 쓴 생성물을 게이트에서 걸러낸다.
+
+### 조치 (2026-09-12 밤, 위 3가지 전부)
+
+1. `isCinematicTrackFile()` 추가 — 킷 import + `<HeroScene>`이면 시네마틱 트랙이다. `isSkeleton7File()`이
+   이걸 골격7로 인정하므로 예약 이미지 세트가 더는 버려지지 않는다. 단 `runSkeleton7DataSlotCheck`는
+   이 트랙을 건너뛴다 — 안 그러면 자동 검토가 "data-slot 컨테이너가 4개가 아니다"를 남겨 모델을 다시
+   골격7 체크리스트 쪽으로 되돌린다.
+2. `injectCinematicImages()` 추가 — 마크업을 넣는 대신 외부 이미지 URL 문자열만 예약 URL로 바꾼다.
+   상수로 빼든(`const HERO = '...'`) prop에 직접 쓰든 같이 걸리고, 킷 레이아웃은 안 건드린다. 파일에
+   나타난 순서대로 첫 URL이 히어로, 그다음 셋이 챕터 1~3이며, 그보다 많으면 ch1~ch3을 돌려 쓴다.
+   영상(.mp4)과 로컬 경로는 제외. 멱등(이미 예약 URL이면 0건).
+3. `checkCinematicSceneOrder`가 외부 이미지 호스트를 잡는다. 이미지로 보이는 URL만 본다(확장자 또는
+   스톡 호스트) — 처음엔 모든 http URL을 봤다가 bakery 생성물의 카카오맵 링크를 오탐했다.
+
+테스트 207건 통과(신규: injectCinematicImages 7건, 외부 이미지 게이트 3건, isCinematicTrackFile 3건).
+저장된 생성물 5건 재판정도 전부 PASS.

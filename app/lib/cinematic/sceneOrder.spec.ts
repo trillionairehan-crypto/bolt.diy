@@ -13,18 +13,18 @@ export default function App() {
       <Cursor />
       <Nav brand="온빛" links={[]} cta="예약" />
       <SceneNav />
-      <HeroScene image="https://cdn/hero.jpg" video="https://cdn/hero.mp4" title="매일 아침 굽습니다" />
+      <HeroScene image="https://pub-x.r2.dev/media/j1/hero.jpg" video="https://pub-x.r2.dev/media/j1/hero.mp4" title="매일 아침 굽습니다" />
       <TextReveal as="h2" className="ck-display ck-display--statement" text="불 앞에서 보낸 시간" />
       <PinnedChapters
         id="story"
         startIndex={2}
         chapters={[
-          { image: 'https://cdn/ch1.jpg', eyebrow: '01', title: '반죽', body: '하루 전에 시작합니다.', treatment: 'grain' },
-          { image: 'https://cdn/ch2.jpg', eyebrow: '02', title: '발효', body: '느리게 기다립니다.', treatment: 'mono' },
-          { image: 'https://cdn/ch3.jpg', eyebrow: '03', title: '굽기', body: '아침 여섯 시.', treatment: 'none' },
+          { image: 'https://pub-x.r2.dev/media/j1/ch1.jpg', eyebrow: '01', title: '반죽', body: '하루 전에 시작합니다.', treatment: 'grain' },
+          { image: 'https://pub-x.r2.dev/media/j1/ch2.jpg', eyebrow: '02', title: '발효', body: '느리게 기다립니다.', treatment: 'mono' },
+          { image: 'https://pub-x.r2.dev/media/j1/ch3.jpg', eyebrow: '03', title: '굽기', body: '아침 여섯 시.', treatment: 'none' },
         ]}
       />
-      <Showcase3D eyebrow="대표" title="캉파뉴" body="묵직한 결" specs={[{ label: '무게', value: '900g' }]} shape="bowl" poster="https://cdn/hero.jpg" />
+      <Showcase3D eyebrow="대표" title="캉파뉴" body="묵직한 결" specs={[{ label: '무게', value: '900g' }]} shape="bowl" poster="https://pub-x.r2.dev/media/j1/hero.jpg" />
       <Marquee items={['매일 굽는 빵']} emphasize={[1]} />
       <Contact id="contact" title="찾아오시는 길" rows={[]} cta="전화" />
     </>
@@ -66,9 +66,9 @@ describe('checkCinematicSceneOrder', () => {
 export default function App() {
   return (
     <section data-slot="hero" style={{ height: '100vh' }}>
-      <video src="https://cdn/hero.mp4" autoPlay muted loop playsInline />
-      <img src="https://cdn/ch1.jpg" alt="" />
-      <ScrollChapter index={2} image="https://cdn/ch1.jpg" />
+      <video src="https://pub-x.r2.dev/media/j1/hero.mp4" autoPlay muted loop playsInline />
+      <img src="https://pub-x.r2.dev/media/j1/ch1.jpg" alt="" />
+      <ScrollChapter index={2} image="https://pub-x.r2.dev/media/j1/ch1.jpg" />
     </section>
   );
 }
@@ -83,7 +83,7 @@ export default function App() {
   });
 
   it('챕터가 3개가 아니면 잡아낸다', () => {
-    const twoChapters = GOOD.replace(/ {10}\{ image: 'https:\/\/cdn\/ch3\.jpg'[^\n]*\n/, '');
+    const twoChapters = GOOD.replace(/ {10}\{ image: '[^']*ch3\.jpg'[^\n]*\n/, '');
     expect(checkCinematicSceneOrder(twoChapters).chapterCount).toBe(2);
   });
 
@@ -96,9 +96,9 @@ export default function App() {
     const hoisted = GOOD.replace(/chapters=\{\[[\s\S]*?\]\}/, 'chapters={CHAPTERS}').replace(
       'export default function App() {',
       `const CHAPTERS = [
-  { image: 'https://cdn/ch1.jpg', eyebrow: '01', title: '반죽', body: '하루 전에 시작합니다.', treatment: 'grain' },
-  { image: 'https://cdn/ch2.jpg', eyebrow: '02', title: '발효', body: '느리게 기다립니다.', treatment: 'mono' },
-  { image: 'https://cdn/ch3.jpg', eyebrow: '03', title: '굽기', body: '아침 여섯 시.', treatment: 'none' },
+  { image: 'https://pub-x.r2.dev/media/j1/ch1.jpg', eyebrow: '01', title: '반죽', body: '하루 전에 시작합니다.', treatment: 'grain' },
+  { image: 'https://pub-x.r2.dev/media/j1/ch2.jpg', eyebrow: '02', title: '발효', body: '느리게 기다립니다.', treatment: 'mono' },
+  { image: 'https://pub-x.r2.dev/media/j1/ch3.jpg', eyebrow: '03', title: '굽기', body: '아침 여섯 시.', treatment: 'none' },
 ];
 
 export default function App() {`,
@@ -113,5 +113,28 @@ export default function App() {`,
     const asChildren = GOOD.replace(/<TextReveal[\s\S]*?\/>/, '<TextReveal>불 앞에서 보낸 시간</TextReveal>');
     const result = checkCinematicSceneOrder(asChildren);
     expect(result.problems).toContain('<TextReveal>에 text prop이 없다 — 문장을 children이 아니라 text로 넘긴다');
+  });
+
+  it('예약 사진 대신 외부 스톡 사진을 쓴 생성물을 잡는다', () => {
+    const stock = GOOD.replace(/https:\/\/pub-x\.r2\.dev\/media\/j1\//g, 'https://images.unsplash.com/');
+    const result = checkCinematicSceneOrder(stock);
+
+    expect(result.pass).toBe(false);
+    expect(result.problems.some((p) => p.includes('images.unsplash.com'))).toBe(true);
+  });
+
+  it('R2 예약 URL과 웹폰트·영상은 외부 이미지로 보지 않는다', () => {
+    const withFont = GOOD.replace("from './kit'", "from './kit'; // https://fonts.googleapis.com/css2?family=X");
+
+    expect(checkCinematicSceneOrder(withFont).problems).toEqual([]);
+  });
+
+  it('사진이 아닌 외부 링크(지도 등)는 잡지 않는다', () => {
+    const withMap = GOOD.replace(
+      '<Contact id="contact"',
+      '<a href="https://map.kakao.com/link/to/1,2,3">길찾기</a>\n      <Contact id="contact"',
+    );
+
+    expect(checkCinematicSceneOrder(withMap).problems).toEqual([]);
   });
 });
