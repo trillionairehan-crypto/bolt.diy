@@ -22,12 +22,20 @@ const ROOT = process.cwd();
 const KIT_SRC = join(ROOT, 'kits/cinematic/src');
 const TMP = join(ROOT, 'kits/cinematic/.render-tmp');
 
-/** 어느 생성물을 잴지 — `node ... renderGenerated.mjs portfolio-claude-sonnet-5` */
+/*
+ * 어느 생성물을 잴지 — `node ... renderGenerated.mjs portfolio-claude-sonnet-5`.
+ * `/`가 들어간 값은 tests/benchmark/cinematic 기준 경로로 본다(예: repro/textreveal-children).
+ */
 const CASE_DIR = process.argv[2] ?? 'bakery-claude-sonnet-5';
-const GEN = join(ROOT, 'tests/benchmark/cinematic/gen-2026-09-12-round2', CASE_DIR, 'screens.tsx');
+const CASE_ROOT = join(
+  ROOT,
+  'tests/benchmark/cinematic',
+  CASE_DIR.includes('/') ? CASE_DIR : join('gen-2026-09-12-round2', CASE_DIR),
+);
+const GEN = join(CASE_ROOT, 'screens.tsx');
 const STILL = join(ROOT, 'tests/benchmark/cinematic/.render-media/still.jpg');
 const VITE = join(ROOT, 'kits/cinematic/node_modules/vite/bin/vite.js');
-const SHOTS = join(ROOT, 'tests/benchmark/cinematic/render-2026-09-12', CASE_DIR);
+const SHOTS = join(ROOT, 'tests/benchmark/cinematic/render-2026-09-12', CASE_DIR.replace('/', '-'));
 
 const DESKTOP = { width: 1280, height: 800 };
 const MOBILE = { width: 400, height: 860 };

@@ -425,3 +425,32 @@ WebGL 히어로 재측정은 실제 렌더에서 한다.
 - (a) 실제 WebContainer 프리뷰·배포 사이트에서의 재측정. CORS는 열려 있음이 확인됐다(위 표) — 남은 건 측정뿐.
 - 실제 GPU·WebContainer 프리뷰에서의 재현(측정은 여전히 SwiftShader + 로컬 정적 서버).
 - 히어로 서브 카피 어절 중간 줄바꿈.
+
+## 실제 WebContainer 프리뷰 실측 (2026-09-12 밤) — 백지 버그 발견
+
+여태 측정은 전부 로컬 정적 서버였다. 실제 제품 경로(채팅 UI → 온보딩 → 생성 → WebContainer 프리뷰)로
+빵집 1건을 만들어 프리뷰 URL을 직접 열었다.
+
+결과: **화면이 백지**. 콘솔:
+
+```
+TypeError: Cannot read properties of undefined (reading 'split')
+    at src/kit/TextReveal.tsx:23
+The above error occurred in the <TextReveal> component
+```
+
+생성물이 `<TextReveal>문장</TextReveal>`(children)로 썼고 `text`가 undefined가 됐다. 킷이 던진 예외를
+받아줄 에러 경계가 없어 App 트리 전체가 언마운트됐다. CORS나 WebGL과 무관한, 프롬프트 준수 실패 +
+킷의 취약함이 겹친 버그다. R2 CORS는 정상이었다(프리뷰 도메인 허용 확인됨).
+
+조치 두 겹
+1. 킷: `TextReveal`이 `children` 문자열도 받고, 문장이 비면 예외 대신 `null`을 그린다. 호출부를 LLM이
+   쓰는 이상 prop 하나 빠졌다고 페이지 전체가 죽어서는 안 된다.
+2. 게이트: `checkCinematicSceneOrder`가 `<TextReveal ... text=...>`가 아니면 잡는다.
+
+검증: 문제의 children 형태를 재현한 픽스처(`repro/textreveal-children/screens.tsx`)를 고친 킷으로 빌드해
+렌더 — 히어로 캔버스 O, 핀·스크럽 O, 3D 드래그 106.1로 정상이다(고치기 전에는 백지). 게이트는 이 픽스처를
+FAIL로, 실제 생성물 5건은 모두 PASS로 판정한다.
+
+이 실측이 말해주는 것: 소스 게이트(sceneOrderCheck)와 로컬 렌더(renderGenerated)만으로는 프롬프트를 벗어난
+호출을 못 잡는다. 실제 프리뷰를 한 번은 열어봐야 한다.

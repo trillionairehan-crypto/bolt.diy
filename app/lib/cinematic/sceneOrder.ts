@@ -149,6 +149,17 @@ export function checkCinematicSceneOrder(source: string): SceneOrderResult {
     }
   }
 
+  /*
+   * 실측(2026-09-12, WebContainer 프리뷰): 생성물이 `<TextReveal>문장</TextReveal>`로 써서 text가
+   * undefined가 됐고, 킷이 던진 예외로 페이지가 백지가 됐다. 킷도 children을 받도록 고쳤지만,
+   * 프롬프트가 지정한 형태를 벗어난 건 여기서 잡는다.
+   */
+  const textReveal = source.match(/<TextReveal(\s[^>]*)?>/);
+
+  if (textReveal && !/\stext=/.test(textReveal[1] ?? '')) {
+    problems.push('<TextReveal>에 text prop이 없다 — 문장을 children이 아니라 text로 넘긴다');
+  }
+
   const chapterCount = countChapters(source);
 
   if (chapterCount !== 3) {

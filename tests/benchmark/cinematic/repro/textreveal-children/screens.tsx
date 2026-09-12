@@ -1,0 +1,119 @@
+/* src/App.jsx */
+import {
+  HeroScene,
+  PinnedChapters,
+  TextReveal,
+  Showcase3D,
+  BigNumber,
+  Marquee,
+  Contact,
+  Nav,
+  Preloader,
+  Cursor,
+  SceneNav,
+  useSmoothScroll,
+} from './kit';
+
+const PHOTO_URL =
+  'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/still-mtwykpyk-1.jpg';
+const HERO_VIDEO_URL =
+  'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/hero-loop.mp4';
+
+function App() {
+  useSmoothScroll({ snap: true });
+
+  return (
+    <>
+      <Preloader brand="onnul 베이커리" />
+      <Cursor />
+      <Nav
+        brand="onnul 베이커리"
+        links={[
+          { label: '이야기', href: '#story' },
+          { label: '오시는 길', href: '#contact' },
+        ]}
+        cta={{ label: '오늘 빵 보기', href: '#story' }}
+      />
+      <SceneNav />
+
+      <HeroScene
+        image={PHOTO_URL}
+        video={HERO_VIDEO_URL}
+        eyebrow="EVERY MORNING, FRESH BREAD"
+        title="새벽 다섯 시, 반죽이 부풀어요"
+        sub="문 열기 전부터 오븐이 돌아가는 동네 빵집이에요"
+        cta={{ label: '이야기 읽어보기', href: '#story' }}
+        overlay={0.45}
+      />
+
+      <TextReveal as="h2" className="ck-display ck-display--statement">좋은 빵은 시간을 줄이지 않아요, 정직하게 기다릴 뿐이에요</TextReveal>
+
+      <PinnedChapters
+        id="story"
+        startIndex={2}
+        chapters={[
+          {
+            image: PHOTO_URL,
+            eyebrow: '01 · 시작',
+            title: '작은 골목, 작은 오븐에서 시작했어요',
+            body: '2016년, 세 평 남짓한 가게에서 오븐 하나로 문을 열었어요. 손님 한 분 한 분 얼굴을 기억하며 빵을 굽다 보니 어느새 동네에서 아침을 여는 빵집이 됐어요.',
+            treatment: 'grain',
+          },
+          {
+            image: PHOTO_URL,
+            eyebrow: '02 · 반죽',
+            title: '전날 밤부터 저온 발효로 기다려요',
+            body: '밀가루, 물, 소금, 효모. 딱 그만큼만 넣고 열두 시간 넘게 천천히 발효해요. 빠른 길이 있어도 가지 않는 이유예요.',
+            treatment: 'mono',
+          },
+          {
+            image: PHOTO_URL,
+            eyebrow: '03 · 아침',
+            title: '해 뜨기 전, 첫 빵이 나와요',
+            body: '오전 7시, 매장 문이 열리는 순간 갓 구운 빵 냄새가 골목까지 퍼져요. 그 냄새를 맡고 들어오시는 분들이 저희의 하루를 시작하게 해요.',
+            treatment: 'none',
+          },
+        ]}
+      />
+
+      <Showcase3D
+        eyebrow="발효 반죽"
+        title="시간이 만드는 결"
+        body="저온 발효로 부풀어 오른 반죽 하나가 빵의 전부를 결정해요. 손으로 직접 돌려보며 결을 확인해보세요."
+        specs={[
+          { label: '발효 시간', value: '12~15시간' },
+          { label: '반죽 온도', value: '4°C 저온숙성' },
+          { label: '사용 재료', value: '밀가루·물·소금·효모' },
+        ]}
+        shape="bowl"
+        poster={PHOTO_URL}
+      />
+
+      <BigNumber value={200} suffix="개 / 하루" label="하루 평균 판매량" />
+
+      <Marquee
+        items={[
+          '매일 아침 6시 오픈',
+          '당일 소진, 당일 마감',
+          '저온 발효 12시간',
+          '방부제 없이 굽는 빵',
+        ]}
+        emphasize={[1]}
+      />
+
+      <Contact
+        id="contact"
+        title="빵 냄새 따라 오시는 길"
+        rows={[
+          { label: '주소', value: '서울시 마포구 동교로 23길 12' },
+          { label: '영업시간', value: '매일 06:00 - 20:00 (재료 소진 시 마감)' },
+          { label: '휴무', value: '매주 월요일' },
+          { label: '문의', value: '02-334-5678' },
+        ]}
+        cta={{ label: '카카오맵으로 찾기', href: 'https://map.kakao.com' }}
+      />
+    </>
+  );
+}
+
+export default App;

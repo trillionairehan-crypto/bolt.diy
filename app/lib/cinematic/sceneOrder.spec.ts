@@ -108,4 +108,10 @@ export default function App() {`,
     expect(result.chapterCount).toBe(3);
     expect(result.problems).toEqual([]);
   });
+
+  it('TextReveal을 children으로 쓴 생성물을 잡는다 (프리뷰 백지 원인)', () => {
+    const asChildren = GOOD.replace(/<TextReveal[\s\S]*?\/>/, '<TextReveal>불 앞에서 보낸 시간</TextReveal>');
+    const result = checkCinematicSceneOrder(asChildren);
+    expect(result.problems).toContain('<TextReveal>에 text prop이 없다 — 문장을 children이 아니라 text로 넘긴다');
+  });
 });
