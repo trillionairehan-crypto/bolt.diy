@@ -296,11 +296,19 @@ WebGL 히어로 재측정은 실제 렌더에서 한다.
 - 모바일에서 히어로가 이미지 폴백이라 항목 1의 연출이 데스크톱 전용이다(설계대로지만 점수는 데스크톱 기준).
 - `injectSkeleton7Images`(정규식 폴백)는 `data-slot`을 찾는다. 시네마틱 생성물에는 이제 `data-slot`이 없으므로 이 트랙에서 폴백은 사실상 동작하지 않는다 — 모델이 URL을 직접 쓰는 프롬프트 경로에만 의존한다.
 
-### 사용자 액션 — R2 CORS 추가 필요
-현재 허용 오리진은 `*.webcontainer-api.io` 하나뿐이다(2026-09-12 curl 확인). 그래서:
-- WebContainer 프리뷰: WebGL 히어로 정상 예상.
-- **배포된 사용자 사이트: 막힌다.** 배포 도메인(그리고 `coralred.app`)에서는 텍스처 로드가 CORS로 실패해
-  히어로가 `<video>`/`<img>`로 내려간다 — 항목 1이 0점이 된다. 배포 오리진도 허용 목록에 넣어야 한다.
+### R2 CORS 허용 오리진 (2026-09-12 curl 재확인)
+
+| Origin | ACAO 응답 |
+|---|---|
+| `https://…webcontainer-api.io` | 허용 |
+| `https://coralred.kr` | 허용 |
+| `https://coralred.pages.dev` · `https://<sub>.coralred.pages.dev` · `https://<any>.pages.dev` | 허용 |
+| `https://www.coralred.kr` | **없음** |
+| `http://localhost:*` | 없음(로컬 측정은 같은 오리진으로 미디어를 준다) |
+
+프리뷰도 배포도 열려 있다. 앞선 기록에서 "배포 오리진이 막혀 있다"고 적은 건 존재하지 않는 도메인
+(`coralred.app`)으로 찔러본 오판이었다 — 실제 도메인은 `coralred.kr`이다.
+남은 구멍은 `www.coralred.kr` 하나. 지금 www로 서비스하지 않으면 문제 없고, 나중에 www를 쓰면 그때 추가한다.
 
 ## 쇼룸(딥 브리프 B1 카드) 미디어 — 2026-09-11 밤
 
@@ -414,6 +422,6 @@ WebGL 히어로 재측정은 실제 렌더에서 한다.
 - `export default function App()`로 쓴 생성물에 `export default App;`을 덧붙여 빌드가 깨졌다 → 이미 default export가 있으면 안 붙인다.
 
 ### 여전히 남은 것
-- (a) 배포 오리진 R2 CORS 추가 — 사용자 액션. 이게 없으면 배포된 사용자 사이트에서 항목 1이 0점이다.
+- (a) 실제 WebContainer 프리뷰·배포 사이트에서의 재측정. CORS는 열려 있음이 확인됐다(위 표) — 남은 건 측정뿐.
 - 실제 GPU·WebContainer 프리뷰에서의 재현(측정은 여전히 SwiftShader + 로컬 정적 서버).
 - 히어로 서브 카피 어절 중간 줄바꿈.
