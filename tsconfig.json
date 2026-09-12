@@ -22,7 +22,8 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"],
-      "~design-handoff/*": ["./design-handoff/*"]
+      "~design-handoff/*": ["./design-handoff/*"],
+      "~cinematic-kit/*": ["./kits/cinematic/src/*"]
     },
     // vite takes care of building everything, not tsc
     "noEmit": true

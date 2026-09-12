@@ -30,6 +30,8 @@ import type { ProviderInfo } from '~/types/model';
 import { useSearchParams } from '@remix-run/react';
 import { createSampler } from '~/utils/sampler';
 import { getBaselineTemplate } from '~/utils/selectStarterTemplate';
+import { CINEMATIC_KIT_PROMPT } from '~/lib/cinematic/kit-files';
+import { seedCinematicKit } from '~/lib/cinematic/seedKit';
 import { designSchemeToHue } from '~/utils/paletteToHue';
 import { logStore } from '~/lib/stores/logs';
 import { streamingState } from '~/lib/stores/streaming';
@@ -945,7 +947,11 @@ export const ChatImpl = memo(
      * setDesignScheme(...) and generateNewApp(...) back to back, and React state updates are
      * async, so the designScheme closure here would otherwise still see the pre-update value.
      */
-    const generateNewApp = async (promptContent: string, designSchemeOverride?: DesignScheme) => {
+    const generateNewApp = async (
+      promptContent: string,
+      designSchemeOverride?: DesignScheme,
+      cinematic: boolean = false,
+    ) => {
       runAnimation();
 
       const effectiveDesignScheme = designSchemeOverride ?? designScheme;
@@ -974,7 +980,21 @@ export const ChatImpl = memo(
        * src/pages/index.astro, which nothing wires App.tsx into — the app was dead on arrival).
        * See selectStarterTemplate.ts's getBaselineTemplate() doc comment for the full story.
        */
-      const { assistantMessage, userMessage } = getBaselineTemplate(designSchemeToHue(effectiveDesignScheme?.palette));
+      /*
+       * 2단계 — 시네마틱 트랙이면 킷 소스(src/kit/, 21파일 86KB)를 WebContainer에 먼저 직접 쓴다.
+       * 아티팩트로 넣지 않는 이유: baseline 아티팩트는 assistant 메시지라 소스 전체가 첫 생성 컨텍스트에
+       * 얹힌다. 모델에게는 CINEMATIC_KIT_PROMPT(API 요약)만 간다. 시드가 실패하면 킷 import가 깨지므로
+       * 그 턴은 기본 트랙(cr- 킷)으로 되돌린다.
+       */
+      let cinematicReady = cinematic;
+
+      if (cinematic) {
+        cinematicReady = await seedCinematicKit();
+      }
+
+      const { assistantMessage, userMessage } = getBaselineTemplate(designSchemeToHue(effectiveDesignScheme?.palette), {
+        cinematic: cinematicReady,
+      });
       const userMessageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${promptContent}`;
       const uploadedFileParts = await filesToFileParts(uploadedFiles);
 
@@ -1070,18 +1090,24 @@ export const ChatImpl = memo(
        * 생성과 동시에 돌린다. 아니면 재료만 기억해 생성물이 골격 7로 나올 때 시작한다(정규식 주입 폴백).
        */
       let promptToSend = finalPrompt;
+      const baseUserPrompt = finalPrompt.split(ONBOARDING_ADDITIONS_MARKER)[0].trim();
+
+      /*
+       * 시네마틱 트랙 판정은 이미지 예약과 같은 조건(골격 7 = 소개·홍보형)을 쓴다 — 둘은 같은 결과물을
+       * 겨냥한다. 트랙이면 baseline에 킷 의존성이 붙고 src/kit/이 시드되며, 프롬프트에 킷 API 요약이 들어간다.
+       */
+      const cinematic = directives.skeleton === 7 || looksLikeShowcasePrompt(baseUserPrompt);
 
       if (directives.industry) {
         const palette = getActivePalette();
-        const userPrompt = finalPrompt.split(ONBOARDING_ADDITIONS_MARKER)[0].trim();
         const jobInput = {
           industry: directives.industry,
-          prompt: userPrompt,
+          prompt: baseUserPrompt,
           accentHex: palette.accent,
           darkPalette: palette.dark,
         };
 
-        if (directives.skeleton === 7 || looksLikeShowcasePrompt(userPrompt)) {
+        if (cinematic) {
           const prepared = await prepareSkeleton7Images(jobInput);
 
           if (prepared) {
@@ -1093,7 +1119,13 @@ export const ChatImpl = memo(
         }
       }
 
-      generateNewApp(promptToSend, designSchemeOverride);
+      if (cinematic) {
+        promptToSend = `${promptToSend}
+
+${CINEMATIC_KIT_PROMPT}`;
+      }
+
+      generateNewApp(promptToSend, designSchemeOverride, cinematic);
     };
 
     /**

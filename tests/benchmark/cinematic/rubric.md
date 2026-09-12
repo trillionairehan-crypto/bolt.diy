@@ -199,6 +199,35 @@ CSSDA 스크립트로 데모 실측(`motion.mjs`/`tech.mjs`, 127.0.0.1:5190) vs 
 - 운영 조건: R2 공개 버킷에 CORS 규칙이 없으면 생성물에서는 히어로가 `<video>` 폴백으로 내려간다(빈 화면은 아니다).
   WebGL 히어로를 실제 사이트에서 쓰려면 버킷에 `Access-Control-Allow-Origin` 허용 규칙이 필요하다 — 사용자 액션.
 
+## 2단계 1차 — 생성물에 킷 주입 (2026-09-12, 실생성 2회)
+
+경로: 시네마틱 트랙(골격 7 = 소개·홍보형 판정)이면 baseline이 킷 의존성(three·@react-three/fiber·gsap·lenis)·서체·
+`src/kit/tokens.css` import를 달고, 킷 소스 21파일은 WebContainer에 직접 시드된다(대화 기록에는 API 요약만).
+증거 `gen-2026-09-12/hero-generated.jpg`.
+
+| 항목 | 골격 7 기준선(09-11) | 킷 트랙 생성물(09-12) | 근거 |
+|---|---|---|---|
+| 1 WebGL 배경 | 0 | 0 | HeroScene이 `<video>` 폴백으로 내려감 — R2 CORS 허용 오리진에 WebContainer 프리뷰(`*.webcontainer-api.io`)가 없어 텍스처 로드 실패(실측: 프리뷰에서 `fetch` CORS 오류) |
+| 2 스크롤 연출 | 0 | 0.5 | Lenis 스무스 + 리빌. 모델이 `PinnedChapters` 대신 구형 `ScrollChapter`를 골라 핀·스크럽 없음 |
+| 3 전면 미디어 | 0 | 1 | 히어로 영상 루프 + 챕터 실사진 4장(예약 URL 그대로) |
+| 4 3D·AR | 0 | 0 | 모델이 `Showcase3D`를 안 씀(프롬프트가 "실제 사물이 있을 때만"이라 적음) |
+| 5 전환·커서·프리로더 | 0 | 0 | `Preloader`·`Cursor` 미사용 |
+| 6 타이포 | 0.5 | 1 | ck-display--xl 한글 헤드라인, 킷 스케일 그대로 |
+| 9 카피 | 0.5 | 1 | 실제 한글 문장, 자리표시 없음 |
+| 10 일관성 | 1 | 1 | ck- 클래스·토큰만 사용(cr- 혼용 없음) |
+| 7 성능 / 8 모바일 | 1 / 0.5 | 미측정 | 이번 런에서 번들·LCP·모바일 레이아웃 측정 안 함 |
+
+같이 확인된 것
+- 킷 시드 실측: `/home/project/src/kit/` 21파일 생성(콘솔 로그). baseline 아티팩트 크기는 13.8KB → 14.4KB로만 증가 — 킷 소스는 컨텍스트에 안 들어간다.
+- 1차 런 실패 원인: 모델이 "npm install과 개발 서버는 이미 실행 중"이라고 쓰고 설치를 건너뛰어 미리보기가 아예 안 떴다.
+  → baseline 아티팩트가 시네마틱 트랙에서 `npm install` + `npm run dev`를 직접 실행하도록 고침. 2차 런에서 미리보기 정상.
+- 2차 런에서 "마무리가 안 끝났어요" 스톨 오탐이 다시 떴다(0단계에서 예고된 three 설치 지연 문제). 화면은 정상 렌더 — feat/stall-fix 영역.
+
+남은 것(2단계 2차)
+- 프롬프트에 장면 순서를 고정: Preloader → Cursor → Nav → HeroScene → TextReveal → PinnedChapters ×3 → BigNumber → Marquee → Contact. `ScrollChapter`는 이 트랙에서 쓰지 말라고 명시.
+- R2 CORS 허용 오리진 확대(아래 사용자 액션) 후 WebGL 히어로 재측정.
+- 생성물 기준 성능·모바일 측정, 그리고 같은 채점표로 재채점.
+
 ## 쇼룸(딥 브리프 B1 카드) 미디어 — 2026-09-11 밤
 
 `kits/cinematic/demo/?showroom`. 가상 브랜드 밀도 × 세계관 6종(`app/lib/media/style-locks.ts`). 세계관당 스틸 3장 생성 → 육안 선별 1장 → Seedance 5초 루프. 스크린샷 `showroom-2026-09-11/`.

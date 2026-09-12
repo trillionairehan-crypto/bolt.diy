@@ -536,6 +536,14 @@ export class WorkbenchStore {
     return this.#filesStore.isFolderLocked(folderPath);
   }
 
+  /**
+   * 파일을 만들되 에디터에서 열지는 않는다 — 시네마틱 킷 시드처럼 한 번에 20개 넘게 쓰는 경로용.
+   * createFile은 쓸 때마다 setSelectedFile을 호출해서 에디터 탭이 파일 수만큼 튄다.
+   */
+  async createFileQuiet(filePath: string, content: string) {
+    return this.#filesStore.createFile(filePath, content);
+  }
+
   async createFile(filePath: string, content: string | Uint8Array = '') {
     try {
       const success = await this.#filesStore.createFile(filePath, content);

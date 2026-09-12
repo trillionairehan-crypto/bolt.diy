@@ -126,12 +126,11 @@ export function extractFilesFromAssistantText(text: string): SimpleFile[] {
 // --- 기준 프로젝트(첫 생성 시드) ---
 
 /*
- * 출시 블로커 조사(2026-09-10)로 발견: coralredKit.ts가 `~design-handoff/coralred-ui.css?raw`로
- * 킷 CSS를 읽는데, 이 harness는 esbuild로 번들해서 node로 직접 실행한다(bundleAndRun.cjs) — esbuild는
- * Vite의 `?raw` 원문 로더 규칙을 모르고 조용히 빈 객체({})로 resolve해버려서, 템플릿 리터럴에 꽂히는
- * 순간 문자열 "[object Object]"가 된다(에러도 안 남, esbuild가 unknown import를 에러 없이 빈 객체로
- * 처리). 프로덕션(Vite/Remix)에서는 `?raw`가 정상 동작해 실제 생성물에는 영향 없다 — harness 전용
- * 버그. 디스크에서 직접 읽어 대체한다.
+ * 출시 블로커 조사(2026-09-10)로 발견했던 harness 전용 버그의 안전망. coralredKit.ts는 킷 CSS를
+ * `~design-handoff/coralred-ui.css?raw`로 읽는데, esbuild는 Vite의 `?raw` 규칙을 몰라 조용히 빈
+ * 객체({})로 resolve했고 템플릿 리터럴에 꽂히는 순간 "[object Object]"가 됐다. 2026-09-12에
+ * bundleAndRun.cjs에 `?raw` 로더 플러그인을 넣어 원인을 없앴다(이제 실제 원문이 온다) — 아래 교체는
+ * 플러그인이 빠지거나 다른 번들 경로가 생겼을 때를 위한 폴백으로만 남긴다.
  */
 const REAL_CORALRED_UI_CSS = (() => {
   try {
