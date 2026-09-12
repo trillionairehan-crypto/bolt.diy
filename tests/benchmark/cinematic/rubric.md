@@ -454,3 +454,38 @@ FAIL로, 실제 생성물 5건은 모두 PASS로 판정한다.
 
 이 실측이 말해주는 것: 소스 게이트(sceneOrderCheck)와 로컬 렌더(renderGenerated)만으로는 프롬프트를 벗어난
 호출을 못 잡는다. 실제 프리뷰를 한 번은 열어봐야 한다.
+
+## Q3 "브랜드 소개·포트폴리오" 실생성 (2026-09-12 밤, 사진 스튜디오)
+
+격자 항목을 새로 넣고 제품 경로 그대로 1건 생성했다. 킷은 제대로 붙었다 — 프리뷰에 `<canvas>` 1개
+(히어로 WebGL, `<video>` 폴백 0), `[data-ck="preloader"]`·`[data-ck="cursor"]`·`[data-ck="chapter"]`
+모두 존재, 마키·TextReveal 스크럽 동작. 백지 없음.
+
+그런데 **사진이 전부 Unsplash URL이었다**(4장). 예약된 R2 URL은 한 장도 안 쓰였다.
+
+원인: `isSkeleton7File()`이 `data-slot="hero"` 또는 `100vh` 리터럴 개수로 골격7을 판정한다. 시네마틱
+생성물에는 둘 다 없다(킷이 내부에서 처리). 그래서 생성 직후 콘솔에 이렇게 찍힌다:
+
+```
+Skeleton7Images  generated app is not skeleton 7 — discarding pre-started image set
+```
+
+결과가 나쁜 쪽으로 세 겹이다.
+1. 미리 시작한 이미지 세트(4장)가 버려진다 — 이미 생성됐고 원가도 나갔다(`api.media-images image set generated`).
+2. 히어로 영상도 계속 만들어져 완료된다(`video ready`) — 역시 아무도 안 쓴다.
+3. 정규식 주입 폴백(`injectSkeleton7Images`)도 `data-slot`을 찾으므로 사실상 무효다.
+   → 모델이 예약 URL을 안 쓰면 복구 경로가 아예 없다.
+
+같은 런에서 나온 다른 문제
+- `Showcase3D`가 빠졌다(캔버스 1개, "DRAG TO ROTATE" 없음) — 채점표 항목 4가 0이다. 헤드리스 게이트
+  5건은 전부 통과했는데 UI 경로에서만 빠졌다. UI 경로에는 baseline 아티팩트·온보딩 지시문·자동 검토
+  재작성(이 런에서 Marquee items 수정 1회)이 더 붙는다 — 그 차이를 봐야 한다.
+- 히어로 사진이 밝은 하늘 배경이라 흰 헤드라인이 거의 안 읽힌다(overlay 0.45로 부족). 그리고 사람 손이
+  크게 나온다 — 실사 인물 금지 규칙에 걸린다(Unsplash 사진이라 우리 생성 파이프라인 밖이긴 하다).
+- 색 단계에서 "다크"를 골랐는데 생성물은 킷 기본(밝은 톤)으로 나왔다. 킷 토큰이 팔레트를 대체하므로
+  의도된 동작이지만, 사용자가 고른 색이 무시된 것처럼 보인다.
+
+고칠 방향(미착수)
+1. `isSkeleton7File`이 시네마틱 트랙도 골격7로 인정하게 한다(예: `from './kit'` + `<HeroScene`).
+2. 시네마틱 트랙용 주입 경로 — `data-slot` 대신 킷 props(`<HeroScene image=`, `chapters`의 `image:`)를 갈아끼운다.
+3. `checkCinematicSceneOrder`가 외부 이미지 호스트(unsplash 등)를 잡는다 — 예약 URL을 안 쓴 생성물을 게이트에서 걸러낸다.
