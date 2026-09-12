@@ -89,9 +89,9 @@ createRoot(document.getElementById('root')!).render(
 );
 `;
 
-function buildBaselineIndexHtml(hue: number, cinematic = false): string {
+function buildBaselineIndexHtml(hue: number, cinematic = false, darkTheme = false): string {
   return `<!doctype html>
-<html lang="ko">
+<html lang="ko"${darkTheme ? ' data-theme="dark"' : ''}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -122,16 +122,24 @@ ${CORALRED_HEAD_INJECTION}${cinematic ? CINEMATIC_FONT_LINKS : ''}</head>
  * ever needs one shape, this local, GitHub-independent baseline is the only path: no network
  * dependency, no LLM selection call, no risk of picking something the pipeline can't render.
  */
-export function getBaselineTemplate(hue: number, options: { cinematic?: boolean } = {}) {
+export function getBaselineTemplate(hue: number, options: { cinematic?: boolean; darkTheme?: boolean } = {}) {
   /*
    * 시네마틱 트랙(골격 7 소개·홍보형)은 킷 의존성·서체·토큰 import가 더 붙는다. 킷 소스 자체는 여기 없다 —
    * 86KB라 아티팩트에 넣으면 첫 생성 컨텍스트가 그만큼 커진다. seedCinematicKit()이 WebContainer에 직접 쓴다.
    */
   const cinematic = options.cinematic === true;
+
+  /*
+   * 팔레트는 여태 --hue 숫자 하나로만 생성물에 전달됐다. 다크·미니멀처럼 색상(hue)이 아니라 배경·글자
+   * 밝기로 구별되는 팔레트는 그 숫자에 아무것도 안 담겨서, 사용자가 "다크"를 골라도 생성물이 밝게
+   * 나왔다(2026-09-12 실측). 어두운 팔레트면 코랄레드 킷의 data-theme="dark"를 켠다 — 시네마틱 킷
+   * 토큰도 var(--bg)·var(--text)를 그대로 받으므로 같이 어두워진다.
+   */
+  const darkTheme = options.darkTheme === true;
   const files: { path: string; content: string }[] = [
     { path: 'package.json', content: buildBaselinePackageJson(cinematic) },
     { path: 'vite.config.ts', content: BASELINE_VITE_CONFIG },
-    { path: 'index.html', content: buildBaselineIndexHtml(hue, cinematic) },
+    { path: 'index.html', content: buildBaselineIndexHtml(hue, cinematic, darkTheme) },
     { path: 'src/main.tsx', content: buildBaselineMainTsx(cinematic) },
     { path: 'src/App.tsx', content: CORALRED_APP_TSX },
     { path: 'src/index.css', content: CORALRED_INDEX_CSS },

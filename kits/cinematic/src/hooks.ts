@@ -28,17 +28,51 @@ export function useIsDesktop(): boolean {
   return useMediaQuery('(min-width: 768px)');
 }
 
-/** WebGL 컨텍스트를 만들 수 있는지. 첫 렌더는 false — 못 만드는 브라우저에 three 청크를 보내지 않는다. */
+function canCreateWebGLContext(): boolean {
+  try {
+    const canvas = document.createElement('canvas');
+    return Boolean(canvas.getContext('webgl2') || canvas.getContext('webgl'));
+  } catch {
+    return false;
+  }
+}
+
+/*
+ * WebGL 컨텍스트를 만들 수 있는지. 첫 렌더는 false — 못 만드는 브라우저에 three 청크를 보내지 않는다.
+ *
+ * 한 번만 재보면 안 된다: 2026-09-12 WebContainer 프리뷰 실측에서 생성 직후 첫 마운트의 probe가 false로
+ * 나와 히어로와 Showcase3D가 둘 다 정지 이미지로 굳었다(같은 페이지 콘솔에서 직접 만들면 성공했다).
+ * 생성 직후는 설치·번들·이미지 업로드가 겹쳐 GPU 프로세스가 늦게 뜨는 구간이라, 실패하면 몇 번 더 본다.
+ */
+const WEBGL_RETRY_DELAYS_MS = [0, 400, 1500, 4000];
+
 export function useWebGL(): boolean {
   const [ok, setOk] = useState(false);
 
   useEffect(() => {
-    try {
-      const canvas = document.createElement('canvas');
-      setOk(Boolean(canvas.getContext('webgl2') || canvas.getContext('webgl')));
-    } catch {
-      setOk(false);
+    if (canCreateWebGLContext()) {
+      setOk(true);
+      return undefined;
     }
+
+    let done = false;
+    const timers = WEBGL_RETRY_DELAYS_MS.map((delay) =>
+      window.setTimeout(() => {
+        if (done) {
+          return;
+        }
+
+        if (canCreateWebGLContext()) {
+          done = true;
+          setOk(true);
+        }
+      }, delay),
+    );
+
+    return () => {
+      done = true;
+      timers.forEach((timer) => window.clearTimeout(timer));
+    };
   }, []);
 
   return ok;

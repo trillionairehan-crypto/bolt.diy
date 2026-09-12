@@ -1,13 +1,13 @@
 {
   "preloaderAtLoad": true,
-  "loadMs": 1096,
+  "loadMs": 1043,
   "paint": {
-    "fcpMs": 500,
-    "domMs": 1098
+    "fcpMs": 432,
+    "domMs": 1043
   },
   "heroCanvas": true,
   "heroVideoFallback": false,
-  "heroMotion": 2.17,
+  "heroMotion": 1.74,
   "cursor": true,
   "chapterFound": true,
   "pinPosition": "sticky",
@@ -19,14 +19,14 @@
     },
     "samples": [
       {
-        "scrollY": 1871,
+        "scrollY": 1826,
         "top": 0,
         "position": "sticky",
         "active": 1,
         "inPinWindow": true
       },
       {
-        "scrollY": 1209,
+        "scrollY": 997,
         "top": 0,
         "position": "sticky",
         "active": 0,
@@ -64,11 +64,11 @@
   "canvasCount": 2,
   "showcaseClip": {
     "x": 672,
-    "y": 360.40625,
+    "y": 388.40625,
     "width": 544,
-    "height": 680
+    "height": 624
   },
-  "dragDelta": 107.84,
+  "dragDelta": 27.35,
   "mobile": {
     "scrollWidth": 400,
     "clientWidth": 400,
@@ -77,7 +77,7 @@
   "bundleKb": {
     "HeroCanvas-BOlio2TY.js": 4,
     "index-DpGTTM8U.css": 5,
-    "index-xK2qs6iL.js": 293,
+    "index-DtGrdeFj.js": 293,
     "Showcase3DScene-DgDc1k_X.js": 5,
     "three-kNIIe7K7.js": 808
   }

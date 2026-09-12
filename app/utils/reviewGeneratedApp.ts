@@ -50,6 +50,16 @@ const MAX_VISUAL_FIX_FILES = 2;
 // 체크리스트가 UI/브랜딩 관심사라 대상이 아니고 토큰만 태우는 순수 보일러플레이트 타입 선언 파일.
 const EXCLUDED_FILENAMES = new Set(['vite-env.d.ts']);
 
+/*
+ * 시네마틱 킷(src/kit/, 21파일 86KB)은 생성물의 코드가 아니라 우리가 시드한 고정 라이브러리다.
+ * 검토 대상에 넣으면 셋 다 손해다.
+ *   - 검토 LLM 입력에 매번 86KB가 얹힌다(생성 1건당 25k 토큰 수준).
+ *   - 체크리스트가 cr- 트랙 기준이라 킷 파일에 엉뚱한 수정 지시가 나온다("수정 금지" 계약 위반).
+ *   - 기계 검사의 색 리터럴 자동수정이 킷 소스를 건드린다 — Showcase3D는 three에 넘기는 색을
+ *     '#ff5330' 문자열로 들고 있고(var(...)는 three가 못 읽는다) 이게 치환되면 3D가 깨진다.
+ */
+const EXCLUDED_DIR_PREFIXES = ['kit/'];
+
 export interface ReviewInput {
   text: string;
   fileCount: number;
@@ -67,6 +77,12 @@ export function selectReviewableEntries(files: FileMap): Array<[string, FileEntr
     }
 
     if (!filePath.startsWith(srcPrefix)) {
+      return false;
+    }
+
+    const relativePath = filePath.slice(srcPrefix.length);
+
+    if (EXCLUDED_DIR_PREFIXES.some((prefix) => relativePath.startsWith(prefix))) {
       return false;
     }
 

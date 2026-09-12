@@ -994,6 +994,7 @@ export const ChatImpl = memo(
 
       const { assistantMessage, userMessage } = getBaselineTemplate(designSchemeToHue(effectiveDesignScheme?.palette), {
         cinematic: cinematicReady,
+        darkTheme: getActivePalette().dark === true,
       });
       const userMessageText = `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${promptContent}`;
       const uploadedFileParts = await filesToFileParts(uploadedFiles);
