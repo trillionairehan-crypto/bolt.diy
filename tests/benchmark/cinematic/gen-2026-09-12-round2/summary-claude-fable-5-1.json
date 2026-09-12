@@ -1,0 +1,9 @@
+[
+  {
+    "name": "yoga",
+    "model": "claude-fable-5-1",
+    "pass": true,
+    "problems": [],
+    "elapsedSec": 81.49978229999999
+  }
+]

@@ -41,17 +41,34 @@ function firstIndexOf(source: string, component: string): number {
  * 본문 카피에 중괄호가 들어가는 경우는 없지만, 따옴표 안의 대괄호로 배열이 일찍 닫히는 오판은 막는다.
  */
 function countChapters(source: string): number {
-  const start = source.search(/chapters=\{\[/);
+  const inline = source.search(/chapters=\{\[/);
 
-  if (start < 0) {
+  if (inline >= 0) {
+    return countObjectsInArrayAt(source, source.indexOf('[', inline));
+  }
+
+  /*
+   * 배열을 밖으로 빼는 생성물도 있다(claude-opus-5 실측: `const CHAPTERS = [...]` 뒤
+   * `chapters={CHAPTERS}`). 더 나은 코드지 위반이 아니므로 선언을 찾아가서 센다.
+   */
+  const named = source.match(/chapters=\{([A-Za-z_$][\w$]*)\}/);
+
+  if (!named) {
     return 0;
   }
 
+  const declaration = source.search(new RegExp(`(const|let|var)\\s+${named[1]}\\b[^=]*=\\s*\\[`));
+
+  return declaration < 0 ? 0 : countObjectsInArrayAt(source, source.indexOf('[', declaration));
+}
+
+/** @param open 배열을 여는 `[`의 인덱스. */
+function countObjectsInArrayAt(source: string, open: number): number {
   let depth = 0;
   let count = 0;
   let quote: string | null = null;
 
-  for (let i = source.indexOf('[', start); i < source.length; i++) {
+  for (let i = open; i < source.length; i++) {
     const char = source[i];
 
     if (quote) {

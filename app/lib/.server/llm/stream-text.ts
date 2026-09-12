@@ -7,6 +7,7 @@ import {
   type FileMap,
 } from './constants';
 import { getSystemPrompt } from '~/lib/common/prompts/prompts';
+import { isCinematicProject } from '~/lib/cinematic/isCinematicProject';
 import { DEFAULT_MODEL, DEFAULT_PROVIDER, MODIFICATIONS_TAG_NAME, PROVIDER_LIST, WORK_DIR } from '~/utils/constants';
 import type { IProviderSetting } from '~/types/model';
 import { PromptLibrary } from '~/lib/common/prompt-library';
@@ -187,6 +188,7 @@ export async function streamText(props: {
       allowedHtmlElements: allowedHTMLElements,
       modificationTagName: MODIFICATIONS_TAG_NAME,
       designScheme,
+      cinematic: isCinematicProject(files),
       supabase: {
         isConnected: options?.supabaseConnection?.isConnected || false,
         hasSelectedProject: options?.supabaseConnection?.hasSelectedProject || false,

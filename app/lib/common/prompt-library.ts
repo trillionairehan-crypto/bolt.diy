@@ -8,6 +8,9 @@ export interface PromptOptions {
   allowedHtmlElements: string[];
   modificationTagName: string;
   designScheme?: DesignScheme;
+
+  /** 시네마틱 트랙(src/kit/이 시드된 프로젝트)인지 — 골격 7 체크리스트를 킷 지시로 바꾼다. */
+  cinematic?: boolean;
   supabase?: {
     isConnected: boolean;
     hasSelectedProject: boolean;
@@ -30,7 +33,7 @@ export class PromptLibrary {
     default: {
       label: 'Default Prompt',
       description: 'An fine tuned prompt for better results and less token usage',
-      get: (options) => getFineTunedPrompt(options.cwd, options.supabase, options.designScheme),
+      get: (options) => getFineTunedPrompt(options.cwd, options.supabase, options.designScheme, options.cinematic),
     },
     original: {
       label: 'Old Default Prompt',

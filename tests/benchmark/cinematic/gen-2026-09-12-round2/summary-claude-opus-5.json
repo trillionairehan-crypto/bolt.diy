@@ -1,0 +1,11 @@
+[
+  {
+    "name": "portfolio",
+    "model": "claude-opus-5",
+    "pass": false,
+    "problems": [
+      "PinnedChapters 챕터가 0개다 — 정확히 3개여야 한다"
+    ],
+    "elapsedSec": 50.8770226
+  }
+]

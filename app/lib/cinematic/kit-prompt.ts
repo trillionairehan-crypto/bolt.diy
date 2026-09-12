@@ -10,13 +10,9 @@
  */
 export const CINEMATIC_KIT_PROMPT = `이 프로젝트에는 시네마틱 킷이 \`src/kit/\`에 이미 설치돼 있다(수정 금지, 새로 만들지 말 것). 화면은 이 컴포넌트들을 조립해서 만든다.
 
-## 이 지시가 골격 7(소개·홍보형) 체크리스트를 대체한다
-골격 7 체크리스트는 킷이 없는 프로젝트용이다. 이 프로젝트에서는 아래 항목이 무효다 — 따르지 말 것.
-- data-slot="hero"/"ch1"/"ch2"/"ch3" 컨테이너 4개, height: 100vh 리터럴 → 대신 아래 장면 순서를 쓴다.
-- 히어로·챕터 마크업을 JSX 블록으로 직접 쓰라는 지시, 이미지 16:9·4:3 비율 지시, 좌우 교대 지시 → 킷 컴포넌트가 처리한다.
-- font-family: 'Noto Serif KR' 인라인 지정과 <head> 폰트 로딩 코드 추가 → 킷 서체가 index.html에 이미 있고 ck- 클래스가 적용한다.
-- 페이드+상승 600ms 등장, "패럴랙스를 쓰지 않는다" 규칙 → 이 트랙은 핀·스크럽·패럴랙스를 쓴다(킷이 구현한다).
-- "사진을 보내주시면 여기에 넣어드릴게요" 문구와 코랄 틴트 플레이스홀더 → 사진 URL이 이미 있으므로 쓰지 않는다.
+## 이 지시가 골격 7(소개·홍보형)의 첫 화면 문법을 대체한다
+어디선가 data-slot 컨테이너 4개·height: 100vh 리터럴·이미지 16:9/4:3·'Noto Serif KR' 인라인 지정·
+페이드+상승 등장·"패럴랙스를 쓰지 않는다"를 봤다면 그건 킷이 없는 프로젝트용이다 — 따르지 말 것.
 그대로 유지되는 것: 밀도 spacious, 한글 실문장 카피, 나열(.map 반복 카드) 금지.
 
 import { HeroScene, PinnedChapters, TextReveal, Showcase3D, BigNumber, Marquee, Contact, Nav, Preloader, Cursor, SceneNav, useSmoothScroll } from './kit';

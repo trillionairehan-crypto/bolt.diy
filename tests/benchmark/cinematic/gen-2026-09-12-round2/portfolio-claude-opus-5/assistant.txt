@@ -1,0 +1,141 @@
+사진작가 포트폴리오 사이트를 시네마틱 킷으로 조립했어요. 히어로에서 영상이 셰이더로 흐르고, 스크롤에 따라 선언문이 어절 단위로 드러난 뒤 작업물 3개가 핀+스크럽으로 펼쳐지는 구성이에요.
+
+카메라를 소개하는 3D 섹션은 `shape="jar"`(렌즈 경통에 가까운 기둥형)로 두었고, 확인되지 않은 숫자는 지어내지 않기 위해 BigNumber는 건너뛰었어요.
+
+<boltArtifact id="photographer-portfolio-cinematic" title="사진작가 포트폴리오 - 시네마틱 킷">
+<boltAction type="file" filePath="src/App.jsx">import {
+  HeroScene,
+  PinnedChapters,
+  TextReveal,
+  Showcase3D,
+  Marquee,
+  Contact,
+  Nav,
+  Preloader,
+  Cursor,
+  SceneNav,
+  useSmoothScroll,
+} from './kit';
+
+const HERO_IMAGE =
+  'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/still-mtwykpyk-1.jpg';
+const HERO_VIDEO =
+  'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/hero-loop.mp4';
+
+const CHAPTERS = [
+  {
+    image: HERO_IMAGE,
+    alt: '새벽 골목을 담은 거리 사진',
+    eyebrow: '01 — 거리',
+    title: '해가 뜨기 직전의 골목',
+    body: '사람이 나오기 전의 도시를 찍었어요. 간판 불이 꺼지고 첫 버스가 지나갈 때까지, 같은 골목을 두 달 동안 걸었어요. 비어 있는 시간에도 도시는 계속 표정을 바꾸더라고요.',
+    treatment: 'grain',
+  },
+  {
+    image: HERO_IMAGE,
+    alt: '창가에 앉은 인물을 담은 초상 사진',
+    eyebrow: '02 — 인물',
+    title: '말을 걸기 전의 표정',
+    body: '셔터를 누르기 전에 먼저 한참을 이야기해요. 카메라를 의식하지 않게 되는 순간이 오면, 그때부터 찍기 시작해요. 꾸며진 얼굴보다 잠깐 스치는 표정이 더 오래 남아요.',
+    treatment: 'mono',
+  },
+  {
+    image: HERO_IMAGE,
+    alt: '작업실의 정물을 담은 사진',
+    eyebrow: '03 — 정물',
+    title: '오래 쓴 물건의 기록',
+    body: '누군가 매일 쥐었던 물건에는 손자국이 남아요. 낡은 주전자, 닳은 앞치마, 이 빠진 잔. 그 흔적을 빛 하나로 드러내는 게 이 작업의 전부예요.',
+    treatment: 'none',
+  },
+];
+
+const SPECS = [
+  { label: '주로 쓰는 카메라', value: '필름 중형 · 디지털 35mm' },
+  { label: '작업 방식', value: '자연광 중심, 최소한의 보정' },
+  { label: '작업 분야', value: '인물 · 거리 · 정물' },
+];
+
+const MARQUEE_ITEMS = [
+  '거리 사진',
+  '인물 촬영',
+  '정물 기록',
+  '필름 현상',
+  '전시 프린트',
+  '자연광 작업',
+];
+
+const CONTACT_ROWS = [
+  { label: '이메일', value: 'studio@example.com' },
+  { label: '인스타그램', value: '@photo.studio' },
+  { label: '작업 문의', value: '평일 10시 — 19시' },
+  { label: '작업실', value: '서울 마포구' },
+];
+
+export default function App() {
+  useSmoothScroll({ snap: true });
+
+  return (
+    <>
+      <Preloader brand="스튜디오 여백" />
+      <Cursor />
+      <Nav
+        brand="스튜디오 여백"
+        links={[
+          { label: '작업', href: '#story' },
+          { label: '소개', href: '#about' },
+          { label: '연락', href: '#contact' },
+        ]}
+        cta={{ label: '촬영 문의', href: '#contact' }}
+      />
+      <SceneNav />
+
+      <HeroScene
+        image={HERO_IMAGE}
+        video={HERO_VIDEO}
+        eyebrow="사진가 · 서울"
+        title="빛이 머문 자리를 찍어요"
+        sub="거리와 사람, 오래 쓴 물건을 기록합니다. 꾸미지 않은 순간을 오래 들여다보는 일을 좋아해요."
+        cta={{ label: '작업 보기', href: '#story' }}
+        overlay={0.45}
+      />
+
+      <TextReveal
+        as="h2"
+        className="ck-display ck-display--statement"
+        text="좋은 사진은 잘 찍은 사진이 아니라 오래 들여다보게 되는 사진이라고 믿어요"
+        emphasize={[8, 9]}
+      />
+
+      <PinnedChapters id="story" startIndex={2} chapters={CHAPTERS} />
+
+      <Showcase3D
+        id="about"
+        eyebrow="쓰는 장비"
+        title="손에 익은 렌즈 하나면 충분해요"
+        body="장비를 많이 바꾸지 않아요. 같은 렌즈를 오래 쓰면 어떤 거리에서 어떤 빛이 담기는지 몸이 먼저 기억하게 되거든요. 그때부터는 고민 대신 그냥 찍게 돼요."
+        specs={SPECS}
+        shape="jar"
+        poster={HERO_IMAGE}
+      />
+
+      <Marquee items={MARQUEE_ITEMS} emphasize={[1]} />
+
+      <Contact
+        id="contact"
+        title="찍고 싶은 장면이 있다면 알려주세요"
+        rows={CONTACT_ROWS}
+        cta={{ label: '메일 보내기', href: 'mailto:studio@example.com' }}
+      />
+    </>
+  );
+}
+</boltAction>
+</boltArtifact>
+
+작업물 3개는 거리·인물·정물로 나눠 각각 grain / mono / none 질감을 다르게 줬어요. 소개 섹션은 장비 이야기로 풀어서 3D 오브젝트와 자연스럽게 이어지게 했고요.
+
+다음으로 이런 것도 해볼 수 있어요:
+- 작업물 설명 내 이야기로 바꾸기
+- 연락처 정보 실제 걸로 수정하기
+- 상호명이랑 문구 다듬기
+- 배포해서 링크 공유하기

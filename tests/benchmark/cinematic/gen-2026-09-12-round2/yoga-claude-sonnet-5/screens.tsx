@@ -1,0 +1,116 @@
+/* src/App.jsx */
+import {
+  HeroScene,
+  PinnedChapters,
+  TextReveal,
+  Showcase3D,
+  Marquee,
+  Contact,
+  Nav,
+  Preloader,
+  Cursor,
+  SceneNav,
+  useSmoothScroll,
+} from './kit';
+
+const PHOTO =
+  'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/still-mtwykpyk-1.jpg';
+const HERO_VIDEO =
+  'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/hero-loop.mp4';
+
+function App() {
+  useSmoothScroll({ snap: true });
+
+  return (
+    <>
+      <Preloader brand="mudra 요가원" />
+      <Cursor />
+      <Nav
+        brand="mudra 요가원"
+        links={[
+          { label: '수업', href: '#story' },
+          { label: '강사', href: '#story' },
+          { label: '문의', href: '#contact' },
+        ]}
+        cta={{ label: '시간표 문의하기', href: '#contact' }}
+      />
+      <SceneNav />
+
+      <HeroScene
+        image={PHOTO}
+        video={HERO_VIDEO}
+        eyebrow="TRUST YOUR BREATH"
+        title="숨을 고르는 시간, 여기서부터"
+        sub="번잡한 하루 끝, 몸과 마음이 함께 쉬어가는 요가원이에요"
+        cta={{ label: '시간표 문의하기', href: '#contact' }}
+        overlay={0.45}
+      />
+
+      <TextReveal
+        as="h2"
+        className="ck-display ck-display--statement"
+        text="잘하지 않아도 괜찮아요, 매트 위에서는 오직 나의 속도만 있어요"
+        emphasize={[8, 9]}
+      />
+
+      <PinnedChapters
+        id="story"
+        startIndex={2}
+        chapters={[
+          {
+            image: PHOTO,
+            eyebrow: 'CLASS MOOD',
+            title: '조용히 스며드는 수업 분위기',
+            body: '은은한 조명과 낮은 음악 속에서 호흡을 따라가다 보면 어느새 잡생각이 가라앉아요. 초보자도 부담 없이 자기 몸에 집중할 수 있도록 소수 정원으로만 진행해요.',
+            treatment: 'grain',
+          },
+          {
+            image: PHOTO,
+            eyebrow: 'INSTRUCTOR',
+            title: '10년을 매트 위에서 보낸 강사',
+            body: '해부학 기반의 안전한 동작 지도를 가장 중요하게 생각해요. 회원 한 명 한 명의 몸 상태를 살피고, 무리하지 않는 선에서 깊이를 더해가는 방식으로 수업을 이끌어요.',
+            treatment: 'mono',
+          },
+          {
+            image: PHOTO,
+            eyebrow: 'EVERYDAY PRACTICE',
+            title: '일상에 자연스럽게 스며드는 루틴',
+            body: '아침반, 저녁반, 주말반까지 생활 패턴에 맞춰 고를 수 있어요. 하루 50분, 일주일에 두세 번이면 몸이 달라지는 걸 느낄 수 있어요.',
+            treatment: 'none',
+          },
+        ]}
+      />
+
+      <Showcase3D
+        eyebrow="OUR SPACE"
+        title="정성으로 채운 수련 공간"
+        body="천장이 높은 스튜디오에 자연광이 깊게 들어오도록 설계했어요. 매트 한 장의 간격까지 신경 써서 온전히 나에게 집중할 수 있어요."
+        specs={[
+          { label: '수업 정원', value: '최대 8명' },
+          { label: '운영 시간', value: '평일 07:00 - 21:00' },
+          { label: '수업 방식', value: '하타 · 빈야사 · 스트레칭' },
+        ]}
+        shape="bowl"
+        poster={PHOTO}
+      />
+
+      <Marquee
+        items={['호흡', '균형', '이완', '유연함', '집중', '회복']}
+        emphasize={[1]}
+      />
+
+      <Contact
+        id="contact"
+        title="시간표가 궁금하다면 편하게 물어보세요"
+        rows={[
+          { label: '전화 문의', value: '02-1234-5678' },
+          { label: '카카오톡', value: '@mudra요가원' },
+          { label: '위치', value: '서울시 강남구 수련로 12길 8' },
+        ]}
+        cta={{ label: '시간표 문의하기', href: 'tel:02-1234-5678' }}
+      />
+    </>
+  );
+}
+
+export default App;

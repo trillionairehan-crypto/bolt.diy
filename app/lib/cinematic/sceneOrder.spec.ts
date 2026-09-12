@@ -91,4 +91,21 @@ export default function App() {
     const bracketCopy = GOOD.replace('하루 전에 시작합니다.', '하루 전에 시작합니다 [오전 6시]');
     expect(checkCinematicSceneOrder(bracketCopy).chapterCount).toBe(3);
   });
+
+  it('배열을 밖으로 뺀 생성물도 챕터를 센다 (claude-opus-5 실측 모양)', () => {
+    const hoisted = GOOD.replace(/chapters=\{\[[\s\S]*?\]\}/, 'chapters={CHAPTERS}').replace(
+      'export default function App() {',
+      `const CHAPTERS = [
+  { image: 'https://cdn/ch1.jpg', eyebrow: '01', title: '반죽', body: '하루 전에 시작합니다.', treatment: 'grain' },
+  { image: 'https://cdn/ch2.jpg', eyebrow: '02', title: '발효', body: '느리게 기다립니다.', treatment: 'mono' },
+  { image: 'https://cdn/ch3.jpg', eyebrow: '03', title: '굽기', body: '아침 여섯 시.', treatment: 'none' },
+];
+
+export default function App() {`,
+    );
+
+    const result = checkCinematicSceneOrder(hoisted);
+    expect(result.chapterCount).toBe(3);
+    expect(result.problems).toEqual([]);
+  });
 });

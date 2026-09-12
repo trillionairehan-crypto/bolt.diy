@@ -1,0 +1,23 @@
+[
+  {
+    "name": "bakery",
+    "model": "claude-sonnet-5",
+    "pass": true,
+    "problems": [],
+    "elapsedSec": 37.3360556
+  },
+  {
+    "name": "portfolio",
+    "model": "claude-sonnet-5",
+    "pass": true,
+    "problems": [],
+    "elapsedSec": 37.103932799999995
+  },
+  {
+    "name": "yoga",
+    "model": "claude-sonnet-5",
+    "pass": true,
+    "problems": [],
+    "elapsedSec": 35.8579627
+  }
+]

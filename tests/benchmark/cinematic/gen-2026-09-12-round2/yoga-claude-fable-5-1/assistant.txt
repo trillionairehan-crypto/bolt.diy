@@ -1,0 +1,138 @@
+요가원 홍보 페이지를 만들어드릴게요. 보내주신 사진과 영상을 히어로에 그대로 넣고, 스크롤을 내리면 수업 분위기 → 강사 소개 → 첫 수업 안내가 한 장면씩 펼쳐지도록 구성했어요. 마지막에는 시간표를 문의할 수 있는 연락 섹션이 있어요.
+
+숫자 통계는 알려주신 정보가 없어서 넣지 않았고, 3D 오브젝트는 요가원에 어울리는 싱잉볼로 잡았어요.
+
+<boltArtifact id="yoga-studio-landing" title="요가원 홍보 페이지">
+<boltAction type="file" filePath="src/App.tsx" contentType="text/typescript-jsx">import {
+  HeroScene,
+  PinnedChapters,
+  TextReveal,
+  Showcase3D,
+  Marquee,
+  Contact,
+  Nav,
+  Preloader,
+  Cursor,
+  SceneNav,
+  useSmoothScroll,
+} from './kit';
+
+const HERO_IMAGE =
+  'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/still-mtwykpyk-1.jpg';
+const HERO_VIDEO =
+  'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/showroom/photo-editorial/hero-loop.mp4';
+
+const BRAND = '숨 요가원';
+
+const NAV_LINKS = [
+  { label: '수업', href: '#story' },
+  { label: '싱잉볼', href: '#bowl' },
+  { label: '문의', href: '#contact' },
+];
+
+const CHAPTERS = [
+  {
+    image: HERO_IMAGE,
+    alt: '아침 햇살이 드는 요가원에서 매트를 펴고 호흡하는 수련생',
+    eyebrow: '수업 분위기',
+    title: '말이 적고, 숨이 많은 공간',
+    body:
+      '수업은 한 번에 여덟 명까지만 받아요. 강사가 한 사람 한 사람의 호흡을 따라갈 수 있는 인원이에요. 창으로 들어오는 빛과 나무 바닥의 온기 속에서 오늘 내 몸이 허락하는 만큼만 움직여요.',
+    treatment: 'grain',
+  },
+  {
+    image: HERO_IMAGE,
+    alt: '수련생의 자세를 손으로 부드럽게 바로잡아주는 강사',
+    eyebrow: '강사 소개',
+    title: '먼저 오래 앉아본 사람이 곁에 있어요',
+    body:
+      '숨 요가원의 강사들은 모두 하타와 빈야사를 기본으로 국제 요가 지도자 과정을 마쳤어요. 자세를 밀어붙이지 않고, 지금 몸 상태에 맞는 대안을 함께 찾아드려요. 부상 이력이 있거나 처음이라도 걱정하지 않아도 돼요.',
+    treatment: 'mono',
+  },
+  {
+    image: HERO_IMAGE,
+    alt: '수업이 끝난 뒤 조용히 정리된 매트와 소도구',
+    eyebrow: '첫 수업 안내',
+    title: '매트만 깔면 준비는 끝이에요',
+    body:
+      '첫 방문은 체험 수업으로 시작해요. 매트와 블록, 스트랩은 모두 요가원에 준비돼 있으니 편한 옷만 챙겨 오세요. 원하는 요일과 시간을 문의로 남겨주시면 맞는 수업을 안내해드려요.',
+    treatment: 'none',
+  },
+];
+
+const BOWL_SPECS = [
+  { label: '쓰이는 수업', value: '사운드 힐링 · 명상' },
+  { label: '소재', value: '수작업 놋쇠' },
+  { label: '울리는 때', value: '수업 시작과 끝, 각 3회' },
+];
+
+const MARQUEE_ITEMS = ['하타', '빈야사', '명상', '사운드 힐링', '소도구 요가', '개인 레슨'];
+
+const CONTACT_ROWS = [
+  { label: '수업 시간', value: '평일 아침 7시부터 저녁 9시, 주말 아침 9시부터 오후 3시' },
+  { label: '체험 수업', value: '첫 방문 1회, 원하는 요일과 시간을 남겨주시면 안내해드려요' },
+  { label: '준비물', value: '편한 옷만 챙겨 오세요. 매트와 소도구는 요가원에 있어요' },
+];
+
+function App() {
+  useSmoothScroll({ snap: true });
+
+  return (
+    <>
+      <Preloader brand={BRAND} />
+      <Cursor />
+      <Nav brand={BRAND} links={NAV_LINKS} cta={{ label: '시간표 문의', href: '#contact' }} />
+      <SceneNav />
+
+      <HeroScene
+        image={HERO_IMAGE}
+        video={HERO_VIDEO}
+        eyebrow="숨 요가원"
+        title="오늘의 몸에 맞는 만큼만"
+        sub="바쁜 하루 사이, 숨을 고르는 한 시간. 작은 수업에서 천천히 몸을 만나요."
+        cta={{ label: '수업 둘러보기', href: '#story' }}
+        overlay={0.45}
+      />
+
+      <TextReveal
+        as="h2"
+        className="ck-display ck-display--statement"
+        text="바쁜 하루 끝에 숨 한 번 고르는 시간, 몸이 먼저 편안해집니다."
+        emphasize={[8, 9]}
+      />
+
+      <PinnedChapters id="story" startIndex={2} chapters={CHAPTERS} />
+
+      <Showcase3D
+        id="bowl"
+        eyebrow="수업의 시작과 끝"
+        title="싱잉볼 소리로 여닫는 한 시간"
+        body="수업은 싱잉볼 울림으로 시작하고 끝나요. 소리가 사라질 때까지 눈을 감고 기다리는 그 짧은 순간이, 수련생들이 가장 좋아하는 시간이에요."
+        specs={BOWL_SPECS}
+        shape="bowl"
+        poster={HERO_IMAGE}
+      />
+
+      <Marquee items={MARQUEE_ITEMS} emphasize={[1]} />
+
+      <Contact
+        id="contact"
+        title="원하는 시간을 알려주시면 맞는 수업을 안내해드려요"
+        rows={CONTACT_ROWS}
+        cta={{ label: '시간표 문의하기', href: 'mailto:hello@soomyoga.kr' }}
+      />
+    </>
+  );
+}
+
+export default App;
+</boltAction>
+</boltArtifact>
+
+문의 버튼은 지금 이메일로 연결돼 있어요. 카카오톡 채널 주소나 전화번호를 알려주시면 그쪽으로 바꿔드릴게요. 요가원 이름도 '숨 요가원'으로 임시로 넣었으니 실제 상호를 알려주세요.
+
+다음으로 이런 것도 해볼 수 있어요:
+- 요가원 이름과 연락처 바꾸기
+- 강사 소개 문구 다듬기
+- 수업 종류 추가하기
+- 배포하기

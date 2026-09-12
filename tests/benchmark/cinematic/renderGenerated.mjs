@@ -9,7 +9,7 @@
  * *.webcontainer-api.io뿐이라(2026-09-12 확인) localhost에서는 WebGL 텍스처가 CORS로 막혀
  * 히어로가 <video>/<img>로 내려간다 — 그건 킷 문제가 아니라 측정 환경 문제라서 배제한다.
  *
- *   node tests/benchmark/cinematic/renderGenerated.mjs
+ *   node tests/benchmark/cinematic/renderGenerated.mjs [생성물 디렉터리 이름]
  */
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -21,10 +21,13 @@ import sharp from 'sharp';
 const ROOT = process.cwd();
 const KIT_SRC = join(ROOT, 'kits/cinematic/src');
 const TMP = join(ROOT, 'kits/cinematic/.render-tmp');
-const GEN = join(ROOT, 'tests/benchmark/cinematic/gen-2026-09-12-round2/screens.tsx');
+
+/** 어느 생성물을 잴지 — `node ... renderGenerated.mjs portfolio-claude-sonnet-5` */
+const CASE_DIR = process.argv[2] ?? 'bakery-claude-sonnet-5';
+const GEN = join(ROOT, 'tests/benchmark/cinematic/gen-2026-09-12-round2', CASE_DIR, 'screens.tsx');
 const STILL = join(ROOT, 'tests/benchmark/cinematic/.render-media/still.jpg');
 const VITE = join(ROOT, 'kits/cinematic/node_modules/vite/bin/vite.js');
-const SHOTS = join(ROOT, 'tests/benchmark/cinematic/render-2026-09-12');
+const SHOTS = join(ROOT, 'tests/benchmark/cinematic/render-2026-09-12', CASE_DIR);
 
 const DESKTOP = { width: 1280, height: 800 };
 const MOBILE = { width: 400, height: 860 };
@@ -101,7 +104,8 @@ function writeProject() {
   const app = localizeMedia(readFileSync(GEN, 'utf8'));
   writeFileSync(join(TMP, 'src/App.tsx'), app, 'utf8');
 
-  if (!/export default App/.test(app)) {
+  // `export default App;`도 `export default function App()`도 이미 있으면 덧붙이지 않는다(중복 default export = 빌드 실패).
+  if (!/export\s+default/.test(app)) {
     writeFileSync(join(TMP, 'src/App.tsx'), `${app}\nexport default App;\n`, 'utf8');
   }
 }
@@ -333,12 +337,22 @@ async function measure(url) {
   results.canvasCount = canvasCount;
 
   if (canvasCount > 1) {
+    /*
+     * useSmoothScroll({ snap: true })의 스냅이 섹션 시작점으로 되끌어서, 800px 뷰포트로는 Showcase3D
+     * 캔버스가 화면 밖에 걸리는 생성물이 있다(claude-fable-5-1 실측: 보이는 높이 159px → 드래그 측정이
+     * 무의미해졌다). 이 단계에서만 뷰포트를 세로로 키워 섹션 전체가 들어오게 한다 — 데스크톱 판정은
+     * 가로 기준(min-width: 768px)이라 바뀌지 않는다.
+     */
+    const TALL = { width: DESKTOP.width, height: 1400 };
+    await page.setViewportSize(TALL);
+    await page.waitForTimeout(600);
+
     const showcase = canvases.nth(canvasCount - 1);
     await showcase.scrollIntoViewIfNeeded();
     await page.waitForTimeout(900);
 
-    const box = await centerInViewport(page, showcase, DESKTOP);
-    const clip = box ? clampClip(box, DESKTOP) : null;
+    const box = await centerInViewport(page, showcase, TALL);
+    const clip = box ? clampClip(box, TALL) : null;
     results.showcaseClip = clip;
 
     if (clip) {
