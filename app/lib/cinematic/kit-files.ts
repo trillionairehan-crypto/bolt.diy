@@ -71,27 +71,4 @@ export const CINEMATIC_FONT_LINKS = `    <link
     />
 `;
 
-/**
- * 모델에게 주는 킷 API 요약. 소스가 아니라 이것만 프롬프트에 들어간다 — 짧게 유지할 것.
- * 컴포넌트 이름·props는 kits/cinematic/src/index.ts와 반드시 일치해야 한다.
- */
-export const CINEMATIC_KIT_PROMPT = `이 프로젝트에는 시네마틱 킷이 \`src/kit/\`에 이미 설치돼 있다(수정 금지, 새로 만들지 말 것). 화면은 이 컴포넌트들을 조립해서 만든다.
-
-import { HeroScene, PinnedChapters, TextReveal, Showcase3D, BigNumber, Marquee, Contact, Nav, Preloader, Cursor, SceneNav, useSmoothScroll } from './kit';
-
-- useSmoothScroll({ snap: true }) — App 최상단에서 한 번만 호출.
-- <Preloader brand="상호" /> · <Cursor /> · <Nav brand links cta /> · <SceneNav /> — 페이지당 한 번.
-- <HeroScene image video eyebrow title sub cta overlay={0.45} /> — 전면 히어로. image는 예약된 사진 URL, video는 있으면 넘긴다. 데스크톱에서 셰이더(WebGL)로 렌더된다.
-- <TextReveal as="h2" className="ck-display ck-display--statement" text="..." emphasize={[8,9]} /> — 어절 스크럽 리빌 선언문.
-- <PinnedChapters id="story" startIndex={2} chapters={[{ image, eyebrow, title, body, treatment }]} /> — 핀+스크럽 챕터 3개. treatment는 'grain' | 'mono' | 'none'.
-- <Showcase3D eyebrow title body specs={[{label,value}]} shape="jar" poster /> — 드래그로 도는 3D 오브젝트. 실제 소개할 사물이 있을 때만 쓴다.
-- <BigNumber value={200} suffix="개 / 하루" label="하루 평균 판매량" /> — 실제 숫자가 있을 때만.
-- <Marquee items={[...]} emphasize={[1]} /> · <Contact id="contact" title rows cta /> — 마무리.
-- 색·서체·간격은 src/kit/tokens.css의 ck- 클래스와 --ck-* 변수만 쓴다. cr- 클래스와 섞지 말 것. 새 CSS 파일을 만들지 말 것.
-- 헤드라인은 한글 실문장으로 쓴다. 자리표시 문구 금지.
-- package.json에 three·@react-three/fiber·gsap·lenis가 이미 있고 기본 파일 단계에서 npm install과 npm run dev가 실행된다. 다시 실행할 필요는 없지만 미리보기가 안 뜨면 npm install을 한 번 돌린다.`;
-
-/** .bolt/prompt에 덧붙는 한 줄 요약(모델이 매 턴 보는 파일이라 더 짧게). */
-export const CINEMATIC_BOLT_PROMPT_ADDITION = `
-이 프로젝트는 시네마틱 트랙이다. \`src/kit/\`의 시네마틱 킷(HeroScene, PinnedChapters, TextReveal, Showcase3D, BigNumber, Marquee, Contact, Nav, Preloader, Cursor, SceneNav)을 조립해 화면을 만든다. 킷 파일 자체는 수정하지 않는다. 스타일은 킷의 ck- 클래스와 --ck-* 변수만 쓰고, cr- 클래스는 이 트랙에서 쓰지 않는다.
-`;
+export { CINEMATIC_KIT_PROMPT, CINEMATIC_BOLT_PROMPT_ADDITION } from './kit-prompt';

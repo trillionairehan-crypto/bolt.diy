@@ -228,6 +228,43 @@ CSSDA 스크립트로 데모 실측(`motion.mjs`/`tech.mjs`, 127.0.0.1:5190) vs 
 - R2 CORS 허용 오리진 확대(아래 사용자 액션) 후 WebGL 히어로 재측정.
 - 생성물 기준 성능·모바일 측정, 그리고 같은 채점표로 재채점.
 
+## 2단계 2차 — 장면 순서 고정 (2026-09-12, 실생성 1회)
+
+### 1차의 진짜 원인: 프롬프트끼리 충돌
+
+1차 결과를 "모델이 구형 컴포넌트를 골랐다"로 적었지만, 원인은 모델이 아니라 서로 반대되는 지시 3벌을
+동시에 받은 것이었다. 이번에 셋 다 정리했다.
+
+| 충돌원 | 1차에 모델이 받은 지시 | 킷 지시와 부딪힌 부분 | 조치 |
+|---|---|---|---|
+| `new-prompt.ts` 골격 7 체크리스트 | `data-slot="hero"/"ch1~3"` 4개, `height: 100vh` 리터럴, 이미지 16:9·4:3, 페이드+상승, **"패럴랙스를 쓰지 않는다"** | 핀·스크럽·패럴랙스 자체를 금지 | CINEMATIC_KIT_PROMPT 머리에 "이 지시가 골격 7 체크리스트를 대체한다" 절을 넣고 무효 항목을 하나씩 명시 |
+| `skeleton7Images.ts`의 사진 지시줄 | "히어로는 이미지를 전면(objectFit cover, 100vh)으로 깔고 그 위에 그라데이션", "챕터 1~3은 4:3으로 캡션 옆에", raw `<video ... matchMedia>` | HeroScene·PinnedChapters를 손으로 다시 만들게 함. **히어로가 `<video>`로 내려간 것도 여기 지시대로 한 결과일 수 있다**(CORS 단독 원인이 아님) | 배치 지시를 킷 props로 바꿔 다시 씀(`skeleton7PromptLines.ts`로 분리) |
+| CINEMATIC_KIT_PROMPT 자체 | 컴포넌트 목록만 나열, Showcase3D는 "실제 사물이 있을 때만" | 순서·필수 여부가 없어 모델이 취사선택 | 번호 절차 11항목으로 고정, `ScrollChapter` 금지 명시, Showcase3D 필수화(BigNumber만 조건부) |
+
+### 실생성 1회 결과 (claude-sonnet-5, 빵집 소개, 32.1초)
+
+`gen-2026-09-12-round2/screens.tsx`. 게이트 `tests/benchmark/cinematic/sceneOrderCheck.ts`가
+UI와 같은 프롬프트를 보내고 생성물 원문을 기계 판정한다.
+
+| 항목 | 1차 | 2차 |
+|---|---|---|
+| 장면 순서 | ScrollChapter 사용, Preloader·Cursor·Marquee·Showcase3D 누락 | Preloader → Cursor → Nav → SceneNav → HeroScene → TextReveal → PinnedChapters → Showcase3D → Marquee → Contact **전부 순서대로** |
+| 챕터 수 | — | 3 |
+| `<ScrollChapter>` | 사용 | 없음 |
+| `data-slot=` | 있음 | 없음 |
+| raw `<img>`·`<video>` | 있음 | 없음(히어로 영상은 `<HeroScene video>` prop) |
+
+PASS. 다만 이건 "킷을 제대로 조립했나"만 본다 — 채점표의 시각 항목(1·2·4·5·7·8)은 실제 렌더가 필요하다.
+
+### R2 CORS
+사용자가 `*.webcontainer-api.io`를 허용 오리진에 추가했다. 확인:
+`curl -I -H "Origin: https://…webcontainer-api.io" <R2 스틸 URL>` → `Access-Control-Allow-Origin`이 그 오리진으로 돌아온다.
+WebGL 히어로 재측정은 실제 렌더에서 한다.
+
+### 아직 안 한 것
+- 실제 렌더 기준 재채점: 항목 1(WebGL 히어로가 셰이더로 뜨는지) · 2(핀·스크럽) · 4(3D 드래그) · 5(프리로더·커서) · 7 성능 · 8 모바일.
+- `injectSkeleton7Images`(정규식 폴백)는 `data-slot`을 찾는다. 시네마틱 생성물에는 이제 `data-slot`이 없으므로 이 트랙에서 폴백은 사실상 동작하지 않는다 — 모델이 URL을 직접 쓰는 프롬프트 경로에만 의존한다.
+
 ## 쇼룸(딥 브리프 B1 카드) 미디어 — 2026-09-11 밤
 
 `kits/cinematic/demo/?showroom`. 가상 브랜드 밀도 × 세계관 6종(`app/lib/media/style-locks.ts`). 세계관당 스틸 3장 생성 → 육안 선별 1장 → Seedance 5초 루프. 스크린샷 `showroom-2026-09-11/`.

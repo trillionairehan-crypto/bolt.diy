@@ -3,6 +3,7 @@ import { chatId as chatIdAtom, ensureChatId } from '~/lib/persistence';
 import { selectReviewableEntries } from '~/utils/reviewGeneratedApp';
 import { createScopedLogger } from '~/utils/logger';
 import { injectSkeleton7Images, type Skeleton7ImageUrls } from './injectSkeleton7Images';
+import { buildSkeleton7PromptLines } from './skeleton7PromptLines';
 import { buildLoopMotionPrompt } from './shotlist';
 import { isSkeleton7File } from '~/lib/review/mechanical-checks';
 
@@ -138,21 +139,6 @@ export interface PreparedSkeleton7Images {
   promptLines: string[];
 }
 
-function buildPromptLines(urls: Skeleton7ImageUrls, video?: ReservedVideo): string[] {
-  const lines = [
-    `사진 4장(사용자가 준 실제 URL — 반드시 이 URL 그대로 <img src>에 쓴다, 다른 이미지 URL이나 플레이스홀더 금지): 히어로 전면 배경 = ${urls.hero} · 챕터 1 = ${urls.ch1} · 챕터 2 = ${urls.ch2} · 챕터 3 = ${urls.ch3}`,
-    '사진이 있으므로 코랄 틴트 플레이스홀더 박스와 "사진을 보내주시면 여기에 넣어드릴게요" 문구는 어디에도 쓰지 않는다. 히어로는 이미지를 전면(objectFit cover, 100vh)으로 깔고 그 위에 어두운 그라데이션과 흰 헤드라인을 올린다. 챕터 1~3은 각 이미지를 4:3 비율로 캡션 옆에 놓는다(loading="lazy", alt는 업종에 맞는 짧은 설명).',
-  ];
-
-  if (video) {
-    lines.push(
-      `히어로 영상(사용자가 준 무음 5초 루프, URL = ${video.url}): 히어로 배경을 <video src="${video.url}" poster="${urls.hero}" autoPlay muted loop playsInline style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }} />로 깐다 — 단 window.matchMedia('(min-width: 768px)')가 참일 때만 video를 렌더하고, 모바일에서는 같은 자리에 히어로 이미지 <img>만 쓴다(useState+useEffect로 판별). 영상은 준비 중일 수 있으니 poster를 반드시 넣는다.`,
-    );
-  }
-
-  return lines;
-}
-
 /**
  * 생성 직전에 호출 — URL을 예약하고 이미지 생성을 시작한다(결과는 기다리지 않는다). 예약이 실패하면
  * null을 돌려주고, 생성 뒤 폴백(applySkeleton7Images의 정규식 주입)만 남는다.
@@ -161,7 +147,7 @@ export async function prepareSkeleton7Images(input: Skeleton7ImageJobInput): Pro
   lastInput = input;
 
   if (pending) {
-    return { urls: pending.urls, promptLines: buildPromptLines(pending.urls, pending.video) };
+    return { urls: pending.urls, promptLines: buildSkeleton7PromptLines(pending.urls, pending.video) };
   }
 
   const jobId = newJobId();
@@ -185,7 +171,7 @@ export async function prepareSkeleton7Images(input: Skeleton7ImageJobInput): Pro
 
   pending = job;
 
-  return { urls, promptLines: buildPromptLines(urls, video) };
+  return { urls, promptLines: buildSkeleton7PromptLines(urls, video) };
 }
 
 /** POST로 작업을 만들고 GET으로 폴링, 완료되면 서버가 R2에 복사한 URL을 돌려준다. 실패·타임아웃은 null. */
