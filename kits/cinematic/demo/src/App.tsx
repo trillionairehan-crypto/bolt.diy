@@ -1,15 +1,30 @@
-import { BigNumber, Contact, Cursor, HeroScene, Marquee, Nav, PinnedChapters, Preloader, SceneNav, TextReveal, useSmoothScroll } from '@kit/index';
+import { BigNumber, Contact, Cursor, HeroScene, Marquee, Nav, PinnedChapters, Preloader, SceneNav, Showcase3D, TextReveal, useSmoothScroll } from '@kit/index';
 
 /*
  * 데모 v0.2 = CSSDA 8.5~8.9 원형(제품 스토리 + 라이트 에디토리얼) 시퀀스:
- * 프리로더 → 히어로(영상 루프 + 한글 헤드라인 400) → 선언문(어절 스크럽 리빌) → 핀 챕터 ×3(ch1~ch3) → 큰 숫자 → 마퀴 → 연락처 + 풀블리드 워드마크.
+ * 프리로더 → 히어로(영상 루프를 셰이더로 통과 + 한글 헤드라인 400) → 선언문(어절 스크럽 리빌) → 핀 챕터 ×3(ch1~ch3)
+ * → 3D 오브젝트(드래그 회전) → 큰 숫자 → 마퀴 → 연락처 + 풀블리드 워드마크.
  * 2026-09-11 밤 재생성(smoke-1789128016839, 인물 없는 샷리스트) R2 미디어 그대로. 히어로 영상은 같은 hero.jpg에서 만든 Seedance 2.0 fast 루프.
  */
-const MEDIA = 'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/smoke-1789128016839';
-const HERO_VIDEO = 'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev/media/cmpmtwwnz17/hero-seedance.mp4';
+/*
+ * dev는 같은 오리진 경로 — vite 프록시가 R2 공개 버킷으로 넘긴다(버킷에 Access-Control-Allow-Origin이 없어
+ * 직접 주소로는 WebGL 텍스처가 막힌다). 빌드본은 프록시가 없으니 원 주소를 쓰고, 그 경우 히어로는
+ * onError 폴백으로 <video>를 깐다 — 운영에서 WebGL 히어로를 쓰려면 버킷에 CORS 규칙이 필요하다.
+ */
+const R2 = 'https://pub-b08f99b5ccf040e4b6b0293f2d95f744.r2.dev';
+const BASE = import.meta.env.DEV ? '/r2' : R2;
+const MEDIA = `${BASE}/media/smoke-1789128016839`;
+const HERO_VIDEO = `${BASE}/media/cmpmtwwnz17/hero-seedance.mp4`;
 
 export default function App() {
   useSmoothScroll({ snap: true });
+
+  /*
+   * 채점·대조군용 히어로 모드 — 기본(webgl) = 영상 텍스처를 셰이더에 통과, video = 셰이더 없이 <video>,
+   * image = 정지 사진. ?hero=video 처럼 준다.
+   */
+  const heroMode = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('hero') : null;
+  const noVideo = heroMode === 'image';
 
   return (
     <div className="ck-page">
@@ -20,7 +35,7 @@ export default function App() {
 
       <HeroScene
         image={`${MEDIA}/hero.jpg`}
-        video={HERO_VIDEO}
+        video={noVideo ? undefined : HERO_VIDEO}
         eyebrow="Yeonnam-dong · Since 2021"
         title={
           <>
@@ -29,6 +44,7 @@ export default function App() {
             그날 구운 <span className="ck-em">만큼만</span>
           </>
         }
+        effect={heroMode === 'video' || heroMode === 'image' ? 'none' : 'displace'}
         sub="연남동 소금빵 전문. 하루 세 번 굽고, 다 팔리면 문을 닫습니다."
         cta={{ label: '이야기 보기', href: '#story' }}
         overlay={0.45}
@@ -90,6 +106,25 @@ export default function App() {
             treatment: 'none',
           },
         ]}
+      />
+
+      <Showcase3D
+        eyebrow="04 — Object"
+        title={
+          <>
+            마지막 한 줌을 담는
+            <br />
+            소금 단지
+          </>
+        }
+        body="구움이 끝난 빵 위에 뿌리는 소금은 이 단지에서 나옵니다. 매대 옆 같은 자리에 5년째 놓여 있습니다."
+        specs={[
+          { label: 'Salt', value: '게랑드 천일염' },
+          { label: 'Vessel', value: '분청 도자, 청주 가마' },
+          { label: 'Since', value: '2021년 개업일부터' },
+        ]}
+        shape="jar"
+        poster="/showcase-jar.jpg"
       />
 
       <section data-ck="scene" style={{ padding: 'clamp(96px, 14vh, 180px) var(--ck-gutter)', borderTop: '1px solid var(--ck-line)' }}>

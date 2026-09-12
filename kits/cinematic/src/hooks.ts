@@ -28,6 +28,22 @@ export function useIsDesktop(): boolean {
   return useMediaQuery('(min-width: 768px)');
 }
 
+/** WebGL 컨텍스트를 만들 수 있는지. 첫 렌더는 false — 못 만드는 브라우저에 three 청크를 보내지 않는다. */
+export function useWebGL(): boolean {
+  const [ok, setOk] = useState(false);
+
+  useEffect(() => {
+    try {
+      const canvas = document.createElement('canvas');
+      setOk(Boolean(canvas.getContext('webgl2') || canvas.getContext('webgl')));
+    } catch {
+      setOk(false);
+    }
+  }, []);
+
+  return ok;
+}
+
 export function useReducedMotion(): boolean {
   const reduced = useMediaQuery('(prefers-reduced-motion: reduce)');
 

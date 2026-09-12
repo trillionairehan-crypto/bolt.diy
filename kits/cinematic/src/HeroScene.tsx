@@ -5,7 +5,7 @@ const HeroCanvas = lazy(() => import('./HeroCanvas'));
 
 export interface HeroSceneProps {
   image: string;
-  /** 무음 루프 영상. 있으면 데스크톱에서 WebGL 대신 영상을 깐다(영상이 이미 움직이므로). */
+  /** 무음 루프 영상. 데스크톱·WebGL이면 셰이더 텍스처로, 아니면 <video>로 깐다. */
   video?: string;
   eyebrow?: string;
   title: ReactNode;
@@ -30,12 +30,14 @@ function supportsWebGL(): boolean {
 
 /**
  * 히어로 — 전면 미디어 + 거대 세리프 헤드라인. 레이어 순서: 미디어(WebGL/영상/이미지) → 그라데이션 → 텍스트.
- * 모바일·reduced-motion·WebGL 불가 = 이미지만(three 다운로드 없음).
+ * 데스크톱·WebGL이면 사진이든 영상이든 셰이더(HeroCanvas)를 통과시킨다 — 노이즈 일렁임·그레인·비네트·마우스 패럴랙스.
+ * 모바일·reduced-motion·WebGL 불가 = 이미지(또는 영상)만(three 다운로드 없음).
  */
 export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta, effect = 'displace', overlay = 0.5 }: HeroSceneProps) {
   const isDesktop = useIsDesktop();
   const reduced = useReducedMotion();
   const [webgl, setWebgl] = useState(false);
+  const [canvasFailed, setCanvasFailed] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -61,8 +63,8 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
     };
   }, [reduced]);
 
-  const useCanvas = isDesktop && !reduced && webgl && !video && effect !== 'none';
-  const useVideo = isDesktop && Boolean(video);
+  const useCanvas = isDesktop && !reduced && webgl && !canvasFailed && effect !== 'none';
+  const useVideo = isDesktop && Boolean(video) && !useCanvas;
 
   return (
     <section
@@ -97,7 +99,12 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
       {useCanvas ? (
         <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
           <Suspense fallback={null}>
-            <HeroCanvas src={image} strength={effect === 'displace' ? 1 : 0} />
+            <HeroCanvas
+              src={image}
+              video={video}
+              strength={effect === 'displace' ? 1 : 0}
+              onError={() => setCanvasFailed(true)}
+            />
           </Suspense>
         </div>
       ) : null}
