@@ -11,7 +11,7 @@
     "email": "coralred@coralred.kr"
   },
   "scripts": {
-    "deploy": "npm run build && wrangler pages deploy build/client --project-name=coralred --branch=coralred",
+    "deploy": "npm run build && wrangler pages deploy build/client --project-name=bolt-air --branch=coralred",
     "build": "remix vite:build",
     "dev": "node pre-start.cjs  && remix vite:dev",
     "preview-server": "node server/preview-server.mjs",
