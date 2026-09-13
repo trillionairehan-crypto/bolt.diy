@@ -618,3 +618,33 @@ Error: Objects are not valid as a React child (found: object with keys {label, e
 교훈(반복 확인): 킷 컴포넌트는 LLM이 호출부를 쓰는 이상 **어떤 prop 모양이 와도 페이지를 죽이면 안 된다.**
 리스트를 받는 컴포넌트를 새로 만들 때는 정규화 + 빈 값 방어를 기본으로 넣는다. Contact(rows)·Nav(links)·
 Showcase3D(specs)는 값을 필드로 꺼내 쓰므로 같은 사고가 나지 않는다(확인함).
+
+## 프로덕션 2차 (2026-09-13, 가죽 공방) — Marquee 수정 검증 + 새 버그
+
+재배포 후 다시 생성했다.
+
+**Marquee 수정 검증됨.** 백지 없음. 섹션 10개(preloader·cursor·nav·scene-nav·hero·chapter·scene·
+marquee·contact) 전부 렌더, 마퀴 텍스트 정상 출력(`#핸드메이드 · 식물성 탄닌 가죽 · 주문 제작 …`),
+`data-theme="dark"` 유지. 시드된 킷에 `normalizeMarqueeItems` 포함 확인.
+
+**새 버그: 사진 URL 조립이 틀린다.** 이미지 4장 전부 404.
+
+```
+실제:  https://pub-….r2.dev/hero.jpg
+정상:  https://pub-….r2.dev/media/<jobId>/hero.jpg
+```
+
+모델이 `MEDIA_BASE`를 버킷 루트로 잡고 파일명만 붙여 `media/<jobId>/`를 통째로 빠뜨렸다.
+(skeleton7Images.ts 주석의 "LLM은 URL을 통째로 안 쓰고 MEDIA_BASE + 템플릿 리터럴로 조립한다"가
+이번엔 잘못된 base로 조립된 경우다.)
+
+이게 방어를 전부 통과한 이유 — **"호스트가 r2.dev면 정상"이라는 가정**이 두 곳에 있었다.
+- `injectCinematicImages`: 외부 호스트만 교체 대상으로 봤다 → R2 도메인이면 손대지 않았다.
+- `checkCinematicSceneOrder`: r2.dev면 통과시켰다.
+
+조치
+1. `injectCinematicImages`가 **예약 URL 그 자체**(쿼리 무시 비교)만 남기고 나머지 이미지 URL은 전부
+   갈아끼운다. 호스트가 아니라 URL 일치로 판정한다. 캐시버스터(`?v=`)가 붙은 예약 URL은 그대로 둔다.
+2. 게이트가 `r2.dev`인데 `/media/` 경로가 없는 이미지 URL을 잡는다.
+
+테스트 71건 통과(신규 3건). 저장된 생성물 5건 재판정도 전부 PASS.

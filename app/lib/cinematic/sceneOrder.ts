@@ -204,6 +204,15 @@ export function checkCinematicSceneOrder(source: string): SceneOrderResult {
   }
 
   /*
+   * 호스트가 R2여도 경로가 틀리면 404다. 실측(2026-09-13 프로덕션): 생성물이 버킷 루트에 파일명만
+   * 붙여(`https://pub-….r2.dev/hero.jpg`) media/<jobId>/ 경로를 통째로 빠뜨렸고, "R2니까 정상"으로
+   * 통과해 사진 4장이 전부 깨진 채 배포됐다. 예약 URL은 항상 /media/ 아래에 있다.
+   */
+  if (/https?:\/\/[^"'`\s)]*\.r2\.dev\/(?!media\/)[^"'`\s)]*\.(?:jpe?g|png|webp|avif|gif)/i.test(source)) {
+    problems.push('R2 이미지 URL에 media/<jobId>/ 경로가 빠졌다 — 예약 URL을 그대로 써야 한다');
+  }
+
+  /*
    * 실측(2026-09-13, coralred.kr 프로덕션): <Marquee items={[{ label, emphasis }]}>처럼 객체를 넘겨
    * "Objects are not valid as a React child"로 페이지가 백지가 됐다. 킷도 객체를 받도록 고쳤지만
    * 프롬프트가 지정한 형태(문자열 배열)를 벗어난 건 여기서 잡는다.

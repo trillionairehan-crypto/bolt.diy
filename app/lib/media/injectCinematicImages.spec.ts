@@ -91,4 +91,28 @@ describe('injectCinematicImages', () => {
     expect(result.replaced).toBe(0);
     expect(result.content).toBe(UNSPLASH_APP);
   });
+
+  /*
+   * 2026-09-13 프로덕션 실측: 생성물이 버킷 루트에 파일명만 붙여 media/<jobId>/ 경로를 빠뜨렸다.
+   * 호스트만 보면 "우리 R2"라 통과하지만 실제로는 404다.
+   */
+  it('경로가 빠진 R2 URL도 예약 URL로 갈아끼운다', () => {
+    const wrongPath = `const HERO = 'https://pub-x.r2.dev/hero.jpg';
+const W1 = 'https://pub-x.r2.dev/ch1.jpg';
+<HeroScene image={HERO} />`;
+    const result = injectCinematicImages(wrongPath, RESERVED);
+
+    expect(result.replaced).toBe(2);
+    expect(result.content).toContain(RESERVED.hero);
+    expect(result.content).toContain(RESERVED.ch1);
+    expect(result.content).not.toContain("'https://pub-x.r2.dev/hero.jpg'");
+  });
+
+  it('예약 URL에 캐시버스터가 붙어 있어도 그대로 둔다', () => {
+    const busted = `<HeroScene image="${RESERVED.hero}?v=123" />`;
+    const result = injectCinematicImages(busted, RESERVED);
+
+    expect(result.replaced).toBe(0);
+    expect(result.content).toBe(busted);
+  });
 });

@@ -145,4 +145,11 @@ export default function App() {`,
       '<Marquee items>에 객체를 넣었다 — 문자열 배열로 넘긴다',
     );
   });
+
+  it('경로가 빠진 R2 이미지 URL을 잡는다 (프로덕션 사진 404 원인)', () => {
+    const wrongPath = GOOD.replace(/https:\/\/pub-x\.r2\.dev\/media\/j1\//g, 'https://pub-x.r2.dev/');
+    const result = checkCinematicSceneOrder(wrongPath);
+
+    expect(result.problems).toContain('R2 이미지 URL에 media/<jobId>/ 경로가 빠졌다 — 예약 URL을 그대로 써야 한다');
+  });
 });

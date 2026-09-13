@@ -15,8 +15,14 @@ import type { Skeleton7ImageUrls } from './injectSkeleton7Images';
  * 생성물은 항상 히어로를 먼저 쓴다(장면 순서 6번이 HeroScene, 8번이 PinnedChapters).
  */
 
-/** 우리 미디어(R2)와 로컬 경로는 그대로 둔다 — 이미 올바른 URL이거나 킷 자산이다. */
-const OUR_MEDIA_HOST_REGEX = /\.r2\.dev$|^\/|^data:/;
+/*
+ * "예약된 URL 그 자체"만 그대로 둔다. 호스트가 R2라는 것만으로는 부족하다 — 2026-09-13 프로덕션
+ * 실측에서 생성물이 `https://pub-….r2.dev/hero.jpg`처럼 버킷 루트에 파일명만 붙여(`media/<jobId>/`
+ * 경로가 통째로 빠진 채) 썼고, 404가 났는데도 "R2니까 정상"으로 통과해 사진 4장이 전부 깨졌다.
+ */
+function sameUrlIgnoringQuery(a: string, b: string): boolean {
+  return a.split('?')[0] === b.split('?')[0];
+}
 
 /** 문자열 리터럴 안의 http(s) 이미지 URL. 영상(.mp4 등)은 건드리지 않는다 — 영상은 별도 경로다. */
 const IMAGE_URL_REGEX = /https?:\/\/[^"'`\s)]+?\.(?:jpe?g|png|webp|avif|gif)(?:\?[^"'`\s)]*)?/gi;
@@ -35,22 +41,18 @@ export interface CinematicInjectResult {
   slots: Array<keyof Skeleton7ImageUrls>;
 }
 
-function isOurs(url: string): boolean {
-  try {
-    return OUR_MEDIA_HOST_REGEX.test(new URL(url).hostname);
-  } catch {
-    return true;
-  }
+function isReserved(url: string, reserved: string[]): boolean {
+  return reserved.some((expected) => sameUrlIgnoringQuery(url, expected));
 }
 
-function collectExternalImageUrls(content: string): string[] {
+function collectReplaceableImageUrls(content: string, reserved: string[]): string[] {
   const found = new Set<string>();
   const ordered: string[] = [];
 
   for (const match of [...content.matchAll(IMAGE_URL_REGEX), ...content.matchAll(STOCK_IMAGE_URL_REGEX)]) {
     const url = match[0];
 
-    if (isOurs(url) || found.has(url)) {
+    if (isReserved(url, reserved) || found.has(url)) {
       continue;
     }
 
@@ -67,7 +69,8 @@ function collectExternalImageUrls(content: string): string[] {
  */
 export function injectCinematicImages(content: string, urls: Skeleton7ImageUrls): CinematicInjectResult {
   const order: Array<keyof Skeleton7ImageUrls> = ['hero', 'ch1', 'ch2', 'ch3'];
-  const external = collectExternalImageUrls(content);
+  const reserved = order.map((slot) => urls[slot]).filter((url): url is string => Boolean(url));
+  const external = collectReplaceableImageUrls(content, reserved);
 
   if (external.length === 0 || !urls.hero) {
     return { content, replaced: 0, slots: [] };
