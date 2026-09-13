@@ -203,6 +203,15 @@ export function checkCinematicSceneOrder(source: string): SceneOrderResult {
     problems.push(`예약된 사진 대신 외부 이미지를 썼다 — ${foreignHosts.join(', ')}`);
   }
 
+  /*
+   * 실측(2026-09-13, coralred.kr 프로덕션): <Marquee items={[{ label, emphasis }]}>처럼 객체를 넘겨
+   * "Objects are not valid as a React child"로 페이지가 백지가 됐다. 킷도 객체를 받도록 고쳤지만
+   * 프롬프트가 지정한 형태(문자열 배열)를 벗어난 건 여기서 잡는다.
+   */
+  if (/<Marquee[^>]*items=\{\[\s*\{/.test(source)) {
+    problems.push('<Marquee items>에 객체를 넣었다 — 문자열 배열로 넘긴다');
+  }
+
   const chapterCount = countChapters(source);
 
   if (chapterCount !== 3) {

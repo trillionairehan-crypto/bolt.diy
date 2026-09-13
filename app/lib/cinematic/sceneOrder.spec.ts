@@ -137,4 +137,12 @@ export default function App() {`,
 
     expect(checkCinematicSceneOrder(withMap).problems).toEqual([]);
   });
+
+  it('Marquee items에 객체를 넘긴 생성물을 잡는다 (프로덕션 백지 원인)', () => {
+    const objectItems = GOOD.replace("items={['매일 굽는 빵']}", "items={[{ label: '매일 굽는 빵', emphasis: true }]}");
+
+    expect(checkCinematicSceneOrder(objectItems).problems).toContain(
+      '<Marquee items>에 객체를 넣었다 — 문자열 배열로 넘긴다',
+    );
+  });
 });

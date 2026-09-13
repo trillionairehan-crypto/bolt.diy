@@ -584,3 +584,37 @@ CORS 캐시 수정 뒤 제품 경로로 한 건 더 만들어 전부 다시 봤�
 남은 것(2단계 밖)
 - "마무리가 안 끝났어요" 스톨 오탐이 이번에도 떴다 — feat/stall-fix 영역이다.
 - 실 GPU·배포 도메인 측정. 배포는 auto mode에서 막혀 사용자가 직접 돌려야 한다.
+
+## 프로덕션(coralred.kr) 첫 실생성 — 2026-09-13, 목공방
+
+머지·푸시·배포 뒤 실제 프로덕션에서 처음 돌렸다. 지금까지 검증은 전부 로컬 dev + WebContainer 프리뷰였다.
+
+먼저 막힌 것들(제품 자체 문제는 아님)
+- 계정 무료 생성 한도 소진(`무료 생성 횟수를 모두 사용했어요`). generation_usage_v2에서 month_count 7,
+  day_count 3이었다. PostgREST(service_role)로 0으로 리셋해 진행했다. Supabase 대시보드는 Chrome 자동
+  번역이 React DOM을 깨뜨려(`removeChild`) 접속이 안 됐다 — 대시보드 대신 PostgREST를 쓰면 우회된다.
+- 네트워크 로그의 `/api/health` 503은 배포 직후 콜드스타트 잔여 기록이었다. 이후 GET·HEAD 모두 200,
+  마이그레이션 5개 전부 true.
+
+생성 결과: **화면 백지.** 콘솔:
+
+```
+Error: Objects are not valid as a React child (found: object with keys {label, emphasis})
+```
+
+생성물이 `<Marquee items={[{ label, emphasis }]}>`로 객체 배열을 넘겼고, 킷이 그대로 children으로
+렌더하다 예외가 났다. 에러 경계가 없어 App 트리째 언마운트 — 09-12의 TextReveal 사고와 **완전히 같은 형태**다.
+
+조치(두 겹, 그때와 동일한 방식)
+1. 킷: `normalizeMarqueeItems()`가 문자열·숫자·`{ label, emphasis }`를 모두 받고, 렌더할 글자가 없는
+   항목은 버린다. 항목이 하나도 없으면 예외 대신 `null`.
+2. 게이트: `checkCinematicSceneOrder`가 `<Marquee items={[{ … }]}` 형태를 잡는다.
+
+확인된 것(백지와 별개로 정상 동작)
+- `data-theme="dark"` — 다크 팔레트가 프로덕션에서도 생성물에 전달된다.
+- App.tsx의 이미지 URL 5개 전부 R2, 외부 이미지 0 — 예약 사진 주입이 프로덕션에서도 작동한다.
+- Q3 격자의 "브랜드 소개·포트폴리오"로 골격 7 → 시네마틱 트랙 진입, 색 단계에서 다크·미니멀 추천 배지.
+
+교훈(반복 확인): 킷 컴포넌트는 LLM이 호출부를 쓰는 이상 **어떤 prop 모양이 와도 페이지를 죽이면 안 된다.**
+리스트를 받는 컴포넌트를 새로 만들 때는 정규화 + 빈 값 방어를 기본으로 넣는다. Contact(rows)·Nav(links)·
+Showcase3D(specs)는 값을 필드로 꺼내 쓰므로 같은 사고가 나지 않는다(확인함).
