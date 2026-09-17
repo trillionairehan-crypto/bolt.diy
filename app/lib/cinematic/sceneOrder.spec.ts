@@ -152,4 +152,20 @@ export default function App() {`,
 
     expect(result.problems).toContain('R2 이미지 URL에 media/<jobId>/ 경로가 빠졌다 — 예약 URL을 그대로 써야 한다');
   });
+
+  it('킷에 없는 prop을 잡는다 (프로덕션 카피 유실 원인)', () => {
+    const invented = GOOD.replace('<Contact id="contact"', '<Contact id="contact" subtitle="예약 없이 오세요"');
+    const result = checkCinematicSceneOrder(invented);
+
+    expect(result.problems.some((p) => p.includes('<Contact subtitle>'))).toBe(true);
+  });
+
+  it('킷이 받는 별칭(description·eyebrow)과 중첩 객체 키는 prop으로 오인하지 않는다', () => {
+    const aliases = GOOD.replace(
+      '<Contact id="contact" title="찾아오시는 길" rows={[]} cta="전화" />',
+      `<Contact id="contact" eyebrow="오시는 길" description="예약 없이 오세요" title="찾아오시는 길" rows={[{ label: '전화', value: '031' }]} cta={{ label: '전화', href: 'tel:031' }} />`,
+    ).replace('title="캉파뉴" body="묵직한 결"', 'title="캉파뉴" description="묵직한 결"');
+
+    expect(checkCinematicSceneOrder(aliases).problems).toEqual([]);
+  });
 });

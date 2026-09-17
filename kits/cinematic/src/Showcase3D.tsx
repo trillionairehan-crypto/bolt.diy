@@ -41,6 +41,11 @@ export interface Showcase3DProps {
   eyebrow?: string;
   title: ReactNode;
   body?: string;
+  /**
+   * body의 별칭. 생성물이 description으로 쓰는 경우가 잦다(2026-09-13 프로덕션 실측) — 받지 않으면 설명
+   * 문장이 조용히 사라진다. body가 있으면 body가 우선.
+   */
+  description?: string;
   /** 오브젝트 옆 사양표. 실제 값만 쓴다(가짜 스펙 금지). */
   specs?: Showcase3DSpec[];
   /** 'jar' = 단지(목에 금속 밴드), 'bowl' = 얕은 접시 */
@@ -56,7 +61,8 @@ export interface Showcase3DProps {
  * 데스크톱 + WebGL + 뷰포트 근접일 때만 three 청크를 내려받는다. 모바일·reduced-motion은 스틸 1장.
  * AR(model-viewer + USDZ)은 이 킷에 넣지 않았다 — 스크립트 300KB가 항목 7 예산을 깬다.
  */
-export function Showcase3D({ id, eyebrow, title, body, specs, shape = 'jar', poster, color }: Showcase3DProps) {
+export function Showcase3D({ id, eyebrow, title, body: bodyProp, description, specs, shape = 'jar', poster, color }: Showcase3DProps) {
+  const body = bodyProp ?? description;
   const isDesktop = useIsDesktop();
   const reduced = useReducedMotion();
   const webgl = useWebGL();

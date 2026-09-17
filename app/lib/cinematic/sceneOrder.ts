@@ -143,6 +143,141 @@ function externalImageHosts(source: string): string[] {
   return [...hosts];
 }
 
+/*
+ * 킷 컴포넌트가 실제로 받는 prop. 생성물이 없는 prop을 지어내면(2026-09-13 프로덕션 실측:
+ * <Showcase3D description>, <Contact eyebrow description>) 크래시 없이 그 카피만 조용히 사라진다.
+ * 흔한 별칭은 킷이 받도록 넓혔고, 그래도 모르는 prop은 여기서 잡는다. kits/cinematic/src의 Props
+ * 인터페이스와 맞춰 둔다(kit-files.spec.ts가 export 이름 일치를 보듯, 이 목록도 킷을 바꾸면 같이 바꾼다).
+ */
+const KIT_COMPONENT_PROPS: Record<string, string[]> = {
+  HeroScene: ['image', 'video', 'eyebrow', 'title', 'sub', 'cta', 'secondaryCta', 'effect', 'overlay'],
+  PinnedChapters: ['chapters', 'startIndex', 'media', 'stepVh', 'id'],
+  TextReveal: ['text', 'as', 'className', 'style', 'mode', 'scrub', 'emphasize'],
+  Showcase3D: ['id', 'eyebrow', 'title', 'body', 'description', 'specs', 'shape', 'poster', 'color'],
+  Marquee: ['items', 'emphasize', 'duration'],
+  Contact: ['title', 'rows', 'cta', 'image', 'note', 'eyebrow', 'description', 'id', 'wordmark', 'credits'],
+  Nav: ['brand', 'links', 'cta'],
+  Preloader: ['brand', 'minMs'],
+  BigNumber: ['value', 'prefix', 'suffix', 'label', 'decimals', 'group'],
+};
+
+/** React가 어떤 컴포넌트에든 받는 prop — 킷 인터페이스에 없어도 문제 아니다. */
+const UNIVERSAL_PROPS = new Set(['key', 'ref']);
+
+/*
+ * JSX 여는 태그의 prop 이름을 뽑는다. 값 안의 중괄호·문자열을 건너뛰며 최상위 `name=`과 불리언
+ * shorthand(`scrub`)만 센다 — 정규식 하나로는 `cta={{ label: '…' }}` 안의 `label:`을 prop으로 오인한다.
+ */
+function openingTagPropNames(tag: string): string[] {
+  const names: string[] = [];
+  let depth = 0;
+  let quote: string | null = null;
+  let token = '';
+
+  const flush = () => {
+    if (/^[A-Za-z_$][\w$]*$/.test(token)) {
+      names.push(token);
+    }
+
+    token = '';
+  };
+
+  for (let i = 0; i < tag.length; i++) {
+    const char = tag[i];
+
+    if (quote) {
+      if (char === quote && tag[i - 1] !== '\\') {
+        quote = null;
+      }
+
+      continue;
+    }
+
+    if (depth > 0) {
+      if (char === '{') {
+        depth++;
+      } else if (char === '}') {
+        depth--;
+      } else if (char === '"' || char === "'" || char === '`') {
+        quote = char;
+      }
+
+      continue;
+    }
+
+    if (char === '{') {
+      token = '';
+      depth++;
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
+      token = '';
+      quote = char;
+      continue;
+    }
+
+    if (char === '=') {
+      flush();
+      continue;
+    }
+
+    if (/\s|\/|>/.test(char)) {
+      flush();
+      continue;
+    }
+
+    token += char;
+  }
+
+  flush();
+
+  return names;
+}
+
+function unknownKitProps(source: string): string[] {
+  const found: string[] = [];
+
+  for (const [component, known] of Object.entries(KIT_COMPONENT_PROPS)) {
+    const pattern = new RegExp(`<${component}(?![A-Za-z0-9_])`, 'g');
+
+    for (const match of source.matchAll(pattern)) {
+      let end = match.index + match[0].length;
+      let depth = 0;
+      let quote: string | null = null;
+
+      // 여는 태그 끝(최상위 `>`)까지 — 값 안의 `>`(화살표 함수 등)는 건너뛴다.
+      for (; end < source.length; end++) {
+        const char = source[end];
+
+        if (quote) {
+          if (char === quote && source[end - 1] !== '\\') {
+            quote = null;
+          }
+        } else if (char === '"' || char === "'" || char === '`') {
+          quote = char;
+        } else if (char === '{') {
+          depth++;
+        } else if (char === '}') {
+          depth--;
+        } else if (char === '>' && depth === 0) {
+          break;
+        }
+      }
+
+      const tagBody = source.slice(match.index + match[0].length, end);
+
+      for (const name of openingTagPropNames(tagBody)) {
+        if (!known.includes(name) && !UNIVERSAL_PROPS.has(name)) {
+          found.push(`<${component} ${name}>`);
+        }
+      }
+    }
+  }
+
+  return [...new Set(found)];
+}
+
 /**
  * @param source 생성물의 화면 소스 전체(킷 파일 `src/kit/**` 은 빼고 넘긴다 — 킷 내부는 이 규칙의 대상이 아니다).
  */
@@ -219,6 +354,12 @@ export function checkCinematicSceneOrder(source: string): SceneOrderResult {
    */
   if (/<Marquee[^>]*items=\{\[\s*\{/.test(source)) {
     problems.push('<Marquee items>에 객체를 넣었다 — 문자열 배열로 넘긴다');
+  }
+
+  const unknownProps = unknownKitProps(source);
+
+  if (unknownProps.length > 0) {
+    problems.push(`킷에 없는 prop을 썼다 — ${unknownProps.join(', ')} (해당 카피가 화면에 안 나온다)`);
   }
 
   const chapterCount = countChapters(source);

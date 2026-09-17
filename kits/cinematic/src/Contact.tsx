@@ -14,6 +14,12 @@ export interface ContactProps {
   /** 배경 이미지(선택). 아주 어둡게 깔린다. */
   image?: string;
   note?: string;
+  /**
+   * 생성물이 흔히 붙이는 prop 두 개를 받는다(2026-09-13 프로덕션 실측) — 받지 않으면 해당 카피가 조용히
+   * 사라진다. eyebrow는 제목 위 모노 라벨, description은 note의 별칭(note가 있으면 note 우선).
+   */
+  eyebrow?: string;
+  description?: string;
   id?: string;
   /** 화면 폭 워드마크(Noho "happy modern", /zeroz). 상호 2~4자 권장 */
   wordmark?: string;
@@ -22,7 +28,8 @@ export interface ContactProps {
 }
 
 /** 마지막 장면 — 큰 제목 + 위치·시간·연락 표 + CTA + (선택) 풀블리드 워드마크. 지도는 없는 모듈이라 주소 텍스트 + 링크만. */
-export function Contact({ title, rows, cta, image, note, id, wordmark, credits }: ContactProps) {
+export function Contact({ title, rows, cta, image, note: noteProp, description, eyebrow, id, wordmark, credits }: ContactProps) {
+  const note = noteProp ?? description;
   const root = useRef<HTMLElement>(null);
   useRevealOnScroll(root);
 
@@ -52,6 +59,11 @@ export function Contact({ title, rows, cta, image, note, id, wordmark, credits }
       ) : null}
       <div style={{ display: 'grid', gap: '40px' }}>
         <div style={{ display: 'grid', gap: '40px', maxWidth: '1200px' }}>
+          {eyebrow ? (
+            <span className="ck-eyebrow" data-reveal>
+              {eyebrow}
+            </span>
+          ) : null}
           <h2 className="ck-display ck-display--xl" data-reveal>
             {title}
           </h2>
@@ -66,7 +78,7 @@ export function Contact({ title, rows, cta, image, note, id, wordmark, credits }
               paddingTop: '24px',
             }}
           >
-            {rows.map((row) => (
+            {(rows ?? []).map((row) => (
               <div key={row.label} style={{ display: 'grid', gap: '6px' }}>
                 <dt className="ck-eyebrow">{row.label}</dt>
                 <dd style={{ margin: 0, fontSize: 'var(--ck-body)' }}>{row.value}</dd>
