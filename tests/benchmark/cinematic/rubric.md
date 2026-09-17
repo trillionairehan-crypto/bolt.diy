@@ -689,3 +689,26 @@ esbuild 서비스가 죽고 이후 transform이 전부 실패했다. "다시 시
 - `<Contact eyebrow=… description=…>` — 킷에 없는 prop. 같은 방식으로 사라진다.
 크래시는 아니지만 카피가 통째로 유실된다. 다음 차수 후보: 킷이 흔한 별칭(description→body)을 받아주거나,
 게이트가 미지의 prop을 잡는다.
+
+## 프로덕션 4차 (2026-09-17, 원목 가구 공방) — 처음으로 프로덕션 프리뷰에서 전부 눈으로 확인
+
+`1a0db3f4`(지어낸 prop 별칭 + 모르는 prop 게이트) 배포 후 생성. WebContainer 정상 기동(`VITE ready in 1549 ms`).
+
+| 항목 | 결과 |
+|---|---|
+| 히어로 WebGL | `<canvas>` 1, `<video>` 폴백 0 — 셰이더 위 흰 헤드라인, 밝은 창가 사진에서도 읽힘 |
+| 예약 사진 | `<img>` 5/5 로드, 외부·경로 빠진 URL 0, `?v=` 캐시버스터 적용 |
+| 다크 팔레트 | `data-theme="dark"` |
+| 핀 챕터 | 01 원목 선별 → 02 손끝의 마감 → 03 완성과 전달, 인덱스 전환 확인 |
+| 3D 쇼케이스 | 볼이 실제 렌더, 라벨 "DRAG TO ROTATE"(3D 모드) |
+| 별칭 카피 | Contact eyebrow "VISIT & CONTACT", description→note "주문 제작은 평균 4~6주 소요돼요", Showcase description→body 모두 화면에 나옴 |
+| 한글 줄바꿈 | 어절 단위 정상 |
+
+측정 함정 기록: 프리뷰 URL을 **새 탭**으로 열면 그 탭은 `visibilityState: hidden`이라 IntersectionObserver가
+돌지 않고, Showcase3D가 "360° · 데스크톱"(정지)로 남는다. 킷 버그로 오인하기 쉽다 — 3D는 보이는 탭
+(워크벤치 안 프리뷰)에서 확인해야 한다.
+
+남은 관찰(2단계 밖)
+- 워크벤치 프리뷰에서 3D 위 드래그가 회전 대신 페이지를 다음 스냅 지점(Contact)으로 넘겼다. 로컬 하네스에서는
+  드래그 회전이 측정되므로(81.6) 스냅 + iframe 조합의 상호작용 문제로 보인다. 미조사.
+- 채팅 패널에 "마무리가 안 끝났어요"/"고치지 못했어요" 알림 — 화면은 정상. feat/stall-fix 영역.
