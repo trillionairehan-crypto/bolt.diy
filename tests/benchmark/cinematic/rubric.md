@@ -852,3 +852,9 @@ fd8c210a 배포(5a614bec). files.spec.ts 2건.
 - 수정 2: `sceneOrder.ts`에 `KIT_EXPORTS`(index.ts와 1:1) + `킷에 없는 컴포넌트를 import했다 — …` 문제. type import·`as` 별칭 처리. spec 3건(그중 하나는 `kits/cinematic/src/index.ts`를 읽어 목록 동기화 검증).
 - `BigNumber`는 이미 `KIT_COMPONENT_PROPS`에 있었음(value·prefix·suffix·label·decimals·group).
 - 검증은 유닛(188 통과)까지. 실생성 검증은 Anthropic 크레딧 뒤.
+
+## 2026-09-18 15:45 — `/api/llmcall` 400 원인 (큐 4번)
+
+- 가다페 런의 `/api/llmcall:400`은 우리 검증 400이 아니라 **Anthropic upstream 400 "Your credit balance is too low"**가 catch fallback(`status: errorResponse.statusCode`)으로 그대로 통과한 것. chat 실패와 같은 뿌리(크레딧 소진). 자동 검토 로그엔 "llmcall failed 400"만 남아 형식 오류처럼 보였다.
+- 수정: `app/lib/.server/llm/provider-error.ts` `isProviderBillingError`(Anthropic·OpenAI 결제 문구) → api.llmcall이 **402 `provider_billing`, isRetryable false**로 갈라 냄, Sentry tag `kind: provider_billing`. reviewGeneratedApp은 402면 "skipped — provider billing"로 로그. spec 3건.
+- 사용자 액션 그대로: Anthropic 크레딧 충전 전엔 chat·자동 검토 둘 다 못 돈다.

@@ -16,6 +16,11 @@ import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '~/lib/api/c
 import { createScopedLogger } from '~/utils/logger';
 import { getPlatformUserId } from '~/lib/cloud/cloudPlatformAuth';
 import { recordMessageUsage } from '~/lib/cloud/messageUsage';
+import {
+  isProviderBillingError,
+  PROVIDER_BILLING_MESSAGE,
+  PROVIDER_BILLING_STATUS,
+} from '~/lib/.server/llm/provider-error';
 
 export async function action(args: ActionFunctionArgs) {
   return llmCallAction(args);
@@ -316,7 +321,13 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
       );
     } catch (error: unknown) {
       logger.error(error);
-      Sentry.captureException(error, { tags: { route: 'api.llmcall', mode: 'non-stream', model }, extra: { chatId } });
+
+      const billing = error instanceof Error && isProviderBillingError(error.message);
+
+      Sentry.captureException(error, {
+        tags: { route: 'api.llmcall', mode: 'non-stream', model, kind: billing ? 'provider_billing' : 'unknown' },
+        extra: { chatId },
+      });
 
       const errorResponse = {
         error: true,
@@ -325,6 +336,27 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
         isRetryable: (error as any).isRetryable !== false,
         provider: (error as any).provider || 'unknown',
       };
+
+      /*
+       * 2026-09-18 실측: Anthropic "credit balance is too low"가 upstream 400으로 와서 아래 fallback이
+       * 그대로 400을 냈다 — 형식 오류처럼 보였다. 결제 문제는 재시도해도 소용없으니 402로 갈라 낸다.
+       */
+      if (billing) {
+        return new Response(
+          JSON.stringify({
+            ...errorResponse,
+            message: PROVIDER_BILLING_MESSAGE,
+            statusCode: PROVIDER_BILLING_STATUS,
+            isRetryable: false,
+            kind: 'provider_billing',
+          }),
+          {
+            status: PROVIDER_BILLING_STATUS,
+            headers: { 'Content-Type': 'application/json' },
+            statusText: 'Payment Required',
+          },
+        );
+      }
 
       if (error instanceof Error && error.message?.includes('API key')) {
         return new Response(

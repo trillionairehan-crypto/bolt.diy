@@ -242,7 +242,11 @@ async function runTextReview(files: FileMap, mechanicalHints: string): Promise<T
     });
 
     if (!response.ok) {
-      logger.error('text review: llmcall failed', response.status);
+      // 402 = 공급자 크레딧 부족(api.llmcall이 갈라 냄) — 요청 문제가 아니라 결제 문제. 재시도 무의미.
+      logger.error(
+        response.status === 402 ? 'text review: skipped — LLM provider billing (402)' : 'text review: llmcall failed',
+        response.status,
+      );
       return null;
     }
 
@@ -393,7 +397,12 @@ async function runVisualReview(
     });
 
     if (!response.ok) {
-      logger.error('visual review: llmcall failed', response.status);
+      logger.error(
+        response.status === 402
+          ? 'visual review: skipped — LLM provider billing (402)'
+          : 'visual review: llmcall failed',
+        response.status,
+      );
       return null;
     }
 
