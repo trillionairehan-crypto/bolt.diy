@@ -792,16 +792,6 @@ Worker 분리다 — 이건 2단계 밖이라 별도 작업으로 넘긴다.
 ## 2026-09-18 12:40 — 재생성(도예 공방·다크): 예약 사진 프롬프트 모드로 들어감, 격리체 범인 범위 좁힘
 
 - 생성물 `App.tsx`: `HERO_IMAGE`/`CH1~3` 전부 `pub-…r2.dev/media/jmu6ep4iq-…/` 예약 URL, `HERO_VIDEO`도 `hero-seedance.mp4`. **모델이 예약 URL을 그대로 씀(prompted 모드)** — 직전 런의 Pexels는 모델 편차였다.
-- 그러나 프리뷰 미확인: `/api/chat` 200(30s) 후 "마무리가 안 끝났어요"(Post-stream action stall) — 액션 하나(App.tsx write)가 running에서 안 내려옴, 프리뷰는 스타터 그대로. 오늘 3런 중 2런(1·3) 재현, 2런은 정상. "다시 시도"(액션 재실행) → `/api/chat` 503 "Worker exceeded resource limits" HTML이 채팅에 덤프.
-- 격리체 실험:
-  - 생성 직전 같은 커넥션(머신 17d1) `/pricing` 200 → 생성 뒤 7/8 503. **생성 플로우가 격리체를 병들게 한다(확정).**
-  - 재배포로 리셋 후 브라우저에서 `/api/media-images` reserve+generate만 실행(41s, 200) → `/pricing` 8/8 200, `/api/health` 6/6 200. **이미지 생성 단독은 무죄.**
-  - 남은 용의자: `/api/chat`(스트리밍 30~45s), `/api/llmcall`(자동 검토), `/api/media-video`(폴링), `/api/onboarding`. curl `--next`는 커넥션을 안 이어서(ray 매번 다름) 브라우저 핀 커넥션으로만 실험 가능.
-  - 다음 실험: 브라우저에서 `fetch` 몽키패치로 `/api/chat` 요청 본문을 캡처 → 재배포 → 같은 본문만 재생 → `/pricing` 프로브.
-
-## 2026-09-18 12:40 — 재생성(도예 공방·다크): 예약 사진 프롬프트 모드로 들어감, 격리체 범인 범위 좁힘
-
-- 생성물 `App.tsx`: `HERO_IMAGE`/`CH1~3` 전부 `pub-…r2.dev/media/jmu6ep4iq-…/` 예약 URL, `HERO_VIDEO`도 `hero-seedance.mp4`. **모델이 예약 URL을 그대로 씀(prompted 모드)** — 직전 런의 Pexels는 모델 편차였다.
 - R2 실제 파일: hero.jpg·ch1.jpg·ch2.jpg 200, **ch3.jpg 404**, hero-seedance.mp4 404(영상은 아직 생성 중일 수 있음). ch3 누락은 별도 조사 필요(이미지 세트 4장 중 3장만 업로드?).
 - 프리뷰 미확인: `/api/chat` 200(30s) 후 "마무리가 안 끝났어요"(Post-stream action stall) — 액션 하나(App.tsx write)가 running에서 안 내려옴, 프리뷰는 스타터 그대로. 오늘 3런 중 2런(1·3) 재현, 2런은 정상. "다시 시도"(액션 재실행) → `/api/chat` 503 "Worker exceeded resource limits" HTML이 채팅에 덤프.
 - 격리체 실험:
