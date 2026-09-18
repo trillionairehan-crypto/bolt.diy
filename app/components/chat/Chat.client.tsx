@@ -52,6 +52,7 @@ import {
   looksLikeShowcasePrompt,
   prepareSkeleton7Images,
   rememberSkeleton7Context,
+  startSkeleton7ImageSet,
 } from '~/lib/media/skeleton7Images';
 import { getActivePalette } from '~/lib/palettes';
 import { setSidebarOpen } from '~/lib/stores/sidebar';
@@ -1341,6 +1342,21 @@ ${CINEMATIC_KIT_PROMPT}`;
       sendMessage({} as any, prompt, modelOverride, true);
       workbenchStore.clearAlert();
     }, [actionAlert, isLoading]);
+
+    /*
+     * 이미지 세트는 chat 스트림이 끝난 뒤에 시작한다 — 같은 Workers 격리체에서 둘이 겹치면 메모리 128MB를
+     * 넘겨 둘 다 죽는다(2026-09-18 실측, 실생성 5런 중 2런). 예약 URL은 생성 전에 이미 프롬프트에 들어갔으므로
+     * 사진만 ~40초 늦게 오고, 자동 검토 뒤 applySkeleton7Images가 캐시버스터로 다시 그린다.
+     */
+    useEffect(() => {
+      if (isLoading) {
+        return;
+      }
+
+      if (startSkeleton7ImageSet()) {
+        logger.info('skeleton 7 images: generation started after stream end');
+      }
+    }, [isLoading]);
 
     /*
      * 자동 수정이 App.tsx를 다시 쓰면 모델이 기억하는 스톡 URL이 되살아나 예약 사진 주입이 사라진다

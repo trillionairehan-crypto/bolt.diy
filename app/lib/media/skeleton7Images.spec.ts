@@ -62,10 +62,17 @@ describe('applySkeleton7Images — 자동 수정 뒤 재주입', () => {
   });
 
   it('자동 수정이 스톡 URL을 되살려도 새 잡 없이 같은 예약 URL을 다시 넣는다', async () => {
-    const { prepareSkeleton7Images, applySkeleton7Images } = await import('./skeleton7Images');
+    const { prepareSkeleton7Images, applySkeleton7Images, startSkeleton7ImageSet } = await import('./skeleton7Images');
 
     const prepared = await prepareSkeleton7Images(JOB_INPUT);
     expect(prepared?.urls.hero).toBe(RESERVED.hero);
+
+    // 예약만 한다 — 이미지 생성 POST는 chat 스트림이 끝난 뒤(startSkeleton7ImageSet)에야 나간다.
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(startSkeleton7ImageSet()).toBe(true);
+    expect(startSkeleton7ImageSet()).toBe(false);
+    await new Promise((resolve) => setTimeout(resolve, 0)); // requestImageSet은 chatId 확정을 먼저 await 한다
+    expect(fetchMock).toHaveBeenCalledTimes(2);
 
     // 모델이 예약 URL을 무시하고 Pexels를 썼다 → 자동 검토 뒤 첫 주입.
     files[APP_PATH] = { type: 'file', content: PEXELS_APP, isBinary: false };

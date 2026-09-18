@@ -40,7 +40,15 @@ interface PendingJob {
   jobId: string;
   urls: Skeleton7ImageUrls;
   video?: ReservedVideo;
-  promise: Promise<Skeleton7ImageUrls | null>;
+  input: Skeleton7ImageJobInput;
+
+  /*
+   * 이미지 생성 요청 — 예약 시점이 아니라 chat 스트림이 끝난 뒤에 시작한다(startSkeleton7ImageSet).
+   * 2026-09-18 프로덕션 실측: /api/chat 스트리밍과 이미지 세트가 같은 Workers 격리체(128MB)에서 겹치면
+   * 둘 다 죽는다(chat 절단 + media 503, 그 뒤 그 머신의 SSR 전부 503). 단독으로는 둘 다 무죄. 사진이
+   * 프리뷰보다 ~40초 늦게 오는 대신 applySkeleton7Images의 캐시버스터 재렌더가 흡수한다.
+   */
+  promise: Promise<Skeleton7ImageUrls | null> | null;
 
   /** 히어로 영상 — 이미지 세트가 끝난 뒤 시작, 완료 시 R2 URL. 공급자 미설정이면 undefined. */
   videoPromise?: Promise<string | null>;
@@ -168,18 +176,40 @@ export async function prepareSkeleton7Images(input: Skeleton7ImageJobInput): Pro
   const { images: urls, video } = reserved;
   logger.info('image set job started', { jobId, industry: input.industry, video: video?.provider ?? 'none' });
 
-  const job: PendingJob = { jobId, urls, video, promise: requestImageSet(jobId, input) };
+  pending = { jobId, urls, video, input, promise: null };
 
-  if (video) {
+  return { urls, promptLines: buildSkeleton7PromptLines(urls, video) };
+}
+
+function startJob(job: PendingJob): Promise<Skeleton7ImageUrls | null> {
+  if (job.promise) {
+    return job.promise;
+  }
+
+  logger.info('image set generation started', { jobId: job.jobId });
+  job.promise = requestImageSet(job.jobId, job.input);
+
+  if (job.video) {
+    const video = job.video;
+
     // 히어로 이미지가 R2에 올라간 뒤에야 영상을 만들 수 있다 — 이미지 세트 완료에 체이닝.
     job.videoPromise = job.promise.then((result) =>
-      result?.hero ? runVideoJob(jobId, result.hero, video, input.industry) : null,
+      result?.hero ? runVideoJob(job.jobId, result.hero, video, job.input.industry) : null,
     );
   }
 
-  pending = job;
+  return job.promise;
+}
 
-  return { urls, promptLines: buildSkeleton7PromptLines(urls, video) };
+/** chat 스트림이 끝난 직후 호출 — 예약된 잡의 이미지 생성을 시작한다. 잡이 없거나 이미 시작했으면 no-op. */
+export function startSkeleton7ImageSet(): boolean {
+  if (!pending || pending.promise) {
+    return false;
+  }
+
+  void startJob(pending);
+
+  return true;
 }
 
 /** POST로 작업을 만들고 GET으로 폴링, 완료되면 서버가 R2에 복사한 URL을 돌려준다. 실패·타임아웃은 null. */
@@ -365,7 +395,7 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
   }
 
   const job = pending as PendingJob;
-  const urls = await job.promise;
+  const urls = await startJob(job);
   pending = null;
 
   if (!urls) {
