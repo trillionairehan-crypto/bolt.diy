@@ -867,3 +867,22 @@ fd8c210a 배포(5a614bec). files.spec.ts 2건.
   - `ActionRunner.restartStartAction`: 마지막 `start` 액션을 러너 경로로 재실행 — 옛 실행 abort → 셸 executionState의 옛 abort 콜백 비움(안 비우면 executeCommand가 다시 불러 새 실행을 'aborted'로 덮음) → 새 AbortController로 'running'. `WorkbenchStore.restartDevServer()`가 호출. spec 2건(재시작 후 status running 유지, 명령 재발행).
   - `Chat.client`: atom 구독 → 2회까지 자동 재시작 + toast "미리보기 서버가 멈춰서 다시 시작하고 있어요", 그 뒤엔 `actionAlert`(source 'terminal' → runAutoFix 대상 아님) "이 브라우저 탭의 자원이 소진됐어요. 저장 기능을 켠 뒤 새 탭에서…". Sentry `dev_server_crash`(count·restarts·sample).
 - 검증: 유닛만. 실제 esbuild 사망은 프로덕션 UI에 터미널 입력이 없어 임의 유발 불가 — 다음 실사용에서 Sentry 이벤트·토스트로 확인. 재시작으로 회복되는지(컨테이너 메모리 자체가 소진됐으면 안 될 수 있음)는 미확인.
+
+## 2026-09-18 17:30 — 킷 v0.4 구도 패스 (품질 감사 → 수정)
+
+**감사 방법:** `AUDIT=1 node tests/benchmark/cinematic/renderGenerated.mjs gen-2026-09-13-prod/` — 1440×900에서 장면마다 뷰포트 샷 + 타이포 수치(`audit/metrics.json`). 보조: `shotScenes.mjs`(뷰포트 단위 샷), `probeSection.mjs`(박스 수치). 미디어는 하네스 스틸(크루아상) — 구도·타이포만 본다.
+
+**감사 결과(v0.3, 수정 전):** 히어로 104px 세리프 4줄 + 문단 + 주황 알약 버튼 2개 + 내비 링크 3개 + 알약 CTA = SaaS 히어로 템플릿. 전면 검은 스크림이 사진을 죽임. 챕터: 액자 사진 + 66px 제목 + 위 빈 공간 + "01 01" 번호 중복 버그. 쇼케이스: 40px 제목 + 둥근 액자 박스 = 제품 카드. 컨택트: 위 절반 공백 + 4열 표 + 알약 버튼 = 푸터 템플릿(1098px, 한 화면 초과). 한글 눈썹에 0.18em 자간("가 온 도 자"). 스크롤 후 내비 블러 띠가 풀블리드 사진을 가로지름.
+
+**v0.4 수정(킷만, 프롬프트·LLM 무관):**
+- tokens: 디스플레이 300/-0.03em/1.02, xl 136·lg 96(1440에서 130·92px). `.ck-btn` → 밑줄 텍스트 링크(알약은 `--solid`로 격하). `.ck-grain` 필름 그레인. `box-sizing: border-box` 리셋. 한글 눈썹 자동(`hasHangul`/`eyebrowClass`).
+- Nav: 상호 16/500, 링크 13px, CTA 밑줄 링크, 배경 띠 없음 + `mix-blend-mode: difference`.
+- HeroScene: 헤드라인 16ch 3줄 이내가 왼쪽 아래 압도, 보조 문장은 우하단 캡션(30ch·15px), 대각 그라데이션+비네트+그레인, SCROLL 라벨 제거.
+- PinnedChapters: 미디어가 오른쪽 절반을 화면 끝까지(풀블리드, 액자 없음), 텍스트 3단(세로 인덱스/92px 제목 13ch/진행선), `stripLeadingIndex`로 번호 중복 제거.
+- Showcase3D: 한 화면 장면, 스테이지 풀블리드, 제목 --lg, 스펙 표 하단.
+- Contact: 제목 위·정보 행 바닥(auto 1fr auto), 정확히 100svh.
+- SceneNav 36px 투명.
+
+**수정 후 실측(1440):** 히어로 h1 130px w300 3줄, 챕터 h3 92px 2줄, 쇼케이스 92px, 컨택트 130px 2줄·섹션 900px. 샷: `render-2026-09-12/kit-v0.4-audit/{hero,chapter,showcase3d,contact}.png`.
+
+**남은 것(미착수):** 모션 감사(스크럽 패럴랙스·스태거 수치), 라이트 팔레트 검수, 모바일 400px 재감사, TextReveal·Marquee 장면 `data-ck` 부여(감사 캡처 누락), 실생성 확인은 크레딧 뒤.

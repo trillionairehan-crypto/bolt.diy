@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
-import { useIsDesktop, useReducedMotion, useWebGL } from './hooks';
+import { eyebrowClass, useIsDesktop, useReducedMotion, useWebGL } from './hooks';
 
 const Showcase3DScene = lazy(() => import('./Showcase3DScene'));
 
@@ -114,27 +114,39 @@ export function Showcase3D({ id, eyebrow, title, body: bodyProp, description, sp
 
   const use3D = isDesktop && webgl && near;
 
+  /*
+   * v0.4: 한 화면짜리 장면. 스테이지가 오른쪽 절반을 화면 끝까지 채우고(액자·둥근 모서리 없음), 제목은
+   * 챕터와 같은 --lg(≈92px). 2026-09-18 감사: 40px 제목 + 액자 박스 = 제품 카드 템플릿으로 읽혔다.
+   */
   return (
     <section
       id={id}
       data-ck="scene"
       style={{
-        padding: 'clamp(96px, 14vh, 180px) var(--ck-gutter)',
-        borderTop: '1px solid var(--ck-line)',
+        minHeight: '100svh',
         display: 'grid',
-        gap: 'clamp(32px, 5vw, 88px)',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))',
-        alignItems: 'center',
+        gridTemplateColumns: 'minmax(0, 5fr) minmax(0, 7fr)',
+        alignItems: 'stretch',
       }}
     >
-      <div style={{ display: 'grid', gap: '22px', alignContent: 'center' }}>
-        {eyebrow ? <span className="ck-eyebrow">{eyebrow}</span> : null}
-        <h2 className="ck-display ck-display--md" style={{ margin: 0 }}>
-          {title}
-        </h2>
-        {body ? (
-          <p style={{ margin: 0, maxWidth: '40ch', fontSize: 'var(--ck-body)', color: 'var(--ck-muted)' }}>{body}</p>
-        ) : null}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateRows: 'auto 1fr auto',
+          gap: '24px',
+          padding: 'clamp(88px, 14vh, 140px) clamp(24px, 4vw, 64px) clamp(36px, 6vh, 64px) var(--ck-gutter)',
+          minWidth: 0,
+        }}
+      >
+        <div>{eyebrow ? <span className={eyebrowClass(eyebrow)}>{eyebrow}</span> : null}</div>
+        <div style={{ display: 'grid', gap: '20px', alignSelf: 'center' }}>
+          <h2 className="ck-display ck-display--lg" style={{ margin: 0, maxWidth: '13ch' }}>
+            {title}
+          </h2>
+          {body ? (
+            <p style={{ margin: 0, maxWidth: '26em', fontSize: '15px', lineHeight: 1.65, color: 'var(--ck-muted)' }}>{body}</p>
+          ) : null}
+        </div>
         {specs?.length ? (
           <dl style={{ margin: 0, display: 'grid', gap: '0', maxWidth: '420px' }}>
             {specs.map((spec) => (
@@ -148,14 +160,16 @@ export function Showcase3D({ id, eyebrow, title, body: bodyProp, description, sp
                   borderTop: '1px solid var(--ck-line)',
                 }}
               >
-                <dt style={{ fontFamily: 'var(--ck-font-mono)', fontSize: '11px', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ck-muted)' }}>
+                <dt className={eyebrowClass(spec.label)} style={{ fontSize: '11px', color: 'var(--ck-muted)' }}>
                   {spec.label}
                 </dt>
                 <dd style={{ margin: 0, fontSize: '15px' }}>{spec.value}</dd>
               </div>
             ))}
           </dl>
-        ) : null}
+        ) : (
+          <div />
+        )}
       </div>
 
       <div
@@ -164,11 +178,8 @@ export function Showcase3D({ id, eyebrow, title, body: bodyProp, description, sp
         data-cursor={use3D ? 'hover' : undefined}
         style={{
           position: 'relative',
-          aspectRatio: '4 / 5',
           width: '100%',
-          maxHeight: '78vh',
-          justifySelf: 'center',
-          borderRadius: '2px',
+          minHeight: '100svh',
           overflow: 'hidden',
           background:
             'radial-gradient(100% 70% at 50% 8%, color-mix(in srgb, var(--ck-text) 16%, transparent) 0%, transparent 70%), linear-gradient(180deg, color-mix(in srgb, var(--ck-text) 10%, var(--ck-surface)) 0%, var(--ck-surface) 68%)',
@@ -191,8 +202,8 @@ export function Showcase3D({ id, eyebrow, title, body: bodyProp, description, sp
         <span
           style={{
             position: 'absolute',
-            left: '16px',
-            bottom: '14px',
+            left: '24px',
+            bottom: '22px',
             fontFamily: 'var(--ck-font-mono)',
             fontSize: '11px',
             letterSpacing: '0.18em',

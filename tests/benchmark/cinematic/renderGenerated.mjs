@@ -37,7 +37,13 @@ const STILL = join(ROOT, 'tests/benchmark/cinematic/.render-media/still.jpg');
 const VITE = join(ROOT, 'kits/cinematic/node_modules/vite/bin/vite.js');
 const SHOTS = join(ROOT, 'tests/benchmark/cinematic/render-2026-09-12', CASE_DIR.replace('/', '-'));
 
-const DESKTOP = { width: 1280, height: 800 };
+/*
+ * AUDIT=1 — 채점이 아니라 품질 감사용. 1440×900에서 장면마다 뷰포트 스크린샷과 타이포·배경 수치를
+ * 뽑는다(2026-09-18: 구조 검사는 다 통과하는데 디자인은 기준(얇은 90~150px 헤딩, 앰비언트 모션, 장면당
+ * 한 화면)에 못 미친다는 지적 → 눈으로 볼 자료). 드래그·모바일 측정은 건너뛴다.
+ */
+const AUDIT = process.env.AUDIT === '1';
+const DESKTOP = AUDIT ? { width: 1440, height: 900 } : { width: 1280, height: 800 };
 const MOBILE = { width: 400, height: 860 };
 
 const INDEX_HTML = `<!doctype html>
@@ -280,6 +286,14 @@ async function measure(url) {
   mkdirSync(SHOTS, { recursive: true });
   await safeShot(page, { path: join(SHOTS, 'desktop-top.png'), clip: { x: 0, y: 0, ...DESKTOP } });
 
+  if (AUDIT) {
+    results.audit = await auditScenes(page);
+    await page.close();
+    await browser.close();
+
+    return results;
+  }
+
   // 항목 1 WebGL 히어로 — 히어로 안에 캔버스가 있고, 그 픽셀이 실제로 움직이는가.
   const heroCanvas = page.locator('canvas').first();
   results.heroCanvas = await heroCanvas.count().then((n) => n > 0);
@@ -465,6 +479,89 @@ async function measure(url) {
   await browser.close();
 
   return results;
+}
+
+/** 뷰포트 안에서 가장 큰 글자 요소의 타이포 수치 — 기준표(얇은 90~150px, weight 300~400, line-height 1.1)와 대조용. */
+const SCENE_METRICS_SCRIPT = () => {
+  const vh = window.innerHeight;
+  const inView = (el) => {
+    const r = el.getBoundingClientRect();
+    return r.bottom > 0 && r.top < vh && r.width > 0 && r.height > 0;
+  };
+  const texts = Array.from(document.querySelectorAll('h1,h2,h3,p,span,a,div'))
+    .filter((el) => el.childElementCount === 0 && (el.textContent || '').trim().length > 0 && inView(el))
+    .map((el) => {
+      const cs = getComputedStyle(el);
+      return {
+        tag: el.tagName.toLowerCase(),
+        text: (el.textContent || '').trim().slice(0, 40),
+        px: parseFloat(cs.fontSize),
+        weight: cs.fontWeight,
+        lh: cs.lineHeight,
+        ls: cs.letterSpacing,
+        family: cs.fontFamily.split(',')[0].replace(/"/g, ''),
+        color: cs.color,
+      };
+    })
+    .sort((a, b) => b.px - a.px);
+  const sceneEl = document.elementFromPoint(Math.round(window.innerWidth / 2), Math.round(vh / 2));
+  let bg = null;
+  let node = sceneEl;
+  while (node && node !== document.documentElement) {
+    const c = getComputedStyle(node).backgroundColor;
+    if (c && c !== 'rgba(0, 0, 0, 0)' && c !== 'transparent') {
+      bg = c;
+      break;
+    }
+    node = node.parentElement;
+  }
+  return {
+    scrollY: Math.round(window.scrollY),
+    bg,
+    canvases: Array.from(document.querySelectorAll('canvas')).filter(inView).length,
+    videos: Array.from(document.querySelectorAll('video')).filter(inView).length,
+    images: Array.from(document.querySelectorAll('img')).filter(inView).length,
+    largest: texts.slice(0, 4),
+  };
+};
+
+async function auditScenes(page) {
+  const dir = join(SHOTS, 'audit');
+  rmSync(dir, { recursive: true, force: true });
+  mkdirSync(dir, { recursive: true });
+
+  const scenes = await page.evaluate(() => {
+    const vh = window.innerHeight;
+    return Array.from(document.querySelectorAll('[data-ck]'))
+      .map((el) => ({ kind: el.getAttribute('data-ck'), top: Math.round(el.getBoundingClientRect().top + window.scrollY), h: Math.round(el.getBoundingClientRect().height) }))
+      .filter((s) => s.h >= vh * 0.5 && !['cursor', 'cursor-ring', 'scene-nav', 'preloader'].includes(s.kind))
+      .sort((a, b) => a.top - b.top);
+  });
+
+  const out = [];
+  let index = 0;
+
+  for (const scene of scenes) {
+    const stops = scene.kind === 'chapter' ? [0.12, 0.5, 0.88] : [0];
+
+    for (const ratio of stops) {
+      const y = scene.top + Math.round(Math.max(0, scene.h - DESKTOP.height) * ratio);
+      await page.evaluate((target) => window.scrollTo(0, target), y);
+      await waitForScrollIdle(page, 500, 4000);
+      await page.waitForTimeout(700);
+
+      const name = `${String(index).padStart(2, '0')}-${scene.kind}${stops.length > 1 ? `-${Math.round(ratio * 100)}` : ''}`;
+      await safeShot(page, { path: join(dir, `${name}.png`), clip: { x: 0, y: 0, ...DESKTOP } });
+
+      const metrics = await page.evaluate(SCENE_METRICS_SCRIPT);
+      out.push({ name, kind: scene.kind, sectionTop: scene.top, sectionHeight: scene.h, viewportHeight: DESKTOP.height, ...metrics });
+      index++;
+    }
+  }
+
+  writeFileSync(join(dir, 'metrics.json'), JSON.stringify(out, null, 2), 'utf8');
+
+  return { scenes: out.length, dir };
 }
 
 function bundleSizes() {

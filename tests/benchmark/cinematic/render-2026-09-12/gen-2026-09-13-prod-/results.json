@@ -1,89 +1,19 @@
 {
   "preloaderAtLoad": true,
-  "loadMs": 1117,
+  "loadMs": 1150,
   "paint": {
-    "fcpMs": 428,
-    "domMs": 1117
+    "fcpMs": 436,
+    "domMs": 1153
   },
-  "heroCanvas": true,
-  "heroVideoFallback": false,
-  "heroMotion": 2.03,
-  "cursor": true,
-  "chapterFound": true,
-  "pinPosition": "sticky",
-  "pin": {
-    "position": "sticky",
-    "section": {
-      "top": 1080,
-      "height": 2401
-    },
-    "samples": [
-      {
-        "scrollY": 1106,
-        "top": 0,
-        "position": "sticky",
-        "active": 0,
-        "inPinWindow": true
-      },
-      {
-        "scrollY": 2039,
-        "top": 0,
-        "position": "sticky",
-        "active": 1,
-        "inPinWindow": true
-      },
-      {
-        "scrollY": 2401,
-        "top": 0,
-        "position": "sticky",
-        "active": 2,
-        "inPinWindow": true
-      },
-      {
-        "scrollY": 3001,
-        "top": -480,
-        "position": "sticky",
-        "active": 2,
-        "inPinWindow": false
-      }
-    ],
-    "topsInPinWindow": [
-      0,
-      0,
-      0
-    ],
-    "pinned": true,
-    "actives": [
-      0,
-      1,
-      2,
-      2
-    ],
-    "scrubbed": true
-  },
-  "canvasCount": 2,
-  "showcaseClip": {
-    "x": 672,
-    "y": 360.203125,
-    "width": 544,
-    "height": 680
-  },
-  "scrollIdleBeforeDrag": true,
-  "ck3dAtDrag": "live",
-  "dragOnShowcaseCanvas": true,
-  "dragScrollDelta": 0,
-  "scrollAliveAfterDrag": true,
-  "dragDelta": 108.09,
-  "mobile": {
-    "scrollWidth": 400,
-    "clientWidth": 400,
-    "canvases": 0
+  "audit": {
+    "scenes": 6,
+    "dir": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\cinematic\\render-2026-09-12\\gen-2026-09-13-prod-\\audit"
   },
   "bundleKb": {
     "HeroCanvas-DGqzLr1r.js": 4,
-    "index-DpGTTM8U.css": 5,
-    "index-VlPejdcB.js": 294,
-    "Showcase3DScene-DZQDJ1dW.js": 5,
+    "index-DYg0Tjow.js": 294,
+    "index-W60lHAwe.css": 6,
+    "Showcase3DScene-C22iuDKG.js": 5,
     "three-kNIIe7K7.js": 808
   }
 }

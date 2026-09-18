@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
-import { gsap, useIsDesktop, useReducedMotion } from './hooks';
+import { eyebrowClass, gsap, useIsDesktop, useReducedMotion } from './hooks';
 
 const HeroCanvas = lazy(() => import('./HeroCanvas'));
 
@@ -117,15 +117,27 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
           </Suspense>
         </div>
       ) : null}
+      {/*
+       * v0.4 오버레이: 평평한 검은 스크림 대신 글자가 앉는 왼쪽 아래만 어둡게(대각 그라데이션) + 가장자리
+       * 비네트 + 필름 그레인. 사진의 밝은 부분은 살린다 — 2026-09-18 감사에서 전면 스크림이 사진을 죽였다.
+       */}
       <div
         aria-hidden="true"
         style={{
           position: 'absolute',
           inset: 0,
           zIndex: 2,
-          background: `linear-gradient(180deg, rgba(0,0,0,${overlay * 0.5}) 0%, rgba(0,0,0,${overlay * 0.35}) 40%, rgba(0,0,0,${Math.min(0.92, Math.max(0.72, overlay + 0.4))}) 100%)`,
+          background: [
+            `linear-gradient(205deg, rgba(0,0,0,${(overlay * 0.1).toFixed(2)}) 0%, rgba(0,0,0,${(overlay * 0.45).toFixed(2)}) 55%, rgba(0,0,0,${Math.min(0.9, overlay + 0.35).toFixed(2)}) 100%)`,
+            'radial-gradient(120% 90% at 50% 35%, transparent 50%, rgba(0,0,0,0.5) 100%)',
+          ].join(', '),
         }}
       />
+      <div aria-hidden="true" className="ck-grain" style={{ zIndex: 2 }} />
+      {/*
+       * 텍스트 구도: 헤드라인 하나가 왼쪽 아래를 압도, 보조 문장·링크는 오른쪽 아래 캡션 자리(wearebrand.io).
+       * 헤드라인은 3줄 이내(16ch), 보조 문장은 30ch·15px.
+       */}
       <div
         ref={textRef}
         style={{
@@ -133,34 +145,48 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
           zIndex: 3,
           width: '100%',
           padding: 'var(--ck-gutter)',
-          paddingBottom: 'clamp(48px, 9vh, 120px)',
+          paddingBottom: 'clamp(40px, 7vh, 96px)',
           display: 'grid',
-          gap: '20px',
-          maxWidth: '1200px',
-          /*
-           * 밝은 히어로 사진(하늘·역광)에서는 그라데이션만으로 흰 글자가 안 읽힌다(2026-09-12 실측:
-           * 사진 스튜디오 생성물의 헤드라인이 하늘에 묻혔다). 어두운 사진에서는 티가 안 나는 정도의
-           * 그림자를 글자에만 깐다 — 오버레이를 더 올리면 사진이 죽는다.
-           */
+          gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 30ch)',
+          columnGap: 'clamp(24px, 4vw, 64px)',
+          rowGap: '28px',
+          alignItems: 'end',
           textShadow: '0 1px 28px rgba(0,0,0,0.5)',
         }}
       >
-        {eyebrow ? (
-          <span className="ck-eyebrow" data-hero-reveal>
-            {eyebrow}
-          </span>
-        ) : null}
-        <h1 className="ck-display ck-display--xl" data-hero-reveal style={{ maxWidth: '14ch', wordBreak: 'keep-all' }}>
-          {title}
-        </h1>
+        <div style={{ gridColumn: '1 / -1', display: 'grid', gap: '22px' }}>
+          {eyebrow ? (
+            <span className={eyebrowClass(eyebrow)} data-hero-reveal style={{ color: 'rgba(255,255,255,0.75)' }}>
+              {eyebrow}
+            </span>
+          ) : null}
+          <h1 className="ck-display ck-display--xl" data-hero-reveal style={{ maxWidth: '16ch', wordBreak: 'keep-all' }}>
+            {title}
+          </h1>
+        </div>
+        <div style={{ gridColumn: '1', display: 'flex', gap: '28px', flexWrap: 'wrap', alignItems: 'center' }} data-hero-reveal>
+          {cta ? (
+            <a className="ck-btn" href={cta.href} data-cursor="hover">
+              {cta.label}
+            </a>
+          ) : null}
+          {secondaryCta ? (
+            <a className="ck-btn ck-btn--ghost" href={secondaryCta.href} data-cursor="hover">
+              {secondaryCta.label}
+            </a>
+          ) : null}
+        </div>
         {sub ? (
           <p
             data-hero-reveal
             style={{
+              gridColumn: '2',
               margin: 0,
-              maxWidth: '44ch',
-              fontSize: 'var(--ck-body)',
-              opacity: 0.86,
+              // SceneNav(우하단 화살표)와 겹치지 않게 오른쪽 여백
+              paddingRight: 'clamp(80px, 7vw, 110px)',
+              fontSize: '15px',
+              lineHeight: 1.6,
+              opacity: 0.8,
               // 한글은 기본 줄바꿈이 어절 중간을 끊는다(실측: "빵을 굽 / 고 있어요").
               wordBreak: 'keep-all',
             }}
@@ -168,35 +194,6 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
             {sub}
           </p>
         ) : null}
-        {cta || secondaryCta ? (
-          <div data-hero-reveal style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '8px' }}>
-            {cta ? (
-              <a className="ck-btn" href={cta.href} data-cursor="hover">
-                {cta.label}
-              </a>
-            ) : null}
-            {secondaryCta ? (
-              <a className="ck-btn ck-btn--ghost" href={secondaryCta.href} data-cursor="hover">
-                {secondaryCta.label}
-              </a>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          right: 'var(--ck-gutter)',
-          bottom: '32px',
-          zIndex: 3,
-          fontFamily: 'var(--ck-font-mono)',
-          fontSize: '11px',
-          letterSpacing: '0.2em',
-          opacity: 0.6,
-        }}
-      >
-        SCROLL
       </div>
     </section>
   );

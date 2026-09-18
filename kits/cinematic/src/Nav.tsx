@@ -38,31 +38,36 @@ export function Nav({ brand, links = [], cta }: NavProps) {
         justifyContent: 'space-between',
         gap: '24px',
         padding: '18px var(--ck-gutter)',
-        // 히어로(항상 어두운 사진) 위에서는 흰색, 스크롤해 블러 배경이 깔리면 킷 글자색.
-        color: scrolled ? 'var(--ck-text)' : '#fff',
-        background: scrolled ? 'color-mix(in srgb, var(--ck-bg) 72%, transparent)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(14px)' : 'none',
-        transition: 'background 400ms, backdrop-filter 400ms',
+        /*
+         * v0.4: 배경 띠 없음. 스크롤 후 블러 바가 풀블리드 사진을 가로질러 검은 띠로 보였다(2026-09-18 감사).
+         * 흰 글자 + difference 블렌드 — 사진·밝은 배경·어두운 배경 어디서나 읽히는 수상작 문법.
+         */
+        color: '#fff',
+        mixBlendMode: 'difference',
+        background: 'transparent',
+        opacity: scrolled ? 0.92 : 1,
+        transition: 'opacity 400ms',
       }}
     >
-      <a href="#" data-cursor="hover" style={{ fontFamily: 'var(--ck-font-display)', fontWeight: 600, fontSize: '20px', textDecoration: 'none', color: 'inherit', letterSpacing: '-0.01em' }}>
+      {/* v0.4: 상호 16px·500, 링크는 13px 모노풍, CTA는 알약 대신 밑줄 링크 — 헤드라인 하나가 화면을 지배하도록 크롬을 낮춘다 */}
+      <a href="#" data-cursor="hover" style={{ fontFamily: 'var(--ck-font-body)', fontWeight: 500, fontSize: '16px', textDecoration: 'none', color: 'inherit', letterSpacing: '-0.01em' }}>
         {brand}
       </a>
-      <nav style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
+      <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
         {isDesktop
           ? links.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 data-cursor="hover"
-                style={{ fontSize: '14px', textDecoration: 'none', color: 'inherit', opacity: 0.8, whiteSpace: 'nowrap' }}
+                style={{ fontSize: '13px', textDecoration: 'none', color: 'inherit', opacity: 0.72, whiteSpace: 'nowrap' }}
               >
                 {link.label}
               </a>
             ))
           : null}
         {cta ? (
-          <a className="ck-btn" href={cta.href} data-cursor="hover" style={{ padding: '10px 18px', fontSize: '14px', whiteSpace: 'nowrap' }}>
+          <a className="ck-btn" href={cta.href} data-cursor="hover" style={{ fontSize: '13px', padding: '2px 0', whiteSpace: 'nowrap' }}>
             {cta.label}
           </a>
         ) : null}

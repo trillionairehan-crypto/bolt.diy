@@ -1,6 +1,6 @@
 import { useRef, type ReactNode } from 'react';
 import { Wordmark } from './Wordmark';
-import { useRevealOnScroll } from './hooks';
+import { eyebrowClass, useRevealOnScroll } from './hooks';
 
 export interface ContactRow {
   label: string;
@@ -42,8 +42,10 @@ export function Contact({ title, rows, cta, image, note: noteProp, description, 
         position: 'relative',
         minHeight: '100svh',
         display: 'grid',
-        alignItems: 'end',
-        padding: `clamp(64px, 12vh, 160px) var(--ck-gutter) ${wordmark ? '20px' : 'clamp(40px, 8vh, 96px)'}`,
+        // v0.4: 제목은 위, 정보 행은 바닥 — 화면 위 절반이 비던 구도(2026-09-18 감사)를 채운다.
+        gridTemplateRows: 'auto 1fr auto',
+        alignItems: 'start',
+        padding: `clamp(80px, 12vh, 120px) var(--ck-gutter) ${wordmark ? '20px' : 'clamp(28px, 5vh, 56px)'}`,
         overflow: 'hidden',
         isolation: 'isolate',
         // 배경 사진이 있으면 흰 글자 + 검은 그라데이션(팔레트 무관), 없으면 킷 배경 위 킷 글자색.
@@ -57,43 +59,51 @@ export function Contact({ title, rows, cta, image, note: noteProp, description, 
           <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: -1, background: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.9) 100%)' }} />
         </>
       ) : null}
-      <div style={{ display: 'grid', gap: '40px' }}>
-        <div style={{ display: 'grid', gap: '40px', maxWidth: '1200px' }}>
-          {eyebrow ? (
-            <span className="ck-eyebrow" data-reveal>
-              {eyebrow}
-            </span>
-          ) : null}
-          <h2 className="ck-display ck-display--xl" data-reveal>
-            {title}
-          </h2>
-          <dl
-            data-reveal
-            style={{
-              margin: 0,
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-              gap: '24px 40px',
-              borderTop: '1px solid var(--ck-line)',
-              paddingTop: '24px',
-            }}
-          >
-            {(rows ?? []).map((row) => (
-              <div key={row.label} style={{ display: 'grid', gap: '6px' }}>
-                <dt className="ck-eyebrow">{row.label}</dt>
-                <dd style={{ margin: 0, fontSize: 'var(--ck-body)' }}>{row.value}</dd>
-              </div>
-            ))}
-          </dl>
-          <div data-reveal style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-            {cta ? (
-              <a className="ck-btn" href={cta.href} data-cursor="hover">
-                {cta.label}
-              </a>
-            ) : null}
-            {note ? <span style={{ color: 'var(--ck-muted)', fontSize: '14px' }}>{note}</span> : null}
+      {image ? <div aria-hidden="true" className="ck-grain" style={{ zIndex: -1 }} /> : null}
+      <div style={{ display: 'grid', gap: '18px', alignContent: 'start' }}>
+        {eyebrow ? (
+          <span className={eyebrowClass(eyebrow)} data-reveal>
+            {eyebrow}
+          </span>
+        ) : null}
+        <h2 className="ck-display ck-display--xl" data-reveal style={{ maxWidth: '14ch', lineHeight: 1.0 }}>
+          {title}
+        </h2>
+        {cta ? (
+          <div data-reveal style={{ marginTop: '8px' }}>
+            <a className="ck-btn" href={cta.href} data-cursor="hover">
+              {cta.label}
+            </a>
           </div>
-        </div>
+        ) : null}
+      </div>
+      <div />
+      <div style={{ display: 'grid', gap: '20px' }}>
+        <dl
+          data-reveal
+          style={{
+            margin: 0,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: '16px 32px',
+            borderTop: '1px solid var(--ck-line)',
+            paddingTop: '20px',
+          }}
+        >
+          {(rows ?? []).map((row) => (
+            <div key={row.label} style={{ display: 'grid', gap: '6px' }}>
+              <dt className={eyebrowClass(row.label)} style={{ fontSize: '11px' }}>
+                {row.label}
+              </dt>
+              <dd style={{ margin: 0, fontSize: '15px' }}>{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+        {note ? (
+          <span data-reveal style={{ color: 'var(--ck-muted)', fontSize: '13px' }}>
+            {note}
+          </span>
+        ) : null}
         {wordmark ? (
           <div data-reveal style={{ display: 'grid', gap: '12px', marginTop: 'clamp(24px, 6vh, 72px)' }}>
             <Wordmark text={wordmark} />

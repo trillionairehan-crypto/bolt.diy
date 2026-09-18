@@ -24,6 +24,15 @@ function useMediaQuery(query: string, initial = false): boolean {
 }
 
 /** 768px 이상 = 데스크톱. WebGL·영상·커서는 여기서만 켠다. 첫 렌더는 false(모바일 폴백)로 시작해 다운로드를 아낀다. */
+/** 한글이 섞인 라벨은 모노 대문자·넓은 자간 장치를 쓰면 안 된다 — 눈썹·인덱스 클래스 선택용. */
+export function hasHangul(text: unknown): boolean {
+  return typeof text === 'string' && /[\u3131-\u318e\uac00-\ud7a3]/.test(text);
+}
+
+export function eyebrowClass(text: unknown): string {
+  return hasHangul(text) ? 'ck-eyebrow ck-eyebrow--ko' : 'ck-eyebrow';
+}
+
 export function useIsDesktop(): boolean {
   return useMediaQuery('(min-width: 768px)');
 }

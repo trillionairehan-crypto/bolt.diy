@@ -23,13 +23,18 @@
   --ck-font-body: var(--ck-font-ko);
   --ck-font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
 
-  --ck-display-weight: 400;
-  --ck-display-tracking: -0.02em;
-  --ck-display-leading: 1.08;
+  /*
+   * v0.4 (2026-09-18 감사): 1440px 실측 히어로 104px·챕터 66px·굵기 400은 "템플릿 히어로"로 읽혔다.
+   * 기준(wearebrand.io, CSSDA 8.5~8.9)은 화면당 헤드라인 하나가 압도 — 얇은 300, 120~150px, 리딩 1.0대.
+   * 한글 300은 Pretendard Variable이 실제로 갖고 있다.
+   */
+  --ck-display-weight: 300;
+  --ck-display-tracking: -0.03em;
+  --ck-display-leading: 1.02;
 
-  /* 라틴 기준 96~130px, 한글은 그 85~90% */
-  --ck-display-xl: clamp(44px, 7.2vw, 112px);
-  --ck-display-lg: clamp(34px, 4.6vw, 72px);
+  /* 1440px에서 xl 130px·lg 92px. 한글은 같은 px에서 라틴보다 커 보이므로 상한을 150에 두지 않는다 */
+  --ck-display-xl: clamp(52px, 9vw, 136px);
+  --ck-display-lg: clamp(38px, 6.4vw, 96px);
   --ck-display-md: clamp(26px, 2.8vw, 40px);
   --ck-display-statement: clamp(28px, 3.6vw, 56px);
   --ck-number: clamp(56px, 8vw, 136px);
@@ -43,8 +48,8 @@
 .ck-type-serif {
   --ck-font-display: 'Instrument Serif', 'Noto Serif KR', 'Apple Myungjo', serif;
   --ck-display-weight: 400;
-  --ck-display-tracking: -0.01em;
-  --ck-display-leading: 1.12;
+  --ck-display-tracking: -0.015em;
+  --ck-display-leading: 1.06;
 }
 
 .ck-type-compact,
@@ -61,6 +66,14 @@
 html.ck-lenis,
 html.ck-lenis body {
   height: auto;
+}
+
+/* 생성물에 CSS 리셋이 없을 수 있다 — min-height: 100svh + 패딩이 content-box로 합산돼 마지막 장면이 1053px가 됐다(2026-09-18 감사) */
+.ck-page,
+.ck-page *,
+.ck-page *::before,
+.ck-page *::after {
+  box-sizing: border-box;
 }
 
 .ck-page {
@@ -81,11 +94,15 @@ html.ck-lenis body {
   max-width: 34em; /* 한글 본문 한 줄 30~36자 */
 }
 
-/* 눈썹 — 영문·숫자·시간·위치 라벨은 모노 대문자. 한글 라벨은 .ck-eyebrow--ko */
+/*
+ * 눈썹 — 영문·숫자·시간·위치 라벨은 모노 대문자. 한글 라벨은 .ck-eyebrow--ko.
+ * 컴포넌트는 hasHangul()로 자동 선택한다 — 2026-09-18 감사: 0.18em 자간이 한글에 그대로 걸려
+ * "가 온 도 자 · 찾 아 오 시 는 길"처럼 글자가 흩어졌다.
+ */
 .ck-eyebrow {
   font-family: var(--ck-font-mono);
   font-size: var(--ck-eyebrow);
-  letter-spacing: 0.18em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ck-accent);
 }
@@ -93,7 +110,8 @@ html.ck-lenis body {
 .ck-eyebrow--ko {
   font-family: var(--ck-font-body);
   font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: 13px;
+  letter-spacing: 0.02em;
   text-transform: none;
 }
 
@@ -155,27 +173,73 @@ html.ck-lenis body {
   line-height: 0.9;
 }
 
+/*
+ * 버튼 → 조용한 텍스트 링크. v0.3까지의 주황 알약 버튼은 SaaS 랜딩 문법이라 수상작 문법(UI 거의 없음)과
+ * 정면충돌했다(2026-09-18 감사). 밑줄 하나와 화살표만. 강조가 필요하면 .ck-btn--solid.
+ */
 .ck-btn {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 16px 28px;
-  border-radius: 999px;
-  background: var(--ck-accent);
-  color: #fff;
+  padding: 6px 0;
+  background: transparent;
+  color: inherit;
+  font-family: var(--ck-font-body);
+  font-size: 15px;
   font-weight: 500;
+  letter-spacing: 0;
   text-decoration: none;
-  transition: transform 400ms var(--ck-ease), background 300ms;
+  border-bottom: 1px solid currentColor;
+  transition: opacity 300ms var(--ck-ease), gap 300ms var(--ck-ease);
+}
+
+.ck-btn::after {
+  content: '→';
+  font-family: var(--ck-font-latin);
+  font-weight: 400;
 }
 
 .ck-btn:hover {
-  transform: translateY(-2px);
+  opacity: 0.7;
+  gap: 16px;
 }
 
 .ck-btn--ghost {
-  background: transparent;
-  border: 1px solid var(--ck-line);
-  color: var(--ck-text);
+  opacity: 0.7;
+  border-bottom-color: color-mix(in srgb, currentColor 40%, transparent);
+}
+
+.ck-btn--solid {
+  padding: 14px 24px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+}
+
+.ck-btn--solid::after {
+  content: none;
+}
+
+/* 필름 그레인 — 앰비언트 모션의 최소 단위. 히어로·컨택트 배경 사진 위에 얹는다 (SVG 노이즈, 네트워크 0) */
+.ck-grain {
+  position: absolute;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.8 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 240px 240px;
+  animation: ck-grain 0.9s steps(6) infinite;
+}
+
+@keyframes ck-grain {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-4%, 3%); }
+  40% { transform: translate(3%, -5%); }
+  60% { transform: translate(-6%, -2%); }
+  80% { transform: translate(5%, 4%); }
+  100% { transform: translate(0, 0); }
 }
 
 /* 등장 애니메이션 기본 상태 — Preloader가 끝나고 html.ck-ready가 붙기 전까지 숨김 (reduced-motion이면 즉시 보임) */
@@ -287,7 +351,8 @@ li.ck-pin-text[data-active='true'] {
     transform: none;
   }
 
-  .ck-marquee__track {
+  .ck-marquee__track,
+  .ck-grain {
     animation: none;
   }
 

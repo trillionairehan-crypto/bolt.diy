@@ -96,12 +96,13 @@ export function SceneNav() {
   };
 
   const btn: React.CSSProperties = {
-    width: 44,
-    height: 44,
+    width: 36,
+    height: 36,
     borderRadius: '50%',
-    border: '1px solid rgba(255,255,255,0.35)',
-    background: 'rgba(0,0,0,0.25)',
-    color: '#fff',
+    border: '1px solid rgba(255,255,255,0.22)',
+    background: 'transparent',
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: '13px',
     display: 'grid',
     placeItems: 'center',
     cursor: 'pointer',

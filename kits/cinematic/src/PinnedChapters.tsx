@@ -1,7 +1,12 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { ScrollChapter } from './ScrollChapter';
 import { MediaTreatment, type Treatment } from './MediaTreatment';
-import { ScrollTrigger, useIsDesktop } from './hooks';
+import { eyebrowClass, ScrollTrigger, useIsDesktop } from './hooks';
+
+/** 생성물이 눈썹에 번호를 이미 넣는 경우("01 · 흙을 빚는 시간") 킷 번호와 겹쳐 "01 01"이 됐다(2026-09-18 감사). 앞 번호를 떼어낸다. */
+function stripLeadingIndex(eyebrow: string | undefined): string | undefined {
+  return eyebrow?.replace(/^\s*\d{1,2}\s*(?:[·.\-–—/|]\s*)?/, '').trim() || undefined;
+}
 
 export interface PinnedChapter {
   image: string;
@@ -101,8 +106,13 @@ export function PinnedChapters({ chapters, startIndex = 1, media = 'right', step
       id={id}
       data-ck="chapter"
       data-ck-snap-steps={n}
-      style={{ position: 'relative', height: `${n * stepVh}vh`, borderTop: '1px solid var(--ck-line)' }}
+      style={{ position: 'relative', height: `${n * stepVh}vh` }}
     >
+      {/*
+       * v0.4 구도: 미디어가 한쪽 절반을 화면 끝까지 채운다(풀블리드, 액자 없음). 텍스트 칸은 위 인덱스 /
+       * 가운데 헤드라인(--lg ≈ 92px) / 아래 진행선의 3단. 2026-09-18 감사: 액자 사진 + 66px 제목 + 위쪽 빈
+       * 공간 = "피처 섹션 템플릿"으로 읽혔다.
+       */}
       <div
         style={{
           position: 'sticky',
@@ -110,31 +120,48 @@ export function PinnedChapters({ chapters, startIndex = 1, media = 'right', step
           height: '100vh',
           display: 'grid',
           gridTemplateColumns: media === 'right' ? 'minmax(0, 5fr) minmax(0, 7fr)' : 'minmax(0, 7fr) minmax(0, 5fr)',
-          gap: 'clamp(32px, 5vw, 80px)',
-          alignItems: 'center',
-          padding: 'clamp(64px, 10vh, 120px) var(--ck-gutter)',
+          alignItems: 'stretch',
           overflow: 'hidden',
         }}
       >
-        <div style={{ order: media === 'right' ? 0 : 1, display: 'grid', gap: '36px', alignContent: 'center' }}>
-          {/* 챕터 인덱스(Lidar "Scan / Connection / Compactness") — 현재 항목만 본색 */}
-          <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexWrap: 'wrap', gap: '8px 24px' }}>
-            {chapters.map((c, i) => (
-              <li
-                key={i}
-                ref={(node) => {
-                  texts.current[i] = node;
-                }}
-                className="ck-pin-text"
-                style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}
-              >
-                <span style={{ fontFamily: 'var(--ck-font-mono)', fontSize: '12px' }}>{String(startIndex + i).padStart(2, '0')}</span>
-                {c.eyebrow ? <span className="ck-eyebrow" style={{ color: 'inherit' }}>{c.eyebrow}</span> : null}
-              </li>
-            ))}
+        <div
+          style={{
+            order: media === 'right' ? 0 : 1,
+            display: 'grid',
+            gridTemplateRows: 'auto 1fr auto',
+            gap: '24px',
+            padding: 'clamp(88px, 14vh, 140px) var(--ck-gutter) clamp(36px, 6vh, 64px)',
+            paddingRight: media === 'right' ? 'clamp(24px, 4vw, 64px)' : 'var(--ck-gutter)',
+            paddingLeft: media === 'right' ? 'var(--ck-gutter)' : 'clamp(24px, 4vw, 64px)',
+            minWidth: 0,
+          }}
+        >
+          {/* 챕터 인덱스(Lidar "Scan / Connection / Compactness") — 세로 목록, 현재 항목만 본색 */}
+          <ol style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: '6px' }}>
+            {chapters.map((c, i) => {
+              const label = stripLeadingIndex(c.eyebrow);
+
+              return (
+                <li
+                  key={i}
+                  ref={(node) => {
+                    texts.current[i] = node;
+                  }}
+                  className="ck-pin-text"
+                  style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}
+                >
+                  <span style={{ fontFamily: 'var(--ck-font-mono)', fontSize: '11px', letterSpacing: '0.08em' }}>{String(startIndex + i).padStart(2, '0')}</span>
+                  {label ? (
+                    <span className={eyebrowClass(label)} style={{ color: 'inherit', fontSize: '12px' }}>
+                      {label}
+                    </span>
+                  ) : null}
+                </li>
+              );
+            })}
           </ol>
           {/* 헤드라인·본문은 같은 칸에 겹쳐 두고 크로스페이드 — 높이는 가장 긴 챕터가 정한다 */}
-          <div style={{ display: 'grid' }}>
+          <div style={{ display: 'grid', alignSelf: 'center' }}>
             {chapters.map((c, i) => (
               <div
                 key={i}
@@ -142,10 +169,14 @@ export function PinnedChapters({ chapters, startIndex = 1, media = 'right', step
                   texts.current[n + i] = node;
                 }}
                 className="ck-pin-text"
-                style={{ gridArea: '1 / 1', display: 'grid', gap: '16px', alignContent: 'start' }}
+                style={{ gridArea: '1 / 1', display: 'grid', gap: '20px', alignContent: 'start' }}
               >
-                <h3 className="ck-display ck-display--lg">{c.title}</h3>
-                {c.body ? <p style={{ margin: 0, color: 'var(--ck-muted)', maxWidth: '28em' }}>{c.body}</p> : null}
+                <h3 className="ck-display ck-display--lg" style={{ maxWidth: '13ch' }}>
+                  {c.title}
+                </h3>
+                {c.body ? (
+                  <p style={{ margin: 0, color: 'var(--ck-muted)', maxWidth: '26em', fontSize: '15px', lineHeight: 1.65 }}>{c.body}</p>
+                ) : null}
               </div>
             ))}
           </div>
@@ -153,7 +184,7 @@ export function PinnedChapters({ chapters, startIndex = 1, media = 'right', step
             <div ref={bar} style={{ position: 'absolute', inset: 0, background: 'var(--ck-accent)', transformOrigin: 'left', transform: 'scaleX(0)' }} />
           </div>
         </div>
-        <div style={{ order: media === 'right' ? 1 : 0, position: 'relative', aspectRatio: '4 / 5', maxHeight: '80vh', width: '100%', justifySelf: 'center' }}>
+        <div style={{ order: media === 'right' ? 1 : 0, position: 'relative', height: '100vh', width: '100%', overflow: 'hidden' }}>
           {chapters.map((c, i) => (
             <div
               key={i}
