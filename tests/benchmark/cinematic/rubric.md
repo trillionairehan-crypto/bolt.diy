@@ -763,3 +763,17 @@ Lenis를 쥔 쪽이 다른 변수를 본다(실측: 첫 구현에서 잠금이 �
 
 결론: `e962e83f`는 재배포해도 된다. 진짜 조치는 `_routes.json` 추가, 이미지 라우트 메모리 절감, 미디어 생성의
 Worker 분리다 — 이건 2단계 밖이라 별도 작업으로 넘긴다.
+
+## 2026-09-18 12:05 — `_routes.json` 배포 후 재발 확인, 원인 범위 좁힘
+
+- `public/_routes.json` 추가(정적 에셋 Function 제외) → 커밋 4de85278, main 동기화, `npm run deploy` → 9fbd99c8. `/assets/*`·`/favicon.svg`·`/robots.txt` 전부 200 REVALIDATED(정적 서빙), `/`·`/pricing` DYNAMIC(Function). 의도대로 동작.
+- 생성 1건 실행(가죽 공방·다크). `/api/chat` 200(35s)이었으나 `/api/media-images` 503, `/api/health` 503 반복, "마무리가 안 끝났어요" 경고. **`_routes.json`은 사고를 막지 못했다.**
+- 재현 실험(브라우저 콘솔 fetch, 같은 HTTP/2 커넥션):
+  - `/api/health` 쿠키 포함 9/20 503, `credentials:'omit'` 0/20 → 처음엔 쿠키로 보였으나, 쿠키를 전부 지워도 6/20 503. `omit`은 Chrome이 **별도 소켓 풀**을 써서 다른 엣지 머신에 붙는 것뿐.
+  - `/pricing`(SSR) 12/12 503, 각 ~190ms. `/api/models` 1/12. 503 응답 ray는 전부 `…d045-SJC`, 같은 머신.
+  - curl(매번 새 커넥션)은 `/pricing` 12/12 200, ray 접미사 전부 다른 머신. `/api/health` keep-alive 30/30 200(다른 머신).
+  - Chrome을 example.com으로 30초 보냈다 돌아와도 여전히 d045 → 재로그인 페이지(`/`)조차 503.
+- 판정: **엣지 머신 d045의 우리 Worker 격리체가 병들었고 브라우저는 그 머신에 핀 고정**. 생성(스트리밍+미디어) 요청을 받은 머신이 그 후 SSR을 한 번도 못 돌린다(15분 이상 지속). 코드 회귀 아님(curl은 어느 배포본에서도 정상).
+- 남은 분기: 메모리 누수(격리체 128MB, 생성 후 잔존 상태) vs CPU 한도(Free 플랜 10ms — SSR 웜 11~24ms가 이미 초과, 관대한 집행이 머신별로 다를 수 있음). 어제 tail에서 CSS 요청 CPU 220ms가 `ok`였던 것은 Paid(30s) 쪽 정황. **플랜 확인이 결정적** — API 토큰에 구독 읽기 권한 없음, 대시보드 로그인 필요.
+- GraphQL `workersInvocationsAdaptive`는 0행(Pages Function은 이 데이터셋에 안 잡히거나 토큰 범위 밖). `wrangler pages deployment tail 9fbd99c8`은 "does not have a Pages Function"이라며 거부 — `_routes.json` 유무와 관련 있는지 미확인(Function 자체는 동작).
+- 드래그 검증: 이 브라우저는 d045에 묶여 생성 불가. Chrome 재시작(또는 `chrome://net-internals/#sockets` → Flush socket pools) 후 재시도해야 한다.
