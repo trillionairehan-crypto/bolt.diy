@@ -829,3 +829,18 @@ Worker 분리다 — 이건 2단계 밖이라 별도 작업으로 넘긴다.
   2. `saveFile`이 워처가 아직 못 올린 새 파일에 `unreachable('Expected content to be defined')`를 던지고, `WorkbenchStore.addToExecutionQueue`에 catch가 없어 거부 하나가 전역 큐를 죽인다(이후 모든 close 실행 건너뜀). 콘솔에 'Failed to update file content'가 남아야 하는데 이번 런에선 없었음 → 1번이 주범, 2번은 잠재.
 - 수정: saveFile에 20s 타임아웃(타임아웃 시 던지지 않고 진행 — 바로 뒤 러너 쓰기가 자체 타임아웃·failed 표시로 두 번째 기회), 새 파일은 oldContent ''로 처리, 전역 큐 catch, stall Sentry extra에 `type:status:executed` 추가(다음 발생 때 경로 확정용). spec 2건(files.spec.ts).
 - 근본(WebContainer writeFile 응답 유실)은 미해결 — 계측이 Sentry에 쌓이면 빈도·파일 크기 상관 확인.
+
+## 2026-09-18 14:50 — 스톨 수정 배포·검증 시도 (2개 경로 확정, 나머지 계측)
+
+**원인 분해:** "마무리가 안 끝났어요"(post-stream stall)는 단일 버그가 아니라 증상. complete 표시는 `onActionClose → WorkbenchStore._runAction → filesStore.saveFile → runner.runAction` 순서의 맨 끝에서만 찍힌다. 이 사슬을 끊는 경로 3개:
+1. **saveFile의 webcontainer.fs.writeFile 무응답** — 타임아웃 없었음(291cacdb는 액션 러너 쪽만 막음). 파일은 스트리밍 쓰기로 이미 반영돼 프리뷰는 정상 → 관측과 일치. **수정: 20s 타임아웃, 던지지 않고 진행.**
+2. **새 파일 unreachable → 전역 큐 사망** — 스트리밍 직후 워처가 못 올린 파일에 saveFile이 `unreachable`을 던졌고 `addToExecutionQueue`에 catch가 없어 이후 close 실행 전부 스킵. **수정: 새 파일 처리 + 큐 catch.**
+3. **WebContainer 자체 사망** — `The service was stopped (x17)`, 브라우저 탭이 한 세션에서 ~7회 생성 후 자원 소진. 서버 버그 아님, 새 탭이면 리셋. 계측만.
+
+fd8c210a 배포(5a614bec). files.spec.ts 2건.
+
+**검증 2회 다 다른 이유로 막힘:**
+- 금속공예 런(기존 탭): stall 떴으나 터미널 `The service was stopped (x17)` = 경로 3(WebContainer 사망). 내가 고친 1·2가 아님. App.tsx가 ScrollChapter·ImagePlaceholder(킷에 없음)·BigNumber를 써서 Vite pre-transform 에러도 겹침.
+- 가다페 런(새 탭, WebContainer 정상): stall 안 뜸, 프리뷰 정상. 그러나 `/api/chat`이 **Anthropic 크레딧 잔액 부족**("Your credit balance is too low")으로 실패 → App.tsx 생성 자체가 안 됨. 코드로 검증 불가.
+
+**막힌 것 — 사용자 액션:** Anthropic API 크레딧(플랫폼 키) 충전해야 생성이 돌고, 그래야 1·2 경로를 end-to-end로 확인 가능. 지금은 스톨 수정 2건이 유닛 테스트로만 검증됨.
