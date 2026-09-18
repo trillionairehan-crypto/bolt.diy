@@ -38,17 +38,43 @@ export interface GeminiImageInput {
   aspectRatio: ImageAspectRatio;
 
   /** 레퍼런스 이미지(체이닝). 있으면 프롬프트 앞에 이미지 파트로 붙는다. */
-  reference?: { bytes: Uint8Array; mimeType: string };
+  reference?: ImageReference;
 
   /** 스타일 앵커 레퍼런스(여러 장). 체이닝 reference 뒤에 붙는다 — "이 결로 찍어라"용, 내용 복제용 아님. */
-  references?: Array<{ bytes: Uint8Array; mimeType: string }>;
+  references?: ImageReference[];
   model?: string;
   timeoutMs?: number;
   signal?: AbortSignal;
 }
 
+/*
+ * 레퍼런스는 bytes 또는 base64 중 하나로 넘긴다. 격리체 메모리(128MB) 절약: 직전 결과의 base64 문자열을
+ * 그대로 다음 요청에 실으면 bytes → 바이너리 문자열 → btoa 재인코딩(이미지당 ~3배 임시 할당)이 사라진다.
+ * 2026-09-18 프로덕션 실측: /api/chat 스트리밍과 이미지 세트가 같은 격리체에서 겹치면 둘 다 죽었다.
+ */
+export interface ImageReference {
+  mimeType: string;
+  bytes?: Uint8Array;
+  base64?: string;
+}
+
+export function referenceToBase64(ref: ImageReference): string {
+  if (ref.base64) {
+    return ref.base64;
+  }
+
+  if (!ref.bytes) {
+    throw new Error('image reference needs bytes or base64');
+  }
+
+  return bytesToBase64(ref.bytes);
+}
+
 export interface GeminiImageResult {
   bytes: Uint8Array;
+
+  /** 응답의 base64 원문 — 다음 이미지의 레퍼런스로 재인코딩 없이 넘기기 위해 보관(URL 응답 경로엔 없음). */
+  base64?: string;
   mimeType: string;
   model: string;
   promptTokens: number;
@@ -114,11 +140,11 @@ export async function generateGeminiImage(input: GeminiImageInput): Promise<Gemi
   const parts: Array<Record<string, unknown>> = [];
 
   if (input.reference) {
-    parts.push({ inlineData: { mimeType: input.reference.mimeType, data: bytesToBase64(input.reference.bytes) } });
+    parts.push({ inlineData: { mimeType: input.reference.mimeType, data: referenceToBase64(input.reference) } });
   }
 
   for (const ref of input.references ?? []) {
-    parts.push({ inlineData: { mimeType: ref.mimeType, data: bytesToBase64(ref.bytes) } });
+    parts.push({ inlineData: { mimeType: ref.mimeType, data: referenceToBase64(ref) } });
   }
 
   parts.push({ text: input.prompt });
@@ -180,6 +206,7 @@ export async function generateGeminiImage(input: GeminiImageInput): Promise<Gemi
 
   return {
     bytes: base64ToBytes(imagePart.inlineData.data),
+    base64: imagePart.inlineData.data,
     mimeType: imagePart.inlineData.mimeType || 'image/png',
     model,
     promptTokens,

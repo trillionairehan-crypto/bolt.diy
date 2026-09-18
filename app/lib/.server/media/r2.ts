@@ -78,8 +78,13 @@ export async function putR2Object(
     const response = await client.fetch(url, {
       method: 'PUT',
 
-      // aws4fetch signs the body hash; pass a fresh ArrayBuffer-backed copy so the Workers fetch types accept it.
-      body: bytes.slice().buffer as ArrayBuffer,
+      /*
+       * aws4fetch signs the body hash and the Workers fetch types want an ArrayBuffer. Only copy when the view
+       * doesn't own its whole buffer — a copy per image was one more transient sample in a 128MB isolate.
+       */
+      body: (bytes.byteOffset === 0 && bytes.byteLength === bytes.buffer.byteLength
+        ? bytes.buffer
+        : bytes.slice().buffer) as ArrayBuffer,
       headers: {
         'Content-Type': contentType,
         'Cache-Control': 'public, max-age=31536000, immutable',

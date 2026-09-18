@@ -4,7 +4,7 @@
  * size 는 '2048x1152' 처럼 픽셀로 준다('2K'는 세로 이미지가 나온다).
  * 결과 형태는 GeminiImageResult 와 같게 맞춰 skeleton7-image-set 이 공급자를 바꿔 끼울 수 있게 한다.
  */
-import type { GeminiImageResult } from './gemini-image';
+import { referenceToBase64, type GeminiImageResult, type ImageReference } from './gemini-image';
 
 export const SEEDREAM_ENDPOINT = 'https://ark.ap-southeast.bytepluses.com/api/v3/images/generations';
 export const DEFAULT_SEEDREAM_MODEL = 'dola-seedream-5-0-pro-260628';
@@ -18,7 +18,7 @@ export interface SeedreamImageInput {
   aspectRatio: '16:9' | '4:3' | '1:1';
 
   /** 체이닝·앵커 레퍼런스 — image[] 로 data URL 전달 */
-  references?: Array<{ bytes: Uint8Array; mimeType: string }>;
+  references?: ImageReference[];
   model?: string;
   timeoutMs?: number;
   signal?: AbortSignal;
@@ -40,8 +40,8 @@ const SIZE: Record<SeedreamImageInput['aspectRatio'], string> = {
   '1:1': '2048x2048',
 };
 
-function toDataUrl(ref: { bytes: Uint8Array; mimeType: string }): string {
-  return `data:${ref.mimeType};base64,${Buffer.from(ref.bytes).toString('base64')}`;
+function toDataUrl(ref: ImageReference): string {
+  return `data:${ref.mimeType};base64,${referenceToBase64(ref)}`;
 }
 
 export async function generateSeedreamImage(input: SeedreamImageInput): Promise<GeminiImageResult> {
@@ -97,6 +97,7 @@ export async function generateSeedreamImage(input: SeedreamImageInput): Promise<
     if (first?.b64_json) {
       return {
         bytes: new Uint8Array(Buffer.from(first.b64_json, 'base64')),
+        base64: first.b64_json,
         mimeType: 'image/jpeg',
         model,
         promptTokens: 0,

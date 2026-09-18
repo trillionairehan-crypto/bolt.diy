@@ -1,4 +1,4 @@
-import { generateGeminiImage, type GeminiImageResult } from './gemini-image';
+import { generateGeminiImage, type GeminiImageResult, type ImageReference } from './gemini-image';
 import { generateSeedreamImage } from './seedream-image';
 import { putR2Object, r2PublicUrl, type R2Config } from './r2';
 import { pickShotList } from '~/lib/media/shotlist';
@@ -143,16 +143,20 @@ export async function generateSkeleton7ImageSet(
   let outputTokens = 0;
   let costUsd = 0;
   let model = '';
-  let previous: GeminiImageResult | null = null;
+
+  /*
+   * 체이닝 레퍼런스는 직전 결과의 base64 원문만 붙든다 — bytes는 R2 업로드가 끝나면 버린다. 격리체 메모리
+   * 128MB를 /api/chat 스트리밍과 나눠 쓰므로(2026-09-18 실측: 둘이 겹치면 둘 다 죽음) 이미지당 잔류 사본을
+   * 1벌로 줄인다.
+   */
+  let previous: ImageReference | null = null;
 
   const useSeedream = deps.provider === 'seedream' && !!deps.arkApiKey;
 
   for (const slot of SKELETON7_SLOTS) {
     const prompt = slot === 'hero' ? buildHeroPrompt(input) : buildChapterPrompt(slot, input);
     const aspectRatio = slot === 'hero' ? '16:9' : '4:3';
-    const reference: { bytes: Uint8Array; mimeType: string } | undefined = previous
-      ? { bytes: previous.bytes, mimeType: previous.mimeType }
-      : undefined;
+    const reference: ImageReference | undefined = previous ?? undefined;
     const result: GeminiImageResult = useSeedream
       ? await generateSeedreamImage({
           apiKey: deps.arkApiKey!,
@@ -170,7 +174,9 @@ export async function generateSkeleton7ImageSet(
     outputTokens += result.outputTokens;
     costUsd += result.costUsd;
     model = result.model;
-    previous = result;
+    previous = result.base64
+      ? { base64: result.base64, mimeType: result.mimeType }
+      : { bytes: result.bytes, mimeType: result.mimeType };
   }
 
   return {
