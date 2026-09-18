@@ -123,6 +123,17 @@ export default function App() {`,
     expect(result.problems.some((p) => p.includes('images.unsplash.com'))).toBe(true);
   });
 
+  it('지어낸 외부 영상 호스트를 잡는다 (프로덕션 영상 404 원인)', () => {
+    const invented = GOOD.replace(
+      'https://pub-x.r2.dev/media/j1/hero.mp4',
+      'https://images.coralred.app/woodcraft/hero-seedance.mp4',
+    );
+
+    expect(checkCinematicSceneOrder(invented).problems).toContain(
+      '예약된 영상 대신 외부 영상 URL을 지어냈다 — images.coralred.app',
+    );
+  });
+
   it('R2 예약 URL과 웹폰트·영상은 외부 이미지로 보지 않는다', () => {
     const withFont = GOOD.replace("from './kit'", "from './kit'; // https://fonts.googleapis.com/css2?family=X");
 

@@ -31,6 +31,15 @@ const IMAGE_URL_REGEX = /https?:\/\/[^"'`\s)]+?\.(?:jpe?g|png|webp|avif|gif)(?:\
 const STOCK_IMAGE_URL_REGEX =
   /https?:\/\/(?:images\.unsplash\.com|source\.unsplash\.com|images\.pexels\.com|picsum\.photos|placehold\.co|via\.placeholder\.com|loremflickr\.com)\/[^"'`\s)]*/gi;
 
+/*
+ * 영상도 같은 문제를 겪는다 — 2026-09-18 프로덕션 실측: 예약 영상 URL을 줬는데 생성물이
+ * `https://images.coralred.app/woodcraft/hero-seedance.mp4`처럼 호스트를 지어냈다(404). 사진은 바뀌었는데
+ * 영상만 빠지는 걸 막기 위해, 예약 영상 URL이 있으면 외부 영상 URL을 그 하나로 바꾼다.
+ */
+const VIDEO_URL_REGEX = /https?:\/\/[^"'`\s)]+?\.(?:mp4|webm|mov)(?:\?[^"'`\s)]*)?/gi;
+
+export type CinematicInjectSlot = keyof Skeleton7ImageUrls | 'video';
+
 export interface CinematicInjectResult {
   content: string;
 
@@ -38,7 +47,7 @@ export interface CinematicInjectResult {
   replaced: number;
 
   /** 교체에 실제로 쓰인 슬롯 순서. */
-  slots: Array<keyof Skeleton7ImageUrls>;
+  slots: CinematicInjectSlot[];
 }
 
 function isReserved(url: string, reserved: string[]): boolean {
@@ -64,21 +73,46 @@ function collectReplaceableImageUrls(content: string, reserved: string[]): strin
   return ordered.sort((a, b) => content.indexOf(a) - content.indexOf(b));
 }
 
+function injectVideo(content: string, video: string | undefined): { content: string; replaced: number } {
+  if (!video) {
+    return { content, replaced: 0 };
+  }
+
+  const external = [...new Set([...content.matchAll(VIDEO_URL_REGEX)].map((match) => match[0]))].filter(
+    (url) => !sameUrlIgnoringQuery(url, video),
+  );
+
+  let next = content;
+
+  for (const url of external) {
+    next = next.split(url).join(video);
+  }
+
+  return { content: next, replaced: external.length };
+}
+
 /**
  * @param urls 예약된 R2 URL. hero가 없으면 아무것도 하지 않는다.
+ * @param video 예약된 히어로 영상 URL — 있으면 외부 영상 URL을 이걸로 바꾼다.
  */
-export function injectCinematicImages(content: string, urls: Skeleton7ImageUrls): CinematicInjectResult {
+export function injectCinematicImages(
+  content: string,
+  urls: Skeleton7ImageUrls,
+  video?: string,
+): CinematicInjectResult {
   const order: Array<keyof Skeleton7ImageUrls> = ['hero', 'ch1', 'ch2', 'ch3'];
   const reserved = order.map((slot) => urls[slot]).filter((url): url is string => Boolean(url));
   const external = collectReplaceableImageUrls(content, reserved);
 
   if (external.length === 0 || !urls.hero) {
-    return { content, replaced: 0, slots: [] };
+    const videoOnly = injectVideo(content, video);
+
+    return { content: videoOnly.content, replaced: videoOnly.replaced, slots: videoOnly.replaced ? ['video'] : [] };
   }
 
   let next = content;
   let replaced = 0;
-  const slots: Array<keyof Skeleton7ImageUrls> = [];
+  const slots: CinematicInjectSlot[] = [];
 
   external.forEach((url, index) => {
     /*
@@ -100,6 +134,14 @@ export function injectCinematicImages(content: string, urls: Skeleton7ImageUrls)
       slots.push(slot);
     }
   });
+
+  const withVideo = injectVideo(next, video);
+
+  if (withVideo.replaced > 0) {
+    next = withVideo.content;
+    replaced += withVideo.replaced;
+    slots.push('video');
+  }
 
   return { content: next, replaced, slots };
 }

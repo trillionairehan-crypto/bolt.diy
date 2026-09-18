@@ -67,7 +67,7 @@ let lastInput: Skeleton7ImageJobInput | null = null;
  * (2026-09-18 프로덕션 실측: 주입 12:13:16 → BigNumber 자동 수정 12:13:37 → Pexels 4장 복귀). 그때 새 잡을
  * 시작하지 않고(비용) 같은 URL로 한 번 더 주입하기 위해 기억한다.
  */
-let lastApplied: { jobId: string; urls: Skeleton7ImageUrls } | null = null;
+let lastApplied: { jobId: string; urls: Skeleton7ImageUrls; video?: string } | null = null;
 
 /** 요청 문장만으로 "소개·홍보형 사이트"일 가능성을 본다 — 온보딩 골격 매핑이 자주 틀려서(빵집 → 거래·수지형) 보조 신호로 쓴다. */
 export function looksLikeShowcasePrompt(prompt: string): boolean {
@@ -366,7 +366,7 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
   }
 
   if (!pending && lastApplied) {
-    const result = await injectIntoEntries(skeleton7Entries, lastApplied.urls);
+    const result = await injectIntoEntries(skeleton7Entries, lastApplied.urls, lastApplied.video);
 
     if (result.filesWritten.length === 0) {
       logger.info('re-apply: reserved photos still in place — nothing to inject');
@@ -402,7 +402,7 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
     return null;
   }
 
-  lastApplied = { jobId: job.jobId, urls };
+  lastApplied = { jobId: job.jobId, urls, video: job.video?.url };
 
   const filesWritten: string[] = [];
 
@@ -432,7 +432,20 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
     return summary;
   }
 
-  const result = await injectIntoEntries(skeleton7Entries, urls);
+  const result = await injectIntoEntries(skeleton7Entries, urls, job.video?.url);
+
+  // 영상은 이미지보다 늦다 — 주입 경로에서도 준비되면 그 URL만 한 번 더 다시 그린다(prompted 경로와 같음).
+  if (job.videoPromise && job.video) {
+    const videoUrl = job.video.url;
+
+    void job.videoPromise.then(async (ready) => {
+      if (ready) {
+        const written = await bustUrls(job.jobId, [videoUrl]);
+        logger.info('video applied', { filesWritten: written });
+      }
+    });
+  }
+
   const summary: ApplyResult = { ...result, mode: 'injected' };
   logger.info('applied (injected)', summary);
 
@@ -443,6 +456,7 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
 async function injectIntoEntries(
   entries: Array<[string, { content: string }]>,
   urls: Skeleton7ImageUrls,
+  video?: string,
 ): Promise<Omit<ApplyResult, 'mode'>> {
   const filesWritten: string[] = [];
   const injected = new Set<string>();
@@ -454,7 +468,7 @@ async function injectIntoEntries(
      * 들어간다. 그래서 마크업을 넣는 대신 모델이 지어낸 외부 이미지 URL을 예약 URL로 바꾼다.
      */
     if (isCinematicTrackFile(file.content)) {
-      const swapped = injectCinematicImages(file.content, urls);
+      const swapped = injectCinematicImages(file.content, urls, video);
 
       if (swapped.replaced > 0) {
         swapped.slots.forEach((slot) => injected.add(slot));

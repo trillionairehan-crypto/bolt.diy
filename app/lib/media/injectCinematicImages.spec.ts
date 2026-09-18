@@ -108,6 +108,26 @@ const W1 = 'https://pub-x.r2.dev/ch1.jpg';
     expect(result.content).not.toContain("'https://pub-x.r2.dev/hero.jpg'");
   });
 
+  /* 2026-09-18 프로덕션 실측: 사진은 예약 URL을 썼는데 영상만 호스트를 지어냈다(404). */
+  it('지어낸 영상 URL을 예약 영상 URL로 바꾼다 — 사진이 이미 예약 URL이어도', () => {
+    const invented = `const HERO_VIDEO = 'https://images.coralred.app/woodcraft/hero-seedance.mp4';
+<HeroScene image="${RESERVED.hero}" video={HERO_VIDEO} />`;
+    const video = 'https://pub-x.r2.dev/media/j1/hero-seedance.mp4';
+    const result = injectCinematicImages(invented, RESERVED, video);
+
+    expect(result.replaced).toBe(1);
+    expect(result.slots).toEqual(['video']);
+    expect(result.content).toContain(`'${video}'`);
+    expect(result.content).not.toContain('images.coralred.app');
+  });
+
+  it('예약 영상 URL을 이미 쓰면 영상은 건드리지 않는다', () => {
+    const video = 'https://pub-x.r2.dev/media/j1/hero-seedance.mp4';
+    const fine = `<HeroScene image="${RESERVED.hero}" video="${video}?v=1" />`;
+
+    expect(injectCinematicImages(fine, RESERVED, video).replaced).toBe(0);
+  });
+
   it('예약 URL에 캐시버스터가 붙어 있어도 그대로 둔다', () => {
     const busted = `<HeroScene image="${RESERVED.hero}?v=123" />`;
     const result = injectCinematicImages(busted, RESERVED);

@@ -123,6 +123,27 @@ const IMAGE_URL_REGEX = /https?:\/\/[^"'`\s)]+?\.(?:jpe?g|png|webp|avif|gif)(?:\
 const STOCK_IMAGE_URL_REGEX =
   /https?:\/\/(?:images\.unsplash\.com|source\.unsplash\.com|images\.pexels\.com|picsum\.photos|placehold\.co|via\.placeholder\.com|loremflickr\.com)\/[^"'`\s)]*/gi;
 
+/* 영상도 같은 규칙 — 2026-09-18 실측: 사진은 예약 URL을 쓰고 영상만 `images.coralred.app`을 지어냈다(404). */
+const VIDEO_URL_REGEX = /https?:\/\/[^"'`\s)]+?\.(?:mp4|webm|mov)(?:\?[^"'`\s)]*)?/gi;
+
+function externalVideoHosts(source: string): string[] {
+  const hosts = new Set<string>();
+
+  for (const match of source.matchAll(VIDEO_URL_REGEX)) {
+    try {
+      const { hostname } = new URL(match[0]);
+
+      if (!ALLOWED_IMAGE_HOST_REGEX.test(hostname)) {
+        hosts.add(hostname);
+      }
+    } catch {
+      // URL로 못 읽으면 판정하지 않는다.
+    }
+  }
+
+  return [...hosts];
+}
+
 function externalImageHosts(source: string): string[] {
   const hosts = new Set<string>();
 
@@ -336,6 +357,12 @@ export function checkCinematicSceneOrder(source: string): SceneOrderResult {
 
   if (foreignHosts.length > 0) {
     problems.push(`예약된 사진 대신 외부 이미지를 썼다 — ${foreignHosts.join(', ')}`);
+  }
+
+  const foreignVideoHosts = externalVideoHosts(source);
+
+  if (foreignVideoHosts.length > 0) {
+    problems.push(`예약된 영상 대신 외부 영상 URL을 지어냈다 — ${foreignVideoHosts.join(', ')}`);
   }
 
   /*

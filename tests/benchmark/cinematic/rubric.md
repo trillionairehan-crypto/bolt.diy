@@ -811,3 +811,11 @@ Worker 분리다 — 이건 2단계 밖이라 별도 작업으로 넘긴다.
 - 해석: chat이 끝난 뒤에도 격리체 힙이 높게 남아 media의 후반 이미지에서 넘친다. chat 단독으론 안 넘치지만 잔류가 있다. 잔류 후보: Sentry(@sentry/cloudflare consoleIntegration·fetchIntegration·opentelemetry 스팬), AI SDK 스트림, LLMManager.
 - 다음 실험(사용자 결정 필요): (a) `functions/_middleware.ts`의 Sentry 플러그인을 임시로 끈 빌드 배포 → 동시 실험 반복. 자동 모드 분류기가 "로깅 변조"로 차단해 실행 못 함. (b) chat → 완료 후 media(겹침 없음) 순차 실험 — 잔류 여부 판정.
 - 현재 프로덕션: 머신 cd6e가 병든 상태, 재배포 필요(`npm run deploy`) — 이것도 분류기가 차단.
+
+## 2026-09-18 13:40 — ① 구현·검증: 이미지 세트를 chat 스트림 종료 뒤 시작
+
+- 7ce5e54f: `prepareSkeleton7Images`는 예약만, 생성 POST는 `startSkeleton7ImageSet()`(Chat.client, `isLoading` false 시) 또는 `applySkeleton7Images`가 시작. 배포 18ca4dbe.
+- 실생성(목공예·다크, 머신 ee01) 타임라인: reserve(-5s) → chat(-4s~37s) → **media-images 37s~78s(200)** → llmcall 37s·42s → media-video 폴링 78s~. 겹침 없음. 직후 `/pricing` 8/8 200, `/api/health` 4/4 200. **머신 건강.**
+- 프리뷰: 히어로·챕터 전부 R2 생성 사진(목공 작업실, 인물 없음). R2 hero/ch1/ch2/ch3 200.
+- 새 결함: 모델이 영상 URL만 `https://images.coralred.app/woodcraft/hero-seedance.mp4`로 지어냄(404) — 주입기·게이트가 영상은 무시했다. 수정: `injectCinematicImages(content, urls, video)`가 외부 영상 URL을 예약 영상 URL로 치환(`slots: 'video'`), 게이트에 `예약된 영상 대신 외부 영상 URL을 지어냈다` 추가, 주입 경로에도 영상 준비 시 bustUrls. spec 3건 추가(77 통과).
+- 남은 것: "마무리가 안 끝났어요"(post-stream stall) 경고가 오늘 6런 중 4런 — 프리뷰는 정상 렌더된 경우도 있어 액션 상태 표시 문제로 보임. 별도 조사.
