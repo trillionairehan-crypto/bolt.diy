@@ -799,3 +799,15 @@ Worker 분리다 — 이건 2단계 밖이라 별도 작업으로 넘긴다.
   - 재배포로 리셋 후 브라우저에서 `/api/media-images` reserve+generate만 실행(41s, 200) → `/pricing` 8/8 200, `/api/health` 6/6 200. **이미지 생성 단독은 무죄.**
   - 남은 용의자: `/api/chat`(스트리밍 30~45s), `/api/llmcall`(자동 검토), `/api/media-video`(폴링), `/api/onboarding`. curl `--next`는 커넥션을 안 이어서(ray 매번 다름) 브라우저 핀 커넥션으로만 실험 가능.
   - 다음 실험: 브라우저에서 `fetch` 몽키패치로 `/api/chat` 요청 본문을 캡처 → 재배포 → 같은 본문만 재생 → `/pricing` 프로브.
+
+## 2026-09-18 13:10 — 실험 2(chat 본문 재생) 결과: 단독은 무죄, 동시 실행이 격리체를 죽인다
+
+브라우저 `fetch` 몽키패치로 실제 `/api/chat` 본문(112KB) 캡처 → 같은 핀 커넥션(머신 cd6e)에서 재생.
+- `/api/chat` 단독 재생: 200, 33s, 24.7KB → 직후 `/pricing` 8/8 200.
+- `/api/media-images` 단독: 41s, 200 → 8/8 200.
+- 실생성(UI, cd6e): 통과(8/8 200) — 겹쳐도 살아남는 경우 있음.
+- **chat 재생 + media 동시**: chat "network error"(스트림 절단) + media 503 `Worker exceeded resource limits`(19s). 직후 8/8 200(격리체 교체됨).
+- 메모리 다이어트(9565357a: base64 원문 레퍼런스, previous bytes 해제, R2 복사 제거) 배포 후 재실험: chat 200(34s) 완료 → **media 503(40s, 4번째 이미지 즈음)** → `/pricing` 8/8 503 지속. 다이어트로는 부족.
+- 해석: chat이 끝난 뒤에도 격리체 힙이 높게 남아 media의 후반 이미지에서 넘친다. chat 단독으론 안 넘치지만 잔류가 있다. 잔류 후보: Sentry(@sentry/cloudflare consoleIntegration·fetchIntegration·opentelemetry 스팬), AI SDK 스트림, LLMManager.
+- 다음 실험(사용자 결정 필요): (a) `functions/_middleware.ts`의 Sentry 플러그인을 임시로 끈 빌드 배포 → 동시 실험 반복. 자동 모드 분류기가 "로깅 변조"로 차단해 실행 못 함. (b) chat → 완료 후 media(겹침 없음) 순차 실험 — 잔류 여부 판정.
+- 현재 프로덕션: 머신 cd6e가 병든 상태, 재배포 필요(`npm run deploy`) — 이것도 분류기가 차단.
