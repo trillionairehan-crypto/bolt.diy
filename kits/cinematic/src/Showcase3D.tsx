@@ -123,18 +123,22 @@ export function Showcase3D({ id, eyebrow, title, body: bodyProp, description, sp
       id={id}
       data-ck="scene"
       style={{
-        minHeight: '100svh',
+        minHeight: isDesktop ? '100svh' : undefined,
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 5fr) minmax(0, 7fr)',
+        // 400px에서 5:7 두 열은 제목이 글자 단위로 깨졌다(2026-09-18 모바일 감사) — 스틸 위, 텍스트 아래로 스택.
+        gridTemplateColumns: isDesktop ? 'minmax(0, 5fr) minmax(0, 7fr)' : 'minmax(0, 1fr)',
         alignItems: 'stretch',
       }}
     >
       <div
         style={{
+          order: isDesktop ? 0 : 1,
           display: 'grid',
-          gridTemplateRows: 'auto 1fr auto',
+          gridTemplateRows: isDesktop ? 'auto 1fr auto' : 'auto auto auto',
           gap: '24px',
-          padding: 'clamp(88px, 14vh, 140px) clamp(24px, 4vw, 64px) clamp(36px, 6vh, 64px) var(--ck-gutter)',
+          padding: isDesktop
+            ? 'clamp(88px, 14vh, 140px) clamp(24px, 4vw, 64px) clamp(36px, 6vh, 64px) var(--ck-gutter)'
+            : '32px var(--ck-gutter) 56px',
           minWidth: 0,
         }}
       >
@@ -179,7 +183,8 @@ export function Showcase3D({ id, eyebrow, title, body: bodyProp, description, sp
         style={{
           position: 'relative',
           width: '100%',
-          minHeight: '100svh',
+          minHeight: isDesktop ? '100svh' : undefined,
+          aspectRatio: isDesktop ? undefined : '4 / 5',
           overflow: 'hidden',
           /*
            * 위가 밝고 아래가 어두운 스튜디오 배경 대신 "바닥 그림자"만 — 라이트 팔레트에서 회색 세로 그라데이션이

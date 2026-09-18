@@ -131,7 +131,7 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
           zIndex: 2,
           background: [
             // 상단 14%만 살짝 어둡게 — 밝은 사진(흰 벽) 위에서 내비 글자가 묻히지 않게(2026-09-18 모션 감사 프레임)
-            'linear-gradient(180deg, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0) 14%)',
+            'linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0) 18%)',
             `linear-gradient(205deg, rgba(0,0,0,${(overlay * 0.1).toFixed(2)}) 0%, rgba(0,0,0,${(overlay * 0.45).toFixed(2)}) 55%, rgba(0,0,0,${Math.min(0.9, overlay + 0.35).toFixed(2)}) 100%)`,
             'radial-gradient(120% 90% at 50% 35%, transparent 50%, rgba(0,0,0,0.5) 100%)',
           ].join(', '),
@@ -151,9 +151,10 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
           padding: 'var(--ck-gutter)',
           paddingBottom: 'clamp(40px, 7vh, 96px)',
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 30ch)',
+          // 400px에서 2열 그리드는 첫 열이 0폭으로 접혀 링크가 글자 단위로 세로 분해됐다(2026-09-18 모바일 감사) — 한 열로.
+          gridTemplateColumns: isDesktop ? 'minmax(0, 1fr) minmax(0, 30ch)' : 'minmax(0, 1fr)',
           columnGap: 'clamp(24px, 4vw, 64px)',
-          rowGap: '28px',
+          rowGap: isDesktop ? '28px' : '20px',
           alignItems: 'end',
           textShadow: '0 1px 28px rgba(0,0,0,0.5)',
         }}
@@ -184,10 +185,10 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
           <p
             data-hero-reveal
             style={{
-              gridColumn: '2',
+              gridColumn: isDesktop ? '2' : '1',
               margin: 0,
               // SceneNav(우하단 화살표)와 겹치지 않게 오른쪽 여백
-              paddingRight: 'clamp(80px, 7vw, 110px)',
+              paddingRight: isDesktop ? 'clamp(80px, 7vw, 110px)' : '96px',
               fontSize: '15px',
               lineHeight: 1.6,
               opacity: 0.8,

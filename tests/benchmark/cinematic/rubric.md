@@ -917,3 +917,13 @@ fd8c210a 배포(5a614bec). files.spec.ts 2건.
   2. SceneNav 흰 화살표가 크림 위에서 사라짐 → 흰색+`difference`(내비와 동일).
   3. Showcase3D 스테이지의 회색 세로 그라데이션이 제품 사진 기본 배경처럼 읽힘 → 바닥 그림자(radial) + `--ck-bg`→`--ck-surface` 미세 그라데이션.
 - 증거: `kit-v0.4-audit/light-{chapter,showcase3d,contact}.png`. 미확인: 마퀴·TextReveal 장면(캡처 누락, `data-ck` 없음).
+
+## 2026-09-18 19:50 — 모바일 400px 감사
+
+- 하네스 `MOBILE=1 shotScenes.mjs`(400×860, isMobile·hasTouch, 가로 넘침 검사). 가로 넘침 없음(400/400).
+- 결함 → 수정:
+  1. **히어로 CTA 세로 분해** — `1fr 30ch` 2열 그리드가 400px에서 첫 열 0폭 → "작/업/이/야/기" 한 글자씩. `useIsDesktop`으로 한 열, 캡션은 링크 아래.
+  2. **ScrollChapter(모바일 폴백)** "01 01" 번호 중복 + 한글 눈썹 모노 자간 + 액자 사진 + 180px 상단 공백 → `stripLeadingIndex`·`eyebrowClass`, 사진 풀블리드(패딩 0), 상단 72px.
+  3. **Showcase3D** 5:7 두 열이 400px에서 제목 "달항아/리" 분해·스펙 압착 → 스틸(4:5, 풀블리드) 위·텍스트 아래 스택, `minHeight` 해제.
+  4. 히어로 상단 그라데이션 0.38/14% → 0.5/18%(밝은 벽 위 내비 CTA).
+- 증거: `kit-v0.4-audit/mobile-{hero,chapter,showcase3d}.png`. 미확인: 모바일 실기기 터치 스크롤(스냅이 400px에서도 켜져 있음 — 하네스 scrollTo가 1169로 튐. 모바일에서 스냅을 끌지는 판단 필요).

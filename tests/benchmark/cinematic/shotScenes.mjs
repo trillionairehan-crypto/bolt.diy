@@ -14,7 +14,9 @@ const ROOT = process.cwd();
 const DIST = join(ROOT, 'kits/cinematic/.render-tmp/dist');
 const OUT = join(ROOT, process.argv[2] ?? 'tests/benchmark/cinematic/render-2026-09-12/audit-scenes');
 const STOPS = (process.argv[3] ?? '0,1,2,3,4,5,6,7,8,9,10').split(',').map(Number);
-const VIEW = { width: 1440, height: 900 };
+/* MOBILE=1 — 400×860, 터치·모바일 UA. 킷의 데스크톱 분기(핀 챕터·WebGL·3D)가 꺼진 폴백을 본다. */
+const MOBILE = process.env.MOBILE === '1';
+const VIEW = MOBILE ? { width: 400, height: 860 } : { width: 1440, height: 900 };
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.png': 'image/png', '.mp4': 'video/mp4', '.svg': 'image/svg+xml' };
 
 function serve(dir) {
@@ -36,14 +38,15 @@ function serve(dir) {
 
 const { server, port } = await serve(DIST);
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-webgl'] });
-const page = await browser.newPage({ viewport: VIEW, deviceScaleFactor: 1 });
+const page = await browser.newPage({ viewport: VIEW, deviceScaleFactor: 1, isMobile: MOBILE, hasTouch: MOBILE });
 mkdirSync(OUT, { recursive: true });
 
 await page.goto(`http://127.0.0.1:${port}/`, { waitUntil: 'networkidle' });
 await page.waitForTimeout(2500);
 
 const total = await page.evaluate(() => document.documentElement.scrollHeight);
-console.log(`scrollHeight ${total}px = ${(total / VIEW.height).toFixed(1)} viewports`);
+const overflow = await page.evaluate(() => ({ scrollWidth: document.documentElement.scrollWidth, clientWidth: document.documentElement.clientWidth }));
+console.log(`scrollHeight ${total}px = ${(total / VIEW.height).toFixed(1)} viewports; width ${overflow.scrollWidth}/${overflow.clientWidth}${overflow.scrollWidth > overflow.clientWidth ? '  ← 가로 넘침' : ''}`);
 
 for (const stop of STOPS) {
   const y = Math.min(Math.round(stop * VIEW.height), total - VIEW.height);
