@@ -434,6 +434,62 @@ export class ActionRunner {
   }
 
   /*
+   * dev 서버 재시작 — 2026-09-18 실측 `The service was stopped`(esbuild 사망) 복구용. 러너를 거쳐야
+   * start 액션 상태가 일관된다: 옛 실행은 abort로 끊고(셸의 executeCommand가 Ctrl-C를 보낸다), 새
+   * AbortController로 같은 액션을 다시 'running'에 둔다. 셸 executionState의 옛 abort 콜백은 미리
+   * 비운다 — 비우지 않으면 executeCommand가 그걸 다시 불러 새 실행을 'aborted'로 덮는다.
+   */
+  restartStartAction(actionId: string): boolean {
+    const action = this.actions.get()[actionId];
+
+    if (!action || action.type !== 'start') {
+      return false;
+    }
+
+    const shell = this.#shellTerminal?.();
+
+    if (!shell?.process || !shell.terminal) {
+      return false;
+    }
+
+    // 옛 실행 끊기 — 옛 abortSignal이 aborted가 되므로 옛 #runStartAction의 catch는 조용히 빠져나간다.
+    action.abort();
+
+    const state = shell.executionState.get();
+
+    if (state?.active) {
+      shell.executionState.set({ ...state, abort: undefined });
+    }
+
+    const abortController = new AbortController();
+    const restarted: ActionState = {
+      ...action,
+      status: 'running',
+      executed: true,
+      abort: () => {
+        abortController.abort();
+        this.#updateAction(actionId, { status: 'aborted' });
+      },
+      abortSignal: abortController.signal,
+    };
+
+    this.#updateAction(actionId, restarted);
+
+    this.#runStartAction(restarted)
+      .then(() => this.#updateAction(actionId, { status: 'complete' }))
+      .catch((err: Error) => {
+        if (restarted.abortSignal.aborted) {
+          return;
+        }
+
+        this.#updateAction(actionId, { status: 'failed', error: 'Action failed' });
+        logger.error('[start]:restart failed\n\n', err);
+      });
+
+    return true;
+  }
+
+  /*
    * Re-runs one action that's stuck (status still 'running'/'pending') or ended in 'failed' —
    * used by the client's post-stream stall recovery so a wedged action can be retried without a
    * new LLM call (no regenerate(), so no generation charge involved).

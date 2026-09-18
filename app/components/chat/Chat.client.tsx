@@ -1,4 +1,5 @@
 import { useStore } from '@nanostores/react';
+import { devServerCrashAtom } from '~/lib/stores/devServerHealth';
 import * as Sentry from '@sentry/remix';
 import type { UIMessage, FileUIPart } from 'ai';
 import { DefaultChatTransport } from 'ai';
@@ -1360,6 +1361,44 @@ ${CINEMATIC_KIT_PROMPT}`;
         logger.info('skeleton 7 images: generation started after stream end');
       }
     }, [isLoading]);
+
+    /*
+     * dev 서버(esbuild) 사망 대응 — 2026-09-18 실측: 한 탭에서 생성 ~7회 뒤 `The service was stopped`,
+     * 프리뷰 없음, 액션 영영 running. 코드 문제가 아니라 LLM 자동 수정으로는 못 고친다. 두 번까지는
+     * dev 서버를 다시 띄우고, 그래도 죽으면 탭 자원 소진으로 보고 사용자에게 새 탭을 안내한다
+     * (source 'terminal' → runAutoFix 대상 아님).
+     */
+    const devServerCrash = useStore(devServerCrashAtom);
+    const devServerRestartsRef = useRef(0);
+
+    useEffect(() => {
+      if (!devServerCrash) {
+        return;
+      }
+
+      const restarts = devServerRestartsRef.current;
+
+      Sentry.captureMessage('dev server crashed', {
+        level: 'warning',
+        tags: { route: 'chat.client', event: 'dev_server_crash' },
+        extra: { count: devServerCrash.count, restarts, sample: devServerCrash.sample },
+      });
+
+      if (restarts < 2 && workbenchStore.restartDevServer()) {
+        devServerRestartsRef.current = restarts + 1;
+        toast.info('미리보기 서버가 멈춰서 다시 시작하고 있어요');
+
+        return;
+      }
+
+      workbenchStore.actionAlert.set({
+        type: 'error',
+        title: '미리보기 서버가 계속 멈춰요',
+        description: '이 브라우저 탭의 자원이 소진됐어요. 저장 기능을 켠 뒤 새 탭에서 앱을 다시 열면 해결돼요.',
+        content: devServerCrash.sample,
+        source: 'terminal',
+      });
+    }, [devServerCrash]);
 
     /*
      * 자동 수정이 App.tsx를 다시 쓰면 모델이 기억하는 스톡 URL이 되살아나 예약 사진 주입이 사라진다

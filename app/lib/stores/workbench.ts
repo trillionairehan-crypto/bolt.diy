@@ -676,6 +676,31 @@ export class WorkbenchStore {
    * 워치독(Chat.client.tsx)이 감지할 수 있도록 노출. 'start' 액션의 'running'은 정상 상태(dev
    * server가 계속 떠 있는 것)라 Artifact.tsx의 allActionFinished 판정과 동일하게 예외 처리한다.
    */
+  /**
+   * 미리보기 dev 서버를 다시 띄운다 — esbuild 서비스가 죽어(`The service was stopped`) 프리뷰가
+   * 안 뜰 때. 마지막 'start' 액션을 러너로 다시 실행한다(ActionRunner.restartStartAction — 상태 일관).
+   * 재시작할 start 액션이 없거나 셸이 없으면 false.
+   */
+  restartDevServer(): boolean {
+    let target: { runner: ActionRunner; actionId: string; command: string } | null = null;
+
+    for (const artifact of Object.values(this.artifacts.get())) {
+      for (const [actionId, action] of Object.entries(artifact.runner.actions.get())) {
+        if (action.type === 'start' && action.content.trim()) {
+          target = { runner: artifact.runner, actionId, command: action.content.trim() };
+        }
+      }
+    }
+
+    if (!target) {
+      return false;
+    }
+
+    logger.warn('dev server restart requested', { command: target.command });
+
+    return target.runner.restartStartAction(target.actionId);
+  }
+
   getUnsettledActions(): Array<{
     artifactId: string;
     actionId: string;

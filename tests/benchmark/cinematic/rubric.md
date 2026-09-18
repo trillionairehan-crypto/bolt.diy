@@ -858,3 +858,12 @@ fd8c210a 배포(5a614bec). files.spec.ts 2건.
 - 가다페 런의 `/api/llmcall:400`은 우리 검증 400이 아니라 **Anthropic upstream 400 "Your credit balance is too low"**가 catch fallback(`status: errorResponse.statusCode`)으로 그대로 통과한 것. chat 실패와 같은 뿌리(크레딧 소진). 자동 검토 로그엔 "llmcall failed 400"만 남아 형식 오류처럼 보였다.
 - 수정: `app/lib/.server/llm/provider-error.ts` `isProviderBillingError`(Anthropic·OpenAI 결제 문구) → api.llmcall이 **402 `provider_billing`, isRetryable false**로 갈라 냄, Sentry tag `kind: provider_billing`. reviewGeneratedApp은 402면 "skipped — provider billing"로 로그. spec 3건.
 - 사용자 액션 그대로: Anthropic 크레딧 충전 전엔 chat·자동 검토 둘 다 못 돈다.
+
+## 2026-09-18 16:20 — WebContainer/dev 서버 사망 대응 (큐 5번)
+
+- 실측 증상: 한 탭에서 생성 ~7회 뒤 터미널 `[vite] Pre-transform error: The service was stopped (x17)`, 프리뷰 "미리볼 화면이 없어요", 액션 영영 running(stall 경로 3). esbuild 서비스 프로세스가 컨테이너 안에서 죽은 것 — 코드 문제가 아니라 LLM 자동 수정 대상이 아님.
+- 구현:
+  - `app/lib/stores/devServerHealth.ts`: 볼트 셸 출력 스트림(`shell.ts` streamA)에서 `The service was stopped|Pre-transform error` 감지, 10s dedupe, `devServerCrashAtom`(count·sample). spec 3건.
+  - `ActionRunner.restartStartAction`: 마지막 `start` 액션을 러너 경로로 재실행 — 옛 실행 abort → 셸 executionState의 옛 abort 콜백 비움(안 비우면 executeCommand가 다시 불러 새 실행을 'aborted'로 덮음) → 새 AbortController로 'running'. `WorkbenchStore.restartDevServer()`가 호출. spec 2건(재시작 후 status running 유지, 명령 재발행).
+  - `Chat.client`: atom 구독 → 2회까지 자동 재시작 + toast "미리보기 서버가 멈춰서 다시 시작하고 있어요", 그 뒤엔 `actionAlert`(source 'terminal' → runAutoFix 대상 아님) "이 브라우저 탭의 자원이 소진됐어요. 저장 기능을 켠 뒤 새 탭에서…". Sentry `dev_server_crash`(count·restarts·sample).
+- 검증: 유닛만. 실제 esbuild 사망은 프로덕션 UI에 터미널 입력이 없어 임의 유발 불가 — 다음 실사용에서 Sentry 이벤트·토스트로 확인. 재시작으로 회복되는지(컨테이너 메모리 자체가 소진됐으면 안 될 수 있음)는 미확인.

@@ -3,6 +3,7 @@ import type { ITerminal } from '~/types/terminal';
 import { withResolvers } from './promises';
 import { atom } from 'nanostores';
 import { expoUrlAtom } from '~/lib/stores/qrCodeStore';
+import { noteDevServerOutput } from '~/lib/stores/devServerHealth';
 
 export async function newShellProcess(webcontainer: WebContainer, terminal: ITerminal) {
   const args: string[] = [];
@@ -158,6 +159,9 @@ export class BoltShell {
               jshReady.resolve();
             }
           }
+
+          // dev 서버(esbuild) 사망 감지 — 2026-09-18 실측 `The service was stopped`. 순수 문자열 검사, 부수효과는 atom 갱신뿐.
+          noteDevServerOutput(data);
 
           terminal.write(data);
         },
