@@ -262,6 +262,13 @@ export const ChatImpl = memo(
     const autoReviewArmedRef = useRef(false);
 
     /*
+     * 자동 수정 턴 뒤 예약 사진 재주입 — 'armed'(자동 수정 전송 직후) → 'loading'(스트림 시작 확인) → 끝나면
+     * 한 번 더 applySkeleton7Images(). 스트림 시작을 확인하는 단계가 있어야 clearAlert 직후 isLoading이 아직
+     * false인 틱에 먼저 발화해 버리는 일이 없다.
+     */
+    const reinjectAfterAutoFixRef = useRef<'idle' | 'armed' | 'loading'>('idle');
+
+    /*
      * 출시 블로커(2026-09-09) 무한 대기 방지 — 서버 3분 상한과 별개로, 클라이언트가 "마지막 진행
      * 신호"를 직접 추적한다. data-progress 이벤트(요약/컨텍스트/응답 단계 전환)와 스트리밍되는
      * 메시지 내용(파일/텍스트 델타) 둘 다 "신호"로 친다 — data-progress만 보면 정상적인 긴 응답
@@ -1330,9 +1337,39 @@ ${CINEMATIC_KIT_PROMPT}`;
       }
 
       chatStore.setKey('autoFixAttempts', attempts + 1);
+      reinjectAfterAutoFixRef.current = 'armed';
       sendMessage({} as any, prompt, modelOverride, true);
       workbenchStore.clearAlert();
     }, [actionAlert, isLoading]);
+
+    /*
+     * 자동 수정이 App.tsx를 다시 쓰면 모델이 기억하는 스톡 URL이 되살아나 예약 사진 주입이 사라진다
+     * (2026-09-18 프로덕션 실측: 주입 12:13:16 → BigNumber 자동 수정 12:13:37 → Pexels 4장 복귀, 히어로에
+     * 실사 인물 스톡). 자동 수정 턴이 끝나면 한 번 더 주입한다. 자동 검토가 아직 안 돌았으면(첫 주입 자체가
+     * 아직) 그쪽 effect에 맡긴다 — 여기서 먼저 부르면 pending 잡을 검토 전에 소비한다.
+     */
+    useEffect(() => {
+      const stage = reinjectAfterAutoFixRef.current;
+
+      if (stage === 'armed' && isLoading) {
+        reinjectAfterAutoFixRef.current = 'loading';
+        return;
+      }
+
+      if (stage !== 'loading' || isLoading || actionAlert || autoReviewArmedRef.current) {
+        return;
+      }
+
+      reinjectAfterAutoFixRef.current = 'idle';
+
+      applySkeleton7Images()
+        .then((media) => {
+          if (media) {
+            logger.info('skeleton 7 images: re-applied after auto-fix', media);
+          }
+        })
+        .catch((error) => logger.error('skeleton 7 images: re-apply failed', error));
+    }, [isLoading, actionAlert]);
 
     useEffect(() => {
       runAutoFix();

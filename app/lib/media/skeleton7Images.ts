@@ -54,6 +54,13 @@ const VIDEO_POLL_TIMEOUT_MS = 8 * 60_000;
 let pending: PendingJob | null = null;
 let lastInput: Skeleton7ImageJobInput | null = null;
 
+/*
+ * 마지막으로 주입에 성공한 잡 — 자동 수정 턴이 파일을 다시 쓰면 모델이 기억하는 스톡 URL이 되살아난다
+ * (2026-09-18 프로덕션 실측: 주입 12:13:16 → BigNumber 자동 수정 12:13:37 → Pexels 4장 복귀). 그때 새 잡을
+ * 시작하지 않고(비용) 같은 URL로 한 번 더 주입하기 위해 기억한다.
+ */
+let lastApplied: { jobId: string; urls: Skeleton7ImageUrls } | null = null;
+
 /** 요청 문장만으로 "소개·홍보형 사이트"일 가능성을 본다 — 온보딩 골격 매핑이 자주 틀려서(빵집 → 거래·수지형) 보조 신호로 쓴다. */
 export function looksLikeShowcasePrompt(prompt: string): boolean {
   return /소개|홍보|랜딩|브랜드|포트폴리오|홈페이지|사이트|웹페이지|landing|portfolio|showcase/i.test(prompt);
@@ -259,7 +266,7 @@ export interface ApplyResult {
   filesWritten: string[];
   injected: string[];
   missing: string[];
-  mode: 'prompted' | 'injected';
+  mode: 'prompted' | 'injected' | 'reinjected';
 }
 
 /*
@@ -328,6 +335,20 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
     return null;
   }
 
+  if (!pending && lastApplied) {
+    const result = await injectIntoEntries(skeleton7Entries, lastApplied.urls);
+
+    if (result.filesWritten.length === 0) {
+      logger.info('re-apply: reserved photos still in place — nothing to inject');
+      return null;
+    }
+
+    const summary: ApplyResult = { ...result, mode: 'reinjected' };
+    logger.info('applied (reinjected)', summary);
+
+    return summary;
+  }
+
   if (!pending) {
     if (!lastInput) {
       logger.warn('skeleton 7 detected but no onboarding context — image set skipped');
@@ -350,6 +371,8 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
   if (!urls) {
     return null;
   }
+
+  lastApplied = { jobId: job.jobId, urls };
 
   const filesWritten: string[] = [];
 
@@ -379,10 +402,23 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
     return summary;
   }
 
+  const result = await injectIntoEntries(skeleton7Entries, urls);
+  const summary: ApplyResult = { ...result, mode: 'injected' };
+  logger.info('applied (injected)', summary);
+
+  return summary;
+}
+
+/** 파일마다 예약 URL을 주입한다 — 시네마틱 트랙은 URL 치환, 그 외 골격 7은 data-slot 마크업 주입. 이미 예약 URL을 쓰는 파일은 건드리지 않는다(멱등). */
+async function injectIntoEntries(
+  entries: Array<[string, { content: string }]>,
+  urls: Skeleton7ImageUrls,
+): Promise<Omit<ApplyResult, 'mode'>> {
+  const filesWritten: string[] = [];
   const injected = new Set<string>();
   const missing = new Set<string>();
 
-  for (const [filePath, file] of skeleton7Entries) {
+  for (const [filePath, file] of entries) {
     /*
      * 시네마틱 트랙에는 data-slot 컨테이너도 직접 쓴 <img>도 없다 — 사진은 킷 컴포넌트의 prop으로만
      * 들어간다. 그래서 마크업을 넣는 대신 모델이 지어낸 외부 이미지 URL을 예약 URL로 바꾼다.
@@ -414,8 +450,5 @@ export async function applySkeleton7Images(): Promise<ApplyResult | null> {
     workbenchStore.resetAllFileModifications();
   }
 
-  const summary: ApplyResult = { filesWritten, injected: [...injected], missing: [...missing], mode: 'injected' };
-  logger.info('applied (injected)', summary);
-
-  return summary;
+  return { filesWritten, injected: [...injected], missing: [...missing] };
 }

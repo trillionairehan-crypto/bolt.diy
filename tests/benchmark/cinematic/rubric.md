@@ -777,3 +777,14 @@ Worker 분리다 — 이건 2단계 밖이라 별도 작업으로 넘긴다.
 - 남은 분기: 메모리 누수(격리체 128MB, 생성 후 잔존 상태) vs CPU 한도(Free 플랜 10ms — SSR 웜 11~24ms가 이미 초과, 관대한 집행이 머신별로 다를 수 있음). 어제 tail에서 CSS 요청 CPU 220ms가 `ok`였던 것은 Paid(30s) 쪽 정황. **플랜 확인이 결정적** — API 토큰에 구독 읽기 권한 없음, 대시보드 로그인 필요.
 - GraphQL `workersInvocationsAdaptive`는 0행(Pages Function은 이 데이터셋에 안 잡히거나 토큰 범위 밖). `wrangler pages deployment tail 9fbd99c8`은 "does not have a Pages Function"이라며 거부 — `_routes.json` 유무와 관련 있는지 미확인(Function 자체는 동작).
 - 드래그 검증: 이 브라우저는 d045에 묶여 생성 불가. Chrome 재시작(또는 `chrome://net-internals/#sockets` → Flush socket pools) 후 재시도해야 한다.
+
+## 2026-09-18 12:20 — 재배포로 d045 리셋, 프로덕션 드래그 검증 통과, 재주입 버그 발견·수정
+
+- 사용자 확인: **Workers Paid 플랜** → CPU 10ms 가설 기각, 남는 건 격리체 메모리(128MB) 쪽.
+- Chrome 재시작 후에도 d045에 붙음(h2, h3 아님). curl에 브라우저 헤더를 붙여 8회 → 1회가 d045에 떨어져 503. **머신 자체가 병든 것, 브라우저·쿠키·헤더 무관.** 같은 코드를 `npm run deploy`로 재배포(e2c78b8b) → d045에서 `/pricing` 8/8 200. 새 버전 = 새 격리체.
+- 생성 1건(가죽 공방·다크): `/api/chat` 200(43s), `/api/llmcall` 자동 검토·수정 2회, 영상 폴링 7회. 오류 없음. 생성 직후 브라우저 커넥션이 cf23으로 옮겨가 "생성이 d045를 병들게 하는가"는 이번엔 판정 못 함.
+- **3D 드래그(프로덕션, 보이는 작업 화면)**: Showcase3D에서 가로·세로·대각 드래그 3회 — 장면 그대로, Contact로 안 튐. 이후 휠 스크롤은 살아 있음(다음 장면으로 갔다가 스냅). 통과.
+- **새 결함**: 모델이 예약 URL을 무시하고 Pexels 4장을 씀(히어로에 실사 인물 스톡 — 하드 룰 위반). 자동 검토 뒤 주입은 됐는데(12:13:16 `applied (injected)`) BigNumber 크래시 자동 수정 턴이 App.tsx를 통째로 다시 써서(12:13:37) Pexels가 복귀. 자동 검토는 1회성이라 재주입 없음.
+  - 수정: `skeleton7Images.ts`에 `lastApplied` 기억 → pending 없고 lastApplied 있으면 새 잡 없이 재주입(`mode: 'reinjected'`, 멱등). `Chat.client.tsx`에 자동 수정 턴 종료 감지(armed→loading→apply) effect. spec 1건 추가(주입→되돌림→재주입, fetch 추가 호출 0).
+  - 미해결: 모델이 예약 URL을 왜 무시했는지("URL이 준비된 게 없어서"라고 말하며 Pexels 사용). 프롬프트 줄은 들어갔다(영상 체인이 돌았으므로 prepare 성공). 다음 생성에서 재확인.
+  - `BigNumber`는 킷에 있지만 `KIT_COMPONENT_PROPS`·11장면 순서에 없다 — 모델이 `items` 배열을 넘겨 크래시. 게이트 확장 후보.
