@@ -819,3 +819,13 @@ Worker 분리다 — 이건 2단계 밖이라 별도 작업으로 넘긴다.
 - 프리뷰: 히어로·챕터 전부 R2 생성 사진(목공 작업실, 인물 없음). R2 hero/ch1/ch2/ch3 200.
 - 새 결함: 모델이 영상 URL만 `https://images.coralred.app/woodcraft/hero-seedance.mp4`로 지어냄(404) — 주입기·게이트가 영상은 무시했다. 수정: `injectCinematicImages(content, urls, video)`가 외부 영상 URL을 예약 영상 URL로 치환(`slots: 'video'`), 게이트에 `예약된 영상 대신 외부 영상 URL을 지어냈다` 추가, 주입 경로에도 영상 준비 시 bustUrls. spec 3건 추가(77 통과).
 - 남은 것: "마무리가 안 끝났어요"(post-stream stall) 경고가 오늘 6런 중 4런 — 프리뷰는 정상 렌더된 경우도 있어 액션 상태 표시 문제로 보임. 별도 조사.
+
+## 2026-09-18 14:10 — "마무리가 안 끝났어요"(post-stream stall) 원인 조사
+
+- 증상(6런 중 4런): 마지막 파일 액션(App.tsx)이 `running`에 남음(Artifact.tsx의 "화면을 만들고 있어요" = running file action). 파일은 써져 프리뷰 정상. 콘솔에 다른 오류 없음.
+- 경로 추적: 스트리밍 중 `actionStreamSampler → _runAction(streaming) → runner(파일 부분 쓰기, status running)`. 닫힘 시 `onActionClose → addToExecutionQueue(_runAction) → editor update → filesStore.saveFile → runner.runAction(complete)`. `complete`는 마지막 runner 호출에서만 찍힌다.
+- 결함 2개(둘 다 saveFile 경로):
+  1. `FilesStore.saveFile`: `webcontainer.fs.writeFile` await에 타임아웃이 없다 — 291cacdb가 액션 러너 쪽에서 관측한 "파일은 써지는데 응답이 유실" 케이스가 여기서 나면 `_runAction`이 영영 멈추고 complete 표시가 안 온다. 파일은 스트리밍 쓰기로 이미 반영돼 프리뷰는 정상 — 관측과 정확히 일치.
+  2. `saveFile`이 워처가 아직 못 올린 새 파일에 `unreachable('Expected content to be defined')`를 던지고, `WorkbenchStore.addToExecutionQueue`에 catch가 없어 거부 하나가 전역 큐를 죽인다(이후 모든 close 실행 건너뜀). 콘솔에 'Failed to update file content'가 남아야 하는데 이번 런에선 없었음 → 1번이 주범, 2번은 잠재.
+- 수정: saveFile에 20s 타임아웃(타임아웃 시 던지지 않고 진행 — 바로 뒤 러너 쓰기가 자체 타임아웃·failed 표시로 두 번째 기회), 새 파일은 oldContent ''로 처리, 전역 큐 catch, stall Sentry extra에 `type:status:executed` 추가(다음 발생 때 경로 확정용). spec 2건(files.spec.ts).
+- 근본(WebContainer writeFile 응답 유실)은 미해결 — 계측이 Sentry에 쌓이면 빈도·파일 크기 상관 확인.

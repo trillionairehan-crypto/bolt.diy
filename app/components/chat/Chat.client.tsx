@@ -566,6 +566,9 @@ export const ChatImpl = memo(
         extra: {
           chatId: chatId.get() ?? 'unknown',
           stuckFilePaths: unsettled.map((action) => action.filePath).filter(Boolean),
+
+          // 어느 경로에서 멈췄는지 구분용 — file:running:executed=false면 close 실행이 아예 안 온 것.
+          stuck: unsettled.map((action) => `${action.type}:${action.status}:executed=${action.executed}`),
           elapsedSec: Math.round(POST_STREAM_STALL_TIMEOUT_MS / 1000),
           completedActions,
           totalActions,

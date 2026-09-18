@@ -135,7 +135,16 @@ export class WorkbenchStore {
   }
 
   addToExecutionQueue(callback: () => Promise<void>) {
-    this.#globalExecutionQueue = this.#globalExecutionQueue.then(() => callback());
+    /*
+     * catch가 없으면 한 태스크의 거부가 큐 프로미스 자체를 거부 상태로 만들어 그 뒤 .then(callback)이
+     * 전부 건너뛰어진다 — 마지막 파일 액션이 'running'에 영영 남는 post-stream stall의 한 경로였다
+     * (2026-09-18). 액션 러너의 #currentExecutionPromise와 같은 방식으로 삼키고 다음 태스크로 간다.
+     */
+    this.#globalExecutionQueue = this.#globalExecutionQueue
+      .then(() => callback())
+      .catch((error) => {
+        logger.error('Execution queue task failed — continuing with the next task', error);
+      });
   }
 
   /**
@@ -667,8 +676,15 @@ export class WorkbenchStore {
    * 워치독(Chat.client.tsx)이 감지할 수 있도록 노출. 'start' 액션의 'running'은 정상 상태(dev
    * server가 계속 떠 있는 것)라 Artifact.tsx의 allActionFinished 판정과 동일하게 예외 처리한다.
    */
-  getUnsettledActions(): Array<{ artifactId: string; actionId: string; filePath?: string; status: ActionStatus }> {
-    const result: Array<{ artifactId: string; actionId: string; filePath?: string; status: ActionStatus }> = [];
+  getUnsettledActions(): Array<{
+    artifactId: string;
+    actionId: string;
+    filePath?: string;
+    status: ActionStatus;
+    type: string;
+    executed: boolean;
+  }> {
+    const result: ReturnType<WorkbenchStore['getUnsettledActions']> = [];
 
     for (const [artifactId, artifact] of Object.entries(this.artifacts.get())) {
       for (const [actionId, action] of Object.entries(artifact.runner.actions.get())) {
@@ -680,6 +696,8 @@ export class WorkbenchStore {
             actionId,
             filePath: action.type === 'file' ? action.filePath : undefined,
             status: action.status,
+            type: action.type,
+            executed: action.executed,
           });
         }
       }

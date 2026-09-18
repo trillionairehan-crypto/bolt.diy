@@ -6,8 +6,8 @@ import { path } from '~/utils/path';
 import { bufferWatchEvents } from '~/utils/buffer';
 import { WORK_DIR } from '~/utils/constants';
 import { computeFileModifications } from '~/utils/diff';
+import * as Sentry from '@sentry/remix';
 import { createScopedLogger } from '~/utils/logger';
-import { unreachable } from '~/utils/unreachable';
 import {
   addLockedFile,
   removeLockedFile,
@@ -43,6 +43,16 @@ export interface Folder {
 type Dirent = File | Folder;
 
 export type FileMap = Record<string, Dirent | undefined>;
+
+/*
+ * 스트림 종료 후 "마무리가 안 끝났어요"(post-stream stall) 원인 — 2026-09-18 실측 6런 중 4런, 마지막 파일
+ * 액션이 'running'에 멈추는데 파일 자체는 써져 프리뷰는 정상. 경로: WorkbenchStore._runAction → saveFile →
+ * webcontainer.fs.writeFile await가 안 풀리면(291cacdb가 액션 러너 쪽에서 관측·타임아웃 처리한 것과 같은
+ * 증상 — 파일은 워처에 찍히는데 응답만 유실) 그 뒤의 runner.runAction(complete 표시)에 영영 못 간다.
+ * 여기서도 같은 타임아웃을 건다. 타임아웃이면 던지지 않고 진행한다 — 쓰기는 대개 이미 반영됐고, 바로 뒤의
+ * 액션 러너 쓰기(자체 타임아웃·failed 표시)가 두 번째 기회다.
+ */
+const SAVE_WRITE_TIMEOUT_MS = 20_000;
 
 export class FilesStore {
   #webcontainer: Promise<WebContainer>;
@@ -557,13 +567,13 @@ export class FilesStore {
         throw new Error(`EINVAL: invalid file path, write '${relativePath}'`);
       }
 
-      const oldContent = this.getFile(filePath)?.content;
+      /*
+       * 스트리밍으로 방금 생긴 파일은 워처가 아직 this.files에 못 올렸을 수 있다 — 예전엔 여기서
+       * unreachable을 던졌고, 그 거부가 WorkbenchStore의 전역 실행 큐를 통째로 죽였다. 새 파일로 다룬다.
+       */
+      const oldContent = this.getFile(filePath)?.content ?? '';
 
-      if (!oldContent && oldContent !== '') {
-        unreachable('Expected content to be defined');
-      }
-
-      await webcontainer.fs.writeFile(relativePath, content);
+      await this.#writeFileWithTimeout(webcontainer, relativePath, content);
 
       if (!this.#modifiedFiles.has(filePath)) {
         this.#modifiedFiles.set(filePath, oldContent);
@@ -586,6 +596,35 @@ export class FilesStore {
       logger.error('Failed to update file content\n\n', error);
 
       throw error;
+    }
+  }
+
+  async #writeFileWithTimeout(webcontainer: WebContainer, relativePath: string, content: string): Promise<void> {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const startedAt = Date.now();
+
+    const timeout = new Promise<'timeout'>((resolve) => {
+      timeoutId = setTimeout(() => resolve('timeout'), SAVE_WRITE_TIMEOUT_MS);
+    });
+
+    try {
+      const outcome = await Promise.race([
+        webcontainer.fs.writeFile(relativePath, content).then(() => 'written' as const),
+        timeout,
+      ]);
+
+      if (outcome === 'timeout') {
+        logger.error(
+          `saveFile: writeFile did not resolve within ${SAVE_WRITE_TIMEOUT_MS}ms — continuing: ${relativePath}`,
+        );
+        Sentry.captureMessage('webcontainer file write timeout (saveFile)', {
+          level: 'error',
+          tags: { route: 'files-store', event: 'file_write_timeout' },
+          extra: { filePath: relativePath, contentLength: content.length, elapsedMs: Date.now() - startedAt },
+        });
+      }
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
