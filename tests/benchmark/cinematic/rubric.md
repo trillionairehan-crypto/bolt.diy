@@ -886,3 +886,24 @@ fd8c210a 배포(5a614bec). files.spec.ts 2건.
 **수정 후 실측(1440):** 히어로 h1 130px w300 3줄, 챕터 h3 92px 2줄, 쇼케이스 92px, 컨택트 130px 2줄·섹션 900px. 샷: `render-2026-09-12/kit-v0.4-audit/{hero,chapter,showcase3d,contact}.png`.
 
 **남은 것(미착수):** 모션 감사(스크럽 패럴랙스·스태거 수치), 라이트 팔레트 검수, 모바일 400px 재감사, TextReveal·Marquee 장면 `data-ck` 부여(감사 캡처 누락), 실생성 확인은 크레딧 뒤.
+
+## 2026-09-18 18:30 — 모션 감사 (CSSDA motion.mjs를 킷 빌드에 적용)
+
+**방법:** `renderGenerated.mjs`로 빌드 → `serveDist.mjs 4188` → `node tests/benchmark/cssda/motion.mjs --out <tmp>`(수상작 90개와 같은 측정: 1280×800, 700ms 프레임 차이·호버·휠 400·여정). 비교 기준 = 수상작 중앙값/p75.
+
+| 지표 | 수상작 중앙값 / p75 | v0.4 전 | v0.4 후 |
+|---|---|---|---|
+| idleMotion(앰비언트) | 0.036 / 0.173 | **0.001** | **0.044** |
+| hoverDiff | 0.018 / 0.158 | **0** | **0.033** |
+| inertia | 0.196 / 0.423 | 0.327 | 0.795(스냅 이동 포함) |
+| journeyChange | 0.367 / 0.615 | 0.52 | 0.51 |
+| scrollDelta(휠 400 → 실제 이동) | 394 | **112** | **767** |
+
+**원인·수정:**
+- 앰비언트 0.001: 히어로 셰이더 변위 0.006·속도 0.08은 정지 사진과 구별 불가 → 0.013·0.16, 그레인 0.06→0.09, CSS `.ck-kenburns`(22s 1→1.07) 미디어 레이어에, `.ck-grain` 0.1.
+- 호버 0: 선 하나 링은 측정 불가 → 호버 시 링 2.4배·액센트 채움·`difference` 블렌드, 내비 링크 `.ck-navlink` 밑줄 그리기.
+- scrollDelta 112: "가장 가까운 지점" 스냅이 뷰포트 44% 휠을 삼키고 히어로로 되돌림 → 방향 스냅(`self.direction`, 12% 넘으면 다음 장면). GSAP snapTo는 `(naturalEnd, self)`만 넘긴다 — 세 번째 인자 없음.
+- 부수: `difference` 내비가 흰 벽 위에서 탁해짐 → 히어로 상단 14% 그라데이션.
+
+증거: `render-2026-09-12/kit-v0.4-audit/{motion.json,motion-frame-0.jpg,hero.png}`. 보조 스크립트 `serveDist.mjs`.
+**남은 것:** 챕터 핀 구간의 앰비언트(스크럽 외 유휴 모션 없음), 라이트 팔레트·모바일 감사, 실생성 확인(크레딧 뒤).

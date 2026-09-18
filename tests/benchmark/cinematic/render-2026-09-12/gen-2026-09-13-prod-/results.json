@@ -1,19 +1,19 @@
 {
   "preloaderAtLoad": true,
-  "loadMs": 1150,
+  "loadMs": 1199,
   "paint": {
-    "fcpMs": 436,
-    "domMs": 1153
+    "fcpMs": 464,
+    "domMs": 1200
   },
   "audit": {
     "scenes": 6,
     "dir": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\cinematic\\render-2026-09-12\\gen-2026-09-13-prod-\\audit"
   },
   "bundleKb": {
-    "HeroCanvas-DGqzLr1r.js": 4,
-    "index-DYg0Tjow.js": 294,
-    "index-W60lHAwe.css": 6,
-    "Showcase3DScene-C22iuDKG.js": 5,
+    "HeroCanvas-BhN1s_9f.js": 4,
+    "index-C41K6BpZ.js": 295,
+    "index-Pw_MKmo1.css": 6,
+    "Showcase3DScene-vr3Wn-y0.js": 5,
     "three-kNIIe7K7.js": 808
   }
 }

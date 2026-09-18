@@ -50,7 +50,7 @@ export function Nav({ brand, links = [], cta }: NavProps) {
       }}
     >
       {/* v0.4: 상호 16px·500, 링크는 13px 모노풍, CTA는 알약 대신 밑줄 링크 — 헤드라인 하나가 화면을 지배하도록 크롬을 낮춘다 */}
-      <a href="#" data-cursor="hover" style={{ fontFamily: 'var(--ck-font-body)', fontWeight: 500, fontSize: '16px', textDecoration: 'none', color: 'inherit', letterSpacing: '-0.01em' }}>
+      <a href="#" className="ck-navlink" data-cursor="hover" style={{ fontFamily: 'var(--ck-font-body)', fontWeight: 500, fontSize: '16px', textDecoration: 'none', color: 'inherit', letterSpacing: '-0.01em' }}>
         {brand}
       </a>
       <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
@@ -59,6 +59,7 @@ export function Nav({ brand, links = [], cta }: NavProps) {
               <a
                 key={link.href}
                 href={link.href}
+                className="ck-navlink"
                 data-cursor="hover"
                 style={{ fontSize: '13px', textDecoration: 'none', color: 'inherit', opacity: 0.72, whiteSpace: 'nowrap' }}
               >

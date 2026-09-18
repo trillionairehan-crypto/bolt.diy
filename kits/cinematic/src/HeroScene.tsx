@@ -92,6 +92,7 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
       <img
         src={image}
         alt=""
+        className={reduced ? undefined : 'ck-kenburns'}
         style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
       />
       {useVideo ? (
@@ -102,11 +103,12 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
           muted
           loop
           playsInline
+          className={reduced ? undefined : 'ck-kenburns'}
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 1 }}
         />
       ) : null}
       {useCanvas ? (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
+        <div className="ck-kenburns" style={{ position: 'absolute', inset: 0, zIndex: 1 }}>
           <Suspense fallback={null}>
             <HeroCanvas
               src={image}
@@ -128,6 +130,8 @@ export function HeroScene({ image, video, eyebrow, title, sub, cta, secondaryCta
           inset: 0,
           zIndex: 2,
           background: [
+            // 상단 14%만 살짝 어둡게 — 밝은 사진(흰 벽) 위에서 내비 글자가 묻히지 않게(2026-09-18 모션 감사 프레임)
+            'linear-gradient(180deg, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0) 14%)',
             `linear-gradient(205deg, rgba(0,0,0,${(overlay * 0.1).toFixed(2)}) 0%, rgba(0,0,0,${(overlay * 0.45).toFixed(2)}) 55%, rgba(0,0,0,${Math.min(0.9, overlay + 0.35).toFixed(2)}) 100%)`,
             'radial-gradient(120% 90% at 50% 35%, transparent 50%, rgba(0,0,0,0.5) 100%)',
           ].join(', '),

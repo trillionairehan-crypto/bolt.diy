@@ -38,8 +38,10 @@ export function Cursor() {
       }
 
       if (ring.current) {
-        ring.current.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%) scale(${hovering ? 2.2 : 1})`;
-        ring.current.style.opacity = hovering ? '0.35' : '0.7';
+        // 호버 = 링이 커지며 채워진다(difference 블렌드라 사진·글자 위 어디서나 보인다). 2026-09-18 모션 감사: 선 하나짜리 링은 호버 반응이 0으로 측정됐다.
+        ring.current.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%) scale(${hovering ? 2.4 : 1})`;
+        ring.current.style.opacity = hovering ? '0.9' : '0.7';
+        ring.current.style.background = hovering ? 'var(--ck-accent)' : 'transparent';
       }
 
       frame = requestAnimationFrame(loop);
@@ -64,7 +66,7 @@ export function Cursor() {
   return (
     <>
       <div ref={dot} data-ck="cursor" aria-hidden="true" style={{ ...base, width: 6, height: 6, background: 'var(--ck-accent)' }} />
-      <div ref={ring} data-ck="cursor-ring" aria-hidden="true" style={{ ...base, width: 36, height: 36, border: '1px solid var(--ck-accent)', transition: 'opacity 300ms' }} />
+      <div ref={ring} data-ck="cursor-ring" aria-hidden="true" style={{ ...base, width: 36, height: 36, border: '1px solid var(--ck-accent)', mixBlendMode: 'difference', transition: 'opacity 300ms, background 300ms' }} />
     </>
   );
 }

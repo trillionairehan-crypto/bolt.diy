@@ -64,11 +64,12 @@ void main() {
   // 마우스 패럴랙스: 화면 중심 대비 ±1.2%
   uv += (uMouse - 0.5) * 0.024;
   // 노이즈 일렁임: 아주 느리고 얕게 (물·열기 느낌, 사진이 망가지지 않는 선)
-  float n = snoise(uv * 3.0 + uTime * 0.08);
-  uv += vec2(n, snoise(uv * 3.0 - uTime * 0.06)) * 0.006 * uStrength;
+  // 2026-09-18 모션 감사: 0.006/0.08은 700ms 프레임 차이 0.001(수상작 중앙값 0.036)로 정지 사진과 구별 불가.
+  float n = snoise(uv * 2.6 + uTime * 0.16);
+  uv += vec2(n, snoise(uv * 2.6 - uTime * 0.13)) * 0.013 * uStrength;
   vec3 color = texture2D(uTexture, uv).rgb;
   // 필름 그레인
-  float grain = (fract(sin(dot(vUv * uTime, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) * 0.06;
+  float grain = (fract(sin(dot(vUv * uTime, vec2(12.9898, 78.233))) * 43758.5453) - 0.5) * 0.09;
   color += grain;
   // 비네트
   float d = distance(vUv, vec2(0.5));

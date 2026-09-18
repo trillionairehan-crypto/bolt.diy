@@ -193,14 +193,42 @@ export function useSmoothScroll(options: SmoothScrollOptions | boolean = true): 
 
           return Array.from({ length: steps }, (_, i) => Math.min(1, (el.offsetTop + step * i) / max));
         });
+        /*
+         * 방향 스냅 — 2026-09-18 모션 감사: "가장 가까운 지점" 스냅은 400px 휠(뷰포트의 44%)을 112px로 삼키고
+         * 히어로로 되돌렸다(수상작 중앙값 394px). 진행 방향으로 뷰포트의 12%만 넘으면 다음 장면으로 보낸다;
+         * 그보다 덜 움직였을 때만 제자리로 돌아온다(wearebrand.io 식 앞으로만 넘기는 스냅).
+         */
+        const sorted = [...points].sort((a, b) => a - b);
+        const viewport = window.innerHeight / max;
+        const nearest = (value: number) =>
+          sorted.reduce((best, point) => (Math.abs(point - value) < Math.abs(best - value) ? point : best), sorted[0]);
+
         snapTrigger = ScrollTrigger.create({
           snap: {
             // 잠금 중이면 현재 진행도를 그대로 돌려준다 — 스냅이 일어나도 이동 거리가 0이다.
-            snapTo: (value) =>
-              isCinematicScrollLocked()
-                ? value
-                : points.reduce((best, point) => (Math.abs(point - value) < Math.abs(best - value) ? point : best), points[0]),
-            duration: { min: 0.25, max: 0.7 },
+            snapTo: (value: number, self?: ScrollTrigger) => {
+              if (isCinematicScrollLocked()) {
+                return value;
+              }
+
+              // GSAP은 (naturalEnd, self)만 넘긴다 — 방향은 self.direction(1 아래 / -1 위).
+              const direction = self?.direction ?? 0;
+
+              const prev = [...sorted].reverse().find((p) => p <= value + 1e-6);
+              const next = sorted.find((p) => p > value + 1e-6);
+
+              if (direction && direction > 0 && prev !== undefined && next !== undefined && value - prev >= viewport * 0.12) {
+                return next;
+              }
+
+              if (direction && direction < 0 && prev !== undefined && next !== undefined && next - value >= viewport * 0.12) {
+                return prev;
+              }
+
+              return nearest(value);
+            },
+            directional: true,
+            duration: { min: 0.3, max: 0.8 },
             delay: 0.05,
             ease: 'power2.out',
           },

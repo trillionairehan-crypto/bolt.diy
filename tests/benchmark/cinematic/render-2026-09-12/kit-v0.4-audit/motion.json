@@ -1,0 +1,27 @@
+[
+  {
+    "id": "kit-v04",
+    "title": "kit v0.4 gen-2026-09-13-prod",
+    "url": "http://127.0.0.1:4188/",
+    "ok": true,
+    "rafPerSec": 33,
+    "scrollTriggers": null,
+    "gsap": false,
+    "lenis": true,
+    "locomotive": false,
+    "canvases": 1,
+    "videosPlaying": 0,
+    "idleMotion": 0.044,
+    "hoverDiff": 0.033,
+    "inertia": 0.795,
+    "scrollDelta": 834,
+    "elements": {
+      "normal": 59,
+      "parallax": 0,
+      "pinned": 0,
+      "fixed": 1
+    },
+    "docHeight": 5257,
+    "journeyChange": 0.512
+  }
+]
