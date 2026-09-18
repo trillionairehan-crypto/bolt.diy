@@ -1,5 +1,7 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { checkCinematicSceneOrder, CINEMATIC_SCENE_ORDER } from './sceneOrder';
+import { checkCinematicSceneOrder, CINEMATIC_SCENE_ORDER, KIT_EXPORTS } from './sceneOrder';
 
 /** 프롬프트가 요구하는 모양 그대로의 최소 통과본. */
 const GOOD = `import { HeroScene, PinnedChapters, TextReveal, Showcase3D, Marquee, Contact, Nav, Preloader, Cursor, SceneNav, useSmoothScroll } from './kit';
@@ -121,6 +123,48 @@ export default function App() {`,
 
     expect(result.pass).toBe(false);
     expect(result.problems.some((p) => p.includes('images.unsplash.com'))).toBe(true);
+  });
+
+  /* 2026-09-18 프로덕션 실측: ImagePlaceholder를 './kit'에서 import → Vite pre-transform 에러, 프리뷰 백지. */
+  it('킷에 없는 이름을 import한 생성물을 잡는다', () => {
+    const invented = GOOD.replace(
+      "useSmoothScroll } from './kit';",
+      "useSmoothScroll, ImagePlaceholder } from './kit';",
+    );
+    const result = checkCinematicSceneOrder(invented);
+
+    expect(result.problems.some((p) => p.includes('킷에 없는 컴포넌트를 import했다 — ImagePlaceholder'))).toBe(true);
+  });
+
+  it('type import와 별칭(as)은 킷 이름으로 판정한다', () => {
+    const aliased = GOOD.replace(
+      "useSmoothScroll } from './kit';",
+      "useSmoothScroll, type HeroSceneProps, Scene as Section } from './kit';",
+    );
+
+    expect(checkCinematicSceneOrder(aliased).problems.some((p) => p.includes('킷에 없는'))).toBe(false);
+  });
+
+  it('KIT_EXPORTS는 kits/cinematic/src/index.ts의 export와 같다', () => {
+    const index = readFileSync(resolve(__dirname, '../../../kits/cinematic/src/index.ts'), 'utf-8');
+    const exported = new Set<string>();
+
+    for (const match of index.matchAll(/export\s*\{([^}]*)\}/g)) {
+      for (const raw of match[1].split(',')) {
+        const name = raw.trim();
+
+        if (name && !name.startsWith('type ')) {
+          exported.add(
+            name
+              .split(/\s+as\s+/)
+              .pop()!
+              .trim(),
+          );
+        }
+      }
+    }
+
+    expect([...KIT_EXPORTS].sort()).toEqual([...exported].sort());
   });
 
   it('지어낸 외부 영상 호스트를 잡는다 (프로덕션 영상 404 원인)', () => {

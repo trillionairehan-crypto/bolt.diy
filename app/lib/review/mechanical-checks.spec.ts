@@ -429,6 +429,31 @@ describe('runMechanicalChecks (orchestration)', () => {
     expect(findings.some((f) => f.rule === 'external-image-no-onerror' && !f.autoFixed)).toBe(true);
   });
 
+  /* 2026-09-18: 게이트가 하네스에서만 돌고 자동 검토엔 안 붙어 있어 프로덕션에서 전부 통과하던 것. */
+  it('시네마틱 트랙 파일은 장면 순서 게이트 문제를 힌트 finding으로 낸다', () => {
+    const files = {
+      'src/App.tsx': `import { HeroScene, ImagePlaceholder } from './kit';
+export default function App() {
+  return <HeroScene image="https://images.pexels.com/photos/1/pexels-photo-1.jpeg" title="x" />;
+}`,
+    };
+    const { findings, updatedFiles } = runMechanicalChecks(files, HUE);
+    const gate = findings.filter((f) => f.rule === 'cinematic-scene-order');
+
+    expect(gate.length).toBeGreaterThan(0);
+    expect(gate.every((f) => !f.autoFixed && f.file === 'src/App.tsx')).toBe(true);
+    expect(gate.some((f) => f.message.includes('ImagePlaceholder'))).toBe(true);
+    expect(gate.some((f) => f.message.includes('images.pexels.com'))).toBe(true);
+    expect(updatedFiles['src/App.tsx']).toBeUndefined();
+  });
+
+  it('시네마틱 트랙이 아니면 장면 순서 게이트를 돌리지 않는다', () => {
+    const files = { 'src/App.tsx': '<section data-slot="hero" style={{ height: "100vh" }} />' };
+    const { findings } = runMechanicalChecks(files, HUE);
+
+    expect(findings.some((f) => f.rule === 'cinematic-scene-order')).toBe(false);
+  });
+
   it('does not emit unguarded-array-map findings (disabled after live false-positive measurement)', () => {
     const files = {
       'src/List.tsx': '<ul>{items.map((item) => <li key={item.id}>{item.name}</li>)}</ul>',

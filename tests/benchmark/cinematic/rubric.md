@@ -844,3 +844,11 @@ fd8c210a 배포(5a614bec). files.spec.ts 2건.
 - 가다페 런(새 탭, WebContainer 정상): stall 안 뜸, 프리뷰 정상. 그러나 `/api/chat`이 **Anthropic 크레딧 잔액 부족**("Your credit balance is too low")으로 실패 → App.tsx 생성 자체가 안 됨. 코드로 검증 불가.
 
 **막힌 것 — 사용자 액션:** Anthropic API 크레딧(플랫폼 키) 충전해야 생성이 돌고, 그래야 1·2 경로를 end-to-end로 확인 가능. 지금은 스톨 수정 2건이 유닛 테스트로만 검증됨.
+
+## 2026-09-18 15:20 — 게이트 구멍 2개 메움 (큐 3번)
+
+- **발견: `checkCinematicSceneOrder`는 벤치마크 하네스에서만 돌고 프로덕션 자동 검토(`runMechanicalChecks`)에 연결된 적이 없었다.** 오늘 실측에서 Pexels 4장·지어낸 prop·지어낸 영상 호스트·`ImagePlaceholder` import가 전부 통과한 근본 이유. 자동 수정이 돈 건 런타임 크래시(BigNumber) 알림뿐.
+- 수정 1: `mechanical-checks.ts`에 `runCinematicSceneOrderCheck` — `isCinematicTrackFile`인 파일에 게이트를 돌려 `rule: 'cinematic-scene-order'` 힌트 finding으로 LLM 검토에 넘긴다(자동수정 없음). spec 2건.
+- 수정 2: `sceneOrder.ts`에 `KIT_EXPORTS`(index.ts와 1:1) + `킷에 없는 컴포넌트를 import했다 — …` 문제. type import·`as` 별칭 처리. spec 3건(그중 하나는 `kits/cinematic/src/index.ts`를 읽어 목록 동기화 검증).
+- `BigNumber`는 이미 `KIT_COMPONENT_PROPS`에 있었음(value·prefix·suffix·label·decimals·group).
+- 검증은 유닛(188 통과)까지. 실생성 검증은 Anthropic 크레딧 뒤.

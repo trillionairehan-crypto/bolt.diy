@@ -186,6 +186,61 @@ const KIT_COMPONENT_PROPS: Record<string, string[]> = {
 const UNIVERSAL_PROPS = new Set(['key', 'ref']);
 
 /*
+ * 킷이 실제로 export하는 이름 — kits/cinematic/src/index.ts와 1:1. 2026-09-18 프로덕션 실측: 생성물이
+ * `ImagePlaceholder`를 './kit'에서 import해 Vite pre-transform 에러로 프리뷰가 아예 안 떴다. 다른 게이트는
+ * 전부 통과했다(장면 순서·prop 이름은 맞았으므로). sceneOrder.spec.ts가 index.ts를 읽어 이 목록과 대조한다.
+ */
+export const KIT_EXPORTS = new Set([
+  'HeroScene',
+  'ScrollChapter',
+  'PinnedChapters',
+  'MediaStage',
+  'MediaTreatment',
+  'TextReveal',
+  'BigNumber',
+  'Marquee',
+  'Wordmark',
+  'ScrollSequence',
+  'Showcase3D',
+  'Contact',
+  'Nav',
+  'Preloader',
+  'Cursor',
+  'Scene',
+  'SceneNav',
+  'useSmoothScroll',
+  'useIsDesktop',
+  'useReducedMotion',
+  'useWebGL',
+  'useRevealOnScroll',
+  'useParallax',
+]);
+
+/** `import { A, type B, C as D } from './kit'`에서 킷에 없는 이름만 돌려준다. */
+function unknownKitImports(source: string): string[] {
+  const unknown: string[] = [];
+
+  for (const match of source.matchAll(/import\s*\{([^}]*)\}\s*from\s*['"]\.\/kit(?:\/index)?['"]/g)) {
+    for (const raw of match[1].split(',')) {
+      const trimmed = raw.trim();
+
+      // 타입 import는 런타임에 지워지므로 잘못돼도 프리뷰를 깨지 않는다 — 판정 대상 아님.
+      if (trimmed.startsWith('type ')) {
+        continue;
+      }
+
+      const name = trimmed.split(/\s+as\s+/)[0].trim();
+
+      if (name && !KIT_EXPORTS.has(name) && !unknown.includes(name)) {
+        unknown.push(name);
+      }
+    }
+  }
+
+  return unknown;
+}
+
+/*
  * JSX 여는 태그의 prop 이름을 뽑는다. 값 안의 중괄호·문자열을 건너뛰며 최상위 `name=`과 불리언
  * shorthand(`scrub`)만 센다 — 정규식 하나로는 `cta={{ label: '…' }}` 안의 `label:`을 prop으로 오인한다.
  */
@@ -351,6 +406,12 @@ export function checkCinematicSceneOrder(source: string): SceneOrderResult {
 
   if (textReveal && !/\stext=/.test(textReveal[1] ?? '')) {
     problems.push('<TextReveal>에 text prop이 없다 — 문장을 children이 아니라 text로 넘긴다');
+  }
+
+  const missingExports = unknownKitImports(source);
+
+  if (missingExports.length > 0) {
+    problems.push(`킷에 없는 컴포넌트를 import했다 — ${missingExports.join(', ')}. 킷 export 목록에 있는 이름만 쓴다`);
   }
 
   const foreignHosts = externalImageHosts(source);

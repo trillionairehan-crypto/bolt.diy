@@ -7,6 +7,8 @@
  * 테스트가 가능하고, 파일 쓰기 등 부수효과는 전부 호출자(reviewGeneratedApp.ts)가 맡는다.
  */
 
+import { checkCinematicSceneOrder } from '~/lib/cinematic/sceneOrder';
+
 export interface MechanicalFinding {
   file: string;
   line: number;
@@ -2305,6 +2307,26 @@ function runSummaryCardMissingContextHintCheck(filePath: string, content: string
  * 자동수정된 파일만 updatedFiles에 담기고, 호출자가 이걸 실제로 쓸지 말지(적용 시점·1회 쓰기 배치
  * 등)는 전적으로 결정한다 — 이 함수는 store에 아무것도 쓰지 않는다.
  */
+/*
+ * 시네마틱 트랙 게이트를 자동 검토에 연결한다. 2026-09-18까지 checkCinematicSceneOrder는 벤치마크 하네스
+ * (tests/benchmark/cinematic)에서만 돌았고 프로덕션 자동 검토는 한 번도 안 봤다 — 그래서 실측에서
+ * Pexels 4장·지어낸 prop·지어낸 영상 호스트·킷에 없는 import(ImagePlaceholder)가 전부 통과했다.
+ * 자동수정은 없다(힌트만): 장면 순서·prop·URL은 LLM이 고쳐야 하고, 사진 URL은 applySkeleton7Images가 따로 바꾼다.
+ */
+function runCinematicSceneOrderCheck(filePath: string, content: string): MechanicalFinding[] {
+  if (!isCinematicTrackFile(content)) {
+    return [];
+  }
+
+  return checkCinematicSceneOrder(content).problems.map((message) => ({
+    file: filePath,
+    line: 1,
+    rule: 'cinematic-scene-order',
+    message,
+    autoFixed: false,
+  }));
+}
+
 export function runMechanicalChecks(files: Record<string, string>, resolvedHue: number | null): MechanicalCheckOutcome {
   const findings: MechanicalFinding[] = [];
   const updatedFiles: Record<string, string> = {};
@@ -2367,6 +2389,7 @@ export function runMechanicalChecks(files: Record<string, string>, resolvedHue: 
     findings.push(...runTypographyExtremesCheck(filePath, content));
     findings.push(...runGradientTextCheck(filePath, content));
     findings.push(...runZeroOffsetChromaticShadowCheck(filePath, content));
+    findings.push(...runCinematicSceneOrderCheck(filePath, content));
 
     if (content !== originalContent) {
       updatedFiles[filePath] = content;
