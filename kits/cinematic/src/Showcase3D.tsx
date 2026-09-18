@@ -181,8 +181,12 @@ export function Showcase3D({ id, eyebrow, title, body: bodyProp, description, sp
           width: '100%',
           minHeight: '100svh',
           overflow: 'hidden',
+          /*
+           * 위가 밝고 아래가 어두운 스튜디오 배경 대신 "바닥 그림자"만 — 라이트 팔레트에서 회색 세로 그라데이션이
+           * 제품 사진 기본 배경처럼 읽혔다(2026-09-18 라이트 감사). 다크에서는 같은 식이 은은한 받침이 된다.
+           */
           background:
-            'radial-gradient(100% 70% at 50% 8%, color-mix(in srgb, var(--ck-text) 16%, transparent) 0%, transparent 70%), linear-gradient(180deg, color-mix(in srgb, var(--ck-text) 10%, var(--ck-surface)) 0%, var(--ck-surface) 68%)',
+            'radial-gradient(70% 42% at 50% 90%, color-mix(in srgb, var(--ck-text) 22%, transparent) 0%, transparent 70%), linear-gradient(180deg, color-mix(in srgb, var(--ck-text) 4%, var(--ck-bg)) 0%, var(--ck-surface) 100%)',
         }}
       >
         {use3D ? (

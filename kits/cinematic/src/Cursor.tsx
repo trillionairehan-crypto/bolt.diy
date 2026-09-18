@@ -66,7 +66,8 @@ export function Cursor() {
   return (
     <>
       <div ref={dot} data-ck="cursor" aria-hidden="true" style={{ ...base, width: 6, height: 6, background: 'var(--ck-accent)' }} />
-      <div ref={ring} data-ck="cursor-ring" aria-hidden="true" style={{ ...base, width: 36, height: 36, border: '1px solid var(--ck-accent)', mixBlendMode: 'difference', transition: 'opacity 300ms, background 300ms' }} />
+      {/* difference 블렌드는 라이트 팔레트에서 액센트를 보색(시안)으로 뒤집는다(2026-09-18 라이트 감사) — 블렌드 없이 액센트 그대로 */}
+      <div ref={ring} data-ck="cursor-ring" aria-hidden="true" style={{ ...base, width: 36, height: 36, border: '1px solid var(--ck-accent)', transition: 'opacity 300ms, background 300ms' }} />
     </>
   );
 }

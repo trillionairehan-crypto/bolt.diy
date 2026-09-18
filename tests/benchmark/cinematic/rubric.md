@@ -907,3 +907,13 @@ fd8c210a 배포(5a614bec). files.spec.ts 2건.
 
 증거: `render-2026-09-12/kit-v0.4-audit/{motion.json,motion-frame-0.jpg,hero.png}`. 보조 스크립트 `serveDist.mjs`.
 **남은 것:** 챕터 핀 구간의 앰비언트(스크럽 외 유휴 모션 없음), 라이트 팔레트·모바일 감사, 실생성 확인(크레딧 뒤).
+
+## 2026-09-18 19:10 — 라이트 팔레트 검수 (coral: bg #FBF5EE / text #1A1A1A / accent #FF5330)
+
+- 하네스 `PALETTE=light AUDIT=1 renderGenerated.mjs` 추가 — 코랄레드 라이트 변수를 :root에 깔고 렌더.
+- 통과: 히어로(사진 위 흰 글자, 팔레트 무관), 챕터(크림 배경·92px 검정 세리프·B&W 풀블리드), 컨택트, 내비(`difference` → 크림 위에서 검정).
+- 결함 3개 → 수정:
+  1. 커서 링 `difference` 블렌드가 액센트를 보색(시안)으로 뒤집음 → 블렌드 제거(호버 채움은 그대로).
+  2. SceneNav 흰 화살표가 크림 위에서 사라짐 → 흰색+`difference`(내비와 동일).
+  3. Showcase3D 스테이지의 회색 세로 그라데이션이 제품 사진 기본 배경처럼 읽힘 → 바닥 그림자(radial) + `--ck-bg`→`--ck-surface` 미세 그라데이션.
+- 증거: `kit-v0.4-audit/light-{chapter,showcase3d,contact}.png`. 미확인: 마퀴·TextReveal 장면(캡처 누락, `data-ck` 없음).

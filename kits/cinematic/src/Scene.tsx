@@ -99,9 +99,11 @@ export function SceneNav() {
     width: 36,
     height: 36,
     borderRadius: '50%',
-    border: '1px solid rgba(255,255,255,0.22)',
+    // 흰색 + difference — 라이트 팔레트(크림 배경)에서도, 히어로 사진 위에서도 보인다(2026-09-18 라이트 감사: 흰 화살표가 크림 위에서 사라짐)
+    border: '1px solid rgba(255,255,255,0.45)',
     background: 'transparent',
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(255,255,255,0.9)',
+    mixBlendMode: 'difference' as const,
     fontSize: '13px',
     display: 'grid',
     placeItems: 'center',

@@ -35,7 +35,7 @@ const CASE_ROOT = join(
 const GEN = join(CASE_ROOT, 'screens.tsx');
 const STILL = join(ROOT, 'tests/benchmark/cinematic/.render-media/still.jpg');
 const VITE = join(ROOT, 'kits/cinematic/node_modules/vite/bin/vite.js');
-const SHOTS = join(ROOT, 'tests/benchmark/cinematic/render-2026-09-12', CASE_DIR.replace('/', '-'));
+const SHOTS = join(ROOT, 'tests/benchmark/cinematic/render-2026-09-12', CASE_DIR.replace('/', '-') + (process.env.PALETTE === 'light' ? '-light' : ''));
 
 /*
  * AUDIT=1 — 채점이 아니라 품질 감사용. 1440×900에서 장면마다 뷰포트 스크린샷과 타이포·배경 수치를
@@ -43,6 +43,14 @@ const SHOTS = join(ROOT, 'tests/benchmark/cinematic/render-2026-09-12', CASE_DIR
  * 한 화면)에 못 미친다는 지적 → 눈으로 볼 자료). 드래그·모바일 측정은 건너뛴다.
  */
 const AUDIT = process.env.AUDIT === '1';
+
+/*
+ * PALETTE=light — 코랄레드 라이트 팔레트(coral: app/lib/palettes.ts)의 변수를 :root에 깔고 렌더한다.
+ * 킷 토큰은 var(--bg)·var(--text)…를 받으므로 생성물이 라이트 팔레트일 때와 같은 결과. 기본은 킷 폴백(다크).
+ */
+const PALETTE = process.env.PALETTE === 'light'
+  ? ':root { --bg: #FBF5EE; --surface: #FFFFFF; --text: #1A1A1A; --muted: #6E645B; --accent: #FF5330; --border: #EFE4D6; }'
+  : '';
 const DESKTOP = AUDIT ? { width: 1440, height: 900 } : { width: 1280, height: 800 };
 const MOBILE = { width: 400, height: 860 };
 
@@ -56,7 +64,7 @@ const INDEX_HTML = `<!doctype html>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600&family=Instrument+Serif&family=Noto+Serif+KR:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" />
-    <style>body { margin: 0; --hue: 33; }</style>
+    <style>body { margin: 0; --hue: 33; } ${PALETTE}</style>
   </head>
   <body>
     <div id="root"></div>
