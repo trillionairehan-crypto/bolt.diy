@@ -98,6 +98,61 @@ export interface SmoothScrollOptions {
   snap?: boolean;
 }
 
+/*
+ * 스크롤 잠금 — 3D 오브젝트를 드래그하는 동안 페이지가 손 밑에서 미끄러지지 않게 한다.
+ *
+ * 실측(2026-09-17 프로덕션 프리뷰): Showcase3D 위에서 가로로 끌면 오브젝트가 도는 대신 페이지가 다음
+ * 스냅 지점(Contact)으로 넘어갔다. 드래그는 스크롤 이벤트를 만들지 않지만, 직전 스크롤의 스냅 트윈이
+ * 아직 날아가는 중이면 그게 드래그 도중에 착지한다. Lenis의 관성도 같이 남는다.
+ *
+ * 그래서 드래그 시작에 (1) 진행 중인 스냅 트윈을 죽이고 (2) Lenis를 멈춘다. 놓으면 되돌린다.
+ * 모듈 전역에 두는 이유: 킷은 페이지당 useSmoothScroll을 한 번만 부르고, Showcase3DScene은 그
+ * 인스턴스를 prop으로 넘겨받지 않는다.
+ */
+interface ScrollController {
+  lock(): void;
+  unlock(): void;
+}
+
+interface ScrollLockRegistry {
+  controller: ScrollController | null;
+  depth: number;
+}
+
+/*
+ * 상태를 모듈 스코프가 아니라 globalThis에 둔다. Showcase3D는 three 청크를 늦게 받으려고
+ * Showcase3DScene을 lazy로 부르는데, 번들러가 hooks를 그 청크에도 복제해 넣으면 모듈 인스턴스가
+ * 둘이 된다 — 잠금을 건 쪽과 Lenis를 쥔 쪽이 서로 다른 변수를 본다(2026-09-18 실측: 드래그 중
+ * lenis-stopped 클래스가 끝내 안 붙었다).
+ */
+const SCROLL_LOCK_KEY = '__ckScrollLock';
+
+function registry(): ScrollLockRegistry {
+  const host = globalThis as typeof globalThis & { [SCROLL_LOCK_KEY]?: ScrollLockRegistry };
+
+  if (!host[SCROLL_LOCK_KEY]) {
+    host[SCROLL_LOCK_KEY] = { controller: null, depth: 0 };
+  }
+
+  return host[SCROLL_LOCK_KEY];
+}
+
+/** 잠금 중에는 스냅이 "지금 위치"로 스냅한다 — 즉 아무 데도 안 움직인다. */
+export function isCinematicScrollLocked(): boolean {
+  return registry().depth > 0;
+}
+
+export function setCinematicScrollLock(locked: boolean): void {
+  const state = registry();
+  state.depth = Math.max(0, state.depth + (locked ? 1 : -1));
+
+  if (locked && state.depth === 1) {
+    state.controller?.lock();
+  } else if (!locked && state.depth === 0) {
+    state.controller?.unlock();
+  }
+}
+
 export function useSmoothScroll(options: SmoothScrollOptions | boolean = true): void {
   const { enabled = true, snap = false } = typeof options === 'boolean' ? { enabled: options } : options;
 
@@ -131,7 +186,11 @@ export function useSmoothScroll(options: SmoothScrollOptions | boolean = true): 
         });
         snapTrigger = ScrollTrigger.create({
           snap: {
-            snapTo: points,
+            // 잠금 중이면 현재 진행도를 그대로 돌려준다 — 스냅이 일어나도 이동 거리가 0이다.
+            snapTo: (value) =>
+              isCinematicScrollLocked()
+                ? value
+                : points.reduce((best, point) => (Math.abs(point - value) < Math.abs(best - value) ? point : best), points[0]),
             duration: { min: 0.25, max: 0.7 },
             delay: 0.05,
             ease: 'power2.out',
@@ -140,7 +199,52 @@ export function useSmoothScroll(options: SmoothScrollOptions | boolean = true): 
       }
     }
 
+    /*
+     * 잠금은 "위치 고정"으로 건다. lenis.stop()만으로는 부족하다 — ScrollTrigger의 스냅 트윈은 Lenis를
+     * 거치지 않고 스크롤러를 직접 움직여서, 멈춘 Lenis 위로 페이지가 그대로 미끄러진다
+     * (2026-09-18 실측: stop()만 걸었을 때 드래그 중 46~190px 이동).
+     */
+    let frozenAt: number | null = null;
+    const holdPosition = () => {
+      if (frozenAt !== null && Math.round(window.scrollY) !== frozenAt) {
+        window.scrollTo(0, frozenAt);
+      }
+    };
+
+    registry().controller = {
+      lock: () => {
+        frozenAt = Math.round(window.scrollY);
+        lenis.stop();
+
+        /*
+         * 날아가는 중인 스냅 트윈을 죽인다. 안 죽이면 위치 고정과 트윈이 매 프레임 싸워서 드래그 내내
+         * 40px 안팎으로 흔들린다(2026-09-18 실측). ScrollTrigger는 스냅 트윈을 인스턴스의 tween에 두고,
+         * 버전에 따라 getTween(true)로도 준다 — 둘 다 시도한다.
+         */
+        const snapping = snapTrigger as (ScrollTrigger & { tween?: gsap.core.Tween }) | undefined;
+        snapping?.tween?.kill();
+        snapping?.getTween?.(true)?.kill();
+
+        // 트리거 자체를 꺼서 잠금 중에 스냅이 새로 시작되지도 않게 한다.
+        snapping?.disable(false, true);
+
+        window.addEventListener('scroll', holdPosition, { passive: true });
+      },
+      unlock: () => {
+        window.removeEventListener('scroll', holdPosition);
+        frozenAt = null;
+        lenis.start();
+        (snapTrigger as (ScrollTrigger & { enable?: (reset?: boolean) => void }) | undefined)?.enable?.(false);
+      },
+    };
+
+    if (isCinematicScrollLocked()) {
+      registry().controller?.lock();
+    }
+
     return () => {
+      window.removeEventListener('scroll', holdPosition);
+      registry().controller = null;
       snapTrigger?.kill();
       gsap.ticker.remove(tick);
       lenis.destroy();

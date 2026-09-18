@@ -227,6 +227,31 @@ async function motion(page, clip, gap = 900) {
   return diff / ra.length;
 }
 
+/*
+ * 스크롤이 멎을 때까지 기다린다. 뷰포트를 바꾸면 ScrollTrigger가 핀 구간을 다시 계산하면서 스크롤을
+ * 얼마간 더 움직인다 — 그걸 드래그 중 이동으로 오인하면 잠금이 실패한 것처럼 보인다(2026-09-18).
+ */
+async function waitForScrollIdle(page, quietMs = 600, timeoutMs = 6000) {
+  const started = Date.now();
+  let last = await page.evaluate(() => Math.round(window.scrollY));
+  let stableSince = Date.now();
+
+  while (Date.now() - started < timeoutMs) {
+    await page.waitForTimeout(100);
+
+    const now = await page.evaluate(() => Math.round(window.scrollY));
+
+    if (now !== last) {
+      last = now;
+      stableSince = Date.now();
+    } else if (Date.now() - stableSince >= quietMs) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 async function measure(url) {
   const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-webgl'] });
   const results = {};
@@ -365,11 +390,46 @@ async function measure(url) {
 
     if (clip) {
       const before = await page.screenshot({ clip });
+
+      /*
+       * 드래그하는 동안 페이지가 움직이면 안 된다 — 2026-09-17 프로덕션 프리뷰에서 3D를 끌었더니
+       * 직전 스크롤의 스냅 트윈이 착지해 다음 장면으로 넘어갔다. 드래그 전후 scrollY를 같이 잰다.
+       */
+      results.scrollIdleBeforeDrag = await waitForScrollIdle(page);
       await page.mouse.move(clip.x + clip.width / 2, clip.y + clip.height / 2);
       await page.mouse.down();
+
+      /*
+       * 기준점은 pointerdown 이후에 잡는다. 그 전에는 직전 스크롤의 스냅이 아직 착지하는 중이라,
+       * 드래그와 무관한 이동까지 같이 재게 된다(2026-09-18: 그래서 56~190px으로 들쭉날쭉했다).
+       */
+      const scrollBefore = await page.evaluate(() => Math.round(window.scrollY));
+
+      /*
+       * 3D가 아직 'still'이면(뷰포트 감지 전) 캔버스가 없어 드래그가 히어로로 가고, 잠금도 안 걸린다.
+       * 그 경우의 이동량은 스냅 잔여이지 잠금 실패가 아니므로 같이 기록해 구분한다.
+       */
+      results.ck3dAtDrag = await page.evaluate(
+        () => document.querySelector('[data-ck-3d]')?.getAttribute('data-ck-3d') ?? null,
+      );
+      results.dragOnShowcaseCanvas = await page.evaluate(() => !!document.querySelector('[data-ck-3d] canvas'));
       await page.mouse.move(clip.x + clip.width / 2 + 180, clip.y + clip.height / 2, { steps: 12 });
+
+      const scrollDuringDrag = await page.evaluate(() => Math.round(window.scrollY));
       await page.mouse.up();
-      await page.waitForTimeout(700);
+      await page.waitForTimeout(900);
+      results.dragScrollDelta = Math.abs(scrollDuringDrag - scrollBefore);
+
+      // 놓은 뒤에는 스크롤이 다시 살아야 한다 — 잠금이 안 풀리면 페이지가 굳는다.
+      const beforeWheel = await page.evaluate(() => Math.round(window.scrollY));
+      await page.mouse.wheel(0, 600);
+      await page.waitForTimeout(900);
+      results.scrollAliveAfterDrag = (await page.evaluate(() => Math.round(window.scrollY))) !== beforeWheel;
+
+      /*
+       * 회전 자체는 픽셀 변화로 재기 어렵다 — jar·bowl은 LatheGeometry라 Y축 회전이 이미지를 거의
+       * 안 바꾼다(실측 2.78). 그래서 드래그 성공 판정은 "페이지가 안 밀렸고 잠금이 걸렸다 풀렸다"로 본다.
+       */
 
       const after = await page.screenshot({ clip });
       const [ra, rb] = await Promise.all([

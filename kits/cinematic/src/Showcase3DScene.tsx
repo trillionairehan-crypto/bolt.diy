@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import { setCinematicScrollLock } from './hooks';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
@@ -126,6 +127,12 @@ function Stage({ shape, color, accent, spin, onFirstFrame }: StageProps) {
       lastX.current = event.clientX;
       el.style.cursor = 'grabbing';
       el.setPointerCapture(event.pointerId);
+
+      /*
+       * 드래그하는 동안 페이지를 잠근다. 드래그 자체는 스크롤을 만들지 않지만, 직전 스크롤의 스냅
+       * 트윈이 아직 날아가는 중이면 손 밑에서 페이지가 다음 장면으로 넘어간다(2026-09-17 실측).
+       */
+      setCinematicScrollLock(true);
     };
     const move = (event: PointerEvent) => {
       if (!dragging.current) {
@@ -136,8 +143,13 @@ function Stage({ shape, color, accent, spin, onFirstFrame }: StageProps) {
       lastX.current = event.clientX;
     };
     const up = (event: PointerEvent) => {
+      if (!dragging.current) {
+        return;
+      }
+
       dragging.current = false;
       el.style.cursor = 'grab';
+      setCinematicScrollLock(false);
 
       try {
         el.releasePointerCapture(event.pointerId);
@@ -153,6 +165,11 @@ function Stage({ shape, color, accent, spin, onFirstFrame }: StageProps) {
     el.addEventListener('pointerleave', up);
 
     return () => {
+      if (dragging.current) {
+        dragging.current = false;
+        setCinematicScrollLock(false);
+      }
+
       el.removeEventListener('pointerdown', down);
       el.removeEventListener('pointermove', move);
       el.removeEventListener('pointerup', up);
