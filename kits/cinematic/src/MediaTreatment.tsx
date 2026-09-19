@@ -31,6 +31,9 @@ export interface MediaTreatmentProps {
   radius?: number;
   style?: CSSProperties;
   children?: ReactNode;
+
+  /** 유휴 드리프트(.ck-drift) — 핀 챕터처럼 한 사진이 오래 머무는 자리에서 켠다. reduced-motion이면 CSS가 끈다. */
+  drift?: boolean;
 }
 
 const GRAIN =
@@ -54,7 +57,7 @@ function filterFor(treatment: Treatment, grade: boolean): string {
   }
 }
 
-export function MediaTreatment({ src, video, alt = '', treatment = 'none', ratio = '4 / 3', fill = false, focus = '50% 50%', grade = true, radius = 0, style, children }: MediaTreatmentProps) {
+export function MediaTreatment({ src, video, alt = '', treatment = 'none', ratio = '4 / 3', fill = false, focus = '50% 50%', grade = true, radius = 0, style, children, drift = false }: MediaTreatmentProps) {
   const isDesktop = useIsDesktop();
   const mediaStyle: CSSProperties = {
     position: 'absolute',
@@ -82,7 +85,18 @@ export function MediaTreatment({ src, video, alt = '', treatment = 'none', ratio
 
   return (
     <div style={wrap} data-treatment={treatment}>
-      {isDesktop && video ? <video src={video} poster={src} autoPlay muted loop playsInline style={mediaStyle} /> : <img src={src} alt={alt} loading="lazy" style={mediaStyle} />}
+      {(() => {
+        const media = isDesktop && video ? <video src={video} poster={src} autoPlay muted loop playsInline style={mediaStyle} /> : <img src={src} alt={alt} loading="lazy" style={mediaStyle} />;
+
+        // 드리프트는 별도 래퍼에 — 미디어 자체의 transform(detail/blur 확대)과 겹치지 않게
+        return drift ? (
+          <div aria-hidden="true" className="ck-drift">
+            {media}
+          </div>
+        ) : (
+          media
+        );
+      })()}
       {treatment === 'duotone' ? (
         <>
           <div aria-hidden="true" style={{ position: 'absolute', inset: 0, background: 'var(--ck-accent)', mixBlendMode: 'multiply', opacity: 0.9 }} />

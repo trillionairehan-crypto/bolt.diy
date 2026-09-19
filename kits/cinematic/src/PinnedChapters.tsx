@@ -194,7 +194,10 @@ export function PinnedChapters({ chapters, startIndex = 1, media = 'right', step
               className="ck-pin-media"
               style={{ transformOrigin: 'center', willChange: 'transform, opacity' }}
             >
-              <MediaTreatment src={c.image} video={c.video} alt={c.alt} treatment={c.treatment} ratio="auto" fill />
+              <MediaTreatment src={c.image} video={c.video} alt={c.alt} treatment={c.treatment} ratio="auto" fill drift />
+              {/* 살아있는 그레인 — 정지 사진 위 앰비언트의 최소 단위(히어로와 같은 .ck-grain) */}
+              <div aria-hidden="true" className="ck-sweep" style={{ zIndex: 1 }} />
+              <div aria-hidden="true" className="ck-grain" style={{ zIndex: 1, opacity: 0.12 }} />
             </div>
           ))}
         </div>

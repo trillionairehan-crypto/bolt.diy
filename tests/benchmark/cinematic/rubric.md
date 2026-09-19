@@ -937,3 +937,9 @@ fd8c210a 배포(5a614bec). files.spec.ts 2건.
   3. 내비 링크 0.72 → 0.88(difference 위 밝은 사진에서 탁함).
 - 미수정(판단): 마퀴(195px 띠)는 스냅 지점이 아니라 전환 중에만 보임 — 스냅 지점으로 넣으면 컨택트가 잘린 채 멈춰 더 나쁨. 그대로 둠.
 - 도구: `detailProbe.mjs`, `probeReveal.mjs`. 증거 `kit-v0.4-audit/{statement,detail-hero-cta,detail-chapter-index}.png`.
+
+## 2026-09-19 — 챕터 핀 구간 유휴 모션
+
+- 측정 도구 `probeIdle.mjs <selector> <ratio>` — cssda/motion.mjs의 idleMotion과 같은 방법을 임의 장면에. 수정 전: 핀 챕터 3지점 전부 **0**(스크럽이 멈추면 정지 사진), Showcase3D 0.023.
+- 수정: `MediaTreatment drift` prop → `.ck-drift` 래퍼(12s 왕복, 2.5%/1.8% 이동 + 1.04→1.10 줌; 미디어 자체 transform과 분리). 핀 챕터 미디어에 `.ck-sweep`(9s 빛 스침, soft-light 0.14) + `.ck-grain` 0.12. 첫 시도(18s·1.5%·그레인 0.1)는 0.001로 700ms 창에 안 잡혀 키움. reduced-motion 전부 정지. 모바일 ScrollChapter는 의도적으로 정지.
+- 수정 후: 챕터 0.15/0.5/0.9 지점 **0.041 / 0.040 / 0.047**(수상작 중앙값 0.036). 스틸에서 스침은 안 보이고 그레인만 보임 — 의도대로.
