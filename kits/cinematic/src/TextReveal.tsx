@@ -72,9 +72,12 @@ export function TextReveal({ text, children, as = 'p', className, style, mode = 
     return null;
   }
 
+  // 선언문(--statement)은 스냅·감사가 장면으로 인식하도록 표식을 단다.
+  const isStatement = typeof className === 'string' && className.includes('ck-display--statement');
+
   return createElement(
     as,
-    { ref: root, className, style, 'aria-label': source },
+    { ref: root, className, style, 'aria-label': source, ...(isStatement ? { 'data-ck': 'statement' } : {}) },
     words.map((w, i) => (
       <span key={i} aria-hidden="true">
         <span className={`ck-split-word${emphasize.includes(i) ? ' ck-em' : ''}`}>

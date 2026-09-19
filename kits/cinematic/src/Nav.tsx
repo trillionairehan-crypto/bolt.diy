@@ -61,7 +61,7 @@ export function Nav({ brand, links = [], cta }: NavProps) {
                 href={link.href}
                 className="ck-navlink"
                 data-cursor="hover"
-                style={{ fontSize: '13px', textDecoration: 'none', color: 'inherit', opacity: 0.72, whiteSpace: 'nowrap' }}
+                style={{ fontSize: '13px', textDecoration: 'none', color: 'inherit', opacity: 0.88, whiteSpace: 'nowrap' }}
               >
                 {link.label}
               </a>

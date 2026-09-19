@@ -36,7 +36,7 @@
   --ck-display-xl: clamp(52px, 9vw, 136px);
   --ck-display-lg: clamp(38px, 6.4vw, 96px);
   --ck-display-md: clamp(26px, 2.8vw, 40px);
-  --ck-display-statement: clamp(28px, 3.6vw, 56px);
+  --ck-display-statement: clamp(32px, 4.8vw, 76px); /* 선언문이 한 화면 장면이 되면서 56px는 빈 화면에 묻혔다(2026-09-19) */
   --ck-number: clamp(56px, 8vw, 136px);
   --ck-body: clamp(16px, 1.1vw, 18px);
   --ck-eyebrow: 12px;
@@ -143,9 +143,19 @@ html.ck-lenis body {
 .ck-display--statement {
   font-size: var(--ck-display-statement);
   line-height: 1.22;
-  letter-spacing: -0.015em;
-  max-width: 24em;
+  letter-spacing: -0.02em;
+  max-width: 17em; /* 1440에서 2~3줄 */
   text-wrap: pretty;
+}
+
+/*
+ * 선언문 장면 — 생성물은 <section><TextReveal className="ck-display--statement"/></section>로 쓴다(프롬프트 규칙).
+ * 그 섹션이 315px 띠로 남아 스냅 지점도 없이 지나쳐졌다(2026-09-19 디테일 검증). 한 화면 장면으로 세운다.
+ */
+.ck-page section:has(> .ck-display--statement) {
+  min-height: 100svh;
+  display: grid;
+  align-items: center;
 }
 
 /* 대문자 장치의 한글 대체 — 한 줄 안의 굵기 대비 / 크기 대비 */

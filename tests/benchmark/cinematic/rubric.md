@@ -927,3 +927,13 @@ fd8c210a 배포(5a614bec). files.spec.ts 2건.
   3. **Showcase3D** 5:7 두 열이 400px에서 제목 "달항아/리" 분해·스펙 압착 → 스틸(4:5, 풀블리드) 위·텍스트 아래 스택, `minHeight` 해제.
   4. 히어로 상단 그라데이션 0.38/14% → 0.5/18%(밝은 벽 위 내비 CTA).
 - 증거: `kit-v0.4-audit/mobile-{hero,chapter,showcase3d}.png`. 미확인: 모바일 실기기 터치 스크롤(스냅이 400px에서도 켜져 있음 — 하네스 scrollTo가 1169로 튐. 모바일에서 스냅을 끌지는 판단 필요).
+
+## 2026-09-19 — 디테일 검증 (detailProbe.mjs: 장면별 좌측 정렬·간격·서체 수치 + 2배 크롭)
+
+- 정렬: 모든 장면 텍스트 블록 좌측 x=72(거터) 일치, 챕터 인덱스 라벨 x=99(번호 폭+12), 컨택트 4열 72/404/736/1068. 내비 상호 y18/h27 vs 링크 y21/h22 — 세로 중심 일치. 히어로 캡션 하단 837 = CTA 하단 838. 통과.
+- 결함 → 수정:
+  1. **컨택트 리빌이 영영 안 켜짐(회귀)** — 휠 18회로 끝까지 가도 opacity 0. bisect: 84edc296·03ab8486 정상, e1fa16f6(모바일 패스)부터 고장. 원인: `useIsDesktop` 첫 렌더가 false(모바일 레이아웃) → 그 프레임에 마운트된 컨택트 ScrollTrigger가 모바일 기준 위치(Showcase3D 스택이 ~900px 더 김)를 재고, 데스크톱으로 뒤집힌 뒤 그 위치에 영영 못 닿음. 수정: `useMediaQuery` 초기값을 `matchMedia`로 동기 계산 + `document.fonts.ready`·1.6s 뒤 `ScrollTrigger.refresh()`(웹폰트 도착으로 높이가 바뀌는 실사용 케이스도 커버).
+  2. **선언문 장면이 315px 띠** — 스냅 지점 없이 지나쳐짐. `.ck-page section:has(> .ck-display--statement)`로 100svh 장면화, TextReveal이 `data-ck="statement"` 표식, 스냅·SceneNav 지점에 포함. 크기 56→69px(1440), 17em 2줄.
+  3. 내비 링크 0.72 → 0.88(difference 위 밝은 사진에서 탁함).
+- 미수정(판단): 마퀴(195px 띠)는 스냅 지점이 아니라 전환 중에만 보임 — 스냅 지점으로 넣으면 컨택트가 잘린 채 멈춰 더 나쁨. 그대로 둠.
+- 도구: `detailProbe.mjs`, `probeReveal.mjs`. 증거 `kit-v0.4-audit/{statement,detail-hero-cta,detail-chapter-index}.png`.

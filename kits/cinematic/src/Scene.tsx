@@ -81,7 +81,9 @@ export function Scene({ image, video, title, body, cta, place = 'bottom-left', o
 /** 장면 이동 화살표 — 우하단 고정. snap 켠 페이지에서 한 장면씩 이동. */
 export function SceneNav() {
   const go = (dir: 1 | -1) => {
-    const scenes = Array.from(document.querySelectorAll<HTMLElement>('[data-ck="hero"], [data-ck="scene"], [data-ck="chapter"], [data-ck="contact"]'));
+    const scenes = Array.from(
+      document.querySelectorAll<HTMLElement>('[data-ck="hero"], [data-ck="scene"], [data-ck="chapter"], [data-ck="contact"], [data-ck="statement"]'),
+    ).map((el) => (el.dataset.ck === 'statement' ? (el.closest('section') ?? el) : el));
     const y = window.scrollY + 2;
     const index = scenes.findIndex((el, i) => {
       const next = scenes[i + 1];

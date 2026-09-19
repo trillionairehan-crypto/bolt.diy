@@ -7,8 +7,15 @@ gsap.registerPlugin(ScrollTrigger);
 
 export { gsap, ScrollTrigger };
 
+/*
+ * 첫 렌더부터 실제 값으로 시작한다. 예전엔 false(모바일)로 시작해 한 프레임 뒤 뒤집었는데, 그 사이에 마운트된
+ * ScrollTrigger(컨택트 리빌 등)가 모바일 레이아웃 기준 위치를 재 놓고 데스크톱으로 바뀐 뒤엔 영영 안 닿았다
+ * (2026-09-19 디테일 검증: Showcase3D 모바일 스택이 900px 더 길어지자 컨택트 리빌이 절대 안 켜짐).
+ */
 function useMediaQuery(query: string, initial = false): boolean {
-  const [matches, setMatches] = useState(initial);
+  const [matches, setMatches] = useState(() =>
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function' ? window.matchMedia(query).matches : initial,
+  );
 
   useEffect(() => {
     const mq = window.matchMedia(query);
@@ -179,10 +186,21 @@ export function useSmoothScroll(options: SmoothScrollOptions | boolean = true): 
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
+    /*
+     * 레이아웃이 늦게 바뀌는 두 지점에서 트리거 위치를 다시 잰다 — 웹폰트 도착(한글 세리프는 수백 ms 늦다,
+     * 헤드라인 높이가 바뀐다)과 프리로더가 걷힌 뒤. 안 재면 아래쪽 장면의 리빌·스냅 지점이 어긋난다.
+     */
+    const refresh = () => ScrollTrigger.refresh();
+    document.fonts?.ready.then(refresh).catch(() => {});
+    const readyTimer = window.setTimeout(refresh, 1600);
+
     let snapTrigger: ScrollTrigger | undefined;
 
     if (snap) {
-      const scenes = Array.from(document.querySelectorAll<HTMLElement>('[data-ck="hero"], [data-ck="scene"], [data-ck="chapter"], [data-ck="contact"]'));
+      // 선언문은 h2에 표식이 있으므로 그 장면(부모 section)을 스냅 지점으로 쓴다.
+      const scenes = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-ck="hero"], [data-ck="scene"], [data-ck="chapter"], [data-ck="contact"], [data-ck="statement"]'),
+      ).map((el) => (el.dataset.ck === 'statement' ? (el.closest('section') ?? el) : el));
       const max = document.documentElement.scrollHeight - window.innerHeight;
 
       if (scenes.length > 1 && max > 0) {
@@ -280,6 +298,7 @@ export function useSmoothScroll(options: SmoothScrollOptions | boolean = true): 
     }
 
     return () => {
+      window.clearTimeout(readyTimer);
       window.removeEventListener('scroll', holdPosition);
       registry().controller = null;
       snapTrigger?.kill();
