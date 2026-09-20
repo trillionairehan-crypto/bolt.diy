@@ -10,6 +10,14 @@ describe('isProviderBillingError', () => {
     ).toBe(true);
   });
 
+  it('Gemini 선불 크레딧 소진(402 RESOURCE_EXHAUSTED)도 잡는다 (2026-09-20 실측)', () => {
+    expect(
+      isProviderBillingError(
+        'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing.',
+      ),
+    ).toBe(true);
+  });
+
   it('OpenAI 쿼터 초과 문구도 잡는다', () => {
     expect(isProviderBillingError('You exceeded your current quota, please check your plan and billing details.')).toBe(
       true,

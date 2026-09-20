@@ -14,6 +14,7 @@ import {
 } from '~/lib/.server/media/skeleton7-image-set';
 import { defaultVideoProviderName, getVideoProvider, type VideoEnv } from '~/lib/.server/media/video';
 import { createScopedLogger } from '~/utils/logger';
+import { isProviderBillingError, PROVIDER_BILLING_STATUS } from '~/lib/.server/llm/provider-error';
 
 const logger = createScopedLogger('api.media-images');
 
@@ -178,7 +179,16 @@ export async function action({ request, context }: ActionFunctionArgs) {
     logger.error('image set failed', kind, error instanceof Error ? error.message : error);
     Sentry.captureException(error, { tags: { route: 'api.media-images', kind }, extra: { chatId, industry } });
 
-    return json({ error: 'image generation failed', kind }, { status: 502 });
+    /*
+     * 502/504는 Cloudflare가 자기 HTML 오류 페이지로 덮어써 JSON(kind)이 사라진다(2026-09-20 실생성: 클라이언트가
+     * "Bad gateway" HTML만 받음). 결제 문제(Gemini "prepayment credits are depleted")는 402, 나머지는 500.
+     */
+    const billing = error instanceof Error && isProviderBillingError(error.message);
+
+    return json(
+      { error: 'image generation failed', kind: billing ? 'provider_billing' : kind, isRetryable: !billing },
+      { status: billing ? PROVIDER_BILLING_STATUS : 500 },
+    );
   } finally {
     clearTimeout(timeoutId);
   }

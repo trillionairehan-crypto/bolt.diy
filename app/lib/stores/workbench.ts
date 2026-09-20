@@ -111,6 +111,9 @@ export class WorkbenchStore {
   #previewScreenshotRequester: (() => Promise<string | null>) | null = null;
 
   constructor() {
+    // 실생성 디버깅용 — 프로덕션 콘솔에서 멈춘 액션을 바로 본다(2026-09-20: stall 원인 추적에 React fiber를 뒤지던 것을 대체).
+    (globalThis as { __ckUnsettled?: () => unknown }).__ckUnsettled = () => this.getUnsettledActions();
+
     if (import.meta.hot) {
       import.meta.hot.data.artifacts = this.artifacts;
       import.meta.hot.data.unsavedFiles = this.unsavedFiles;

@@ -457,8 +457,13 @@ export function checkCinematicSceneOrder(source: string): SceneOrderResult {
    */
   if (/(?:image|video|poster)=["']\/(?:hero|ch[1-3])(?:-[a-z0-9]+)?\.(?:jpe?g|png|webp|mp4|webm)["']/.test(source)) {
     problems.push(
-      '예약 URL 대신 루트 경로(/hero.jpg 등)를 썼다 — 프로젝트에 그 파일은 없다, 예약 URL 전체를 그대로 쓴다',
+      '예약 URL 대신 루트 경로(/hero.jpg 등)를 썼다 — 프로젝트에 그 파일은 없다. 처음 요청에 적힌 예약 URL을 글자 그대로 복사한다',
     );
+  }
+
+  // 자리표시자를 그대로 쓴 URL(`media/<jobId>/`, `{jobId}`) — 2026-09-20 실생성.
+  if (/https?:\/\/[^"'`\s)]*(?:<[A-Za-z]+>|\{[A-Za-z]+\})[^"'`\s)]*/.test(source)) {
+    problems.push('URL에 자리표시자(<...>·{...})가 남아 있다 — 처음 요청에 적힌 예약 URL을 글자 그대로 복사한다');
   }
 
   const foreignHosts = externalImageHosts(source);
@@ -479,7 +484,10 @@ export function checkCinematicSceneOrder(source: string): SceneOrderResult {
    * 통과해 사진 4장이 전부 깨진 채 배포됐다. 예약 URL은 항상 /media/ 아래에 있다.
    */
   if (/https?:\/\/[^"'`\s)]*\.r2\.dev\/(?!media\/)[^"'`\s)]*\.(?:jpe?g|png|webp|avif|gif)/i.test(source)) {
-    problems.push('R2 이미지 URL에 media/<jobId>/ 경로가 빠졌다 — 예약 URL을 그대로 써야 한다');
+    // 문구에 `<jobId>` 같은 자리표시자를 넣지 않는다 — 2026-09-20 실생성: 자동 검토 LLM이 힌트 문구를 그대로 복사해 URL에 `<jobId>`를 썼다.
+    problems.push(
+      'R2 이미지 URL의 경로가 잘못됐다 — 지어내지 말고 처음 요청에 적힌 예약 URL 4개를 글자 그대로 복사한다',
+    );
   }
 
   /*

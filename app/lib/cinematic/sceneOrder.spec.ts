@@ -149,6 +149,12 @@ export default function App() {`,
     expect(msg).not.toContain('HeroScene');
   });
 
+  it('URL에 자리표시자가 남은 생성물을 잡는다 (2026-09-20 실생성: media/<jobId>/)', () => {
+    const placeholder = GOOD.replace(/media\/j1\//g, 'media/<jobId>/');
+
+    expect(checkCinematicSceneOrder(placeholder).problems.some((p) => p.includes('자리표시자'))).toBe(true);
+  });
+
   it('예약 URL 대신 루트 경로를 쓴 생성물을 잡는다 (2026-09-20 실생성)', () => {
     const rootPath = GOOD.replace('image="https://pub-x.r2.dev/media/j1/hero.jpg"', 'image="/hero.jpg"');
 
@@ -224,7 +230,10 @@ export default function App() {`,
     const wrongPath = GOOD.replace(/https:\/\/pub-x\.r2\.dev\/media\/j1\//g, 'https://pub-x.r2.dev/');
     const result = checkCinematicSceneOrder(wrongPath);
 
-    expect(result.problems).toContain('R2 이미지 URL에 media/<jobId>/ 경로가 빠졌다 — 예약 URL을 그대로 써야 한다');
+    expect(result.problems.some((p) => p.includes('R2 이미지 URL의 경로가 잘못됐다'))).toBe(true);
+
+    // LLM이 복사할 수 있는 자리표시자를 문구에 남기지 않는다(2026-09-20 실생성: `<jobId>`가 URL에 그대로 들어감).
+    expect(result.problems.join('\n')).not.toMatch(/<jobId>/);
   });
 
   it('킷에 없는 prop을 잡는다 (프로덕션 카피 유실 원인)', () => {

@@ -132,7 +132,13 @@ async function requestImageSet(jobId: string, input: Skeleton7ImageJobInput): Pr
     });
 
     if (!response.ok) {
-      logger.warn('image set request failed', response.status);
+      const detail = await response.json().catch(() => ({}));
+      logger.warn(
+        response.status === 402 ? 'image set skipped — provider billing (402)' : 'image set request failed',
+        response.status,
+        detail,
+      );
+
       return null;
     }
 

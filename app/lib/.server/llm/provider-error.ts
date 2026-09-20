@@ -13,6 +13,8 @@ const BILLING_PATTERNS = [
   /exceeded your current quota/i,
   /billing (?:hard )?limit/i,
   /payment required/i,
+  /prepayment credits are depleted/i,
+  /RESOURCE_EXHAUSTED/,
 ];
 
 export function isProviderBillingError(message: string | undefined | null): boolean {
