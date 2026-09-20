@@ -54,14 +54,36 @@ function isReserved(url: string, reserved: string[]): boolean {
   return reserved.some((expected) => sameUrlIgnoringQuery(url, expected));
 }
 
+/*
+ * 2026-09-20 실생성: 예약 URL을 받고도 `image="/hero.jpg"`처럼 루트 경로 + 예약 파일명만 썼다. 사용자 로컬 사진
+ * (`/media/local.jpg`)과 구분하기 위해 파일명이 예약 URL의 파일명과 같을 때만 예약 URL로 본다.
+ */
+function localAliasRegex(reserved: string[]): RegExp | null {
+  const names = reserved.map((url) => url.slice(url.lastIndexOf('/') + 1).split('?')[0]).filter(Boolean);
+
+  if (names.length === 0) {
+    return null;
+  }
+
+  return new RegExp(
+    `(?<=["'\`])\\/(?:${names.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(?=["'\`?])`,
+    'g',
+  );
+}
+
 function collectReplaceableImageUrls(content: string, reserved: string[]): string[] {
   const found = new Set<string>();
   const ordered: string[] = [];
+  const alias = localAliasRegex(reserved);
 
-  for (const match of [...content.matchAll(IMAGE_URL_REGEX), ...content.matchAll(STOCK_IMAGE_URL_REGEX)]) {
+  for (const match of [
+    ...content.matchAll(IMAGE_URL_REGEX),
+    ...content.matchAll(STOCK_IMAGE_URL_REGEX),
+    ...(alias ? content.matchAll(alias) : []),
+  ]) {
     const url = match[0];
 
-    if (isReserved(url, reserved) || found.has(url)) {
+    if (isReserved(url, reserved) || found.has(url) || /\.(?:mp4|webm|mov)$/i.test(url)) {
       continue;
     }
 
@@ -78,9 +100,11 @@ function injectVideo(content: string, video: string | undefined): { content: str
     return { content, replaced: 0 };
   }
 
-  const external = [...new Set([...content.matchAll(VIDEO_URL_REGEX)].map((match) => match[0]))].filter(
-    (url) => !sameUrlIgnoringQuery(url, video),
-  );
+  const videoName = video.slice(video.lastIndexOf('/') + 1).split('?')[0];
+  const localVideo = new RegExp(`(?<=["'\`])\\/${videoName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=["'\`?])`, 'g');
+  const external = [
+    ...new Set([...content.matchAll(VIDEO_URL_REGEX), ...content.matchAll(localVideo)].map((match) => match[0])),
+  ].filter((url) => !sameUrlIgnoringQuery(url, video));
 
   let next = content;
 

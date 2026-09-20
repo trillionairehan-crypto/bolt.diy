@@ -986,7 +986,8 @@ const CH7_HERO_CAPTION = '사진을 보내주시면 여기에 넣어드릴게요
  * (2026-09-12 실측: "generated app is not skeleton 7 — discarding pre-started image set" — 이미지 4장과
  * 히어로 영상 원가는 이미 나간 뒤였고, 생성물은 모델이 지어낸 Unsplash 사진을 썼다).
  */
-const CINEMATIC_KIT_IMPORT_REGEX = /from\s+['"](\.\/kit|\.\.\/kit|~\/kit)['"]/;
+// `./kit`(배럴)뿐 아니라 `./kit/HeroScene`처럼 파일 단위 import도 킷 사용이다(2026-09-20 실생성: 모델이 전부 파일 단위로 써서 트랙 판정이 빠지고 예약 사진 세트가 버려졌다).
+const CINEMATIC_KIT_IMPORT_REGEX = /from\s+['"](?:\.\/kit|\.\.\/kit|~\/kit)(?:\/[A-Za-z0-9_]+)?['"]/;
 
 export function isCinematicTrackFile(content: string): boolean {
   return CINEMATIC_KIT_IMPORT_REGEX.test(content) && /<HeroScene(?![A-Za-z0-9_])/.test(content);

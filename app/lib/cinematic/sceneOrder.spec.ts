@@ -136,6 +136,25 @@ export default function App() {`,
     expect(result.problems.some((p) => p.includes('킷에 없는 컴포넌트를 import했다 — ImagePlaceholder'))).toBe(true);
   });
 
+  it('파일 단위 import에서 없는 파일을 잡는다 (2026-09-20 실생성: ./kit/CustomCursor, ./kit/SceneNav)', () => {
+    const perFile = GOOD.replace(
+      /import \{[^}]*\} from '\.\/kit';/,
+      "import { HeroScene } from './kit/HeroScene';\nimport { CustomCursor } from './kit/CustomCursor';\nimport { SceneNav } from './kit/SceneNav';\nimport { PinnedChapters, TextReveal, Showcase3D, Marquee, Contact, Nav, Preloader, Cursor, useSmoothScroll } from './kit';",
+    );
+    const result = checkCinematicSceneOrder(perFile);
+    const msg = result.problems.find((p) => p.includes('킷에 없는 컴포넌트'));
+
+    expect(msg).toContain('./kit/CustomCursor');
+    expect(msg).toContain('./kit/SceneNav');
+    expect(msg).not.toContain('HeroScene');
+  });
+
+  it('예약 URL 대신 루트 경로를 쓴 생성물을 잡는다 (2026-09-20 실생성)', () => {
+    const rootPath = GOOD.replace('image="https://pub-x.r2.dev/media/j1/hero.jpg"', 'image="/hero.jpg"');
+
+    expect(checkCinematicSceneOrder(rootPath).problems.some((p) => p.includes('루트 경로'))).toBe(true);
+  });
+
   it('type import와 별칭(as)은 킷 이름으로 판정한다', () => {
     const aliased = GOOD.replace(
       "useSmoothScroll } from './kit';",

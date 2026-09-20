@@ -1353,14 +1353,22 @@ ${CINEMATIC_KIT_PROMPT}`;
      * 사진만 ~40초 늦게 오고, 자동 검토 뒤 applySkeleton7Images가 캐시버스터로 다시 그린다.
      */
     useEffect(() => {
-      if (isLoading) {
-        return;
+      /*
+       * 2026-09-20 실생성: 첫 스트림이 끝난 직후 자동 수정 스트림(/api/chat)이 바로 시작돼 이미지 세트와 겹쳤다.
+       * 알림(actionAlert)이 떠 있으면 자동 수정이 곧 나가므로 기다리고, 2초 안에 새 스트림이 시작되면 취소한다.
+       */
+      if (isLoading || actionAlert) {
+        return undefined;
       }
 
-      if (startSkeleton7ImageSet()) {
-        logger.info('skeleton 7 images: generation started after stream end');
-      }
-    }, [isLoading]);
+      const timer = window.setTimeout(() => {
+        if (startSkeleton7ImageSet()) {
+          logger.info('skeleton 7 images: generation started after stream end');
+        }
+      }, 2000);
+
+      return () => window.clearTimeout(timer);
+    }, [isLoading, actionAlert]);
 
     /*
      * dev 서버(esbuild) 사망 대응 — 2026-09-18 실측: 한 탭에서 생성 ~7회 뒤 `The service was stopped`,

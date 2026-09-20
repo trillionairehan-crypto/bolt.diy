@@ -24,6 +24,16 @@ describe('noteDevServerOutput', () => {
     expect(devServerCrashAtom.get()?.count).toBe(2);
   });
 
+  it('잘못된 import로 인한 Pre-transform error는 사망이 아니다 (2026-09-20 실생성 오탐)', () => {
+    expect(
+      noteDevServerOutput(
+        '[vite] Pre-transform error: Failed to resolve import "./kit/CustomCursor" from "src/App.tsx"',
+        1_000,
+      ),
+    ).toBe(false);
+    expect(devServerCrashAtom.get()).toBeNull();
+  });
+
   it('정상 출력은 건드리지 않는다', () => {
     expect(noteDevServerOutput('VITE v5.4.21 ready in 1541 ms\r\n  ➜  Local: http://localhost:5173/', 1_000)).toBe(
       false,

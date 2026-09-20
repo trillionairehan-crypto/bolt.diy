@@ -7,7 +7,12 @@ import { atom } from 'nanostores';
  * 죽은 것이라 LLM 자동 수정으로는 못 고친다 — 코드 문제가 아니다. 셸 출력에서 잡아 dev 서버를
  * 다시 띄우고, 그래도 반복되면 사용자에게 새 탭을 안내한다.
  */
-export const DEV_SERVER_CRASH_REGEX = /The service was stopped|Pre-transform error/;
+/*
+ * `Pre-transform error`만으로는 안 된다 — 생성 중 잘못된 import(CustomCursor 등)에도 Vite가 같은 접두사를 찍는다.
+ * 2026-09-20 실생성: 그걸 사망으로 오인해 멀쩡한 dev 서버를 재시작 → 프리뷰 백지 + stall(첫 런부터). esbuild
+ * 서비스 사망 문구 자체만 본다.
+ */
+export const DEV_SERVER_CRASH_REGEX = /The service was stopped/;
 
 /** 같은 사망을 x17처럼 여러 줄로 찍으므로 이 창 안의 반복은 한 번으로 센다. */
 const CRASH_DEDUPE_WINDOW_MS = 10_000;

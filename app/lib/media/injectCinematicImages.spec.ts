@@ -128,6 +128,21 @@ const W1 = 'https://pub-x.r2.dev/ch1.jpg';
     expect(injectCinematicImages(fine, RESERVED, video).replaced).toBe(0);
   });
 
+  /* 2026-09-20 실생성: 예약 URL을 받고도 루트 경로 + 예약 파일명만 썼다. */
+  it('루트 경로 + 예약 파일명(/hero.jpg, /hero-seedance.mp4)을 예약 URL로 바꾼다', () => {
+    const video = 'https://pub-x.r2.dev/media/j1/hero-seedance.mp4';
+    const rootPaths = `<HeroScene image="/hero.jpg" video="/hero-seedance.mp4" />
+const CHAPTERS = [{ image: '/ch1.jpg' }, { image: '/ch2.jpg' }, { image: '/ch3.jpg' }];
+const LOCAL = '/media/local.jpg';`;
+    const result = injectCinematicImages(rootPaths, RESERVED, video);
+
+    expect(result.content).toContain(`image="${RESERVED.hero}"`);
+    expect(result.content).toContain(`video="${video}"`);
+    expect(result.content).toContain(`{ image: '${RESERVED.ch3}' }`);
+    expect(result.content).toContain("'/media/local.jpg'");
+    expect(result.slots).toEqual(['hero', 'ch1', 'ch2', 'ch3', 'video']);
+  });
+
   it('예약 URL에 캐시버스터가 붙어 있어도 그대로 둔다', () => {
     const busted = `<HeroScene image="${RESERVED.hero}?v=123" />`;
     const result = injectCinematicImages(busted, RESERVED);

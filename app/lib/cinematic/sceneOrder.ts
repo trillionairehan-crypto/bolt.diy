@@ -217,10 +217,47 @@ export const KIT_EXPORTS = new Set([
 ]);
 
 /** `import { A, type B, C as D } from './kit'`에서 킷에 없는 이름만 돌려준다. */
+/** 파일 단위 import(`./kit/HeroScene`)가 가리킬 수 있는 파일 — kits/cinematic/src의 .tsx/.ts 이름. */
+export const KIT_FILES = new Set([
+  'index',
+  'HeroScene',
+  'HeroCanvas',
+  'ScrollChapter',
+  'PinnedChapters',
+  'MediaStage',
+  'MediaTreatment',
+  'TextReveal',
+  'BigNumber',
+  'Marquee',
+  'Wordmark',
+  'ScrollSequence',
+  'Showcase3D',
+  'Showcase3DScene',
+  'Contact',
+  'Nav',
+  'Preloader',
+  'Cursor',
+  'Scene',
+  'hooks',
+]);
+
 function unknownKitImports(source: string): string[] {
   const unknown: string[] = [];
 
-  for (const match of source.matchAll(/import\s*\{([^}]*)\}\s*from\s*['"]\.\/kit(?:\/index)?['"]/g)) {
+  for (const match of source.matchAll(/import\s*\{([^}]*)\}\s*from\s*['"]\.\/kit(?:\/([A-Za-z0-9_]+))?['"]/g)) {
+    // 2026-09-20 실생성: `./kit/SceneNav`, `./kit/CustomCursor`처럼 없는 파일을 가리켰다.
+    const file = match[2];
+
+    if (file && file !== 'index' && !KIT_FILES.has(file)) {
+      const label = `./kit/${file}`;
+
+      if (!unknown.includes(label)) {
+        unknown.push(label);
+      }
+
+      continue;
+    }
+
     for (const raw of match[1].split(',')) {
       const trimmed = raw.trim();
 
@@ -412,6 +449,16 @@ export function checkCinematicSceneOrder(source: string): SceneOrderResult {
 
   if (missingExports.length > 0) {
     problems.push(`킷에 없는 컴포넌트를 import했다 — ${missingExports.join(', ')}. 킷 export 목록에 있는 이름만 쓴다`);
+  }
+
+  /*
+   * 2026-09-20 실생성: 예약 URL 대신 `image="/hero.jpg"`, `video="/hero-seedance.mp4"`처럼 루트 경로만 썼다
+   * (파일명은 예약 URL과 같다). 프로젝트에 그런 파일은 없으므로 404.
+   */
+  if (/(?:image|video|poster)=["']\/(?:hero|ch[1-3])(?:-[a-z0-9]+)?\.(?:jpe?g|png|webp|mp4|webm)["']/.test(source)) {
+    problems.push(
+      '예약 URL 대신 루트 경로(/hero.jpg 등)를 썼다 — 프로젝트에 그 파일은 없다, 예약 URL 전체를 그대로 쓴다',
+    );
   }
 
   const foreignHosts = externalImageHosts(source);
