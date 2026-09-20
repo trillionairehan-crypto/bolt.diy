@@ -187,13 +187,35 @@ export async function prepareSkeleton7Images(input: Skeleton7ImageJobInput): Pro
   return { urls, promptLines: buildSkeleton7PromptLines(urls, video) };
 }
 
+/*
+ * chat 스트림 중에는 이미지 생성을 시작하지 않는다 — 같은 Workers 격리체에서 겹치면 둘 다 죽는다. Chat.client의
+ * 디바운스만으로는 부족했다(2026-09-20 실생성 3런: 자동 검토가 applySkeleton7Images로 시작한 요청이 자동 수정
+ * 스트림과 겹쳐 503). 스트림 상태를 여기서도 알고, 시작 직전에 조용해질 때까지 기다린다.
+ */
+let chatStreaming = false;
+
+export function noteChatStreaming(streaming: boolean): void {
+  chatStreaming = streaming;
+}
+
+const QUIET_POLL_MS = 500;
+const QUIET_MAX_WAIT_MS = 4 * 60_000;
+
+async function waitForQuietChat(): Promise<void> {
+  const started = Date.now();
+
+  while (chatStreaming && Date.now() - started < QUIET_MAX_WAIT_MS) {
+    await new Promise((resolve) => setTimeout(resolve, QUIET_POLL_MS));
+  }
+}
+
 function startJob(job: PendingJob): Promise<Skeleton7ImageUrls | null> {
   if (job.promise) {
     return job.promise;
   }
 
-  logger.info('image set generation started', { jobId: job.jobId });
-  job.promise = requestImageSet(job.jobId, job.input);
+  logger.info('image set generation started', { jobId: job.jobId, waitingForChat: chatStreaming });
+  job.promise = waitForQuietChat().then(() => requestImageSet(job.jobId, job.input));
 
   if (job.video) {
     const video = job.video;

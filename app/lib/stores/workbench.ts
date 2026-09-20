@@ -716,7 +716,14 @@ export class WorkbenchStore {
 
     for (const [artifactId, artifact] of Object.entries(this.artifacts.get())) {
       for (const [actionId, action] of Object.entries(artifact.runner.actions.get())) {
-        const settled = action.status === 'complete' || (action.type === 'start' && action.status === 'running');
+        /*
+         * start(dev 서버)는 running이 정상이고, 다음 아티팩트가 자기 dev 서버를 띄우면 앞의 것은 abort된다
+         * (BoltShell.executeCommand가 이전 실행을 끊는다) — 그것도 정상 종료다. 2026-09-20 실생성 3런 전부
+         * 기본 킷 아티팩트의 start:aborted 하나 때문에 "마무리가 안 끝났어요"가 떴다.
+         */
+        const settled =
+          action.status === 'complete' ||
+          (action.type === 'start' && (action.status === 'running' || action.status === 'aborted'));
 
         if (!settled) {
           result.push({

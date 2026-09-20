@@ -534,6 +534,14 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
       return Promise.resolve(null);
     }
 
+    /*
+     * 코드 뷰가 열려 있으면 iframe이 0×0이라 html-to-image가 `data:,`(빈 값)를 돌려주고, 그게 /api/llmcall로
+     * 가서 500("media type: '' not supported")이 났다(2026-09-20 실생성 2·3런). 안 보이면 시각 검토를 건너뛴다.
+     */
+    if (iframe.offsetWidth === 0 || iframe.offsetHeight === 0) {
+      return Promise.resolve(null);
+    }
+
     const requestId = `shot-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const originalWidth = iframe.style.width;
     const originalHeight = iframe.style.height;
@@ -564,7 +572,9 @@ export const Preview = memo(({ setSelectedElement }: PreviewProps) => {
 
       pendingScreenshotRequestsRef.current.set(requestId, (result) => {
         clearTimeout(timeoutId);
-        finish('dataUrl' in result ? result.dataUrl : null);
+
+        // `data:,`처럼 실제 이미지가 아닌 값은 없는 것으로 — 빈 캡처를 LLM에 보내지 않는다.
+        finish('dataUrl' in result && /^data:image\//.test(result.dataUrl) ? result.dataUrl : null);
       });
 
       /*

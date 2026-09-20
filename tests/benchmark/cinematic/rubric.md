@@ -943,3 +943,11 @@ fd8c210a 배포(5a614bec). files.spec.ts 2건.
 - 측정 도구 `probeIdle.mjs <selector> <ratio>` — cssda/motion.mjs의 idleMotion과 같은 방법을 임의 장면에. 수정 전: 핀 챕터 3지점 전부 **0**(스크럽이 멈추면 정지 사진), Showcase3D 0.023.
 - 수정: `MediaTreatment drift` prop → `.ck-drift` 래퍼(12s 왕복, 2.5%/1.8% 이동 + 1.04→1.10 줌; 미디어 자체 transform과 분리). 핀 챕터 미디어에 `.ck-sweep`(9s 빛 스침, soft-light 0.14) + `.ck-grain` 0.12. 첫 시도(18s·1.5%·그레인 0.1)는 0.001로 700ms 창에 안 잡혀 키움. reduced-motion 전부 정지. 모바일 ScrollChapter는 의도적으로 정지.
 - 수정 후: 챕터 0.15/0.5/0.9 지점 **0.041 / 0.040 / 0.047**(수상작 중앙값 0.036). 스틸에서 스침은 안 보이고 그레인만 보임 — 의도대로.
+
+## 2026-09-20 — 실생성 3런 (크레딧 충전 후, 배포 8044dd7e → f0ab9a08 → a901bd7e)
+
+**런 1 유리 공예(8044dd7e):** 이미지 세트가 chat 종료 뒤 시작(37s→78s) ✓. 결함: 모델이 `./kit/HeroScene` 파일 단위 import + `/hero.jpg` 루트 경로 → `isCinematicTrackFile`이 `from './kit'`만 봐서 트랙 판정 실패 → 예약 세트 폐기·게이트 미실행; `./kit/CustomCursor` 등 잘못된 import의 Vite `Pre-transform error`를 dev 서버 사망으로 오인 → 재시작 → 프리뷰 백지+stall; 자동 수정 스트림이 이미지 세트와 겹침. → f0ab9a08.
+**런 2 가죽 공방(f0ab9a08):** import ✓. 자동 검토 LLM이 게이트 힌트 "media/<jobId>/"를 그대로 복사해 URL에 `<jobId>`. `/api/media-images` 502 = **Gemini "prepayment credits are depleted"(402)** — Cloudflare가 우리 502 JSON을 HTML로 덮어 원인 은폐. 시각 검토 llmcall 500. stall. → a901bd7e.
+**런 3 도예 공방(a901bd7e):** import ✓. `__ckUnsettled()` = `start:aborted` — **stall의 진짜 원인: 기본 킷 아티팩트의 `npm run dev`가 생성 아티팩트의 dev 서버에 abort되는 정상 종료를 미완료로 셈**(어제 6런 중 4런 포함, 모든 런). 이미지 세트가 자동 검토 경로(applySkeleton7Images)에서 시작돼 자동 수정 3번째 스트림과 겹쳐 503. 시각 검토 500 = 코드 뷰라 iframe 0×0 → html-to-image `data:,` → Anthropic "media type: ''". 로컬 재현(`probeScreenshot.mjs`)은 122KB 정상.
+**수정(이 커밋):** aborted start = settled(workbench·Artifact), `noteChatStreaming` + `waitForQuietChat`으로 이미지 생성은 어떤 경로든 스트림 중 시작 금지, 숨은 iframe·`data:,` 캡처는 시각 검토 건너뜀.
+**막힌 것:** Google AI Studio 선불 크레딧 소진 — 이미지·영상 생성 전부 402. 충전 전엔 예약 사진 주입 검증 불가. 온보딩 단계 전환이 20~40s(WebContainer 부팅과 메인 스레드 경합) — 별도 이슈.

@@ -100,8 +100,11 @@ export const Artifact = memo(({ artifactId }: ArtifactProps) => {
     }
 
     if (actions.length !== 0) {
+      // start:aborted = 다음 아티팩트의 dev 서버가 대체한 것 — 끝난 것으로 본다(workbench.getUnsettledActions와 같은 규칙).
       const finished = !actions.find(
-        (action) => action.status !== 'complete' && !(action.type === 'start' && action.status === 'running'),
+        (action) =>
+          action.status !== 'complete' &&
+          !(action.type === 'start' && (action.status === 'running' || action.status === 'aborted')),
       );
 
       if (allActionFinished !== finished) {
