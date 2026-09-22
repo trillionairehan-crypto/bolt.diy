@@ -2,7 +2,7 @@
 
 다른 AI 개발자(GPT/Codex 등)에게 넘기는 인수인계. **실제 코드 기준**, HEAD `f8e5f268` (2026-09-22, 코드 대조 반영 — 불일치 목록 `docs/DOC-VS-CODE-AUDIT-2026-09-22.md`).
 
-> **보안 긴급(2026-09-22 실측, 미조치)**: 프로덕션 `GET https://coralred.kr/api/export-api-keys`가 인증 없이 서버의 `ANTHROPIC_API_KEY`·`GOOGLE_GENERATIVE_AI_API_KEY` 실값을 JSON으로 반환한다(bolt 잔재 라우트). **키 2개 폐기·재발급 → 라우트 제거/차단 → 재배포**가 다른 모든 작업보다 먼저다. `GET|POST /api/git-proxy/<domain>/…`도 인증 없는 범용 HTTPS 프록시로 열려 있다. 전체 목록 `docs/DOC-VS-CODE-AUDIT-2026-09-22.md`. 더 깊은 내용: `HANDOFF.md`(함정·절차), `ARCHITECTURE.md`(폴더별 담당·호출자·영향), `docs/AUDIT-2026-09-22.md`(결함 목록).
+> **보안 긴급(2026-09-22 실측, 미조치)**: 프로덕션 `GET https://coralred.kr/api/export-api-keys`가 인증 없이 서버의 `ANTHROPIC_API_KEY`·`GOOGLE_GENERATIVE_AI_API_KEY` 실값을 JSON으로 반환한다(bolt 잔재 라우트). **키 2개 폐기·재발급 → 라우트 제거/차단 → 재배포**가 다른 모든 작업보다 먼저다. `GET|POST /api/git-proxy/<domain>/…`도 인증 없는 범용 HTTPS 프록시로 열려 있다. 전체 목록 `docs/DOC-VS-CODE-AUDIT-2026-09-22.md`. 더 깊은 내용: `HANDOFF.md`(함정·절차), `ARCHITECTURE.md`(폴더별 담당·호출자·영향), `docs/AUDIT-2026-09-22.md`(결함 목록), **`docs/KEEP-REMOVE-REBUILD-2026-09-22.md`(폴더·라우트·dep·DB·설정·외부 서비스 전부의 KEEP/REMOVE/REBUILD/UNKNOWN 판정 — 정리 작업은 여기서 시작)**.
 
 ## 현재 상태 — 구현되어 있는 기능
 
