@@ -62,6 +62,7 @@ docs/instructions/Roadmap.md
 # design-handoff docs are canonical references (brand spec, voice guide, etc.) — must be tracked
 !design-handoff/*.md
 !HANDOFF.md
+!AI_HANDOFF.md
 !CLAUDE.md
 !ARCHITECTURE.md
 !docs/**/*.md

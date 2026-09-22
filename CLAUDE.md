@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-작업 시작 전 `HANDOFF.md`(상태·함정·다음 할 일) → `ARCHITECTURE.md`(폴더별 담당·호출자·변경 영향) 순으로 읽는다. 결함·정리 목록은 `docs/AUDIT-2026-09-22.md`. 사용법·환경 변수는 `README.md`.
+작업 시작 전 `HANDOFF.md`(상태·함정·다음 할 일) → `ARCHITECTURE.md`(폴더별 담당·호출자·변경 영향) 순으로 읽는다. 결함·정리 목록은 `docs/AUDIT-2026-09-22.md`. 사용법·환경 변수는 `README.md`. 다른 AI에게 넘길 요약본은 `AI_HANDOFF.md`.
 
 - 작업 브랜치 `feat/media-gen`(워크트리 `bolt.diy-media-gen`), `main`은 fast-forward로 따라감.
 - 커밋 전: `npx tsc --noEmit -p .`, `npx eslint <files>`, 관련 `npx vitest run`. 파일은 LF.
