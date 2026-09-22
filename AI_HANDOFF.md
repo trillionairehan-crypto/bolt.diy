@@ -120,6 +120,10 @@ Cloud 백엔드: `CLOUD_SUPABASE_URL`, `CLOUD_SUPABASE_SERVICE_KEY`, `CLOUD_APP_
 - 킷 v0.4 결과물을 실생성에서 확인하는 것(하네스로는 확인됨).
 - 디버그 훅: 프로덕션 콘솔 `window.__ckUnsettled()`(멈춘 액션), `fetch('/pricing')`×10 + `cf-ray`(병든 머신 판별).
 
+## 테스트
+
+뭔가 고치면 `pnpm run check`(typecheck·lint·vitest 890+·build) → 커밋, `pnpm run check:full`(+ e2e 스모크: 랜딩→만들기→온보딩, 요금제·가이드·약관·로그인, health, 정적 에셋) → 배포. 새 라우트는 `tests/api/routes.contract.spec.ts`, 새 페이지는 `tests/e2e/smoke.mjs`에 한 줄. 상세 `TESTING.md`.
+
 ## 절대 건드리면 안 되는 부분
 
 - **Cloud API 계약**(`/api/cloud/*` 응답 형식, `coralred-storage.client-template.js`, 앱 토큰 형식) — 이미 배포된 사용자 앱이 이걸 부른다. 바꾸면 남의 사이트가 죽는다.

@@ -98,7 +98,8 @@ async function llmCallAction({ context, request }: ActionFunctionArgs) {
     messageId?: string;
   }>();
 
-  const { name: providerName } = provider;
+  // provider가 없으면 아래 400 검증에 닿기 전에 TypeError로 500이 났다(2026-09-22 API 계약 테스트) — 안전하게 꺼낸다.
+  const providerName = provider?.name;
 
   // validate 'model' and 'provider' fields
   if (!model || typeof model !== 'string') {

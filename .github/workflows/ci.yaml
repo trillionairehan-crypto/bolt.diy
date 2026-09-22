@@ -141,3 +141,42 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  # 주요 사용자 흐름 스모크 — 빌드된 앱을 wrangler pages dev로 띄우고 실제 Chromium으로 랜딩 → 만들기 → 온보딩 2문항,
+  # 요금제/가이드/약관/로그인, /api/health, 정적 에셋을 훑는다. LLM·DB·외부 API 없이 도달 가능한 것만(tests/e2e/smoke.mjs).
+  # "누가 A를 고쳤는데 B가 깨졌다"를 PR에서 잡는 마지막 그물.
+  e2e-smoke:
+    name: E2E smoke (wrangler pages dev + Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9.14.4'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.18.0'
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Smoke
+        run: pnpm run test:e2e
+        env:
+          VITE_PLATFORM_SUPABASE_URL: https://ci-placeholder.supabase.co
+          VITE_PLATFORM_SUPABASE_ANON_KEY: ci-placeholder-anon-key
