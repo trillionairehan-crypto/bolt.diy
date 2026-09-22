@@ -332,7 +332,7 @@ ${value.content}
       let _urlId = urlId;
 
       /*
-       * GEN_STALL_FIX.md — this used to shadow the outer `urlId` with `const urlId = ...` here,
+       * docs/reports/GEN_STALL_FIX.md — this used to shadow the outer `urlId` with `const urlId = ...` here,
        * so the SECOND `if (!urlId)` below (after this block) kept reading the stale, pre-render
        * React state instead of the value just resolved — letting both branches call navigateChat()
        * with two different ids in the same pass (and again on the next call, before setUrlId's

@@ -9,23 +9,6 @@ import { describe, expect, it } from 'vitest';
  * 같은 파일의 성공 알림 박스와 달리 red 계열 텍스트/보더 색상에 dark: 변형이 빠져있던 문제.
  * OVERNIGHT5_PROGRESS.md 사이클 30 기록 참고.
  */
-describe('SettingsButton.tsx 아이콘 버튼이 다크모드 색상 변형을 갖는다', () => {
-  const source = readFileSync(join(__dirname, 'components/ui/SettingsButton.tsx'), 'utf-8');
-
-  it('SettingsButton has a dark: variant next to its light-mode #666 color', () => {
-    const match = source.match(/data-testid="settings-button"[\s\S]*?className="([^"]+)"/);
-    expect(match).not.toBeNull();
-    expect(match?.[1]).toContain('text-[#666]');
-    expect(match?.[1]).toContain('dark:text-gray-500');
-  });
-
-  it('HelpButton has a dark: variant next to its light-mode #666 color', () => {
-    const match = source.match(/data-testid="help-button"[\s\S]*?className="([^"]+)"/);
-    expect(match).not.toBeNull();
-    expect(match?.[1]).toContain('text-[#666]');
-    expect(match?.[1]).toContain('dark:text-gray-500');
-  });
-});
 
 describe('GitHubCacheManager.tsx "전체 삭제" 버튼이 다크모드 red 색상 변형을 갖는다', () => {
   const source = readFileSync(

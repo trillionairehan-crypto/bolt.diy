@@ -7,6 +7,10 @@
 - 실행 환경: WebContainer (브라우저 안에서 돌아가는 Node.js 런타임 — 별도 서버 없이 생성한 코드를 그 자리에서 실행/미리보기)
 - 배포 대상: Cloudflare Pages
 
+## 이어서 개발하려면
+
+`HANDOFF.md`부터 읽으세요 — 현재 아키텍처, 생성 한 번의 데이터 흐름, 검증 하네스, 운영 함정, 미병합 브랜치, 다음 할 일. 과거 작업 보고서는 `docs/reports/`, 실측·사건 로그는 `tests/benchmark/cinematic/rubric.md`.
+
 ## 로컬에서 실행하기
 
 ```bash

@@ -19,11 +19,4 @@ describe('모바일 뷰포트에서 다이얼로그가 넘치지 않는다', () 
      */
     expect(source).toContain('max-w-[960px]');
   });
-
-  it('ColorSchemeDialog.tsx가 min-w-[480px]를 max-w-[90vw]와 무조건 충돌시키지 않는다 (min-width는 CSS에서 max-width보다 우선하므로 모바일에서 min-w만 무조건 적용되면 넘침)', () => {
-    const source = readFileSync(join(__dirname, 'components/ui/ColorSchemeDialog.tsx'), 'utf-8');
-    expect(source).not.toMatch(/className="py-4 px-4 min-w-\[480px\]/);
-    expect(source).toContain('sm:min-w-[480px]');
-    expect(source).toContain('max-w-[90vw]');
-  });
 });

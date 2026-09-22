@@ -9,7 +9,7 @@ const logger = createScopedLogger('api.payment.webhook');
  * webhook-signature headers over the raw body). The structure for reading those and looking up a
  * signing secret is here, but the actual signature check is NOT implemented — right now this logs
  * and 200s every request without verifying or acting on it, so nothing downstream should trust it
- * yet. See OVERNIGHT-REPORT.md for the 3 steps to finish wiring this up.
+ * yet. See docs/reports/OVERNIGHT-REPORT.md for the 3 steps to finish wiring this up.
  */
 export async function action({ request, context }: ActionFunctionArgs) {
   if (request.method !== 'POST') {

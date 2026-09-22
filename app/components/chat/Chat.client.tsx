@@ -297,7 +297,7 @@ export const ChatImpl = memo(
         api: '/api/chat',
 
         /*
-         * GEN_STALL_FIX2.md — diagnostic only, no behavior change: HttpChatTransport.sendMessages
+         * docs/reports/GEN_STALL_FIX2.md — diagnostic only, no behavior change: HttpChatTransport.sendMessages
          * accepts a custom `fetch` and falls back to it instead of the global one, so this wrapper
          * sees every actual dispatch/response/abort for /api/chat without touching library code.
          * Added because the previous round's regenerate().catch() never fires when the request is
@@ -308,7 +308,7 @@ export const ChatImpl = memo(
           logger.info('api/chat fetch: dispatching');
 
           /*
-           * GEN_STALL_FIX2.md follow-up — confirmed via this same wrapper that the request is
+           * docs/reports/GEN_STALL_FIX2.md follow-up — confirmed via this same wrapper that the request is
            * aborted (AbortError, "signal is aborted without reason") before any response arrives.
            * Every .abort() call site found by reading Chat.stop()/handleError/the component tree
            * turned out to be unreachable from this exact flow (stop() is only invoked from a manual
@@ -1032,7 +1032,7 @@ export const ChatImpl = memo(
       ]);
 
       /*
-       * GEN_STALL_FIX.md — regenerate() was fired without await/catch: if its returned promise
+       * docs/reports/GEN_STALL_FIX.md — regenerate() was fired without await/catch: if its returned promise
        * rejects (or throws synchronously before making a request), nothing in this file ever saw
        * it — an unhandled rejection that looks, from the user's side, like generation just
        * silently stopped after "기본 파일을 만들었어요". This log is the checkpoint that proves
@@ -1291,7 +1291,7 @@ ${CINEMATIC_KIT_PROMPT}`;
      * Auto-retries preview runtime errors by asking Coralred to fix them, up to a small cap.
      * Terminal errors are out of scope here — those keep the existing manual "물어보기" flow.
      *
-     * GEN_STALL_FIX2.md root cause: the WebContainer preview can throw a runtime error (and fire
+     * docs/reports/GEN_STALL_FIX2.md root cause: the WebContainer preview can throw a runtime error (and fire
      * actionAlert) while the main generation request is still streaming — e.g. right after the
      * template-import regenerate() call, before all files are written. sendMessage()'s existing
      * `if (isLoading) { abort(); return; }` branch exists for the send button doubling as a stop
