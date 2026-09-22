@@ -1,0 +1,546 @@
+{
+  "id": "s02-online-shop",
+  "title": "온라인 쇼핑몰",
+  "prompt": "온라인 쇼핑몰 만들어줘.",
+  "q": {
+    "q1": "public",
+    "q2": "cloud",
+    "skeleton": 4,
+    "industry": "쇼핑·판매"
+  },
+  "cinematic": false,
+  "outOfScope": null,
+  "turns": [
+    {
+      "turn": "gen",
+      "prompt": "[Model: claude-sonnet-5]\n\n[Provider: Anthropic]\n\n\n---\nbaseline setup is done, and you can now use these files,\nedit only the files that need to be changed, and you can create new files as needed.\nNO NOT EDIT/WRITE ANY FILES THAT ALREADY EXIST IN THE PROJECT AND DOES NOT NEED TO BE MODIFIED\n---\nNow t",
+      "http": 200,
+      "elapsedSec": 118,
+      "costKrw": 334,
+      "tokens": {
+        "prompt": 38608,
+        "completion": 16117
+      },
+      "filesWritten": [
+        "src/lib/coralred-storage.js",
+        "src/data/products.js",
+        "src/components/ProductImage.jsx",
+        "src/components/BottomNav.jsx",
+        "src/screens/HomeScreen.jsx",
+        "src/screens/SearchScreen.jsx",
+        "src/screens/ProductDetailScreen.jsx",
+        "src/screens/CartScreen.jsx",
+        "src/screens/OrdersScreen.jsx",
+        "src/App.tsx"
+      ],
+      "filesTotal": 17,
+      "replyText": "온라인 쇼핑몰을 만들어드릴게요. 상품을 둘러보고, 장바구니에 담고, 주문까지 할 수 있는 손님 관점의 쇼핑몰이에요. 로그인 없이 기기별로 장바구니와 주문 내역이 저장돼요.\n\n목록·상세형 골격으로 구성했어요: 홈에서 카테고리별 상품을 둘러보고, 상품 상세에서 담기, 장바구니에서 수량 조절 후 주문하기까지 이어지는 흐름이에요.\n\n[artifact]\n\n쇼핑몰 준비됐어요. 홈에서 카테고리별로 상품을 둘러보고, 검색으로 원하는 상품을 찾고, 장바구니에 담아서 주문까지 할 수 있어요. 주문 완료하면 주문내역 탭에서 바로 확인돼요.\n\n관리자가 주문 상태를 바꾸거나 상품을 등록하는 화면이 필요하면 말씀해주세요.\n\n다음으로 이런 것도 해볼 수 있어요:\n- 상품 상세에 리뷰 기능 추가하기\n- 결제 기능 연결하기 (토스페이먼츠)\n- 디자인 바꾸기",
+      "findings": [
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/App.tsx",
+          "message": "fontSize 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/App.tsx",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"rgba(0, 0, 0, .5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(1 0 0)\"를 var(--surface)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(0 0 0 / 0.12)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 14px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 14px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "line-height-too-tight",
+          "file": "public/coralred-ui.css",
+          "message": "line-height \"1.1\"가 font-size(44px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "line-height-too-tight",
+          "file": "public/coralred-ui.css",
+          "message": "line-height \"1.25\"가 font-size(28px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"22px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 24px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"3px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 4px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"7px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "public/coralred-ui.css",
+          "message": "letter-spacing \"0.06em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/components/ProductImage.jsx",
+          "message": "색상 리터럴 \"#FFF4EF\"를 var(--accent-soft)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/components/BottomNav.jsx",
+          "message": "색상 리터럴 \"#fff\"를 var(--surface)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/components/BottomNav.jsx",
+          "message": "fontSize 10px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/components/BottomNav.jsx",
+          "message": "padding 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/HomeScreen.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/SearchScreen.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/ProductDetailScreen.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/ProductDetailScreen.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/screens/ProductDetailScreen.jsx",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/OrdersScreen.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        }
+      ],
+      "install": {
+        "ok": true,
+        "sec": 14,
+        "tail": "\nadded 69 packages in 14s\n"
+      },
+      "build": {
+        "ok": true,
+        "sec": 5,
+        "tail": "vite v5.4.19 building for production...\ntransforming...\n✓ 1608 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.92 kB │ gzip:  0.49 kB\ndist/assets/index-tn0RQdqM.css    0.00 kB │ gzip:  0.02 kB\ndist/assets/index-CLRIdPe2.js   168.00 kB │ gzip: 53.49 kB\n✓ built in 4.35s\n"
+      },
+      "render": {
+        "ok": true,
+        "consoleErrors": [],
+        "pageErrors": [],
+        "textLength": 423,
+        "headings": [
+          "오늘 뭐 담아볼까요"
+        ],
+        "interactive": 22,
+        "images": {
+          "total": 0,
+          "broken": 0
+        },
+        "desktopShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s02-online-shop-gen-desktop.png",
+        "mobileShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s02-online-shop-gen-mobile.png",
+        "overflowX": true
+      },
+      "expect": [
+        {
+          "label": "상품 목록",
+          "found": true
+        },
+        {
+          "label": "장바구니",
+          "found": true
+        },
+        {
+          "label": "상세 화면",
+          "found": true
+        },
+        {
+          "label": "결제/주문 버튼",
+          "found": true
+        }
+      ],
+      "stage": "6-렌더 OK, 기대 전부 충족"
+    },
+    {
+      "turn": "f1-stripe",
+      "prompt": "[Model: claude-sonnet-5]\n\n[Provider: Anthropic]\n\n내가 만든 앱에 Stripe 결제를 추가해줘.",
+      "http": 200,
+      "elapsedSec": 69,
+      "costKrw": 303,
+      "tokens": {
+        "prompt": 63064,
+        "completion": 9028
+      },
+      "filesWritten": [
+        "package.json",
+        "src/lib/toss-payments.js",
+        "src/screens/CartScreen.jsx",
+        "src/screens/PaymentResultScreen.jsx",
+        "src/App.tsx",
+        "src/index.css",
+        "src/main.tsx"
+      ],
+      "filesTotal": 19,
+      "replyText": "토스페이먼츠로 결제 기능을 연결해드릴게요.\n\n한국 서비스에서는 Stripe 대신 토스페이먼츠를 기본으로 사용해요. 국내 카드·간편결제(카카오페이, 네이버페이 등)를 바로 지원하고, 국내 사업자 정산에도 맞게 만들어져 있어서 실제로 더 잘 맞아요. 테스트 모드로 연결해드릴 테니, 결제 흐름을 바로 확인해볼 수 있어요.\n\n장바구니에서 '주문하기'를 누르면 결제창이 뜨고, 결제가 성공하면 주문내역에 기록되는 흐름으로 만들었어요.\n\n[artifact]\n\n결제 연동이 끝났어요. 장바구니에서 '결제하기'를 누르면 토스페이먼츠 결제창이 뜨고, 결제가 끝나면 자동으로 주문내역에 담겨요. 지금은 테스트 키라 실제로 돈이 나가지 않으니 편하게 테스트해보실 수 있어요.\n\n실제 서비스로 열 때는 토스페이먼츠에 사업자 등록하고 발급받은 라이브 키로 바꿔주시면 돼요.\n\n다음으로 이런 것도 해볼 수 있어요:\n- 결제 수단에 카카오페이·네이버페이 추가하기\n- 주문 완료 시 카카오 알림톡 보내기\n- 디자인 바꾸기",
+      "findings": [
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/App.tsx",
+          "message": "fontSize 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/App.tsx",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"rgba(0, 0, 0, .5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(0 0 0 / 0.12)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"22px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 24px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"3px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 4px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"7px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "public/coralred-ui.css",
+          "message": "letter-spacing \"0.06em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/components/BottomNav.jsx",
+          "message": "padding 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/HomeScreen.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/SearchScreen.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/ProductDetailScreen.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/ProductDetailScreen.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/screens/ProductDetailScreen.jsx",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/screens/CartScreen.jsx",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/OrdersScreen.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        }
+      ],
+      "install": {
+        "ok": true,
+        "sec": 15,
+        "tail": "\nadded 70 packages in 14s\n"
+      },
+      "build": {
+        "ok": true,
+        "sec": 5,
+        "tail": "vite v5.4.19 building for production...\ntransforming...\n✓ 1611 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.92 kB │ gzip:  0.49 kB\ndist/assets/index-DONHcS9L.css    0.20 kB │ gzip:  0.15 kB\ndist/assets/index-CCVJEZq3.js   175.70 kB │ gzip: 55.96 kB\n✓ built in 4.29s\n"
+      },
+      "render": {
+        "ok": true,
+        "consoleErrors": [],
+        "pageErrors": [],
+        "textLength": 423,
+        "headings": [
+          "오늘 뭐 담아볼까요"
+        ],
+        "interactive": 22,
+        "images": {
+          "total": 0,
+          "broken": 0
+        },
+        "desktopShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s02-online-shop-f1-stripe-desktop.png",
+        "mobileShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s02-online-shop-f1-stripe-mobile.png",
+        "overflowX": true
+      },
+      "expect": [
+        {
+          "label": "Stripe 언급",
+          "found": true
+        },
+        {
+          "label": "서버 필요 안내(한국어)",
+          "found": false
+        }
+      ],
+      "stage": "5-렌더 OK, 기대 1/2"
+    }
+  ]
+}

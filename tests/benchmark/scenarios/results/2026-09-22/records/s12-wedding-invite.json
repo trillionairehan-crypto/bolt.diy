@@ -1,0 +1,1635 @@
+{
+  "id": "s12-wedding-invite",
+  "title": "모바일 청첩장",
+  "prompt": "모바일 청첩장 만들어줘. 10월 24일 토요일 오후 1시, 더채플 앳 청담. 신랑 김민준 신부 이서연.",
+  "q": {
+    "q1": "public",
+    "q2": "none",
+    "skeleton": 7,
+    "industry": "기타"
+  },
+  "cinematic": true,
+  "outOfScope": null,
+  "turns": [
+    {
+      "turn": "gen",
+      "prompt": "[Model: claude-sonnet-5]\n\n[Provider: Anthropic]\n\n\n---\nbaseline setup is done, and you can now use these files,\nedit only the files that need to be changed, and you can create new files as needed.\nNO NOT EDIT/WRITE ANY FILES THAT ALREADY EXIST IN THE PROJECT AND DOES NOT NEED TO BE MODIFIED\n---\nNow t",
+      "http": 200,
+      "elapsedSec": 37,
+      "costKrw": 190,
+      "tokens": {
+        "prompt": 52419,
+        "completion": 3055
+      },
+      "filesWritten": [
+        "src/App.tsx"
+      ],
+      "filesTotal": 29,
+      "replyText": "모바일 청첩장을 시네마틱 킷의 11개 장면 구성으로 만들어드릴게요. 웨딩홀 이미지 자리는 코랄 틴트 플레이스홀더 없이, 킷의 타이포 폴백(배경색 + 헤드라인)으로 채웠어요.\n\n[artifact]\n\n의존성 설치와 개발 서버 실행은 이미 반영되어 있어요.\n\n다음으로 이런 것도 해볼 수 있어요:\n- 갤러리(사진) 섹션 추가하기\n- 계좌번호 안내 섹션 넣기\n- 참석 여부 남기는 방명록 추가하기",
+      "findings": [
+        {
+          "rule": "cinematic-scene-order",
+          "file": "src/App.tsx",
+          "message": "<Showcase3D> 없음",
+          "autoFixed": false
+        },
+        {
+          "rule": "cinematic-scene-order",
+          "file": "src/App.tsx",
+          "message": "킷에 없는 prop을 썼다 — <HeroScene id>, <HeroScene subtitle>, <HeroScene media>, <BigNumber eyebrow>, <BigNumber items> (해당 카피가 화면에 안 나온다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"rgba(0, 0, 0, .5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(1 0 0)\"를 var(--surface)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(0 0 0 / 0.12)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 14px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 14px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "line-height-too-tight",
+          "file": "public/coralred-ui.css",
+          "message": "line-height \"1.1\"가 font-size(44px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "line-height-too-tight",
+          "file": "public/coralred-ui.css",
+          "message": "line-height \"1.25\"가 font-size(28px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"22px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 24px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"3px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 4px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"7px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "public/coralred-ui.css",
+          "message": "letter-spacing \"0.06em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/BigNumber.tsx",
+          "message": "fontSize 14px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/BigNumber.tsx",
+          "message": "gap 값 \"14px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 16px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/BigNumber.tsx",
+          "message": "paddingTop 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Contact.tsx",
+          "message": "색상 리터럴 \"#fff\"를 var(--surface)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Contact.tsx",
+          "message": "색상 리터럴 \"#0f0e0d\"를 var(--text)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Contact.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.35)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Contact.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.45)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Contact.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.9)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/Contact.tsx",
+          "message": "fontSize 11px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/Contact.tsx",
+          "message": "fontSize 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/Contact.tsx",
+          "message": "fontSize 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/Contact.tsx",
+          "message": "fontSize 11px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "img-missing-max-width",
+          "file": "src/kit/Contact.tsx",
+          "message": "이미지에 max-width:100%를 추가했습니다 — 컨테이너보다 큰 원본 이미지가 레이아웃을 밀어내는 걸 막습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/Contact.tsx",
+          "message": "gap 값 \"18px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 20px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/Contact.tsx",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/Contact.tsx",
+          "message": "letter-spacing \"0.12em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "img-missing-max-width",
+          "file": "src/kit/HeroCanvas.tsx",
+          "message": "이미지에 max-width:100%를 추가했습니다 — 컨테이너보다 큰 원본 이미지가 레이아웃을 밀어내는 걸 막습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "img-missing-max-width",
+          "file": "src/kit/HeroCanvas.tsx",
+          "message": "이미지에 max-width:100%를 추가했습니다 — 컨테이너보다 큰 원본 이미지가 레이아웃을 밀어내는 걸 막습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"#fff\"를 var(--surface)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,${(overlay * 0.1)\"를 var(--text)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,${(overlay * 0.45)\"를 var(--text)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,${Math.min(0.9, overlay + 0.35)\"를 var(--text)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(255,255,255,0.75)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "fontSize 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "img-missing-max-width",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "이미지에 max-width:100%를 추가했습니다 — 컨테이너보다 큰 원본 이미지가 레이아웃을 밀어내는 걸 막습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "img-missing-max-width",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "이미지에 max-width:100%를 추가했습니다 — 컨테이너보다 큰 원본 이미지가 레이아웃을 밀어내는 걸 막습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "gap 값 \"22px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 24px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "img-missing-max-width",
+          "file": "src/kit/MediaStage.tsx",
+          "message": "이미지에 max-width:100%를 추가했습니다 — 컨테이너보다 큰 원본 이미지가 레이아웃을 밀어내는 걸 막습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/MediaTreatment.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.9)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/MediaTreatment.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.35)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "img-missing-max-width",
+          "file": "src/kit/MediaTreatment.tsx",
+          "message": "이미지에 max-width:100%를 추가했습니다 — 컨테이너보다 큰 원본 이미지가 레이아웃을 밀어내는 걸 막습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Nav.tsx",
+          "message": "색상 리터럴 \"#fff\"를 var(--surface)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/Nav.tsx",
+          "message": "fontSize 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/Nav.tsx",
+          "message": "fontSize 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/Nav.tsx",
+          "message": "padding 값 \"18px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 20px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/Nav.tsx",
+          "message": "padding 값 \"2px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 4px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "skeleton7-chapter-count",
+          "file": "src/kit/PinnedChapters.tsx",
+          "message": "골격 7 챕터(100vh 컨테이너)가 2개 감지됐습니다 — 정확히 4개(hero/ch1/ch2/ch3)여야 합니다. 자동수정하지 않았습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/PinnedChapters.tsx",
+          "message": "fontSize 11px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/PinnedChapters.tsx",
+          "message": "fontSize 12px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/PinnedChapters.tsx",
+          "message": "fontSize 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "viewport-height-100vh",
+          "file": "src/kit/PinnedChapters.tsx",
+          "message": "100vh를 100dvh로 바꿨습니다 — 모바일 브라우저 주소창만큼 100vh가 실제 화면보다 커서 하단이 잘릴 수 있습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "viewport-height-100vh",
+          "file": "src/kit/PinnedChapters.tsx",
+          "message": "100vh를 100dvh로 바꿨습니다 — 모바일 브라우저 주소창만큼 100vh가 실제 화면보다 커서 하단이 잘릴 수 있습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/PinnedChapters.tsx",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/PinnedChapters.tsx",
+          "message": "letter-spacing \"0.08em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"#fff\"를 var(--surface)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,${overlay * 0.6})\"를 var(--text)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,${overlay * 0.4})\"를 var(--text)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,${Math.min(0.9, overlay + 0.35)\"를 var(--text)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"#fff\"를 var(--surface)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"rgba(255,255,255,0.4)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"rgba(255,255,255,0.45)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"rgba(255,255,255,0.9)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/Scene.tsx",
+          "message": "fontSize 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "img-missing-max-width",
+          "file": "src/kit/Scene.tsx",
+          "message": "이미지에 max-width:100%를 추가했습니다 — 컨테이너보다 큰 원본 이미지가 레이아웃을 밀어내는 걸 막습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/ScrollChapter.tsx",
+          "message": "fontSize 11px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/ScrollChapter.tsx",
+          "message": "fontSize 12px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/ScrollChapter.tsx",
+          "message": "letter-spacing \"0.08em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/ScrollSequence.tsx",
+          "message": "색상 리터럴 \"#fff\"를 var(--surface)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/ScrollSequence.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,${overlay * 0.4})\"를 var(--text)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/ScrollSequence.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/ScrollSequence.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,${overlay})\"를 var(--text)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "img-missing-max-width",
+          "file": "src/kit/ScrollSequence.tsx",
+          "message": "이미지에 max-width:100%를 추가했습니다 — 컨테이너보다 큰 원본 이미지가 레이아웃을 밀어내는 걸 막습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "viewport-height-100vh",
+          "file": "src/kit/ScrollSequence.tsx",
+          "message": "100vh를 100dvh로 바꿨습니다 — 모바일 브라우저 주소창만큼 100vh가 실제 화면보다 커서 하단이 잘릴 수 있습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "색상 리터럴 \"oklch()\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "색상 리터럴 \"#ff5330\"를 var(--accent)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "색상 리터럴 \"#ff5330\"를 var(--accent)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "색상 리터럴 \"rgb()\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "색상 리터럴 \"#ff5330\"를 var(--accent)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "fontSize 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "fontSize 11px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "fontSize 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "fontSize 11px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "img-missing-max-width",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "이미지에 max-width:100%를 추가했습니다 — 컨테이너보다 큰 원본 이미지가 레이아웃을 밀어내는 걸 막습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "text-transform-uppercase",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "text-transform:uppercase가 있습니다 — 본문에 쓰이면 가독성이 떨어질 수 있어 라벨·버튼 등 짧은 텍스트에만 쓰는지 확인하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "letter-spacing \"0.18em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3DScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.55)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3DScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.18)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3DScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3DScene.tsx",
+          "message": "색상 리터럴 \"#cdb99b\"를 var(--border-strong)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3DScene.tsx",
+          "message": "색상 리터럴 \"#ff5330\"를 var(--accent)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/tokens.css",
+          "message": "색상 리터럴 \"rgba(255, 255, 255, 0.14)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/tokens.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "src/kit/tokens.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "line-height-too-tight",
+          "file": "src/kit/tokens.css",
+          "message": "line-height \"0.9\"가 font-size(1.6px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/tokens.css",
+          "message": "gap 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/tokens.css",
+          "message": "padding 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/tokens.css",
+          "message": "padding 값 \"14px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 16px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/tokens.css",
+          "message": "padding-block 값 \"18px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 20px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "text-transform-uppercase",
+          "file": "src/kit/tokens.css",
+          "message": "text-transform:uppercase가 있습니다 — 본문에 쓰이면 가독성이 떨어질 수 있어 라벨·버튼 등 짧은 텍스트에만 쓰는지 확인하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/tokens.css",
+          "message": "letter-spacing \"0.16em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        }
+      ],
+      "install": {
+        "ok": true,
+        "sec": 18,
+        "tail": "\nadded 92 packages in 17s\n"
+      },
+      "build": {
+        "ok": true,
+        "sec": 4,
+        "tail": "\ndist/index.html                                  1.15 kB │ gzip:   0.55 kB\ndist/assets/index-EXaAJKsV.css                   7.34 kB │ gzip:   2.39 kB\ndist/assets/HeroCanvas-GYB3jT7I.js               4.31 kB │ gzip:   2.32 kB\ndist/assets/Showcase3DScene-BqQWUhHh.js          5.47 kB │ gzip:   2.37 kB\ndist/assets/index-DVxXefU2.js                  307.67 kB │ gzip: 106.71 kB\ndist/assets/react-three-fiber.esm-BB8PY6U_.js  819.47 kB │ gzip: 220.10 kB\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\n✓ built in 3.21s\n"
+      },
+      "render": {
+        "ok": false,
+        "consoleErrors": [
+          "TypeError: Cannot read properties of undefined (reading 'toLocaleString')\n    at u (http://localhost:47107/assets/index-DVxXefU2.js:69:71036)\n    at Sx (http://localhost:47107/assets/index-DVxXefU2.js"
+        ],
+        "pageErrors": [
+          "Cannot read properties of undefined (reading 'toLocaleString')"
+        ],
+        "textLength": 0,
+        "headings": [],
+        "interactive": 0,
+        "images": {
+          "total": 0,
+          "broken": 0
+        },
+        "desktopShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s12-wedding-invite-gen-desktop.png",
+        "mobileShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s12-wedding-invite-gen-mobile.png",
+        "overflowX": false
+      },
+      "expect": [
+        {
+          "label": "날짜 반영",
+          "found": true
+        },
+        {
+          "label": "장소 반영",
+          "found": false
+        },
+        {
+          "label": "이름 반영",
+          "found": true
+        },
+        {
+          "label": "모바일 우선(뷰포트/폭 제한)",
+          "found": true
+        }
+      ],
+      "stage": "4-렌더 실패(런타임 에러/빈 화면)"
+    },
+    {
+      "turn": "autofix1",
+      "prompt": "[Model: claude-sonnet-5]\n\n[Provider: Anthropic]\n\n*이 미리보기 오류를 고쳐줘* \n```js\nCannot read properties of undefined (reading 'toLocaleString')\nTypeError: Cannot read properties of undefined (reading 'toLocaleString')\n    at u (http://localhost:47107/assets/index-DVxXefU2.js:69:71036)\n    at Sx (http://loca",
+      "http": 200,
+      "elapsedSec": 33,
+      "costKrw": 187,
+      "tokens": {
+        "prompt": 50842,
+        "completion": 3183
+      },
+      "filesWritten": [
+        "src/App.tsx"
+      ],
+      "filesTotal": 29,
+      "replyText": "`BigNumber` 컴포넌트를 살펴보니 `value`, `prefix`, `suffix`, `label`을 개별 props로 받는 구조인데, App.tsx에서는 `items` 배열로 넘기고 있어서 발생한 오류예요. 컴포넌트를 여러 번 호출하는 방식으로 고쳐드릴게요.\n\n[artifact]\n\n`BigNumber`는 `value`(숫자 하나) 기준으로 만들어진 컴포넌트라서, 배열로 묶은 `items`를 그대로 넘기면 내부에서 `value.toLocaleString()`을 호출할 때 값이 없어 오류가 났던 거예요. 이제 세 개를 각각 호출하고 그리드로 배치했어요.\n\n다음으로 이런 것도 해볼 수 있어요:\n- 갤러리(사진) 섹션 추가하기\n- 계좌번호 안내 섹션 넣기\n- 참석 여부 남기는 방명록 추가하기",
+      "findings": [
+        {
+          "rule": "cinematic-scene-order",
+          "file": "src/App.tsx",
+          "message": "<Showcase3D> 없음",
+          "autoFixed": false
+        },
+        {
+          "rule": "cinematic-scene-order",
+          "file": "src/App.tsx",
+          "message": "킷에 없는 prop을 썼다 — <HeroScene id>, <HeroScene subtitle>, <HeroScene media> (해당 카피가 화면에 안 나온다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"rgba(0, 0, 0, .5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(0 0 0 / 0.12)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"22px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 24px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"3px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 4px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"7px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "public/coralred-ui.css",
+          "message": "letter-spacing \"0.06em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/BigNumber.tsx",
+          "message": "gap 값 \"14px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 16px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/BigNumber.tsx",
+          "message": "paddingTop 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Contact.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.35)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Contact.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.45)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Contact.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.9)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/Contact.tsx",
+          "message": "gap 값 \"18px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 20px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/Contact.tsx",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/Contact.tsx",
+          "message": "letter-spacing \"0.12em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(255,255,255,0.75)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "gap 값 \"22px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 24px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/MediaTreatment.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.9)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/MediaTreatment.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.35)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/Nav.tsx",
+          "message": "padding 값 \"18px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 20px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/Nav.tsx",
+          "message": "padding 값 \"2px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 4px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/PinnedChapters.tsx",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/PinnedChapters.tsx",
+          "message": "letter-spacing \"0.08em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"rgba(255,255,255,0.4)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"rgba(255,255,255,0.45)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"rgba(255,255,255,0.9)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/ScrollChapter.tsx",
+          "message": "letter-spacing \"0.08em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/ScrollSequence.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "색상 리터럴 \"oklch()\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "색상 리터럴 \"rgb()\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "text-transform-uppercase",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "text-transform:uppercase가 있습니다 — 본문에 쓰이면 가독성이 떨어질 수 있어 라벨·버튼 등 짧은 텍스트에만 쓰는지 확인하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "letter-spacing \"0.18em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3DScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.55)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3DScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.18)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3DScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/tokens.css",
+          "message": "색상 리터럴 \"rgba(255, 255, 255, 0.14)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/tokens.css",
+          "message": "gap 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/tokens.css",
+          "message": "padding 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/tokens.css",
+          "message": "padding 값 \"14px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 16px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/tokens.css",
+          "message": "padding-block 값 \"18px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 20px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "text-transform-uppercase",
+          "file": "src/kit/tokens.css",
+          "message": "text-transform:uppercase가 있습니다 — 본문에 쓰이면 가독성이 떨어질 수 있어 라벨·버튼 등 짧은 텍스트에만 쓰는지 확인하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/tokens.css",
+          "message": "letter-spacing \"0.16em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        }
+      ],
+      "install": {
+        "ok": true,
+        "sec": 17,
+        "tail": "\nadded 92 packages in 16s\n"
+      },
+      "build": {
+        "ok": true,
+        "sec": 4,
+        "tail": "\ndist/index.html                                  1.15 kB │ gzip:   0.55 kB\ndist/assets/index-EXaAJKsV.css                   7.34 kB │ gzip:   2.39 kB\ndist/assets/HeroCanvas-B_4PeFnm.js               4.31 kB │ gzip:   2.32 kB\ndist/assets/Showcase3DScene-DE64bepK.js          5.47 kB │ gzip:   2.36 kB\ndist/assets/index-BqImB2Nv.js                  307.99 kB │ gzip: 106.77 kB\ndist/assets/react-three-fiber.esm-uMqNVG-D.js  819.47 kB │ gzip: 220.10 kB\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\n✓ built in 3.35s\n"
+      },
+      "render": {
+        "ok": false,
+        "consoleErrors": [
+          "TypeError: Cannot read properties of undefined (reading 'includes')\n    at http://localhost:47108/assets/HeroCanvas-B_4PeFnm.js:66:1577\n    at _a (http://localhost:47108/assets/index-BqImB2Nv.js:41:24"
+        ],
+        "pageErrors": [
+          "Cannot read properties of undefined (reading 'includes')"
+        ],
+        "textLength": 0,
+        "headings": [],
+        "interactive": 0,
+        "images": {
+          "total": 0,
+          "broken": 0
+        },
+        "desktopShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s12-wedding-invite-autofix1-desktop.png",
+        "mobileShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s12-wedding-invite-autofix1-mobile.png",
+        "overflowX": false
+      },
+      "expect": [
+        {
+          "label": "날짜 반영",
+          "found": true
+        },
+        {
+          "label": "장소 반영",
+          "found": false
+        },
+        {
+          "label": "이름 반영",
+          "found": true
+        },
+        {
+          "label": "모바일 우선(뷰포트/폭 제한)",
+          "found": true
+        }
+      ],
+      "stage": "4-렌더 실패(런타임 에러/빈 화면)"
+    },
+    {
+      "turn": "autofix2",
+      "prompt": "[Model: claude-sonnet-5]\n\n[Provider: Anthropic]\n\n*이 미리보기 오류를 고쳐줘* \n```js\nCannot read properties of undefined (reading 'includes')\nTypeError: Cannot read properties of undefined (reading 'includes')\n    at http://localhost:47108/assets/HeroCanvas-B_4PeFnm.js:66:1577\n    at _a (http://localhost:47108/",
+      "http": 200,
+      "elapsedSec": 45,
+      "costKrw": 205,
+      "tokens": {
+        "prompt": 52909,
+        "completion": 4033
+      },
+      "filesWritten": [
+        "src/App.tsx"
+      ],
+      "filesTotal": 29,
+      "replyText": "`HeroScene`의 실제 props 인터페이스를 다시 보니, `image`(필수 문자열)를 받는 구조인데 App.tsx에서는 `media={{ kind: 'fallback', tone: 'warm' }}`처럼 존재하지 않는 prop을 넘기고 있었어요. 그래서 `image`가 `undefined`인 채로 `HeroCanvas`에 전달돼 `src.includes(...)` 호출에서 오류가 난 거예요.\n\n사진이 아직 없으니, 이미지 자리에 코랄레드 placeholder 규칙에 맞는 안전한 데이터 URL(SVG)을 만들어 넣고, `HeroScene`을 올바른 props(`image`, `title`, `sub`, `eyebrow`)로 고쳐드릴게요.\n\n[artifact]\n\n`HeroScene`은 `image`를 필수로 받아야 하는데 존재하지 않는 `media` prop을 넘기고 있어서, 내부 `HeroCanvas`가 빈 값으로 텍스처 URL을 다루다가 오류가 났던 거예요. 지금은 실제 사진이 없어서 코랄 톤 배경을 임시로 넣었고, `effect=\"none\"`으로 설정해서 사진 없는 상태에서 불필요한 일렁임 효과가 어색하게 보이지 않게 했어요.\n\n다음으로 이런 것도 해볼 수 있어요:\n- 실제 웨딩 사진으로 교체하기\n- 갤러리 섹션 추가하기\n- 계좌번호 안내 섹션 넣기",
+      "findings": [
+        {
+          "rule": "color-literal",
+          "file": "src/App.tsx",
+          "message": "색상 리터럴 \"#FFF4EF\"를 var(--accent-soft)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/App.tsx",
+          "message": "색상 리터럴 \"#2b2320\"를 var(--text)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "cinematic-scene-order",
+          "file": "src/App.tsx",
+          "message": "<Showcase3D> 없음",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"rgba(0, 0, 0, .5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(0 0 0 / 0.12)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"22px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 24px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"3px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 4px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"7px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "public/coralred-ui.css",
+          "message": "letter-spacing \"0.06em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/BigNumber.tsx",
+          "message": "gap 값 \"14px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 16px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/BigNumber.tsx",
+          "message": "paddingTop 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Contact.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.35)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Contact.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.45)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Contact.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.9)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/Contact.tsx",
+          "message": "gap 값 \"18px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 20px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/Contact.tsx",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/Contact.tsx",
+          "message": "letter-spacing \"0.12em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "색상 리터럴 \"rgba(255,255,255,0.75)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/HeroScene.tsx",
+          "message": "gap 값 \"22px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 24px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/MediaTreatment.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.9)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/MediaTreatment.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.35)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/Nav.tsx",
+          "message": "padding 값 \"18px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 20px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/Nav.tsx",
+          "message": "padding 값 \"2px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 4px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/PinnedChapters.tsx",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/PinnedChapters.tsx",
+          "message": "letter-spacing \"0.08em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"rgba(255,255,255,0.4)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"rgba(255,255,255,0.45)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Scene.tsx",
+          "message": "색상 리터럴 \"rgba(255,255,255,0.9)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/ScrollChapter.tsx",
+          "message": "letter-spacing \"0.08em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/ScrollSequence.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "색상 리터럴 \"oklch()\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "색상 리터럴 \"rgb()\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "text-transform-uppercase",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "text-transform:uppercase가 있습니다 — 본문에 쓰이면 가독성이 떨어질 수 있어 라벨·버튼 등 짧은 텍스트에만 쓰는지 확인하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/Showcase3D.tsx",
+          "message": "letter-spacing \"0.18em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3DScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.55)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3DScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.18)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/Showcase3DScene.tsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/kit/tokens.css",
+          "message": "색상 리터럴 \"rgba(255, 255, 255, 0.14)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/tokens.css",
+          "message": "gap 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/tokens.css",
+          "message": "padding 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/tokens.css",
+          "message": "padding 값 \"14px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 16px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "src/kit/tokens.css",
+          "message": "padding-block 값 \"18px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 20px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "text-transform-uppercase",
+          "file": "src/kit/tokens.css",
+          "message": "text-transform:uppercase가 있습니다 — 본문에 쓰이면 가독성이 떨어질 수 있어 라벨·버튼 등 짧은 텍스트에만 쓰는지 확인하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "src/kit/tokens.css",
+          "message": "letter-spacing \"0.16em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        }
+      ],
+      "install": {
+        "ok": true,
+        "sec": 17,
+        "tail": "\nadded 92 packages in 16s\n"
+      },
+      "build": {
+        "ok": true,
+        "sec": 4,
+        "tail": "\ndist/index.html                                  1.15 kB │ gzip:   0.55 kB\ndist/assets/index-EXaAJKsV.css                   7.34 kB │ gzip:   2.39 kB\ndist/assets/HeroCanvas-DS522Wwu.js               4.31 kB │ gzip:   2.32 kB\ndist/assets/Showcase3DScene-BS_jFcGi.js          5.47 kB │ gzip:   2.36 kB\ndist/assets/index-DSNpLOpD.js                  308.28 kB │ gzip: 106.87 kB\n\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\ndist/assets/react-three-fiber.esm-Bsqss_Tr.js  819.47 kB │ gzip: 220.10 kB\n✓ built in 3.37s\n"
+      },
+      "render": {
+        "ok": true,
+        "consoleErrors": [],
+        "pageErrors": [],
+        "textLength": 830,
+        "headings": [
+          "김민준 그리고 이서연\n두 사람이 하나가 되는 날",
+          "서로의 첫 번째 독자가 되어, 앞으로의 모든 페이지를 함께 써 내려가려 합니다.",
+          "오시는 길"
+        ],
+        "interactive": 6,
+        "images": {
+          "total": 4,
+          "broken": 3
+        },
+        "desktopShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s12-wedding-invite-autofix2-desktop.png",
+        "mobileShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s12-wedding-invite-autofix2-mobile.png",
+        "overflowX": false
+      },
+      "expect": [
+        {
+          "label": "날짜 반영",
+          "found": true
+        },
+        {
+          "label": "장소 반영",
+          "found": false
+        },
+        {
+          "label": "이름 반영",
+          "found": true
+        },
+        {
+          "label": "모바일 우선(뷰포트/폭 제한)",
+          "found": true
+        }
+      ],
+      "stage": "5-렌더 OK, 기대 3/4"
+    }
+  ]
+}

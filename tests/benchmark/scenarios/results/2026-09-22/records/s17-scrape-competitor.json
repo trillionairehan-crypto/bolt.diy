@@ -1,0 +1,268 @@
+{
+  "id": "s17-scrape-competitor",
+  "title": "범위 밖: 경쟁사 크롤링",
+  "prompt": "네이버 스마트스토어에서 경쟁사 가격을 매일 크롤링해서 보여주는 앱",
+  "q": {
+    "q1": "solo",
+    "q2": "cloud",
+    "skeleton": 5,
+    "industry": "쇼핑·판매"
+  },
+  "cinematic": false,
+  "outOfScope": "브라우저 앱은 크롤링 불가 — 수동 입력 대안이 정답",
+  "turns": [
+    {
+      "turn": "gen",
+      "prompt": "[Model: claude-sonnet-5]\n\n[Provider: Anthropic]\n\n\n---\nbaseline setup is done, and you can now use these files,\nedit only the files that need to be changed, and you can create new files as needed.\nNO NOT EDIT/WRITE ANY FILES THAT ALREADY EXIST IN THE PROJECT AND DOES NOT NEED TO BE MODIFIED\n---\nNow t",
+      "http": 200,
+      "elapsedSec": 126,
+      "costKrw": 358,
+      "tokens": {
+        "prompt": 38790,
+        "completion": 17829
+      },
+      "filesWritten": [
+        "src/lib/coralred-storage.js",
+        "src/lib/seed.js",
+        "src/lib/format.js",
+        "src/components/PriceTrendChart.tsx",
+        "src/components/ProductCard.tsx",
+        "src/screens/HomeScreen.tsx",
+        "src/screens/ProductListScreen.tsx",
+        "src/screens/ProductDetailScreen.tsx",
+        "src/screens/AddProductScreen.tsx",
+        "src/App.tsx"
+      ],
+      "filesTotal": 17,
+      "replyText": "네이버 스마트스토어 경쟁사 가격을 매일 확인하고 추이를 볼 수 있는 앱을 만들어드릴게요.\n\n실제 크롤링은 브라우저에서 직접 외부 사이트를 긁어올 수 없는 구조적 제약이 있어서(CORS), 상품별로 가격을 손으로 입력해두면 자동으로 매일 기록이 쌓이고 추이를 그래프로 보여주는 방식으로 만들었어요. 데이터는 코랄레드 클라우드에 저장되어 기기가 달라도 이어서 볼 수 있어요.\n\n기록·추이형 골격으로 구성했어요:\n- 홈: 이번 주 요약 + 가격 추이 차트 + 최근 기록\n- 상품 목록: 등록된 경쟁사 상품들\n- 상품 상세: 가격 히스토리 + 추이 차트\n- 기록 추가: 오늘 가격 입력\n\n[artifact]\n\n앱이 실행됐어요. 홈 화면에서 전체 가격 현황과 추이를 보고, 상품을 눌러 들어가면 날짜별 기록과 상세 추이를 확인할 수 있어요. 매일 \"오늘 가격 기록\" 버튼으로 경쟁사 가격을 입력하면 자동으로 히스토리가 쌓여요.\n\n다음으로 이런 것도 해볼 수 있어요:\n- 가격 급등락 시 알림 받기 (카카오 알림톡 연동)\n- 여러 대의 기기에서 같이 관리하기\n- 카테고리별로 상품 묶어서 보기",
+      "findings": [
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"rgba(0, 0, 0, .5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(1 0 0)\"를 var(--surface)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(0 0 0 / 0.12)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 14px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 14px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "line-height-too-tight",
+          "file": "public/coralred-ui.css",
+          "message": "line-height \"1.1\"가 font-size(44px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "line-height-too-tight",
+          "file": "public/coralred-ui.css",
+          "message": "line-height \"1.25\"가 font-size(28px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"22px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 24px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"3px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 4px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"7px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "public/coralred-ui.css",
+          "message": "letter-spacing \"0.06em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/ProductDetailScreen.tsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/ProductDetailScreen.tsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        }
+      ],
+      "install": {
+        "ok": true,
+        "sec": 15,
+        "tail": "\nadded 69 packages in 15s\n"
+      },
+      "build": {
+        "ok": true,
+        "sec": 5,
+        "tail": "vite v5.4.19 building for production...\ntransforming...\n✓ 1608 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.92 kB │ gzip:  0.48 kB\ndist/assets/index-tn0RQdqM.css    0.00 kB │ gzip:  0.02 kB\ndist/assets/index-DqsxPrsL.js   169.50 kB │ gzip: 53.45 kB\n✓ built in 4.22s\n"
+      },
+      "render": {
+        "ok": true,
+        "consoleErrors": [],
+        "pageErrors": [],
+        "textLength": 514,
+        "headings": [
+          "오늘의 가격 현황"
+        ],
+        "interactive": 8,
+        "images": {
+          "total": 0,
+          "broken": 0
+        },
+        "desktopShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s17-scrape-competitor-gen-desktop.png",
+        "mobileShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s17-scrape-competitor-gen-mobile.png",
+        "overflowX": false
+      },
+      "expect": [
+        {
+          "label": "한계 안내(서버/크롤링 불가)",
+          "found": true
+        }
+      ],
+      "stage": "6-렌더 OK, 기대 전부 충족"
+    }
+  ]
+}

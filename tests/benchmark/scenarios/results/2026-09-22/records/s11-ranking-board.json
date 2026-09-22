@@ -1,0 +1,295 @@
+{
+  "id": "s11-ranking-board",
+  "title": "동호회 랭킹",
+  "prompt": "테니스 동호회 회원 승패 기록하고 랭킹 보여주는 앱",
+  "q": {
+    "q1": "team",
+    "q2": "cloud",
+    "skeleton": 6,
+    "industry": "기타"
+  },
+  "cinematic": false,
+  "outOfScope": null,
+  "turns": [
+    {
+      "turn": "gen",
+      "prompt": "[Model: claude-sonnet-5]\n\n[Provider: Anthropic]\n\n\n---\nbaseline setup is done, and you can now use these files,\nedit only the files that need to be changed, and you can create new files as needed.\nNO NOT EDIT/WRITE ANY FILES THAT ALREADY EXIST IN THE PROJECT AND DOES NOT NEED TO BE MODIFIED\n---\nNow t",
+      "http": 200,
+      "elapsedSec": 118,
+      "costKrw": 335,
+      "tokens": {
+        "prompt": 38840,
+        "completion": 16178
+      },
+      "filesWritten": [
+        "src/lib/coralred-storage.js",
+        "src/lib/ranking.js",
+        "src/lib/sampleData.js",
+        "src/hooks/useTennisData.js",
+        "src/components/TierBadge.jsx",
+        "src/components/EmptyState.jsx",
+        "src/components/LoadingState.jsx",
+        "src/components/ErrorState.jsx",
+        "src/screens/HomeScreen.jsx",
+        "src/screens/MemberDetailScreen.jsx",
+        "src/screens/AddMatchScreen.jsx",
+        "src/screens/AddMemberScreen.jsx",
+        "src/components/SettingsSheet.jsx",
+        "src/App.tsx"
+      ],
+      "filesTotal": 21,
+      "replyText": "테니스 클럽 회원 순위 앱을 만들어드릴게요. 승패 기록을 남기면 자동으로 순위와 티어(등급)가 계산되는 구조예요.\n\n**구조 정하기**\n- 순위·티어형 골격을 따르되, 관리자가 경기 결과를 기록하는 관점으로 만들어요 (회원 등록, 경기 기록, 순위 확인)\n- 티어는 S/A/B/C 4단계로, 승률과 승수를 기준으로 점수를 계산해요\n- 코랄레드 클라우드에 저장해서 로그인 없이 기기 간 데이터가 유지돼요\n\n**화면 구성**\n- 홈: 등급별 순위 (S/A/B/C 섹션), 전체 통계 카드 3개\n- 회원 상세: 전적, 최근 경기 기록\n- 경기 기록 추가: 승자/패자 선택\n- 회원 추가\n\n[artifact]\n\n테니스 클럽 순위 앱이 완성됐어요. 회원 8명과 최근 경기 기록으로 미리 채워져 있어서, 바로 순위가 어떻게 나오는지 확인할 수 있어요.\n\n**만든 내용**\n- **순위 홈**: S/A/B/C 등급별로 회원을 나눠서 보여주고, 전체 회원 수·총 경기 수·현재 1위를 카드로 요약해요\n- **경기 기록**: 승자·패자를 고르면 자동으로 승패가 반영되고 순위가 다시 계산돼요\n- **회원 상세**: 탭하면 전적, 승률, 최근 경기 이력을 볼 수 있어요\n- **설정**: 우측 상단 아이콘으로 열리고, 예시 데이터를 한 번에 지울 수 있어요\n\n다음으로 이런 것도 해볼 수 있어요:\n- 디자인 바꾸기\n- 경기 기록에 세트 스코어 자동 입력 추가하기\n- 친구한테 공유하기",
+      "findings": [
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"rgba(0, 0, 0, .5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(1 0 0)\"를 var(--surface)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(0 0 0 / 0.12)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 14px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 14px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "line-height-too-tight",
+          "file": "public/coralred-ui.css",
+          "message": "line-height \"1.1\"가 font-size(44px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "line-height-too-tight",
+          "file": "public/coralred-ui.css",
+          "message": "line-height \"1.25\"가 font-size(28px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"22px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 24px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"3px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 4px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"7px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "public/coralred-ui.css",
+          "message": "letter-spacing \"0.06em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/components/LoadingState.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/components/ErrorState.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/screens/AddMatchScreen.jsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "src/components/SettingsSheet.jsx",
+          "message": "색상 리터럴 \"rgba(0,0,0,0.3)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        }
+      ],
+      "install": {
+        "ok": true,
+        "sec": 15,
+        "tail": "\nadded 69 packages in 15s\n"
+      },
+      "build": {
+        "ok": true,
+        "sec": 5,
+        "tail": "vite v5.4.19 building for production...\ntransforming...\n✓ 1612 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.92 kB │ gzip:  0.48 kB\ndist/assets/index-tn0RQdqM.css    0.00 kB │ gzip:  0.02 kB\ndist/assets/index-CwPl_Dn1.js   168.99 kB │ gzip: 53.56 kB\n✓ built in 4.25s\n"
+      },
+      "render": {
+        "ok": true,
+        "consoleErrors": [],
+        "pageErrors": [],
+        "textLength": 355,
+        "headings": [
+          "S등급 · 마스터",
+          "A등급 · 챌린저",
+          "B등급 · 루키",
+          "C등급 · 비기너"
+        ],
+        "interactive": 12,
+        "images": {
+          "total": 0,
+          "broken": 0
+        },
+        "desktopShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s11-ranking-board-gen-desktop.png",
+        "mobileShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s11-ranking-board-gen-mobile.png",
+        "overflowX": true
+      },
+      "expect": [
+        {
+          "label": "승/패",
+          "found": true
+        },
+        {
+          "label": "랭킹/순위",
+          "found": true
+        },
+        {
+          "label": "정렬 로직",
+          "found": true
+        }
+      ],
+      "stage": "6-렌더 OK, 기대 전부 충족"
+    }
+  ]
+}

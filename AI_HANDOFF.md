@@ -2,7 +2,7 @@
 
 다른 AI 개발자(GPT/Codex 등)에게 넘기는 인수인계. **실제 코드 기준**, HEAD `f8e5f268` (2026-09-22, 코드 대조 반영 — 불일치 목록 `docs/DOC-VS-CODE-AUDIT-2026-09-22.md`).
 
-> **보안 긴급(2026-09-22 실측, 미조치)**: 프로덕션 `GET https://coralred.kr/api/export-api-keys`가 인증 없이 서버의 `ANTHROPIC_API_KEY`·`GOOGLE_GENERATIVE_AI_API_KEY` 실값을 JSON으로 반환한다(bolt 잔재 라우트). **키 2개 폐기·재발급 → 라우트 제거/차단 → 재배포**가 다른 모든 작업보다 먼저다. `GET|POST /api/git-proxy/<domain>/…`도 인증 없는 범용 HTTPS 프록시로 열려 있다. 전체 목록 `docs/DOC-VS-CODE-AUDIT-2026-09-22.md`. 더 깊은 내용: `HANDOFF.md`(함정·절차), `ARCHITECTURE.md`(폴더별 담당·호출자·영향), `docs/AUDIT-2026-09-22.md`(결함 목록), **`docs/KEEP-REMOVE-REBUILD-2026-09-22.md`(폴더·라우트·dep·DB·설정·외부 서비스 전부의 KEEP/REMOVE/REBUILD/UNKNOWN 판정 — 정리 작업은 여기서 시작)**. **`docs/V1-REQUIREMENTS-2026-09-22.md`(파이프라인 10단계별 입력/출력/API/DB/구현/한계/실패 + V1 필수 vs 이후 — 기능 작업은 여기서 시작)**.
+> **보안 긴급(2026-09-22 실측, 미조치)**: 프로덕션 `GET https://coralred.kr/api/export-api-keys`가 인증 없이 서버의 `ANTHROPIC_API_KEY`·`GOOGLE_GENERATIVE_AI_API_KEY` 실값을 JSON으로 반환한다(bolt 잔재 라우트). **키 2개 폐기·재발급 → 라우트 제거/차단 → 재배포**가 다른 모든 작업보다 먼저다. `GET|POST /api/git-proxy/<domain>/…`도 인증 없는 범용 HTTPS 프록시로 열려 있다. 전체 목록 `docs/DOC-VS-CODE-AUDIT-2026-09-22.md`. 더 깊은 내용: `HANDOFF.md`(함정·절차), `ARCHITECTURE.md`(폴더별 담당·호출자·영향), `docs/AUDIT-2026-09-22.md`(결함 목록), **`docs/KEEP-REMOVE-REBUILD-2026-09-22.md`(폴더·라우트·dep·DB·설정·외부 서비스 전부의 KEEP/REMOVE/REBUILD/UNKNOWN 판정 — 정리 작업은 여기서 시작)**. **`docs/V1-REQUIREMENTS-2026-09-22.md`(파이프라인 10단계별 입력/출력/API/DB/구현/한계/실패 + V1 필수 vs 이후 — 기능 작업은 여기서 시작)**. **`docs/SCENARIOS-2026-09-22.md`(실제 사용자 요청 20개 실생성 결과 — 제품이 실제로 어디까지 되는지)**.
 
 ## 현재 상태 — 구현되어 있는 기능
 
@@ -10,7 +10,7 @@
 - **디자인 킷 2종 주입**: 모든 앱에 `design-handoff/coralred-ui.css`(`.cr-*` 클래스, `--hue` 토큰). 소개·홍보형(업종 "브랜드 소개·포트폴리오" 또는 프롬프트에 소개/포트폴리오 류 단어)이면 **시네마틱 킷**(`kits/cinematic/src` 21파일 → 생성물 `src/kit/`; Lenis+GSAP 스크롤 스냅·핀 챕터, WebGL 히어로, three.js 3D 쇼케이스, 커스텀 커서). 킷 v0.4(어워드급 구도·모션 감사 반영).
 - **AI 사진·영상 자동 생성**: 생성 전에 R2 URL 4장(hero, ch1~3)+영상 1개를 예약해 프롬프트에 넣고, chat 스트림이 끝난 뒤 Gemini(`gemini-3.1-flash-image`)로 4장 체이닝 생성 → R2 업로드, Seedance/Kling으로 히어로 루프 영상. 모델이 URL을 무시하면 정규식 주입기가 갈아끼움(`app/lib/media/`).
 - **자동 검토·자동 수정**: 첫 렌더 뒤 기계 검사(`mechanical-checks.ts` — 이모지·색 리터럴·타이포·시네마틱 장면 게이트 등) → Haiku 텍스트 검토 → Sonnet 시각 검토(스크린샷) → 파일 자동 수정. 프리뷰 런타임 에러는 무과금 자동 수정 2회.
-- **계정·과금**: Supabase Auth — **Google·Kakao OAuth + 이메일 OTP(매직링크)**(`lib/stores/auth.ts`; GitHub 로그인 없음). 게스트 월 1건(`localStorage`), Free 계정 월 10건(RPC `get_generation_status_v2`/`increment_generation_count_v2`가 단일 소스). **한도는 클라이언트가 센다 — 서버 라우트는 인증·쿼터 없음.** 요금제 Free 0 / Light 9,900 / Pro 29,900 / Max 79,900원(월 메시지 10/35/100/300)은 `pricing.tsx`에 **표시만** — PortOne 결제 UI·SDK 호출 코드는 없다(버튼은 `/` 링크). 서버 `api.payment.verify`는 존재하지만 호출자 없음.
+- **계정·과금**: Supabase Auth — **Google·Kakao OAuth + 이메일 OTP(매직링크)**(`lib/stores/auth.ts`; GitHub 로그인 없음). 게스트 월 1건(`localStorage`), Free 계정 **코드상 월 10건 / 라이브 RPC는 월 1건**(2026-09-22 실측 `monthLimit:1, canEdit:false` — RUN-7이 라이브에 적용됨. `docs/SCENARIOS-2026-09-22.md §4`). RPC `get_generation_status_v2`/`increment_generation_count_v2`가 단일 소스. **한도는 클라이언트가 센다 — 서버 라우트는 인증·쿼터 없음.** 요금제 Free 0 / Light 9,900 / Pro 29,900 / Max 79,900원(월 메시지 10/35/100/300)은 `pricing.tsx`에 **표시만** — PortOne 결제 UI·SDK 호출 코드는 없다(버튼은 `/` 링크). 서버 `api.payment.verify`는 존재하지만 호출자 없음.
 - **코랄레드 Cloud(생성 앱용 백엔드)**: 생성 앱이 "저장 기능 켜기"를 하면 앱 토큰(HMAC)을 발급하고 `/api/cloud/:appId/:collection[/:docId]` 문서 CRUD, 레이트리밋, 쿼터 RPC 제공. 생성 앱에는 `coralred-storage.client-template.js` SDK가 주입됨.
 - **배포**: 생성 앱을 Cloudflare Pages로 배포 + 커스텀 도메인 연결(`api.cloudflare-deploy.ts`, `api.cloudflare-domain.ts`), "Made with Coralred" 배지 주입. 코드 ZIP 내려받기.
 - **운영**: Sentry(Pages 미들웨어), `/api/health`(마이그레이션 테이블 존재 검사), 온보딩 응답·UTM 저장, 사용량 로깅(`message_usage`).
@@ -20,7 +20,7 @@
 
 - **결제 전체**: `pricing.tsx`에 결제 UI 없음(PortOne SDK 미로드, `PORTONE_STORE_ID`/`PORTONE_CHANNEL_KEY`는 코드 어디서도 안 읽음). `api.payment.webhook.ts` 서명 미검증 no-op, `api.payment.verify`는 호출자 없음·금액 검증은 클라이언트 값 의존. 결제해도 요금제가 계정에 반영되는 경로 없음(티어 조회 자체가 없음 → `TODO_IS_PRO_USER=false`, 배지 무조건).
 - **서버 측 쿼터·인증**: `/api/chat`·`/api/llmcall`·`/api/media-images`·`/api/media-video`는 누구나 호출 가능, 한도는 클라이언트 전용. 미디어 `jobId`는 클라이언트 값이라 남의 R2 이미지를 덮어쓸 수 있음(`docs/API.md`).
-- **Light/Pro/Max 한도 적용**: RPC는 Free 10건만. 유료 플랜 한도·"수정 메시지 차단" 정책은 `feat/access-policy` 브랜치(1커밋, 미병합, RUN-7 SQL 미적용).
+- **Light/Pro/Max 한도 적용**: 유료 플랜 한도 없음. "월 1건·수정 메시지 차단" 정책은 `feat/access-policy` 브랜치(1커밋, 미병합)인데 **그 RUN-7 SQL은 라이브에 이미 적용됨** → 프로덕션 계정은 월 1건으로 막히고 UI는 이유를 모른다.
 - **사용자 사진 업로드로 시네마틱 채우기**: 지금은 AI 생성 사진만. 실사 인물은 정책상 금지(그림체만 허용).
 - **미디어 생성 별도 Worker 분리**: 지금은 순서 조정(`waitForQuietChat`)으로 격리체 겹침을 피함.
 - **온보딩 전환 지연 해결**(20~40초, WebContainer 부팅과 경합).

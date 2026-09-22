@@ -1,0 +1,440 @@
+{
+  "id": "s06-hair-salon-booking",
+  "title": "미용실 예약",
+  "prompt": "미용실 예약 앱. 디자이너별로 시간표 보고 예약하게.",
+  "q": {
+    "q1": "public",
+    "q2": "cloud",
+    "skeleton": 2,
+    "industry": "미용·뷰티"
+  },
+  "cinematic": false,
+  "outOfScope": null,
+  "turns": [
+    {
+      "turn": "gen",
+      "prompt": "[Model: claude-sonnet-5]\n\n[Provider: Anthropic]\n\n\n---\nbaseline setup is done, and you can now use these files,\nedit only the files that need to be changed, and you can create new files as needed.\nNO NOT EDIT/WRITE ANY FILES THAT ALREADY EXIST IN THE PROJECT AND DOES NOT NEED TO BE MODIFIED\n---\nNow t",
+      "http": 200,
+      "elapsedSec": 116,
+      "costKrw": 331,
+      "tokens": {
+        "prompt": 39337,
+        "completion": 15800
+      },
+      "filesWritten": [
+        "src/lib/coralred-storage.js",
+        "src/types.ts",
+        "src/lib/sample-data.ts",
+        "src/hooks/useReservations.ts",
+        "src/lib/format.ts",
+        "src/components/StatusBadge.tsx",
+        "src/components/ReservationCard.tsx",
+        "src/pages/HomePage.tsx",
+        "src/pages/SchedulePage.tsx",
+        "src/pages/NewReservationPage.tsx",
+        "src/pages/DesignersPage.tsx",
+        "src/App.tsx"
+      ],
+      "filesTotal": 19,
+      "replyText": "미용실 예약 앱을 만들어드릴게요. 디자이너별 일정을 관리하는 원장님 관점의 예약·일정형 앱으로 구성했어요.\n\n- 홈: 오늘 예약 요약(예약 수·대기 중·매출) + 오늘 타임라인\n- 예약 관리: 날짜 이동하며 디자이너별 예약 확인, 상태 변경(확정/대기/취소/완료)\n- 예약 등록: 고객 정보, 디자이너, 시술, 날짜/시간 입력\n- 디자이너: 디자이너별 오늘 예약 현황\n\n데이터는 코랄레드 클라우드에 기기별로 저장돼요.\n\n[artifact]\n\n미용실 예약 앱이 완성됐어요. 홈에서 오늘 예약 현황을 한눈에 보고, 예약 관리에서 날짜를 넘기며 디자이너별로 일정을 확인할 수 있어요.\n\n손님이 직접 예약을 넣는 화면이 필요하면 말씀해주세요.\n\n다음으로 이런 것도 해볼 수 있어요:\n- 디자인 바꾸기\n- 기능 추가하기\n- 친구한테 공유하기\n- 배포하기",
+      "findings": [
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/App.tsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/App.tsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/App.tsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"rgba(0, 0, 0, .5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(1 0 0)\"를 var(--surface)로 치환했습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(0 0 0 / 0.12)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 14px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 15px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 14px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 13.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "font-size-below-16px",
+          "file": "public/coralred-ui.css",
+          "message": "font-size 12.5px가 최소 권장 크기(16px)보다 작아 16px로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "line-height-too-tight",
+          "file": "public/coralred-ui.css",
+          "message": "line-height \"1.1\"가 font-size(44px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "line-height-too-tight",
+          "file": "public/coralred-ui.css",
+          "message": "line-height \"1.25\"가 font-size(28px)의 1.3배 미만이라 읽기 답답할 수 있어 1.5로 올렸습니다.",
+          "autoFixed": true
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"22px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 24px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"3px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 4px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"7px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "public/coralred-ui.css",
+          "message": "letter-spacing \"0.06em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        }
+      ],
+      "install": {
+        "ok": true,
+        "sec": 15,
+        "tail": "\nadded 69 packages in 14s\n"
+      },
+      "build": {
+        "ok": true,
+        "sec": 8,
+        "tail": "vite v5.4.19 building for production...\ntransforming...\n✓ 1610 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.92 kB │ gzip:  0.48 kB\ndist/assets/index-tn0RQdqM.css    0.00 kB │ gzip:  0.02 kB\ndist/assets/index-CvFWidnC.js   170.56 kB │ gzip: 53.26 kB\n✓ built in 6.39s\n"
+      },
+      "render": {
+        "ok": true,
+        "consoleErrors": [],
+        "pageErrors": [],
+        "textLength": 418,
+        "headings": [
+          "봄날 미용실",
+          "오늘 타임라인"
+        ],
+        "interactive": 11,
+        "images": {
+          "total": 0,
+          "broken": 0
+        },
+        "desktopShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s06-hair-salon-booking-gen-desktop.png",
+        "mobileShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s06-hair-salon-booking-gen-mobile.png",
+        "overflowX": false
+      },
+      "expect": [
+        {
+          "label": "디자이너 목록",
+          "found": true
+        },
+        {
+          "label": "시간표/슬롯",
+          "found": true
+        },
+        {
+          "label": "예약 저장",
+          "found": true
+        }
+      ],
+      "stage": "6-렌더 OK, 기대 전부 충족"
+    },
+    {
+      "turn": "f1-cancel",
+      "prompt": "[Model: claude-sonnet-5]\n\n[Provider: Anthropic]\n\n예약 취소 기능도 넣어줘",
+      "http": 200,
+      "elapsedSec": 28,
+      "costKrw": 217,
+      "tokens": {
+        "prompt": 60831,
+        "completion": 3317
+      },
+      "filesWritten": [
+        "src/components/ReservationCard.tsx"
+      ],
+      "filesTotal": 19,
+      "replyText": "예약 취소 기능은 이미 들어가 있는데, 확인해보니 확정/대기 상태일 때만 취소 버튼이 보이고 있었어요. 취소된 예약을 명확히 구분하고, 취소 시 한 번 더 확인하는 절차를 추가해서 실수로 취소하는 일이 없도록 보완했어요.\n\n[artifact]\n\n변경한 내용이에요.\n\n- 취소 버튼을 누르면 바로 취소되지 않고, \"취소할까요?\" 확인 문구와 함께 최종 확인 버튼이 한 번 더 나와요\n- 취소된 예약은 카드가 흐릿하게 표시되고 고객 이름에 취소선이 그어져서 한눈에 구분돼요\n- 완료된 예약과 이미 취소된 예약에는 취소 버튼 자체가 보이지 않아요\n\n다음으로 이런 것도 해볼 수 있어요:\n- 디자인 바꾸기\n- 취소 사유 입력 기능 추가하기\n- 친구한테 공유하기\n- 배포하기",
+      "findings": [
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/App.tsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/App.tsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "summary-card-missing-context",
+          "file": "src/App.tsx",
+          "message": "요약 카드에 숫자만 있고 보조 문구(전일 대비/목표 대비/세부 내역)가 없어 보입니다 — cr-caption으로 보조 텍스트를 추가하세요.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"rgba(0, 0, 0, .5)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(from var(--err)\"가 팔레트 변수 대신 쓰였습니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "color-literal",
+          "file": "public/coralred-ui.css",
+          "message": "색상 리터럴 \"oklch(0 0 0 / 0.12)\"가 팔레트 변수 대신 쓰였습니다. (투명도가 있어 자동 치환하지 않습니다 — 팔레트 변수는 전부 불투명입니다)",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"22px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 24px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "gap 값 \"6px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"3px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 4px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"7px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 8px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "spacing-not-4pt-grid",
+          "file": "public/coralred-ui.css",
+          "message": "padding 값 \"10px\"이 4의 배수가 아닙니다 — 가장 가까운 4의 배수는 12px입니다.",
+          "autoFixed": false
+        },
+        {
+          "rule": "letter-spacing-too-wide",
+          "file": "public/coralred-ui.css",
+          "message": "letter-spacing \"0.06em\"이 0.05em을 넘습니다 — 본문에 쓰이면 읽기 어려울 수 있습니다.",
+          "autoFixed": false
+        }
+      ],
+      "install": {
+        "ok": true,
+        "sec": 14,
+        "tail": "\nadded 69 packages in 14s\n"
+      },
+      "build": {
+        "ok": true,
+        "sec": 5,
+        "tail": "vite v5.4.19 building for production...\ntransforming...\n✓ 1610 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.92 kB │ gzip:  0.48 kB\ndist/assets/index-tn0RQdqM.css    0.00 kB │ gzip:  0.02 kB\ndist/assets/index-DshdcFGb.js   171.64 kB │ gzip: 53.50 kB\n✓ built in 4.27s\n"
+      },
+      "render": {
+        "ok": true,
+        "consoleErrors": [],
+        "pageErrors": [],
+        "textLength": 427,
+        "headings": [
+          "봄날 미용실",
+          "오늘 타임라인"
+        ],
+        "interactive": 11,
+        "images": {
+          "total": 0,
+          "broken": 0
+        },
+        "desktopShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s06-hair-salon-booking-f1-cancel-desktop.png",
+        "mobileShot": "C:\\Users\\hlapu\\korean-ai-builder\\bolt.diy-media-gen\\tests\\benchmark\\scenarios\\results\\2026-09-22\\shots\\s06-hair-salon-booking-f1-cancel-mobile.png",
+        "overflowX": false
+      },
+      "expect": [
+        {
+          "label": "취소 버튼/함수",
+          "found": true
+        }
+      ],
+      "stage": "6-렌더 OK, 기대 전부 충족"
+    }
+  ]
+}

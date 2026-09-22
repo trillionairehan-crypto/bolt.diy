@@ -1,0 +1,4 @@
+.tmp/
+progress.log
+results/*/shots/*.png
+!results/*/shots/_contact-*.png
