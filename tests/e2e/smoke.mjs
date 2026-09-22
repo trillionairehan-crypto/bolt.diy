@@ -191,6 +191,12 @@ try {
   const models = await fetch(`${BASE}/api/models`);
   check('GET /api/models → 200', models.status === 200, String(models.status));
 
+  // 6b) 2026-09-22 사고: 서버 키를 반환하던 export-api-keys, 범용 프록시 git-proxy — 반드시 404 (배포본 검사에서 특히 중요)
+  for (const path of ['/api/export-api-keys', '/api/git-proxy/example.com/']) {
+    const r = await fetch(`${BASE}${path}`);
+    check(`GET ${path} → 404 (제거된 위험 라우트)`, r.status === 404, String(r.status));
+  }
+
   // 7) 치명적 콘솔 에러 없음(알려진 무해 경고 제외)
   const fatal = consoleErrors.filter(
     (e) => !/favicon|Sentry|sentryHandleError|ResizeObserver|hydrat|Invalid Sentry Dsn/i.test(e),

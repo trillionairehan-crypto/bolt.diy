@@ -237,6 +237,20 @@ describe('API 계약 — 메서드·인증·미설정 경계', () => {
     expect((await mod.action!(jsonPost('/api/payment/verify', { paymentId: 'p' }))).status).toBe(401);
   });
 
+  /*
+   * 2026-09-22 보안 사고: bolt 잔재 api.export-api-keys(서버 프로바이더 키를 인증 없이 반환)와
+   * api.git-proxy(범용 HTTPS 프록시)가 프로덕션에 열려 있었다. 라우트 파일 자체를 지웠고, 누가 되살리면
+   * 여기서 막힌다. 되살릴 이유는 없다 — docs/DOC-VS-CODE-AUDIT-2026-09-22.md C1/H1.
+   */
+  it('제거된 위험 라우트가 되살아나지 않았다 (export-api-keys, git-proxy)', async () => {
+    const { existsSync } = await import('node:fs');
+    const { resolve } = await import('node:path');
+
+    for (const file of ['api.export-api-keys.ts', 'api.git-proxy.$.ts', 'api.export-api-keys.tsx', 'api.git-proxy.$.tsx']) {
+      expect(existsSync(resolve(process.cwd(), 'app/routes', file)), `${file} must not exist`).toBe(false);
+    }
+  });
+
   it('POST /api/payment/webhook — GET 405, POST는 200 (현재 no-op; 서명 검증이 들어오면 이 기대를 바꾼다)', async () => {
     const mod = (await import('~/routes/api.payment.webhook')) as RouteModule;
     expect((await mod.action!(args('/api/payment/webhook', { method: 'GET' }))).status).toBe(405);
