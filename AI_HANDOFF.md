@@ -100,7 +100,7 @@ bolt 잔재(UI 숨김, URL 열림, 제거 후보): `api.git-*`, `api.github-*`, 
 **Cloud Supabase** (`RUN-3-cloud.sql`, `RUN-4-cloud-apps-rls-policy.sql`)
 - `cloud_apps`(앱 id, 토큰 해시, origin), `cloud_documents`(appId·collection·docId·jsonb), `cloud_rate_limit`, `cloud_usage`. RPC `cloud_check_rate_limit`, `cloud_enforce_quota`, `cloud_track_usage_*`, `cloud_expire_cleanup`. RLS 정책 RUN-4.
 
-미적용 기록: `RUN-2-metering-v2-fix.sql`(일부), `feat/access-policy`의 RUN-7. 적용 확인은 `/api/health`.
+라이브 드리프트(2026-09-22 실측): `deployed_apps`에 `storage_mode/storage_expires_at` 없음(코드 폴백 운영), v1 잔재 `user_generation_usage`·RPC 2개·`rls_auto_enable` 존재, **Cloud 프로젝트 DNS 해석 불가**. 정리 마이그레이션 `supabase/migrations/20260922000000_*_safe.sql`(추가만) / `…_destructive.sql.pending`(사용자 승인 후). 상세 `docs/DB-AUDIT-2026-09-22.md`. RUN-*.sql은 `supabase/migrations/manual/`로 이동.
 
 ## 환경변수
 

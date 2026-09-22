@@ -145,7 +145,7 @@ export async function verifyCloudAppOwnerToken(
 
 /**
  * CLOUD-DESIGN.md 7번 섹션 — 앱 전체 120/분, 기기별 60/분. RPC 하나가 두 카운터를 원자적으로
- * 같이 올리고 둘 다 확인(cloud_check_rate_limit, RUN-3-cloud.sql).
+ * 같이 올리고 둘 다 확인(cloud_check_rate_limit, supabase/migrations/manual/RUN-3-cloud.sql).
  */
 export async function checkCloudRateLimit(
   supabase: SupabaseClient,

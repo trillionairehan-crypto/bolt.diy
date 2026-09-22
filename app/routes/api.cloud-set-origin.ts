@@ -43,7 +43,7 @@ export async function action({ request, context }: ActionFunctionArgs) {
   /*
    * TRUST_FIX_REPORT.md 작업 1 — 배포 안내 문구 정책(배포 안 된 앱 7일 / 배포된 앱 30일)의 실제
    * 구현. cloud_apps.expires_at을 여기서 30일 뒤로 늘리는 게 실제 만료 시점을 결정하는 유일한
-   * 지점이다 — RUN-3-cloud.sql의 cloud_expire_cleanup()이 매시간 이 컬럼만 보고 정리 대상을
+   * 지점이다 — supabase/migrations/manual/RUN-3-cloud.sql의 cloud_expire_cleanup()이 매시간 이 컬럼만 보고 정리 대상을
    * 정하고, deployed_apps.storage_expires_at은 /apps 화면 표시용 복사본일 뿐 만료 자체와는
    * 무관하다.
    */

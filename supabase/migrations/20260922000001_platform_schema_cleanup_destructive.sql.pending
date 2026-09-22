@@ -1,0 +1,56 @@
+-- 2026-09-22 플랫폼 DB 정리 2/2 — 파괴적 단계. **사용자가 확인하고 직접 적용.** (.pending 확장자 = 자동 적용 대상 아님)
+-- 선행 조건: 20260922000000_platform_schema_cleanup_safe.sql 적용 + 배포된 코드가 storage_mode를 쓰는 것 확인
+-- (/api/health 200, deployedApps.ts의 42703 폴백 로그가 더 안 뜸).
+-- 되돌리기: 아래 각 항목의 [rollback] 참고. 삭제 전 스냅샷: Supabase 대시보드 > Database > Backups.
+
+begin;
+
+-- A) v1 메터링 잔재 — 코드 어디서도 참조 안 함(grep 0건). 라이브 row 1.
+--    [rollback] 리포에 v1 SQL 없음. 스냅샷에서만 복구 가능.
+drop function if exists public.increment_generation_count();
+drop function if exists public.get_generation_count();
+drop table if exists public.user_generation_usage;
+
+-- B) rls_auto_enable — 리포에 정의 없음, 코드 참조 없음. 대시보드에서 손으로 만든 유틸로 추정.
+drop function if exists public.rls_auto_enable();
+
+-- C) deployed_apps.supabase_connected — 1단계에서 storage_mode로 백필 완료. 코드 참조 0.
+--    [rollback] alter table public.deployed_apps add column supabase_connected boolean not null default false;
+--               update ... set supabase_connected = (storage_mode = 'supabase');
+alter table public.deployed_apps drop column if exists supabase_connected;
+
+-- D) generation_usage_v2의 일일 상한 잔재 — 0831 마이그레이션이 "읽지 않지만 남겨둔다"고 했던 컬럼.
+--    RPC increment_generation_count_v2가 아직 period_day/day_count에 insert/update한다 → RPC를 먼저 바꿔야 한다.
+--    아래 RPC 재정의는 0831 버전에서 두 컬럼 참조만 뺀 것. carryover_count는 유료 플랜 이월용 예약 — 유지.
+create or replace function public.increment_generation_count_v2()
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_month text := to_char(now(), 'YYYY-MM');
+begin
+  insert into public.generation_usage_v2 (user_id, period_month, month_count)
+  values (auth.uid(), v_month, 1)
+  on conflict (user_id) do update set
+    month_count = case
+      when public.generation_usage_v2.period_month = v_month
+      then public.generation_usage_v2.month_count + 1
+      else 1
+    end,
+    period_month = v_month,
+    updated_at = now();
+
+  return public.get_generation_status_v2();
+end;
+$$;
+
+-- 위 본문 = 리포 0831 버전에서 period_day/day_count 두 줄만 제거(returns jsonb, 한도 판정은 get_generation_status_v2가 담당).
+-- 적용 전 라이브와 대조: select pg_get_functiondef('public.increment_generation_count_v2'::regproc);
+-- get_generation_status_v2는 0831 버전이 이미 day 컬럼을 읽지 않으므로 그대로 둔다(라이브도 0831인지 같은 방법으로 확인).
+alter table public.generation_usage_v2
+  drop column if exists period_day,
+  drop column if exists day_count;
+
+commit;
