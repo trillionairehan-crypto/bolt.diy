@@ -1,6 +1,8 @@
 # 코랄레드 개발 인수인계 (HANDOFF)
 
-다음 개발자(사람이든 AI든)가 이 저장소를 이어받을 때 첫 30분 안에 읽어야 하는 문서. 사용법·환경 변수는 `README.md`, 폴더별 담당·호출자·변경 영향은 `ARCHITECTURE.md`, 결함 목록·정리 우선순위는 `docs/AUDIT-2026-09-22.md`, 인수인계 시점의 상태·결정·함정은 여기. 마지막 갱신: 2026-09-22, HEAD `a6f1030e`.
+다음 개발자(사람이든 AI든)가 이 저장소를 이어받을 때 첫 30분 안에 읽어야 하는 문서. 사용법·환경 변수는 `README.md`, 폴더별 담당·호출자·변경 영향은 `ARCHITECTURE.md`, 결함 목록·정리 우선순위는 `docs/AUDIT-2026-09-22.md`, 인수인계 시점의 상태·결정·함정은 여기. 마지막 갱신: 2026-09-22, HEAD `f8e5f268`(코드 대조 반영).
+
+> **보안 긴급(2026-09-22 실측, 미조치)**: 프로덕션 `GET https://coralred.kr/api/export-api-keys`가 인증 없이 서버의 `ANTHROPIC_API_KEY`·`GOOGLE_GENERATIVE_AI_API_KEY` 실값을 JSON으로 반환한다(bolt 잔재 라우트). **키 2개 폐기·재발급 → 라우트 제거/차단 → 재배포**가 다른 모든 작업보다 먼저다. `GET|POST /api/git-proxy/<domain>/…`도 인증 없는 범용 HTTPS 프록시로 열려 있다. 전체 목록 `docs/DOC-VS-CODE-AUDIT-2026-09-22.md`.
 
 ## 0. 30초 요약
 
@@ -8,7 +10,7 @@
 - **지금 초점**: "시네마틱 킷" 트랙 — 소개·홍보형 사이트를 어워드급(CSSDA 8.5~8.9)으로 뽑는 것. 킷은 `kits/cinematic/src`(21파일), 생성물에 `src/kit/`으로 시드된다.
 - **작업 브랜치**: `feat/media-gen`. `main`은 이 브랜치를 fast-forward로 따라간다(`git fetch . feat/media-gen:main`). 워크트리 `bolt.diy-media-gen`에서 작업.
 - **배포**: `npm run deploy` (build + `wrangler pages deploy build/client --project-name=coralred --branch=coralred`). 배포 = 새 Worker 격리체 = 병든 엣지 머신 리셋 수단이기도 하다.
-- **막힌 것**: Google AI Studio 선불 크레딧 소진(Gemini 402) — 이미지·영상 생성 전부 실패. 충전 전엔 예약 사진 주입 end-to-end 검증 불가.
+- **막힌 것**: 예약 사진이 프리뷰에 뜨는 end-to-end는 마지막으로 09-18에 확인됐고 그 뒤 수정분(a6f1030e 등)은 미확인. Gemini 크레딧 잔량은 코드로 확인 불가 — 실생성 1런으로 확인(`/api/media-images` 402 `provider_billing`이면 소진).
 
 ## 1. 생성 한 번의 데이터 흐름 (시네마틱 트랙)
 
@@ -34,7 +36,7 @@
 
 | 역할 | 파일 |
 |---|---|
-| 생성 오케스트레이션 | `app/components/chat/Chat.client.tsx` (1,400줄, 모든 effect가 여기) |
+| 생성 오케스트레이션 | `app/components/chat/Chat.client.tsx` (1,666줄, 모든 effect가 여기) |
 | 킷 프롬프트 | `app/lib/cinematic/kit-prompt.ts`, `kit-files.ts`(?raw import, 클라이언트 전용), `seedKit.ts` |
 | 트랙 판정 | `app/lib/cinematic/isCinematicProject.ts`(서버, src/kit/tokens.css 유무), `mechanical-checks.ts isCinematicTrackFile`(파일 단위) |
 | 게이트 | `app/lib/cinematic/sceneOrder.ts` — 장면 순서·prop 이름(`KIT_COMPONENT_PROPS`)·export(`KIT_EXPORTS`/`KIT_FILES`)·외부 이미지/영상 호스트·루트 경로·자리표시자 |
@@ -98,10 +100,12 @@
 - 한국어 UI 문구는 `design-handoff/coralred-voice.md`(해요체, 개발 용어 금지).
 - 사진: 실사 AI 인물 금지(그림체는 허용). 오브젝트·공간 우선.
 - 테스트 계정 쿼터 리셋: PostgREST PATCH `generation_usage_v2` (키는 `.env`의 `PLATFORM_SUPABASE_SERVICE_ROLE_KEY`).
+- **서버 인증의 실제 모양**(문서와 코드가 어긋나기 쉬운 곳): `getPlatformUserId`는 `Authorization: Bearer` 헤더만 본다(쿠키 없음). "세션 선택" 라우트(`/api/chat`, `/api/llmcall`, `/api/media-*`)는 인증·쿼터·레이트리밋이 전혀 없다 — 한도는 클라이언트 `freeTrial.ts`가 RPC로 세는 것뿐. Cloud API는 앱 토큰(배포 번들에 들어가는 공개값) + `Origin` 정확 일치 + `device_key`로만 격리한다. `docs/API.md` 구조 메모 1·7.
 
 ## 7. 다음 할 일 (우선순위)
 
-1. Google AI Studio 크레딧 충전 → 새 탭에서 실생성 1~2런: 예약 사진이 프리뷰에 실제로 뜨는지, 킷 v0.4 결과물 눈으로 확인.
+0. **키 유출 차단**: `api.export-api-keys.ts`·`api.git-proxy.$.ts`(및 `check-env-key`, `system.diagnostics`) 제거 또는 미들웨어 404 → 재배포 → Anthropic·Google 키 재발급 후 Pages 시크릿 교체. 그 다음 `/api/media-images`·`/api/media-video`에 최소한 세션 필수 + jobId 소유 검증(예약 시 발급한 jobId만 생성 허용).
+1. 실생성 1~2런(새 탭): 예약 사진이 프리뷰에 실제로 뜨는지, 킷 v0.4 결과물 눈으로 확인(Gemini 402면 크레딧 충전).
 2. 온보딩 전환 지연(§4-9) 원인 — WebContainer `boot()`를 온보딩 뒤로 미루거나 워커로.
 3. `feat/stall-fix`·`feat/access-policy` 병합 + RUN-7 SQL.
 4. 미디어 생성을 별도 Worker로 분리(격리체 문제의 구조적 해법, 지금은 순서 조정으로 회피 중).

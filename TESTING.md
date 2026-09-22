@@ -33,6 +33,7 @@ CI(`.github/workflows/ci.yaml`): push/PR마다 `test` 잡(build→typecheck→li
 - **실제 외부 호출** — Anthropic/Gemini/Cloudflare/Supabase는 전부 mock 또는 미설정 분기. 키·크레딧·권한 문제는 프로덕션에서만 드러난다 → `test:e2e:prod` + `/api/health`.
 - **WebContainer 안** — 생성물이 실제로 `npm run dev` 되는지는 스모크 밖(온보딩 2문항까지만). 킷 렌더는 하네스가 대신 본다.
 - **Worker 격리체 메모리** — 로컬 `wrangler pages dev`는 128MB 한도를 재현하지 않는다.
+- **보안 경계** — 계약 테스트는 코랄레드 고유 라우트 14개의 401/405만 본다. bolt 잔재 라우트(`export-api-keys`, `git-proxy` 등)가 열려 있는지, "세션 선택" 라우트가 인증 없이 비용을 쓰는지, jobId 덮어쓰기 같은 소유권 문제는 **어떤 테스트도 안 잡는다**(`docs/DOC-VS-CODE-AUDIT-2026-09-22.md`). 잔재를 지우거나 막으면 `routes.contract.spec.ts`에 404/405 기대를 추가해 되살아나지 못하게 할 것.
 
 ## 새 기능을 넣을 때 최소 규칙
 

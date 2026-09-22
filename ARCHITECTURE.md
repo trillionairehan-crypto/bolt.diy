@@ -1,6 +1,6 @@
 # 코랄레드 아키텍처 (ARCHITECTURE)
 
-폴더별 **담당 · 누가 호출하는가 · 무엇을 고치면 어디가 흔들리는가**. 인수인계 상태·함정은 `HANDOFF.md`, 결함 목록은 `docs/AUDIT-2026-09-22.md`. 기준 HEAD `a6f1030e` (2026-09-22).
+폴더별 **담당 · 누가 호출하는가 · 무엇을 고치면 어디가 흔들리는가**. 인수인계 상태·함정은 `HANDOFF.md`, 결함 목록은 `docs/AUDIT-2026-09-22.md`. 기준 HEAD `f8e5f268` (2026-09-22, 코드 대조 반영 — 불일치 목록 `docs/DOC-VS-CODE-AUDIT-2026-09-22.md`).
 
 ## 0. 전체 지도
 
@@ -27,7 +27,7 @@ coralred (bolt.diy 포크, Remix + Vite, Cloudflare Pages Functions)
 ├── functions/             Cloudflare Pages Functions 진입: [[path]].ts(Remix 핸들러), _middleware.ts(Sentry)
 ├── public/                정적 파일(_routes.json으로 Function 우회), inspector-script.js(프리뷰 iframe 안에서 돎)
 ├── design-handoff/        브랜드·문구 정본, coralred-ui.css(생성 앱마다 주입되는 디자인 킷)
-├── supabase/migrations/   플랫폼 DB SQL(자동 적용 안 됨) + 루트 RUN-*.sql
+├── supabase/migrations/   플랫폼 DB SQL(자동 적용 안 됨). manual/RUN-*.sql = 과거 수동 적용본(Cloud 스키마 RUN-3/4 포함)
 ├── tests/
 │   ├── benchmark/cinematic 렌더·모션·디테일 하네스 + rubric.md(실측 로그)
 │   ├── benchmark/cssda    CSSDA 수상작 90개 측정 도구·데이터(기준값 출처)
@@ -51,9 +51,9 @@ coralred (bolt.diy 포크, Remix + Vite, Cloudflare Pages Functions)
 | `api.onboarding.ts`, `api.utm-attribution.ts` | 온보딩 응답·UTM 저장 | `PromptClarification.tsx`, 랜딩 | `lib/cloud/onboardingResponses.ts` |
 | `api.cloud.*`, `api.cloud-provision.ts`, `api.cloud-set-origin.ts` | 생성 앱의 백엔드 API(Bearer 앱 토큰, `cloudAuth.ts`) | 생성 앱 안의 `coralred-storage.client-template.js` | 생성 앱 전부(배포된 것 포함) — **호환성 깨지면 이미 배포된 사용자 앱이 죽는다** |
 | `api.cloudflare-deploy.ts`, `api.cloudflare-domain.ts` | 생성 앱 배포·커스텀 도메인 | `CloudflareDeploy.client.tsx` | `lib/services/cloudflarePages.ts` |
-| `api.payment.*` | PortOne 결제 검증·웹훅 | pricing.tsx, PortOne | 요금제·`generation_usage_v2` |
+| `api.payment.*` | PortOne 결제 검증·웹훅(웹훅은 서명 미검증 no-op) | **호출자 없음** — `pricing.tsx`에 PortOne 코드 없음(버튼은 `/` 링크), PortOne 웹훅 URL 등록 여부 미확인 | 요금제·`generation_usage_v2`(연결될 예정, 지금은 무관) |
 | `api.account-delete.ts`, `api.health.ts` | 탈퇴, 마이그레이션 헬스(`/api/health`) | 설정, 운영 | health의 `EXPECTED_TABLES`에 새 테이블 추가 |
-| `api.git-*`, `api.github-*`, `api.gitlab-*`, `api.netlify-*`, `api.vercel-*`, `api.supabase*`, `api.mcp-*`, `api.system.*`, `api.update.ts`, `api.web-search.ts`, `api.enhancer.ts` | **bolt.diy 잔재.** UI는 `SHOW_DEV_TOOLS=false`로 숨김, 라우트는 살아 있음 | (사실상 없음) | 감사 문서 §API 참고 — 제거 후보 |
+| `api.git-*`, `api.github-*`, `api.gitlab-*`, `api.netlify-*`, `api.vercel-*`, `api.supabase*`, `api.mcp-*`, `api.system.*`, `api.update.ts`, `api.web-search.ts`, `api.enhancer.ts`, `api.check-env-key.ts`, **`api.export-api-keys.ts`** | **bolt.diy 잔재.** UI는 `SHOW_DEV_TOOLS=false`로 숨김, 라우트는 살아 있음. **`export-api-keys`는 서버 env의 프로바이더 키를 인증 없이 반환(CRITICAL, 프로덕션 실측)**, `git-proxy`는 범용 HTTPS 프록시(HIGH) | (사실상 없음) | 제거 1순위 — `docs/API.md` 잔재 절 |
 
 ### `app/components/chat/` — 생성 UX (핵심)
 - `Chat.client.tsx`(1,400줄): 온보딩 → `generateNewApp` → 스트림 → 자동 검토 → 자동 수정 → 예약 사진 주입까지 **모든 effect**. 여기가 바뀌면 생성 플로우 전체. 진입점: `generateNewApp()`, `sendMessage()`, `runAutoFix`, AUTO_REVIEW effect, `startSkeleton7ImageSet` effect, `devServerCrash` effect.
@@ -91,7 +91,7 @@ coralred (bolt.diy 포크, Remix + Vite, Cloudflare Pages Functions)
 - `question-bank.ts`(Q1 사용자/Q2 저장/Q3 업종 그리드/Q4 연동/Q5 팔레트), `answer-directives.ts`(answers → `{industry, skeleton, palette…}`), `mapIndustryToSkeleton.ts`(LLM 보조 매핑). `skeleton===7 || looksLikeShowcasePrompt()` → 시네마틱 트랙.
 
 ### `app/lib/cloud/` — 코랄레드 Cloud(생성 앱 백엔드)
-- 토큰(`cloudToken.ts` HMAC, `CLOUD_APP_TOKEN_SECRET`), 인증(`cloudAuth.ts` Bearer + 레이트리밋), 문서 CRUD(`cloudDocuments.ts`), 프로비저닝(`cloudProvision.ts`), 클라이언트 템플릿(`coralred-storage.client-template.js` — 생성 앱에 주입되는 SDK), 플랫폼 인증(`cloudPlatformAuth.ts getPlatformUserId`), 사용량(`messageUsage.ts` → `message_usage`·`generation_usage_v2`), 온보딩 응답, UTM.
+- 토큰(`cloudToken.ts` HMAC `appId.iat.sig`, `CLOUD_APP_TOKEN_SECRET`; DB에는 sha256만), 인증(`cloudAuth.ts` Bearer → 해시 대조 → 만료 → `deploy_origin`===`Origin`; 레이트리밋 RPC는 fail-open), 문서 CRUD(`cloudDocuments.ts` — 항상 `app_id`+`device_key`로 좁힘, 사용자 개념 없음), 프로비저닝(`cloudProvision.ts` 7일, `api.cloud-set-origin`이 배포 시 30일로 연장·origin은 `*.pages.dev`만), 클라이언트 템플릿(`coralred-storage.client-template.js` — 생성 앱에 주입되는 SDK, 토큰은 `VITE_CLOUD_APP_TOKEN`으로 번들에 포함=공개), 플랫폼 인증(`cloudPlatformAuth.ts getPlatformUserId` — Bearer 헤더만, anon 키로 `getUser`), 사용량(`messageUsage.ts` → `message_usage`; `generation_usage_v2`는 클라이언트 `freeTrial.ts`가 RPC로), 온보딩 응답, UTM(둘 다 service role insert).
 - 스펙 다수(`*.spec.ts`, 보안 spec). **API 계약 변경 = 이미 배포된 사용자 앱 호환성.**
 
 ### `app/utils/`
@@ -104,8 +104,8 @@ coralred (bolt.diy 포크, Remix + Vite, Cloudflare Pages Functions)
 ### `functions/`, `public/`
 - `[[path]].ts`: Remix 서버 빌드 로드. `_middleware.ts`: Sentry pages plugin(모든 요청). `public/_routes.json`: `/assets/*`·정적 파일은 Function 우회 — **앱 라우트와 겹치는 접두사 추가 금지**. `public/inspector-script.js`: 프리뷰 iframe 내부 스크립트(위 workbench 참고).
 
-### `supabase/migrations/` + `RUN-*.sql`
-- 자동 적용 없음. 적용 여부는 `/api/health`의 `migrations`(테이블 존재만). 새 테이블 = SQL + `EXPECTED_TABLES` 추가.
+### `supabase/migrations/` + `manual/RUN-*.sql`
+- 자동 적용 없음. 적용 여부는 `/api/health`의 `migrations`(테이블 존재만). 새 테이블 = SQL + `EXPECTED_TABLES` 추가. RLS: 플랫폼 테이블은 `auth.uid()=user_id` select 정책 + service role/RPC(SECURITY DEFINER) 쓰기. Cloud 4테이블은 RLS on이지만 정책은 `cloud_apps`의 service_role 하나뿐(서버가 service 키로만 접근하므로 anon/authenticated는 전부 거부).
 
 ### `tests/`
 - `benchmark/cinematic`: §HANDOFF 3. `rubric.md`가 실측 로그. `benchmark/cssda`: 수상작 크롤·측정(`motion.mjs`가 기준값 출처). `skeleton7-dom/bundleAndRun.cjs`: TS 게이트를 노드에서 번들해 실행. `fixtures/generated/*.json`: 기계 검사 픽스처. `media/*`: 이미지·영상 생성 실험 스크립트(비용 발생).

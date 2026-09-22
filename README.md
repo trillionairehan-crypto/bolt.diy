@@ -27,6 +27,8 @@ Node 22 이상이 필요합니다 (`package.json`의 `engines` 참고).
 
 `.env`, `.env.local`, `.env.production` 등 `.env.*`는 모두 `.gitignore`에 걸려 있어 커밋되지 않습니다(`.env.example`만 추적). 키를 코드나 문서에 붙여넣지 마세요.
 
+> **알려진 보안 문제(2026-09-22)**: bolt 잔재 라우트 `GET /api/export-api-keys`가 서버의 프로바이더 API 키를 인증 없이 반환합니다. 조치 전까지 프로덕션 키는 유출된 것으로 간주하세요 — `HANDOFF.md` 상단 배너.
+
 ## 배포
 
 실제 프로덕션 배포는 Cloudflare Pages입니다.
