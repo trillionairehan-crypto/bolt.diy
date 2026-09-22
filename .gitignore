@@ -81,3 +81,11 @@ docs/instructions/Roadmap.md
 # 시네마틱 렌더 측정용 임시 프로젝트·내려받은 미디어
 kits/cinematic/.render-tmp/
 tests/benchmark/cinematic/.render-media/
+
+# 환경 변수 — 어떤 변형도 커밋 금지(.env.example만 추적)
+.env.*
+!.env.example
+# 로컬 산출물·스크래치
+kits/cinematic/.render-tmp/
+tests/benchmark/cinematic/.render-media/
+*.local.json

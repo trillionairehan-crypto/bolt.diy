@@ -84,6 +84,7 @@
 
 ## 5. 브랜치·미병합·미적용
 
+- 브랜치 현황(2026-09-22 정리): `main` = `feat/media-gen`(fast-forward). `overnight5`는 main에 전부 병합됨 — 로컬·origin에서 삭제 대상(아래 §6). 되돌릴 기준점은 태그·브랜치 `coralred-v0.1-clean`(README "되돌릴 기준점").
 - `feat/access-policy`(1커밋, `bolt.diy` 워크트리): 비로그인 생성 차단, 계정 월 1건 첫 생성만, 수정 메시지 차단. 클라이언트 게이트만. **RUN-7 SQL 미적용.**
 - `feat/stall-fix`(2커밋, `bolt.diy-stall-fix` 워크트리): thinking 모델 스톨 감지 + 설치 중 stall 유예. `a6f1030e`의 start:aborted 수정과 겹치는 영역 — 병합 시 `getUnsettledActions` 충돌 확인.
 - **SQL은 자동 적용 안 됨.** 정본 `supabase/migrations/*.sql`, 과거 수동 적용본 `supabase/migrations/manual/RUN-*.sql`. 라이브 vs 리포 드리프트·정리 마이그레이션은 `docs/DB-AUDIT-2026-09-22.md`(`.pending` 파일은 사용자가 직접 적용). 적용 여부는 `/api/health`의 `migrations` 맵으로 확인(테이블 존재만 검사). `RUN-2-metering-v2-fix.sql`·RUN-7은 미적용 기록 있음.

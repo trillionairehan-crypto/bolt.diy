@@ -9,7 +9,7 @@
 
 ## 이어서 개발하려면
 
-`HANDOFF.md`부터 읽으세요 — 현재 아키텍처, 생성 한 번의 데이터 흐름, 검증 하네스, 운영 함정, 미병합 브랜치, 다음 할 일. 과거 작업 보고서는 `docs/reports/`, 실측·사건 로그는 `tests/benchmark/cinematic/rubric.md`.
+`HANDOFF.md`부터 읽으세요 — 현재 아키텍처, 생성 한 번의 데이터 흐름, 검증 하네스, 운영 함정, 미병합 브랜치, 다음 할 일. AI 개발자(GPT/Codex)용 규칙은 `AI_HANDOFF.md`, 폴더별 담당·호출자·변경 영향은 `ARCHITECTURE.md`, 회귀 검사는 `TESTING.md`, API 목록은 `docs/API.md`, DB 현황은 `docs/DB-AUDIT-2026-09-22.md`. 과거 작업 보고서는 `docs/reports/`, 실측·사건 로그는 `tests/benchmark/cinematic/rubric.md`.
 
 ## 로컬에서 실행하기
 
@@ -23,12 +23,9 @@ Node 22 이상이 필요합니다 (`package.json`의 `engines` 참고).
 
 ### 환경 변수
 
-`.env.example`에 사용 가능한 LLM 프로바이더 키 목록이 있지만, 실제로 코랄레드가 쓰는 건 `ANTHROPIC_API_KEY` 하나뿐입니다(기본 모델이 Claude로 고정되어 있음 — `app/utils/featureFlags.ts`의 `SHOW_DEV_TOOLS`가 꺼져 있으면 사용자에게 모델 선택 UI 자체가 안 보여요). 나머지 프로바이더 키는 `SHOW_DEV_TOOLS`를 켜고 로컬에서 다른 모델을 테스트할 때만 필요합니다.
+`.env.example`이 전체 목록입니다(용도별로 묶여 있고, 각 키가 어느 파일에서 읽히는지 주석으로 적혀 있음). 복사해서 `.env.local`로 쓰세요. 로컬 개발의 최소값은 `ANTHROPIC_API_KEY` + `VITE_PLATFORM_SUPABASE_URL` / `VITE_PLATFORM_SUPABASE_ANON_KEY`이고, 사진·영상 생성(`GOOGLE_GENERATIVE_AI_API_KEY`, `R2_*`)과 결제(`PORTONE_*`), Cloud(`CLOUD_*`)는 해당 기능을 만질 때만 필요합니다. 프로덕션 값은 Cloudflare Pages 대시보드의 환경 변수에만 있습니다.
 
-그 외 실제로 필요한 값(코드베이스 grep 기준, `.env.example`에는 아직 반영 안 됨):
-
-- `VITE_PLATFORM_SUPABASE_URL` / `VITE_PLATFORM_SUPABASE_ANON_KEY` — 코랄레드 자체 계정/로그인/사용량 관리용 Supabase 프로젝트 (`app/lib/supabase/platform-client.ts`). 사용자가 만드는 앱이 연결하는 Supabase 프로젝트(`VITE_SUPABASE_*`)와는 다른 별개의 프로젝트입니다.
-- `PORTONE_STORE_ID` / `PORTONE_CHANNEL_KEY` / `PORTONE_API_SECRET` — 요금제 결제(`app/routes/pricing.tsx`)에 쓰는 PortOne 연동.
+`.env`, `.env.local`, `.env.production` 등 `.env.*`는 모두 `.gitignore`에 걸려 있어 커밋되지 않습니다(`.env.example`만 추적). 키를 코드나 문서에 붙여넣지 마세요.
 
 ## 배포
 
@@ -77,13 +74,26 @@ supabase/migrations/           DB 마이그레이션 SQL — 자동 적용 안 �
 | 명령 | 설명 |
 |---|---|
 | `pnpm run dev` | 로컬 개발 서버 |
+| `pnpm run check` | typecheck → lint → vitest 전체 → build. **뭔가 고쳤으면 커밋 전에 이것.** (~3분) |
+| `pnpm run check:full` | 위 + e2e 스모크(`wrangler pages dev` + Chromium) (~5분) |
 | `pnpm run build` | 프로덕션 빌드 |
 | `pnpm run typecheck` | TypeScript 타입 체크 |
 | `pnpm run lint` / `lint:fix` | ESLint |
-| `pnpm run test` | vitest 테스트 실행 (pre-commit 훅에는 안 걸려 있음 — 별도로 실행) |
+| `pnpm run test` | vitest 전체 (`test:api` = API 계약만) |
+| `pnpm run test:e2e` / `test:e2e:prod` | 브라우저 스모크 — 로컬 빌드 / `https://coralred.kr` |
 | `pnpm run deploy` | Cloudflare Pages 배포 |
 
-커밋 시 husky pre-commit 훅이 `typecheck`와 `lint`를 자동으로 실행합니다.
+무엇이 무엇을 잡는지, 실패했을 때 어디를 보는지는 `TESTING.md`. 커밋 시 husky pre-commit 훅이 `typecheck`와 `lint`를, pre-push 훅이 vitest 전체를 실행합니다.
+
+## 되돌릴 기준점
+
+`coralred-v0.1-clean` 태그(같은 이름의 브랜치도 있음)가 "전체 검사 통과 + 문서·DB·테스트 정리가 끝난 상태"입니다. 뭔가 크게 망가지면 여기로 돌아오세요.
+
+```bash
+git diff coralred-v0.1-clean --stat        # 기준점 이후 무엇이 바뀌었나
+git checkout coralred-v0.1-clean           # 그 상태를 그대로 보기
+git reset --hard coralred-v0.1-clean       # 현재 브랜치를 기준점으로 되돌리기 (작업 내용 사라짐 — 확인 후)
+```
 
 ## bolt.diy와의 관계
 
